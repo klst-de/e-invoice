@@ -10,7 +10,7 @@ The goal is not to build a validator for the xml invoice. For this use [EN-16931
 ## european standard EN16931-1:2017
 defines a semantic data model for a core invoice. This "€uro invoice" standard uses two xml syntax schemes alternatively
 
-- UN/CEFACT Cross Industry Invoice XML message, SCRDM—CII
+- [UN/CEFACT](https://www.unece.org/cefact.html) Cross Industry Invoice XML message, [SCRDM-CII(zip)](https://www.unece.org/fileadmin/DAM/cefact/xml_schemas/D16B_SCRDM__Subset__CII.zip)
 - [OASIS](https://en.wikipedia.org/wiki/OASIS_(organization)) UBL 2.1 for invoice and credit note, [ISO/IEC 19845:2015](https://en.wikipedia.org/wiki/Universal_Business_Language#UBL_2.1_(ISO/IEC_19845:2015)_and_UBL_2.2)
 
 ### What is a CIUS?
