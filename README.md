@@ -8,10 +8,10 @@ The goal is to have a jar, which can be used to create a valid xml invoice confo
 The goal is not to build a validator for the xml invoice. For this use [EN-16931 - Validation artefacts](https://github.com/CenPC434/validation) or [XRechnung validator](https://github.com/itplr-kosit/validator).
 
 ## european standard EN16931-1:2017
-defines a semantic data model for a core invoice. This "€uro invoice" standard uses two xml syntaxes alternatively
+defines a semantic data model for a core invoice. This "€uro invoice" standard uses two xml syntax schemes alternatively
 
-- UN/CEFACT Cross IndustryInvoice XML message gemäß XML Schemas 16B (SCRDM —CII)
-- OASIS UBL für Rechnungen und Gutschriften gemäß ISO/IEC 19845:2015
+- UN/CEFACT Cross Industry Invoice XML message, SCRDM—CII
+- OASIS UBL 2.1 for invoice and credit note, ISO/IEC 19845:2015
 
 ### What is a CIUS?
 The EN16931 data model contains many optional elements. Specific countries, groups, or organisations may create individual specifications for the core model in their respective domains (known as a ‘CIUS’).
