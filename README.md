@@ -9,3 +9,5 @@ The goal is not to build a validator for the xml invoice. For this use [EN-16931
 
 ### What is a CIUS?
 A “Core Invoice Usage Specification” (CIUS) is a specification that provides a seller with detailed guidance, explanations and examples, as well as rules (business rules) related to the actual implementation and use of structured information elements present in the core invoice model in a specific trading situation. An instance document created following a given CIUS shall always be compliant with the European Standard EN16931-1:2017. [[peppol.eu]](https://peppol.eu/core-invoice-usage-specification-cius-use-peppol/)
+
+- [xxx](https://ec.europa.eu/cefdigital/wiki/display/EINVCOMMUNITY/Community-driven+Registry+of+CIUS+(Core+Invoice+Usage+Specifications)+and+Extensions)
