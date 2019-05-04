@@ -14,7 +14,7 @@ A “Core Invoice Usage Specification” (CIUS) is a specification that provides
 - XRechnung is a german CIUSpecification for EN16931 [XRechnung(de)](http://www.xoev.de/de/xrechnung) and is part of [ZUGFeRD](https://de.wikipedia.org/wiki/ZUGFeRD)
 
 ### Two syntax bindings
-The "€uro invoice" standard use two xml syntaxes alternativly
+The "€uro invoice" standard use two xml syntaxes alternatively
 
 - UN/CEFACT Cross IndustryInvoice XML message gemäß XML Schemas 16B (SCRDM —CII)
 - OASIS UBL für Rechnungen und Gutschriften gemäß ISO/IEC 19845:2015
