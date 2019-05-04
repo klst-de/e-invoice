@@ -21,3 +21,11 @@ A “Core Invoice Usage Specification” (CIUS) is a specification that provides
 - [Registry of CIUS (Core Invoice Usage Specifications) and Extensions](https://ec.europa.eu/cefdigital/wiki/display/EINVCOMMUNITY/Community-driven+Registry+of+CIUS+(Core+Invoice+Usage+Specifications)+and+Extensions)
 - [XRechnung(de)](http://www.xoev.de/de/xrechnung) is a german specification (CIUS) for EN16931 and is part of [ZUGFeRD](https://de.wikipedia.org/wiki/ZUGFeRD)
 - the french counterpart is called [Factur-X(en)](http://fnfe-mpe.org/factur-x/factur-x_en/)
+
+Example:
+´´´java
+		Invoice ublInvoice = new CommercialInvoice(XRECHNUNG_12);
+		ublInvoice.setId("123456XX");
+		ublInvoice.setIssueDate("2016-04-04");
+		ublInvoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
+´´´
