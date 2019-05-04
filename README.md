@@ -11,7 +11,7 @@ The goal is not to build a validator for the xml invoice. For this use [EN-16931
 A “Core Invoice Usage Specification” (CIUS) is a specification that provides a seller with detailed guidance, explanations and examples, as well as rules (business rules) related to the actual implementation and use of structured information elements present in the core invoice model in a specific trading situation. An instance document created following a given CIUS shall always be compliant with the European Standard EN16931-1:2017. [[peppol.eu]](https://peppol.eu/core-invoice-usage-specification-cius-use-peppol/)
 
 - [Registry of CIUS (Core Invoice Usage Specifications) and Extensions](https://ec.europa.eu/cefdigital/wiki/display/EINVCOMMUNITY/Community-driven+Registry+of+CIUS+(Core+Invoice+Usage+Specifications)+and+Extensions)
-- XRechnung is a german CIUSpecifications for EN16931 [XRechnung(de)](http://www.xoev.de/de/xrechnung)
+- XRechnung is a german CIUSpecification for EN16931 [XRechnung(de)](http://www.xoev.de/de/xrechnung) and is part of [ZUGFeRD](https://de.wikipedia.org/wiki/ZUGFeRD)
 
 ### Two syntax bindings
 The "€uro invoice" standard use two xml syntaxes alternativly
