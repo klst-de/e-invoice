@@ -1,4 +1,4 @@
-# e-invoice
+# €-invoice
 
 - "e-" as [electronic invoice](https://en.wikipedia.org/wiki/Electronic_invoicing)
 - "e-" as "€uro invoice" conforming to european CIUS “Core Invoice Usage Specification” 
