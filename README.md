@@ -22,7 +22,7 @@ A “Core Invoice Usage Specification” (CIUS) is a specification that provides
 - [XRechnung(de)](http://www.xoev.de/de/xrechnung) is a german specification (CIUS) for EN16931 and is part of [ZUGFeRD](https://de.wikipedia.org/wiki/ZUGFeRD)
 - the french counterpart is called [Factur-X(en)](http://fnfe-mpe.org/factur-x/factur-x_en/)
 
-Example: this creates a valid [ubl invoice](https://github.com/itplr-kosit/xrechnung-testsuite/blob/master/instances/01.01a-INVOICE_ubl.xml)
+Example: this creates a valid ubl invoice [see (xrechnung-testsuite)](https://github.com/itplr-kosit/xrechnung-testsuite/blob/master/instances/01.01a-INVOICE_ubl.xml)
 ```java
   Invoice ublInvoice = new CommercialInvoice(XRECHNUNG_12);
   ublInvoice.setId("123456XX");
@@ -32,13 +32,13 @@ Example: this creates a valid [ubl invoice](https://github.com/itplr-kosit/xrech
   ublInvoice.setOrderReference("1234567890"); // optional
   ublInvoice.setBuyerReference("04011000-12345-34");
 ...
-ublInvoice.addInvoiceLine(ublInvoice.makeInvoiceLine("1"     // invoice line number
-				, new Quantity("XPP", new BigDecimal(1))
-				, new Amount(EUR, new BigDecimal("288.79"))          // lineNetAmount
-				, new UnitPriceAmount(EUR, new BigDecimal("288.79")) // priceAmt
-				, "Zeitschrift [...]"                                // itemName
-				, TaxCategoryCode.StandardRate, new BigDecimal(7)    // TaxCategoryCode, rate 7%
-				));
+  ublInvoice.addInvoiceLine(ublInvoice.makeInvoiceLine("1" // invoice line number
+    , new Quantity("XPP", new BigDecimal(1))
+    , new Amount(EUR, new BigDecimal("288.79"))            // lineNetAmount
+    , new UnitPriceAmount(EUR, new BigDecimal("288.79"))   // priceAmt
+    , "Zeitschrift [...]"                                  // itemName
+    , TaxCategoryCode.StandardRate, new BigDecimal(7)      // TaxCategoryCode, rate 7%
+    ));
 ...
   transformer.toXML(ublInvoice);
 ```
