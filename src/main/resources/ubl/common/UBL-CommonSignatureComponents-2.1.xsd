@@ -1,29 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Library:           OASIS Universal Business Language (UBL) 2.1 OS
-                     http://docs.oasis-open.org/ubl/os-UBL-2.1/
-  Release Date:      04 November 2013
-  Module:            xsdrt/common/UBL-CommonSignatureComponents-2.1.xsd
-  Generated on:      2013-10-31 17:18z
-  Copyright (c) OASIS Open 2013. All Rights Reserved.
--->
-<xsd:schema xmlns="urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2"
-            xmlns:sac="urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2"
+  ~ Licensed to the Koordinierungsstelle für IT-Standards (KoSIT) under
+  ~ one or more contributor license agreements. See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  KoSIT licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License. You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied. See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<xsd:schema xmlns:sac="urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2"
             targetNamespace="urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified"
             version="2.1">
-   <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2"
-               schemaLocation="UBL-SignatureAggregateComponents-2.1.xsd"/>
-   <xsd:element name="UBLDocumentSignatures" type="UBLDocumentSignaturesType"/>
-   <xsd:complexType name="UBLDocumentSignaturesType">
-      <xsd:sequence>
-         <xsd:element ref="sac:SignatureInformation" minOccurs="1" maxOccurs="unbounded"/>
-      </xsd:sequence>
-   </xsd:complexType>
+    <xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2"
+                schemaLocation="UBL-SignatureAggregateComponents-2.1.xsd"/>
+    <xsd:element name="UBLDocumentSignatures" type="UBLDocumentSignaturesType"/>
+    <xsd:complexType name="UBLDocumentSignaturesType">
+        <xsd:sequence>
+            <xsd:element ref="sac:SignatureInformation" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
 </xsd:schema>
-<!-- ===== Copyright Notice ===== --><!--
+        <!-- ===== Copyright Notice ===== --><!--
   OASIS takes no position regarding the validity or scope of any 
   intellectual property or other rights that might be claimed to pertain 
   to the implementation or use of the technology described in this 
