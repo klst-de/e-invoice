@@ -2,15 +2,25 @@ package com.klst.marshaller;
 
 import java.io.InputStream;
 
+import javax.inject.Named;
+
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
 
+@Named
+@javax.inject.Singleton
 public class UblCreditNoteTransformer extends UblTransformer {
 
-	public static final String UBL_CREDITNOTE_XSD_21 = "/ubl/maindoc/UBL-CreditNote-2.1.xsd";
-	private static final String CREDITNOTE_CONTENT_PATH = "oasis.names.specification.ubl.schema.xsd.creditnote_2";
+	public static AbstactTransformer SINGLETON = new UblCreditNoteTransformer();
+
+	public static AbstactTransformer getInstance() {
+		return SINGLETON;
+	}
 	
-	public UblCreditNoteTransformer() {
-		super(CREDITNOTE_CONTENT_PATH);
+	private static final String UBL_CREDITNOTE_XSD_21 = "/ubl/maindoc/UBL-CreditNote-2.1.xsd";
+	private static final String CONTENT_PATH = "oasis.names.specification.ubl.schema.xsd.creditnote_2";
+	
+	private UblCreditNoteTransformer() {
+		super(CONTENT_PATH, SINGLETON);
 	}
 	
 	@Override

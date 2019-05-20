@@ -4,14 +4,19 @@ import static javax.xml.bind.JAXBContext.newInstance;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.logging.Logger;
 
 import javax.inject.Named;
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
@@ -29,28 +34,39 @@ import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 @javax.inject.Singleton
 public abstract class AbstactTransformer {
 
-	public static AbstactTransformer SINGLETON = null;
-
-	public static AbstactTransformer getInstance() {
-		return SINGLETON;
-	}
+	private static final Logger LOG = Logger.getLogger(AbstactTransformer.class.getName());
+	
+//	public static AbstactTransformer SINGLETON = null;
+//
+//	public static AbstactTransformer getInstance() {
+//		return SINGLETON;
+//	}
 
 	final JAXBContext jaxbContext;
 	
+	private AbstactTransformer() {
+		this.jaxbContext = null;
+	}
 	// ctor
-	protected AbstactTransformer(String contentPath) {
-		try {
+	protected AbstactTransformer(String contentPath, AbstactTransformer instance) {
+		LOG.info("ctor "+contentPath + " SINGLETON:"+instance);
+		if(instance==null) try {
 			this.jaxbContext = newInstance(contentPath);
+			LOG.info("jaxbContext "); //+((Object)jaxbContext).toString());
+			instance = this;
 		} catch (JAXBException ex) {
 			throw new TransformationException(TransformationException.JAXB_INSTANTIATE_ERROR, ex);
+		} else {
+			this.jaxbContext = instance.jaxbContext;
 		}
+		LOG.info("ctor >>>>>>>>>>>>>>>>>>"+instance.toString());
 	}
 
 	public Validator getSchemaValidator() throws SAXException {
 		return getSchemaValidator(getResource());
 	}
 	
-	abstract <T> T toModel(InputStream xmlInputStream);
+	public abstract <T> T toModel(InputStream xmlInputStream);
 	
 	<T extends Object> T toModel(InputStream xmlInputStream, Class<T> declaredType) {
 		try {
@@ -74,7 +90,14 @@ public abstract class AbstactTransformer {
 
 	abstract String getResource();
 	
-	abstract Validator getSchemaValidator(String resource) throws SAXException;
+	Validator getSchemaValidator(String resource) throws SAXException {
+		LOG.info("resource:"+resource);
+		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		URL schemaURL = this.getClass().getResource(resource);
+		LOG.info("schemaURL:"+schemaURL);
+		Schema schema = sf.newSchema(schemaURL);
+		return schema.newValidator();
+	}
 
 	abstract NamespacePrefixMapper getNamespacePrefixMapper();
 	

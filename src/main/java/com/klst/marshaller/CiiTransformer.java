@@ -20,11 +20,17 @@ import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryIn
 @Singleton
 public class CiiTransformer extends AbstactTransformer {
 
+	public static AbstactTransformer SINGLETON = new CiiTransformer();
+
+	public static AbstactTransformer getInstance() {
+		return SINGLETON;
+	}
+	
 	private static final String CI_INVOICE_100 = "/cii/maindoc/CrossIndustryInvoice_100pD16B.xsd";
 	private static final String CONTENT_PATH = "un.unece.uncefact.data.standard.crossindustryinvoice._100";
 	
-	public CiiTransformer() {
-		super(CONTENT_PATH);
+	private CiiTransformer() {
+		super(CONTENT_PATH, SINGLETON);
 	}
 	
 	@Override

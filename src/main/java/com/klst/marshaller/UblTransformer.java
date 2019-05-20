@@ -18,8 +18,8 @@ import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 @Singleton
 public class UblTransformer extends AbstactTransformer {
 
-	protected UblTransformer(String contentPath) {
-		super(contentPath);
+	protected UblTransformer(String contentPath, AbstactTransformer instance) {
+		super(contentPath, instance);
 	}
 	
 	@Override
@@ -27,13 +27,13 @@ public class UblTransformer extends AbstactTransformer {
 		return null;
 	}
 
-	@Override // implements abstract
-	Validator getSchemaValidator(String resource) throws SAXException {
-		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		URL schemaURL = UblTransformer.class.getResource(resource);
-		Schema schema = sf.newSchema(schemaURL);
-		return schema.newValidator();
-	}
+//	@Override // implements abstract
+//	Validator getSchemaValidator(String resource) throws SAXException {
+//		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+//		URL schemaURL = this.getClass().getResource(resource);
+//		Schema schema = sf.newSchema(schemaURL);
+//		return schema.newValidator();
+//	}
 
 	@Override
 	public <T> T toModel(InputStream xmlInputStream) {
