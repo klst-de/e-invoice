@@ -1,16 +1,9 @@
 package com.klst.marshaller;
 
 import java.io.InputStream;
-import java.net.URL;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.XMLConstants;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
-
-import org.xml.sax.SAXException;
 
 import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 
@@ -36,14 +29,6 @@ public class CiiTransformer extends AbstactTransformer {
 	@Override
 	String getResource() {
 		return CI_INVOICE_100;
-	}
-
-	@Override // implements abstract
-	Validator getSchemaValidator(String resource) throws SAXException {
-		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		URL schemaURL = CiiTransformer.class.getResource(resource);
-		Schema schema = sf.newSchema(schemaURL);
-		return schema.newValidator();
 	}
 
 	@Override

@@ -1,13 +1,9 @@
 package com.klst.marshaller;
 
-import static javax.xml.bind.JAXBContext.newInstance;
-
 import java.io.InputStream;
-import java.util.logging.Logger;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.bind.JAXBException;
 
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 

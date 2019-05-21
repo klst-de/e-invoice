@@ -36,30 +36,27 @@ public abstract class AbstactTransformer {
 
 	private static final Logger LOG = Logger.getLogger(AbstactTransformer.class.getName());
 	
-//	public static AbstactTransformer SINGLETON = null;
-//
-//	public static AbstactTransformer getInstance() {
-//		return SINGLETON;
-//	}
-
 	final JAXBContext jaxbContext;
 	
+	// this is a SINGLETON! Use getInstance() in subclasses
+	@SuppressWarnings("unused")
 	private AbstactTransformer() {
 		this.jaxbContext = null;
 	}
+	
 	// ctor
 	protected AbstactTransformer(String contentPath, AbstactTransformer instance) {
-		LOG.info("ctor "+contentPath + " SINGLETON:"+instance);
+		LOG.fine("ctor "+contentPath + " SINGLETON:"+instance);
 		if(instance==null) try {
 			this.jaxbContext = newInstance(contentPath);
-			LOG.info("jaxbContext "); //+((Object)jaxbContext).toString());
+			LOG.finer(jaxbContext.toString());
 			instance = this;
 		} catch (JAXBException ex) {
 			throw new TransformationException(TransformationException.JAXB_INSTANTIATE_ERROR, ex);
 		} else {
 			this.jaxbContext = instance.jaxbContext;
 		}
-		LOG.info("ctor >>>>>>>>>>>>>>>>>>"+instance.toString());
+		LOG.fine("ctor >>>>>>>>>>>>>>>>>>"+instance.toString());
 	}
 
 	public Validator getSchemaValidator() throws SAXException {
@@ -91,10 +88,10 @@ public abstract class AbstactTransformer {
 	abstract String getResource();
 	
 	Validator getSchemaValidator(String resource) throws SAXException {
-		LOG.info("resource:"+resource);
-		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		LOG.fine("resource:"+resource + "Class:"+this.getClass());
 		URL schemaURL = this.getClass().getResource(resource);
-		LOG.info("schemaURL:"+schemaURL);
+		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		LOG.fine("schemaURL:"+schemaURL);
 		Schema schema = sf.newSchema(schemaURL);
 		return schema.newValidator();
 	}
