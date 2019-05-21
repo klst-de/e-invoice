@@ -37,7 +37,15 @@ public class VatCategory extends TaxCategoryType {
 	 * at each stage in the production/distribution cycle.
 	 */
 	public static final String VAT = "VAT";
-	
+
+	static TaxSchemeType getVatScheme() {
+		TaxSchemeType taxScheme = new TaxSchemeType();
+		IDType taxSchemeID = new IDType();
+		taxSchemeID.setValue(VAT); // const
+		taxScheme.setID(taxSchemeID);
+		return taxScheme;
+	}
+
 	public VatCategory() {
 		super();
 	}
@@ -58,10 +66,7 @@ public class VatCategory extends TaxCategoryType {
 		PercentType percentType = new PercentType();
 		percentType.setValue(taxRate);
 			
-		TaxSchemeType taxScheme = new TaxSchemeType();
-		IDType taxSchemeID = new IDType();
-		taxSchemeID.setValue(VAT); // const
-		taxScheme.setID(taxSchemeID);
+		TaxSchemeType taxScheme = getVatScheme();
 		
 		TaxCategoryType taxCategory = new TaxCategoryType();
 		taxCategory.setTaxScheme(taxScheme);
