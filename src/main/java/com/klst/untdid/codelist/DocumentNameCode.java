@@ -31,6 +31,9 @@ public enum DocumentNameCode {
 	SelfbilledInvoice		(389),
 	CreditNote 				(381);
 	
+	/**
+	 * @see <A HREF="http://www.unece.org/trade/untdid/d13b/tred/tred1001.htm">UN/EDIFACT 1001</A>
+	 */
 	public static final String SCHEME_ID  = "UN/EDIFACT 1001";
 
 	DocumentNameCode(int value) {
