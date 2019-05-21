@@ -70,6 +70,9 @@ public enum PaymentMeansCode {
 	SEPADirectDebit 	(59),
 	ClearingBetweenPartners (97);
 	
+	/**
+	 * @see <A HREF="http://www.unece.org/trade/untdid/d13b/tred/tred4461.htm">UN/EDIFACT 4461</A>
+	 */
 	public static final String SCHEME_ID  = "UN/EDIFACT 4461";
 
 	PaymentMeansCode(int value) {

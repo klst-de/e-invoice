@@ -75,7 +75,7 @@ public enum TaxCategoryCode {
 	CeutaMelillaTax 	("M");
 	
 	/**
-	 * @see http://www.unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tredi2.htm
+	 * @see <A HREF="http://www.unece.org/trade/untdid/d13b/tred/tred5305.htm">UN/EDIFACT 5305</A>
 	 */
 	public static final String SCHEME_ID  = "UN/EDIFACT 5305";
 	
