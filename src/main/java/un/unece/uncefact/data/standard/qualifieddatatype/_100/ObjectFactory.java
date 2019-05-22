@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -45,83 +45,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link TimeReferenceCodeType }
+     * Create an instance of {@link AccountingAccountTypeCodeType }
      * 
      */
-    public TimeReferenceCodeType createTimeReferenceCodeType() {
-        return new TimeReferenceCodeType();
-    }
-
-    /**
-     * Create an instance of {@link ReferenceCodeType }
-     * 
-     */
-    public ReferenceCodeType createReferenceCodeType() {
-        return new ReferenceCodeType();
-    }
-
-    /**
-     * Create an instance of {@link PackagingMarkingCodeType }
-     * 
-     */
-    public PackagingMarkingCodeType createPackagingMarkingCodeType() {
-        return new PackagingMarkingCodeType();
-    }
-
-    /**
-     * Create an instance of {@link GoodsTypeExtensionCodeType }
-     * 
-     */
-    public GoodsTypeExtensionCodeType createGoodsTypeExtensionCodeType() {
-        return new GoodsTypeExtensionCodeType();
-    }
-
-    /**
-     * Create an instance of {@link FreightChargeTariffClassCodeType }
-     * 
-     */
-    public FreightChargeTariffClassCodeType createFreightChargeTariffClassCodeType() {
-        return new FreightChargeTariffClassCodeType();
-    }
-
-    /**
-     * Create an instance of {@link CargoCommodityCategoryCodeType }
-     * 
-     */
-    public CargoCommodityCategoryCodeType createCargoCommodityCategoryCodeType() {
-        return new CargoCommodityCategoryCodeType();
-    }
-
-    /**
-     * Create an instance of {@link ChargePayingPartyRoleCodeType }
-     * 
-     */
-    public ChargePayingPartyRoleCodeType createChargePayingPartyRoleCodeType() {
-        return new ChargePayingPartyRoleCodeType();
-    }
-
-    /**
-     * Create an instance of {@link CountryIDType }
-     * 
-     */
-    public CountryIDType createCountryIDType() {
-        return new CountryIDType();
-    }
-
-    /**
-     * Create an instance of {@link DeliveryTermsCodeType }
-     * 
-     */
-    public DeliveryTermsCodeType createDeliveryTermsCodeType() {
-        return new DeliveryTermsCodeType();
-    }
-
-    /**
-     * Create an instance of {@link LinearUnitMeasureType }
-     * 
-     */
-    public LinearUnitMeasureType createLinearUnitMeasureType() {
-        return new LinearUnitMeasureType();
+    public AccountingAccountTypeCodeType createAccountingAccountTypeCodeType() {
+        return new AccountingAccountTypeCodeType();
     }
 
     /**
@@ -130,6 +58,30 @@ public class ObjectFactory {
      */
     public AccountingAmountTypeCodeType createAccountingAmountTypeCodeType() {
         return new AccountingAmountTypeCodeType();
+    }
+
+    /**
+     * Create an instance of {@link AccountingDocumentCodeType }
+     * 
+     */
+    public AccountingDocumentCodeType createAccountingDocumentCodeType() {
+        return new AccountingDocumentCodeType();
+    }
+
+    /**
+     * Create an instance of {@link AdjustmentReasonCodeType }
+     * 
+     */
+    public AdjustmentReasonCodeType createAdjustmentReasonCodeType() {
+        return new AdjustmentReasonCodeType();
+    }
+
+    /**
+     * Create an instance of {@link AllowanceChargeIdentificationCodeType }
+     * 
+     */
+    public AllowanceChargeIdentificationCodeType createAllowanceChargeIdentificationCodeType() {
+        return new AllowanceChargeIdentificationCodeType();
     }
 
     /**
@@ -149,54 +101,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link TransportEquipmentFullnessCodeType }
-     * 
-     */
-    public TransportEquipmentFullnessCodeType createTransportEquipmentFullnessCodeType() {
-        return new TransportEquipmentFullnessCodeType();
-    }
-
-    /**
-     * Create an instance of {@link PaymentMeansChannelCodeType }
-     * 
-     */
-    public PaymentMeansChannelCodeType createPaymentMeansChannelCodeType() {
-        return new PaymentMeansChannelCodeType();
-    }
-
-    /**
-     * Create an instance of {@link DocumentCodeType }
-     * 
-     */
-    public DocumentCodeType createDocumentCodeType() {
-        return new DocumentCodeType();
-    }
-
-    /**
-     * Create an instance of {@link AccountingAccountTypeCodeType }
-     * 
-     */
-    public AccountingAccountTypeCodeType createAccountingAccountTypeCodeType() {
-        return new AccountingAccountTypeCodeType();
-    }
-
-    /**
-     * Create an instance of {@link CommunicationChannelCodeType }
-     * 
-     */
-    public CommunicationChannelCodeType createCommunicationChannelCodeType() {
-        return new CommunicationChannelCodeType();
-    }
-
-    /**
-     * Create an instance of {@link DimensionTypeCodeType }
-     * 
-     */
-    public DimensionTypeCodeType createDimensionTypeCodeType() {
-        return new DimensionTypeCodeType();
-    }
-
-    /**
      * Create an instance of {@link CargoCategoryCodeType }
      * 
      */
@@ -205,59 +109,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link TransportEquipmentCategoryCodeType }
+     * Create an instance of {@link CargoCommodityCategoryCodeType }
      * 
      */
-    public TransportEquipmentCategoryCodeType createTransportEquipmentCategoryCodeType() {
-        return new TransportEquipmentCategoryCodeType();
-    }
-
-    /**
-     * Create an instance of {@link VolumeUnitMeasureType }
-     * 
-     */
-    public VolumeUnitMeasureType createVolumeUnitMeasureType() {
-        return new VolumeUnitMeasureType();
-    }
-
-    /**
-     * Create an instance of {@link AdjustmentReasonCodeType }
-     * 
-     */
-    public AdjustmentReasonCodeType createAdjustmentReasonCodeType() {
-        return new AdjustmentReasonCodeType();
-    }
-
-    /**
-     * Create an instance of {@link TaxTypeCodeType }
-     * 
-     */
-    public TaxTypeCodeType createTaxTypeCodeType() {
-        return new TaxTypeCodeType();
-    }
-
-    /**
-     * Create an instance of {@link TransportMovementStageCodeType }
-     * 
-     */
-    public TransportMovementStageCodeType createTransportMovementStageCodeType() {
-        return new TransportMovementStageCodeType();
-    }
-
-    /**
-     * Create an instance of {@link PaymentGuaranteeMeansCodeType }
-     * 
-     */
-    public PaymentGuaranteeMeansCodeType createPaymentGuaranteeMeansCodeType() {
-        return new PaymentGuaranteeMeansCodeType();
-    }
-
-    /**
-     * Create an instance of {@link TransportModeCodeType }
-     * 
-     */
-    public TransportModeCodeType createTransportModeCodeType() {
-        return new TransportModeCodeType();
+    public CargoCommodityCategoryCodeType createCargoCommodityCategoryCodeType() {
+        return new CargoCommodityCategoryCodeType();
     }
 
     /**
@@ -269,35 +125,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PackageTypeCodeType }
+     * Create an instance of {@link ChargePayingPartyRoleCodeType }
      * 
      */
-    public PackageTypeCodeType createPackageTypeCodeType() {
-        return new PackageTypeCodeType();
+    public ChargePayingPartyRoleCodeType createChargePayingPartyRoleCodeType() {
+        return new ChargePayingPartyRoleCodeType();
     }
 
     /**
-     * Create an instance of {@link TaxCategoryCodeType }
+     * Create an instance of {@link CommunicationChannelCodeType }
      * 
      */
-    public TaxCategoryCodeType createTaxCategoryCodeType() {
-        return new TaxCategoryCodeType();
-    }
-
-    /**
-     * Create an instance of {@link FreightChargeTypeIDType }
-     * 
-     */
-    public FreightChargeTypeIDType createFreightChargeTypeIDType() {
-        return new FreightChargeTypeIDType();
-    }
-
-    /**
-     * Create an instance of {@link PaymentTermsIDType }
-     * 
-     */
-    public PaymentTermsIDType createPaymentTermsIDType() {
-        return new PaymentTermsIDType();
+    public CommunicationChannelCodeType createCommunicationChannelCodeType() {
+        return new CommunicationChannelCodeType();
     }
 
     /**
@@ -309,51 +149,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PaymentMeansCodeType }
+     * Create an instance of {@link CountryIDType }
      * 
      */
-    public PaymentMeansCodeType createPaymentMeansCodeType() {
-        return new PaymentMeansCodeType();
-    }
-
-    /**
-     * Create an instance of {@link TransportEquipmentSizeTypeCodeType }
-     * 
-     */
-    public TransportEquipmentSizeTypeCodeType createTransportEquipmentSizeTypeCodeType() {
-        return new TransportEquipmentSizeTypeCodeType();
-    }
-
-    /**
-     * Create an instance of {@link PaymentTermsTypeCodeType }
-     * 
-     */
-    public PaymentTermsTypeCodeType createPaymentTermsTypeCodeType() {
-        return new PaymentTermsTypeCodeType();
-    }
-
-    /**
-     * Create an instance of {@link AllowanceChargeIdentificationCodeType }
-     * 
-     */
-    public AllowanceChargeIdentificationCodeType createAllowanceChargeIdentificationCodeType() {
-        return new AllowanceChargeIdentificationCodeType();
-    }
-
-    /**
-     * Create an instance of {@link PaymentTermsEventTimeReferenceCodeType }
-     * 
-     */
-    public PaymentTermsEventTimeReferenceCodeType createPaymentTermsEventTimeReferenceCodeType() {
-        return new PaymentTermsEventTimeReferenceCodeType();
-    }
-
-    /**
-     * Create an instance of {@link PriceTypeCodeType }
-     * 
-     */
-    public PriceTypeCodeType createPriceTypeCodeType() {
-        return new PriceTypeCodeType();
+    public CountryIDType createCountryIDType() {
+        return new CountryIDType();
     }
 
     /**
@@ -365,11 +165,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link LineStatusCodeType }
+     * Create an instance of {@link DeliveryTermsCodeType }
      * 
      */
-    public LineStatusCodeType createLineStatusCodeType() {
-        return new LineStatusCodeType();
+    public DeliveryTermsCodeType createDeliveryTermsCodeType() {
+        return new DeliveryTermsCodeType();
+    }
+
+    /**
+     * Create an instance of {@link DimensionTypeCodeType }
+     * 
+     */
+    public DimensionTypeCodeType createDimensionTypeCodeType() {
+        return new DimensionTypeCodeType();
+    }
+
+    /**
+     * Create an instance of {@link DocumentCodeType }
+     * 
+     */
+    public DocumentCodeType createDocumentCodeType() {
+        return new DocumentCodeType();
     }
 
     /**
@@ -381,19 +197,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PartyRoleCodeType }
+     * Create an instance of {@link FreightChargeTariffClassCodeType }
      * 
      */
-    public PartyRoleCodeType createPartyRoleCodeType() {
-        return new PartyRoleCodeType();
+    public FreightChargeTariffClassCodeType createFreightChargeTariffClassCodeType() {
+        return new FreightChargeTariffClassCodeType();
     }
 
     /**
-     * Create an instance of {@link WeightUnitMeasureType }
+     * Create an instance of {@link FreightChargeTypeIDType }
      * 
      */
-    public WeightUnitMeasureType createWeightUnitMeasureType() {
-        return new WeightUnitMeasureType();
+    public FreightChargeTypeIDType createFreightChargeTypeIDType() {
+        return new FreightChargeTypeIDType();
     }
 
     /**
@@ -405,19 +221,35 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link GoodsTypeExtensionCodeType }
+     * 
+     */
+    public GoodsTypeExtensionCodeType createGoodsTypeExtensionCodeType() {
+        return new GoodsTypeExtensionCodeType();
+    }
+
+    /**
+     * Create an instance of {@link LinearUnitMeasureType }
+     * 
+     */
+    public LinearUnitMeasureType createLinearUnitMeasureType() {
+        return new LinearUnitMeasureType();
+    }
+
+    /**
+     * Create an instance of {@link LineStatusCodeType }
+     * 
+     */
+    public LineStatusCodeType createLineStatusCodeType() {
+        return new LineStatusCodeType();
+    }
+
+    /**
      * Create an instance of {@link LogisticsChargeCalculationBasisCodeType }
      * 
      */
     public LogisticsChargeCalculationBasisCodeType createLogisticsChargeCalculationBasisCodeType() {
         return new LogisticsChargeCalculationBasisCodeType();
-    }
-
-    /**
-     * Create an instance of {@link TransportMeansTypeCodeType }
-     * 
-     */
-    public TransportMeansTypeCodeType createTransportMeansTypeCodeType() {
-        return new TransportMeansTypeCodeType();
     }
 
     /**
@@ -429,11 +261,179 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link AccountingDocumentCodeType }
+     * Create an instance of {@link PackageTypeCodeType }
      * 
      */
-    public AccountingDocumentCodeType createAccountingDocumentCodeType() {
-        return new AccountingDocumentCodeType();
+    public PackageTypeCodeType createPackageTypeCodeType() {
+        return new PackageTypeCodeType();
+    }
+
+    /**
+     * Create an instance of {@link PackagingMarkingCodeType }
+     * 
+     */
+    public PackagingMarkingCodeType createPackagingMarkingCodeType() {
+        return new PackagingMarkingCodeType();
+    }
+
+    /**
+     * Create an instance of {@link PartyRoleCodeType }
+     * 
+     */
+    public PartyRoleCodeType createPartyRoleCodeType() {
+        return new PartyRoleCodeType();
+    }
+
+    /**
+     * Create an instance of {@link PaymentGuaranteeMeansCodeType }
+     * 
+     */
+    public PaymentGuaranteeMeansCodeType createPaymentGuaranteeMeansCodeType() {
+        return new PaymentGuaranteeMeansCodeType();
+    }
+
+    /**
+     * Create an instance of {@link PaymentMeansChannelCodeType }
+     * 
+     */
+    public PaymentMeansChannelCodeType createPaymentMeansChannelCodeType() {
+        return new PaymentMeansChannelCodeType();
+    }
+
+    /**
+     * Create an instance of {@link PaymentMeansCodeType }
+     * 
+     */
+    public PaymentMeansCodeType createPaymentMeansCodeType() {
+        return new PaymentMeansCodeType();
+    }
+
+    /**
+     * Create an instance of {@link PaymentTermsEventTimeReferenceCodeType }
+     * 
+     */
+    public PaymentTermsEventTimeReferenceCodeType createPaymentTermsEventTimeReferenceCodeType() {
+        return new PaymentTermsEventTimeReferenceCodeType();
+    }
+
+    /**
+     * Create an instance of {@link PaymentTermsIDType }
+     * 
+     */
+    public PaymentTermsIDType createPaymentTermsIDType() {
+        return new PaymentTermsIDType();
+    }
+
+    /**
+     * Create an instance of {@link PaymentTermsTypeCodeType }
+     * 
+     */
+    public PaymentTermsTypeCodeType createPaymentTermsTypeCodeType() {
+        return new PaymentTermsTypeCodeType();
+    }
+
+    /**
+     * Create an instance of {@link PriceTypeCodeType }
+     * 
+     */
+    public PriceTypeCodeType createPriceTypeCodeType() {
+        return new PriceTypeCodeType();
+    }
+
+    /**
+     * Create an instance of {@link ReferenceCodeType }
+     * 
+     */
+    public ReferenceCodeType createReferenceCodeType() {
+        return new ReferenceCodeType();
+    }
+
+    /**
+     * Create an instance of {@link TaxCategoryCodeType }
+     * 
+     */
+    public TaxCategoryCodeType createTaxCategoryCodeType() {
+        return new TaxCategoryCodeType();
+    }
+
+    /**
+     * Create an instance of {@link TaxTypeCodeType }
+     * 
+     */
+    public TaxTypeCodeType createTaxTypeCodeType() {
+        return new TaxTypeCodeType();
+    }
+
+    /**
+     * Create an instance of {@link TimeReferenceCodeType }
+     * 
+     */
+    public TimeReferenceCodeType createTimeReferenceCodeType() {
+        return new TimeReferenceCodeType();
+    }
+
+    /**
+     * Create an instance of {@link TransportEquipmentCategoryCodeType }
+     * 
+     */
+    public TransportEquipmentCategoryCodeType createTransportEquipmentCategoryCodeType() {
+        return new TransportEquipmentCategoryCodeType();
+    }
+
+    /**
+     * Create an instance of {@link TransportEquipmentFullnessCodeType }
+     * 
+     */
+    public TransportEquipmentFullnessCodeType createTransportEquipmentFullnessCodeType() {
+        return new TransportEquipmentFullnessCodeType();
+    }
+
+    /**
+     * Create an instance of {@link TransportEquipmentSizeTypeCodeType }
+     * 
+     */
+    public TransportEquipmentSizeTypeCodeType createTransportEquipmentSizeTypeCodeType() {
+        return new TransportEquipmentSizeTypeCodeType();
+    }
+
+    /**
+     * Create an instance of {@link TransportMeansTypeCodeType }
+     * 
+     */
+    public TransportMeansTypeCodeType createTransportMeansTypeCodeType() {
+        return new TransportMeansTypeCodeType();
+    }
+
+    /**
+     * Create an instance of {@link TransportModeCodeType }
+     * 
+     */
+    public TransportModeCodeType createTransportModeCodeType() {
+        return new TransportModeCodeType();
+    }
+
+    /**
+     * Create an instance of {@link TransportMovementStageCodeType }
+     * 
+     */
+    public TransportMovementStageCodeType createTransportMovementStageCodeType() {
+        return new TransportMovementStageCodeType();
+    }
+
+    /**
+     * Create an instance of {@link VolumeUnitMeasureType }
+     * 
+     */
+    public VolumeUnitMeasureType createVolumeUnitMeasureType() {
+        return new VolumeUnitMeasureType();
+    }
+
+    /**
+     * Create an instance of {@link WeightUnitMeasureType }
+     * 
+     */
+    public WeightUnitMeasureType createWeightUnitMeasureType() {
+        return new WeightUnitMeasureType();
     }
 
     /**

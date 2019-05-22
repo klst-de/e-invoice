@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -99,8 +99,8 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.VariantC
  * 
  *                 
  * <pre>
- * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:Definition xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;A list of two mutually exclusive Boolean values that express the only possible states
- *                     of a property.
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:Definition xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;A list of two mutually exclusive Boolean values that express the only possible states&#13;
+ *                     of a property.&#13;
  *                 &lt;/ccts:Definition&gt;
  * </pre>
  * 
@@ -121,12 +121,12 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.VariantC
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="IndicatorType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>boolean">
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;complexType name="IndicatorType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;boolean"&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -136,66 +136,66 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.VariantC
     "value"
 })
 @XmlSeeAlso({
-    MarkAttentionIndicatorType.class,
+    AcceptedIndicatorType.class,
+    AdValoremIndicatorType.class,
     AnimalFoodApprovedIndicatorType.class,
-    LegalStatusIndicatorType.class,
-    RefrigerationOnIndicatorType.class,
-    RequiredCurriculaIndicatorType.class,
-    VariantConstraintIndicatorType.class,
+    AnimalFoodIndicatorType.class,
+    AuctionConstraintIndicatorType.class,
+    BackOrderAllowedIndicatorType.class,
+    BalanceBroughtForwardIndicatorType.class,
+    BasedOnConsensusIndicatorType.class,
+    BindingOnBuyerIndicatorType.class,
+    BulkCargoIndicatorType.class,
+    CandidateReductionConstraintIndicatorType.class,
+    CatalogueIndicatorType.class,
+    ChargeIndicatorType.class,
+    CompletionIndicatorType.class,
+    ConsolidatableIndicatorType.class,
+    ContainerizedIndicatorType.class,
+    CopyIndicatorType.class,
+    CustomsImportClassifiedIndicatorType.class,
+    DangerousGoodsApprovedIndicatorType.class,
+    FollowupContractIndicatorType.class,
+    FreeOfChargeIndicatorType.class,
+    FrozenDocumentIndicatorType.class,
+    FullyPaidSharesIndicatorType.class,
+    GeneralCargoIndicatorType.class,
+    GovernmentAgreementConstraintIndicatorType.class,
+    HazardousRiskIndicatorType.class,
+    HumanFoodApprovedIndicatorType.class,
+    HumanFoodIndicatorType.class,
     IndicationIndicatorType.class,
-    ToOrderIndicatorType.class,
+    ItemUpdateRequestIndicatorType.class,
+    LegalStatusIndicatorType.class,
+    LivestockIndicatorType.class,
+    MarkAttentionIndicatorType.class,
+    MarkCareIndicatorType.class,
+    OnCarriageIndicatorType.class,
+    OptionalLineItemIndicatorType.class,
+    OrderableIndicatorType.class,
+    OtherConditionsIndicatorType.class,
     PartialDeliveryIndicatorType.class,
     PowerIndicatorType.class,
-    BalanceBroughtForwardIndicatorType.class,
-    BindingOnBuyerIndicatorType.class,
-    AuctionConstraintIndicatorType.class,
-    CandidateReductionConstraintIndicatorType.class,
-    StatusAvailableIndicatorType.class,
-    HumanFoodApprovedIndicatorType.class,
-    SoleProprietorshipIndicatorType.class,
-    PricingUpdateRequestIndicatorType.class,
-    BackOrderAllowedIndicatorType.class,
-    ThirdPartyPayerIndicatorType.class,
-    FullyPaidSharesIndicatorType.class,
-    CompletionIndicatorType.class,
-    AcceptedIndicatorType.class,
-    AnimalFoodIndicatorType.class,
-    FreeOfChargeIndicatorType.class,
-    SpecialSecurityIndicatorType.class,
-    FollowupContractIndicatorType.class,
-    TaxEvidenceIndicatorType.class,
-    DangerousGoodsApprovedIndicatorType.class,
-    OptionalLineItemIndicatorType.class,
-    ReturnabilityIndicatorType.class,
-    OrderableIndicatorType.class,
-    CopyIndicatorType.class,
-    SplitConsignmentIndicatorType.class,
-    HazardousRiskIndicatorType.class,
-    PrizeIndicatorType.class,
-    UnknownPriceIndicatorType.class,
-    TaxIncludedIndicatorType.class,
-    ItemUpdateRequestIndicatorType.class,
-    CustomsImportClassifiedIndicatorType.class,
-    ChargeIndicatorType.class,
-    MarkCareIndicatorType.class,
-    BulkCargoIndicatorType.class,
-    GeneralCargoIndicatorType.class,
-    PublishAwardIndicatorType.class,
-    FrozenDocumentIndicatorType.class,
-    LivestockIndicatorType.class,
-    GovernmentAgreementConstraintIndicatorType.class,
-    HumanFoodIndicatorType.class,
-    ConsolidatableIndicatorType.class,
-    OtherConditionsIndicatorType.class,
-    RefrigeratedIndicatorType.class,
-    ReturnableMaterialIndicatorType.class,
     PreCarriageIndicatorType.class,
-    OnCarriageIndicatorType.class,
-    ContainerizedIndicatorType.class,
-    AdValoremIndicatorType.class,
-    CatalogueIndicatorType.class,
     PrepaidIndicatorType.class,
-    BasedOnConsensusIndicatorType.class
+    PricingUpdateRequestIndicatorType.class,
+    PrizeIndicatorType.class,
+    PublishAwardIndicatorType.class,
+    RefrigeratedIndicatorType.class,
+    RefrigerationOnIndicatorType.class,
+    RequiredCurriculaIndicatorType.class,
+    ReturnabilityIndicatorType.class,
+    ReturnableMaterialIndicatorType.class,
+    SoleProprietorshipIndicatorType.class,
+    SpecialSecurityIndicatorType.class,
+    SplitConsignmentIndicatorType.class,
+    StatusAvailableIndicatorType.class,
+    TaxEvidenceIndicatorType.class,
+    TaxIncludedIndicatorType.class,
+    ThirdPartyPayerIndicatorType.class,
+    ToOrderIndicatorType.class,
+    UnknownPriceIndicatorType.class,
+    VariantConstraintIndicatorType.class
 })
 public class IndicatorType {
 

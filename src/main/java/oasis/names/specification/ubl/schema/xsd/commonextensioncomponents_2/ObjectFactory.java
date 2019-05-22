@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -31,16 +31,16 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _ExtensionAgencyURI_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionAgencyURI");
-    private final static QName _ExtensionVersionID_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionVersionID");
-    private final static QName _ExtensionURI_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionURI");
     private final static QName _UBLExtensions_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "UBLExtensions");
-    private final static QName _ExtensionReasonCode_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionReasonCode");
-    private final static QName _ExtensionAgencyName_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionAgencyName");
-    private final static QName _ExtensionContent_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionContent");
     private final static QName _UBLExtension_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "UBLExtension");
     private final static QName _ExtensionAgencyID_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionAgencyID");
+    private final static QName _ExtensionAgencyName_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionAgencyName");
+    private final static QName _ExtensionAgencyURI_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionAgencyURI");
+    private final static QName _ExtensionContent_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionContent");
     private final static QName _ExtensionReason_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionReason");
+    private final static QName _ExtensionReasonCode_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionReasonCode");
+    private final static QName _ExtensionURI_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionURI");
+    private final static QName _ExtensionVersionID_QNAME = new QName("urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", "ExtensionVersionID");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: oasis.names.specification.ubl.schema.xsd.commonextensioncomponents_2
@@ -50,59 +50,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ExtensionAgencyURIType }
-     * 
-     */
-    public ExtensionAgencyURIType createExtensionAgencyURIType() {
-        return new ExtensionAgencyURIType();
-    }
-
-    /**
-     * Create an instance of {@link ExtensionReasonCodeType }
-     * 
-     */
-    public ExtensionReasonCodeType createExtensionReasonCodeType() {
-        return new ExtensionReasonCodeType();
-    }
-
-    /**
-     * Create an instance of {@link ExtensionContentType }
-     * 
-     */
-    public ExtensionContentType createExtensionContentType() {
-        return new ExtensionContentType();
-    }
-
-    /**
      * Create an instance of {@link UBLExtensionsType }
      * 
      */
     public UBLExtensionsType createUBLExtensionsType() {
         return new UBLExtensionsType();
-    }
-
-    /**
-     * Create an instance of {@link ExtensionVersionIDType }
-     * 
-     */
-    public ExtensionVersionIDType createExtensionVersionIDType() {
-        return new ExtensionVersionIDType();
-    }
-
-    /**
-     * Create an instance of {@link ExtensionAgencyNameType }
-     * 
-     */
-    public ExtensionAgencyNameType createExtensionAgencyNameType() {
-        return new ExtensionAgencyNameType();
-    }
-
-    /**
-     * Create an instance of {@link ExtensionURIType }
-     * 
-     */
-    public ExtensionURIType createExtensionURIType() {
-        return new ExtensionURIType();
     }
 
     /**
@@ -122,6 +74,30 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ExtensionAgencyNameType }
+     * 
+     */
+    public ExtensionAgencyNameType createExtensionAgencyNameType() {
+        return new ExtensionAgencyNameType();
+    }
+
+    /**
+     * Create an instance of {@link ExtensionAgencyURIType }
+     * 
+     */
+    public ExtensionAgencyURIType createExtensionAgencyURIType() {
+        return new ExtensionAgencyURIType();
+    }
+
+    /**
+     * Create an instance of {@link ExtensionContentType }
+     * 
+     */
+    public ExtensionContentType createExtensionContentType() {
+        return new ExtensionContentType();
+    }
+
+    /**
      * Create an instance of {@link ExtensionReasonType }
      * 
      */
@@ -130,35 +106,36 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionAgencyURIType }{@code >}}
+     * Create an instance of {@link ExtensionReasonCodeType }
      * 
      */
-    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionAgencyURI")
-    public JAXBElement<ExtensionAgencyURIType> createExtensionAgencyURI(ExtensionAgencyURIType value) {
-        return new JAXBElement<ExtensionAgencyURIType>(_ExtensionAgencyURI_QNAME, ExtensionAgencyURIType.class, null, value);
+    public ExtensionReasonCodeType createExtensionReasonCodeType() {
+        return new ExtensionReasonCodeType();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionVersionIDType }{@code >}}
+     * Create an instance of {@link ExtensionURIType }
      * 
      */
-    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionVersionID")
-    public JAXBElement<ExtensionVersionIDType> createExtensionVersionID(ExtensionVersionIDType value) {
-        return new JAXBElement<ExtensionVersionIDType>(_ExtensionVersionID_QNAME, ExtensionVersionIDType.class, null, value);
+    public ExtensionURIType createExtensionURIType() {
+        return new ExtensionURIType();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionURIType }{@code >}}
+     * Create an instance of {@link ExtensionVersionIDType }
      * 
      */
-    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionURI")
-    public JAXBElement<ExtensionURIType> createExtensionURI(ExtensionURIType value) {
-        return new JAXBElement<ExtensionURIType>(_ExtensionURI_QNAME, ExtensionURIType.class, null, value);
+    public ExtensionVersionIDType createExtensionVersionIDType() {
+        return new ExtensionVersionIDType();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link UBLExtensionsType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link UBLExtensionsType }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link UBLExtensionsType }{@code >}
      */
     @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "UBLExtensions")
     public JAXBElement<UBLExtensionsType> createUBLExtensions(UBLExtensionsType value) {
@@ -166,35 +143,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionReasonCodeType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link UBLExtensionType }{@code >}
      * 
-     */
-    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionReasonCode")
-    public JAXBElement<ExtensionReasonCodeType> createExtensionReasonCode(ExtensionReasonCodeType value) {
-        return new JAXBElement<ExtensionReasonCodeType>(_ExtensionReasonCode_QNAME, ExtensionReasonCodeType.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionAgencyNameType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionAgencyName")
-    public JAXBElement<ExtensionAgencyNameType> createExtensionAgencyName(ExtensionAgencyNameType value) {
-        return new JAXBElement<ExtensionAgencyNameType>(_ExtensionAgencyName_QNAME, ExtensionAgencyNameType.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionContentType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionContent")
-    public JAXBElement<ExtensionContentType> createExtensionContent(ExtensionContentType value) {
-        return new JAXBElement<ExtensionContentType>(_ExtensionContent_QNAME, ExtensionContentType.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link UBLExtensionType }{@code >}}
-     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link UBLExtensionType }{@code >}
      */
     @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "UBLExtension")
     public JAXBElement<UBLExtensionType> createUBLExtension(UBLExtensionType value) {
@@ -202,8 +156,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionAgencyIDType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionAgencyIDType }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ExtensionAgencyIDType }{@code >}
      */
     @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionAgencyID")
     public JAXBElement<ExtensionAgencyIDType> createExtensionAgencyID(ExtensionAgencyIDType value) {
@@ -211,12 +169,94 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionReasonType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionAgencyNameType }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ExtensionAgencyNameType }{@code >}
+     */
+    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionAgencyName")
+    public JAXBElement<ExtensionAgencyNameType> createExtensionAgencyName(ExtensionAgencyNameType value) {
+        return new JAXBElement<ExtensionAgencyNameType>(_ExtensionAgencyName_QNAME, ExtensionAgencyNameType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionAgencyURIType }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ExtensionAgencyURIType }{@code >}
+     */
+    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionAgencyURI")
+    public JAXBElement<ExtensionAgencyURIType> createExtensionAgencyURI(ExtensionAgencyURIType value) {
+        return new JAXBElement<ExtensionAgencyURIType>(_ExtensionAgencyURI_QNAME, ExtensionAgencyURIType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionContentType }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ExtensionContentType }{@code >}
+     */
+    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionContent")
+    public JAXBElement<ExtensionContentType> createExtensionContent(ExtensionContentType value) {
+        return new JAXBElement<ExtensionContentType>(_ExtensionContent_QNAME, ExtensionContentType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionReasonType }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ExtensionReasonType }{@code >}
      */
     @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionReason")
     public JAXBElement<ExtensionReasonType> createExtensionReason(ExtensionReasonType value) {
         return new JAXBElement<ExtensionReasonType>(_ExtensionReason_QNAME, ExtensionReasonType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionReasonCodeType }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ExtensionReasonCodeType }{@code >}
+     */
+    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionReasonCode")
+    public JAXBElement<ExtensionReasonCodeType> createExtensionReasonCode(ExtensionReasonCodeType value) {
+        return new JAXBElement<ExtensionReasonCodeType>(_ExtensionReasonCode_QNAME, ExtensionReasonCodeType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionURIType }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ExtensionURIType }{@code >}
+     */
+    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionURI")
+    public JAXBElement<ExtensionURIType> createExtensionURI(ExtensionURIType value) {
+        return new JAXBElement<ExtensionURIType>(_ExtensionURI_QNAME, ExtensionURIType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExtensionVersionIDType }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ExtensionVersionIDType }{@code >}
+     */
+    @XmlElementDecl(namespace = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2", name = "ExtensionVersionID")
+    public JAXBElement<ExtensionVersionIDType> createExtensionVersionID(ExtensionVersionIDType value) {
+        return new JAXBElement<ExtensionVersionIDType>(_ExtensionVersionID_QNAME, ExtensionVersionIDType.class, null, value);
     }
 
 }

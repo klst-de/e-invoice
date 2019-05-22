@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -61,8 +61,8 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Tex
  * 
  *                 
  * <pre>
- * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:Definition xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;A character string that constitutes the distinctive designation of a person, place,
- *                     thing or concept.
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:Definition xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;A character string that constitutes the distinctive designation of a person, place,&#13;
+ *                     thing or concept.&#13;
  *                 &lt;/ccts:Definition&gt;
  * </pre>
  * 
@@ -83,12 +83,12 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Tex
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="NameType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2>TextType">
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;complexType name="NameType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2&gt;TextType"&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -96,29 +96,29 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Tex
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "NameType")
 @XmlSeeAlso({
-    TechnicalNameType.class,
-    CityNameType.class,
+    AdditionalStreetNameType.class,
     AliasNameType.class,
+    BlockNameType.class,
+    BrandNameType.class,
+    BuildingNameType.class,
+    CategoryNameType.class,
+    CityNameType.class,
+    CitySubdivisionNameType.class,
     FamilyNameType.class,
     FileNameType.class,
-    ModelNameType.class,
-    ServiceNameType.class,
-    RetailEventNameType.class,
-    AdditionalStreetNameType.class,
-    CategoryNameType.class,
-    BuildingNameType.class,
-    CitySubdivisionNameType.class,
-    RegistrationNameType.class,
-    HolderNameType.class,
-    RoamingPartnerNameType.class,
-    VesselNameType.class,
-    BrandNameType.class,
     FirstNameType.class,
+    HolderNameType.class,
+    MiddleNameType.class,
+    ModelNameType.class,
     oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType.class,
     OtherNameType.class,
+    RegistrationNameType.class,
+    RetailEventNameType.class,
+    RoamingPartnerNameType.class,
+    ServiceNameType.class,
     StreetNameType.class,
-    MiddleNameType.class,
-    BlockNameType.class
+    TechnicalNameType.class,
+    VesselNameType.class
 })
 public class NameType
     extends TextType

@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -49,8 +49,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link CrossIndustryInvoiceType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link CrossIndustryInvoiceType }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link CrossIndustryInvoiceType }{@code >}
      */
     @XmlElementDecl(namespace = "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100", name = "CrossIndustryInvoice")
     public JAXBElement<CrossIndustryInvoiceType> createCrossIndustryInvoice(CrossIndustryInvoiceType value) {

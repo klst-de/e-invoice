@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -63,7 +63,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ValueMea
  * 
  *                 
  * <pre>
- * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:Definition xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;A numeric value determined by measuring an object using a specified unit of measure.
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:Definition xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;A numeric value determined by measuring an object using a specified unit of measure.&#13;
  *                 &lt;/ccts:Definition&gt;
  * </pre>
  * 
@@ -89,13 +89,13 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ValueMea
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="MeasureType">
- *   &lt;simpleContent>
- *     &lt;restriction base="&lt;urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2>MeasureType">
- *       &lt;attribute name="unitCode" use="required" type="{http://www.w3.org/2001/XMLSchema}normalizedString" />
- *     &lt;/restriction>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;complexType name="MeasureType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;restriction base="&lt;urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2&gt;MeasureType"&gt;
+ *       &lt;attribute name="unitCode" use="required" type="{http://www.w3.org/2001/XMLSchema}normalizedString" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -103,32 +103,32 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ValueMea
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MeasureType")
 @XmlSeeAlso({
-    PostEventNotificationDurationMeasureType.class,
-    ComparedValueMeasureType.class,
-    ChargeableWeightMeasureType.class,
-    NetTonnageMeasureType.class,
-    BaseUnitMeasureType.class,
-    NetNetWeightMeasureType.class,
-    LongitudeDegreesMeasureType.class,
-    PreEventNotificationDurationMeasureType.class,
-    GrossTonnageMeasureType.class,
-    LongitudeMinutesMeasureType.class,
-    DurationMeasureType.class,
     AltitudeMeasureType.class,
-    NetVolumeMeasureType.class,
-    LatitudeMinutesMeasureType.class,
-    MinimumMeasureType.class,
-    LatitudeDegreesMeasureType.class,
-    TareWeightMeasureType.class,
-    oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.MeasureType.class,
-    MaximumMeasureType.class,
+    BaseUnitMeasureType.class,
+    ChargeableWeightMeasureType.class,
+    ComparedValueMeasureType.class,
+    DurationMeasureType.class,
+    GrossTonnageMeasureType.class,
+    GrossVolumeMeasureType.class,
     GrossWeightMeasureType.class,
-    LoadingLengthMeasureType.class,
-    SourceValueMeasureType.class,
-    NetWeightMeasureType.class,
+    LatitudeDegreesMeasureType.class,
+    LatitudeMinutesMeasureType.class,
     LeadTimeMeasureType.class,
-    ValueMeasureType.class,
-    GrossVolumeMeasureType.class
+    LoadingLengthMeasureType.class,
+    LongitudeDegreesMeasureType.class,
+    LongitudeMinutesMeasureType.class,
+    MaximumMeasureType.class,
+    oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.MeasureType.class,
+    MinimumMeasureType.class,
+    NetNetWeightMeasureType.class,
+    NetTonnageMeasureType.class,
+    NetVolumeMeasureType.class,
+    NetWeightMeasureType.class,
+    PostEventNotificationDurationMeasureType.class,
+    PreEventNotificationDurationMeasureType.class,
+    SourceValueMeasureType.class,
+    TareWeightMeasureType.class,
+    ValueMeasureType.class
 })
 public class MeasureType
     extends un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.MeasureType

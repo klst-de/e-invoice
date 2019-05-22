@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -114,12 +114,12 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Validity
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="DateType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>date">
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;complexType name="DateType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;date"&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -129,60 +129,60 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Validity
     "value"
 })
 @XmlSeeAlso({
-    LatestSecurityClearanceDateType.class,
-    RegisteredDateType.class,
-    ValidityStartDateType.class,
-    ValidationDateType.class,
+    ActualDeliveryDateType.class,
+    ActualDespatchDateType.class,
     ActualPickupDateType.class,
-    NominationDateType.class,
-    FirstShipmentAvailibilityDateType.class,
-    RequiredDeliveryDateType.class,
+    ApprovalDateType.class,
+    AvailabilityDateType.class,
+    AwardDateType.class,
+    BestBeforeDateType.class,
+    BirthDateType.class,
+    CallDateType.class,
+    ComparisonForecastIssueDateType.class,
+    oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DateType.class,
+    DueDateType.class,
+    EarliestPickupDateType.class,
+    EffectiveDateType.class,
+    EndDateType.class,
     EstimatedDeliveryDateType.class,
     EstimatedDespatchDateType.class,
-    GuaranteedDespatchDateType.class,
-    EffectiveDateType.class,
-    InstallmentDueDateType.class,
-    ActualDeliveryDateType.class,
-    IssueDateType.class,
-    ReferenceDateType.class,
-    ManufactureDateType.class,
-    ReceivedDateType.class,
-    LatestDeliveryDateType.class,
-    CallDateType.class,
-    SubmissionDueDateType.class,
-    ActualDespatchDateType.class,
-    LastRevisionDateType.class,
-    ResolutionDateType.class,
-    SourceForecastIssueDateType.class,
-    ApprovalDateType.class,
-    LatestProposalAcceptanceDateType.class,
-    OccurrenceDateType.class,
-    oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DateType.class,
-    BestBeforeDateType.class,
-    LatestPickupDateType.class,
-    SubmissionDateType.class,
-    ResponseDateType.class,
-    EndDateType.class,
-    EarliestPickupDateType.class,
-    RevisionDateType.class,
     ExpiryDateType.class,
-    DueDateType.class,
-    AwardDateType.class,
-    TaxPointDateType.class,
-    ComparisonForecastIssueDateType.class,
-    AvailabilityDateType.class,
-    PreviousMeterReadingDateType.class,
-    PaymentDueDateType.class,
-    PaidDateType.class,
-    RegistrationDateType.class,
+    FirstShipmentAvailibilityDateType.class,
+    GuaranteedDespatchDateType.class,
+    InstallmentDueDateType.class,
+    IssueDateType.class,
+    LastRevisionDateType.class,
+    LatestDeliveryDateType.class,
     LatestMeterReadingDateType.class,
-    RegistrationExpirationDateType.class,
+    LatestPickupDateType.class,
+    LatestProposalAcceptanceDateType.class,
+    LatestSecurityClearanceDateType.class,
+    ManufactureDateType.class,
+    NominationDateType.class,
+    OccurrenceDateType.class,
+    PaidDateType.class,
+    PaymentDueDateType.class,
     PlannedDateType.class,
-    RequestedPublicationDateType.class,
-    StartDateType.class,
+    PreviousMeterReadingDateType.class,
+    ReceivedDateType.class,
+    ReferenceDateType.class,
+    RegisteredDateType.class,
+    RegistrationDateType.class,
+    RegistrationExpirationDateType.class,
+    RequestedDeliveryDateType.class,
     RequestedDespatchDateType.class,
-    BirthDateType.class,
-    RequestedDeliveryDateType.class
+    RequestedPublicationDateType.class,
+    RequiredDeliveryDateType.class,
+    ResolutionDateType.class,
+    ResponseDateType.class,
+    RevisionDateType.class,
+    SourceForecastIssueDateType.class,
+    StartDateType.class,
+    SubmissionDateType.class,
+    SubmissionDueDateType.class,
+    TaxPointDateType.class,
+    ValidationDateType.class,
+    ValidityStartDateType.class
 })
 public class DateType {
 

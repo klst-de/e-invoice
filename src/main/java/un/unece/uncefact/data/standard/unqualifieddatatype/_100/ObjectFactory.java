@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -37,19 +37,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DateType }
-     * 
-     */
-    public DateType createDateType() {
-        return new DateType();
-    }
-
-    /**
      * Create an instance of {@link IndicatorType }
      * 
      */
     public IndicatorType createIndicatorType() {
         return new IndicatorType();
+    }
+
+    /**
+     * Create an instance of {@link DateType }
+     * 
+     */
+    public DateType createDateType() {
+        return new DateType();
     }
 
     /**
@@ -61,51 +61,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link NumericType }
+     * Create an instance of {@link AmountType }
      * 
      */
-    public NumericType createNumericType() {
-        return new NumericType();
-    }
-
-    /**
-     * Create an instance of {@link ValueType }
-     * 
-     */
-    public ValueType createValueType() {
-        return new ValueType();
-    }
-
-    /**
-     * Create an instance of {@link MeasureType }
-     * 
-     */
-    public MeasureType createMeasureType() {
-        return new MeasureType();
-    }
-
-    /**
-     * Create an instance of {@link PercentType }
-     * 
-     */
-    public PercentType createPercentType() {
-        return new PercentType();
-    }
-
-    /**
-     * Create an instance of {@link IDType }
-     * 
-     */
-    public IDType createIDType() {
-        return new IDType();
-    }
-
-    /**
-     * Create an instance of {@link TextType }
-     * 
-     */
-    public TextType createTextType() {
-        return new TextType();
+    public AmountType createAmountType() {
+        return new AmountType();
     }
 
     /**
@@ -117,27 +77,51 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link QuantityType }
-     * 
-     */
-    public QuantityType createQuantityType() {
-        return new QuantityType();
-    }
-
-    /**
-     * Create an instance of {@link AmountType }
-     * 
-     */
-    public AmountType createAmountType() {
-        return new AmountType();
-    }
-
-    /**
      * Create an instance of {@link CodeType }
      * 
      */
     public CodeType createCodeType() {
         return new CodeType();
+    }
+
+    /**
+     * Create an instance of {@link IDType }
+     * 
+     */
+    public IDType createIDType() {
+        return new IDType();
+    }
+
+    /**
+     * Create an instance of {@link MeasureType }
+     * 
+     */
+    public MeasureType createMeasureType() {
+        return new MeasureType();
+    }
+
+    /**
+     * Create an instance of {@link NumericType }
+     * 
+     */
+    public NumericType createNumericType() {
+        return new NumericType();
+    }
+
+    /**
+     * Create an instance of {@link PercentType }
+     * 
+     */
+    public PercentType createPercentType() {
+        return new PercentType();
+    }
+
+    /**
+     * Create an instance of {@link QuantityType }
+     * 
+     */
+    public QuantityType createQuantityType() {
+        return new QuantityType();
     }
 
     /**
@@ -149,11 +133,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DateType.DateString }
+     * Create an instance of {@link TextType }
      * 
      */
-    public DateType.DateString createDateTypeDateString() {
-        return new DateType.DateString();
+    public TextType createTextType() {
+        return new TextType();
+    }
+
+    /**
+     * Create an instance of {@link ValueType }
+     * 
+     */
+    public ValueType createValueType() {
+        return new ValueType();
     }
 
     /**
@@ -162,6 +154,14 @@ public class ObjectFactory {
      */
     public IndicatorType.IndicatorString createIndicatorTypeIndicatorString() {
         return new IndicatorType.IndicatorString();
+    }
+
+    /**
+     * Create an instance of {@link DateType.DateString }
+     * 
+     */
+    public DateType.DateString createDateTypeDateString() {
+        return new DateType.DateString();
     }
 
     /**

@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -151,9 +151,9 @@ import oasis.names.specification.ubl.schema.xsd.signaturebasiccomponents_2.Refer
  * 
  *                 
  * <pre>
- * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:Definition xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;A character string to identify and uniquely distinguish one instance of an object in an
- *                     identification scheme from all other objects in the same scheme, together with relevant
- *                     supplementary information.
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:Definition xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;A character string to identify and uniquely distinguish one instance of an object in an&#13;
+ *                     identification scheme from all other objects in the same scheme, together with relevant&#13;
+ *                     supplementary information.&#13;
  *                 &lt;/ccts:Definition&gt;
  * </pre>
  * 
@@ -169,8 +169,8 @@ import oasis.names.specification.ubl.schema.xsd.signaturebasiccomponents_2.Refer
  * 
  *                 
  * <pre>
- * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:UsageRule xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;Other supplementary components in the CCT are captured as part of the token and name for
- *                     the schema module containing the identifier list and thus, are not declared as attributes.
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:UsageRule xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;Other supplementary components in the CCT are captured as part of the token and name for&#13;
+ *                     the schema module containing the identifier list and thus, are not declared as attributes.&#13;
  *                 &lt;/ccts:UsageRule&gt;
  * </pre>
  * 
@@ -181,12 +181,12 @@ import oasis.names.specification.ubl.schema.xsd.signaturebasiccomponents_2.Refer
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="IdentifierType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2>IdentifierType">
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;complexType name="IdentifierType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2&gt;IdentifierType"&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -194,118 +194,118 @@ import oasis.names.specification.ubl.schema.xsd.signaturebasiccomponents_2.Refer
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "IdentifierType")
 @XmlSeeAlso({
-    PerformingCarrierAssignedIDType.class,
-    BuyerProfileURIType.class,
-    CustomerAssignedAccountIDType.class,
-    IssuerIDType.class,
-    LoadingSequenceIDType.class,
-    HazardClassIDType.class,
-    SuccessiveSequenceIDType.class,
-    CV2IDType.class,
-    AircraftIDType.class,
-    EndpointIDType.class,
-    SecurityIDType.class,
-    TransportExecutionPlanReferenceIDType.class,
-    CompanyIDType.class,
-    UBLVersionIDType.class,
-    LocationIDType.class,
-    IDType.class,
-    OntologyURIType.class,
-    URIType.class,
-    BuyerEventIDType.class,
-    RevisedForecastLineIDType.class,
     AccountIDType.class,
-    ExchangeMarketIDType.class,
-    ParentDocumentVersionIDType.class,
-    PrimaryAccountNumberIDType.class,
-    LogoReferenceIDType.class,
-    RequestForQuotationLineIDType.class,
-    ConsumptionReportIDType.class,
-    ConsumptionIDType.class,
-    RadioCallSignIDType.class,
-    RegistrationIDType.class,
-    SignatureIDType.class,
-    TransportationServiceDetailsURIType.class,
-    ExtendedIDType.class,
-    LowerOrangeHazardPlacardIDType.class,
-    PrepaidPaymentReferenceIDType.class,
-    NationalityIDType.class,
-    AwardingCriterionIDType.class,
-    TrainIDType.class,
-    SubscriberIDType.class,
-    PaymentMeansIDType.class,
-    CustomizationIDType.class,
-    IssueNumberIDType.class,
-    OpenTenderIDType.class,
-    SchemeURIType.class,
-    SerialIDType.class,
-    AuctionURIType.class,
-    RailCarIDType.class,
-    BusinessClassificationEvidenceIDType.class,
-    UUIDType.class,
-    BarcodeSymbologyIDType.class,
-    CarrierAssignedIDType.class,
-    PaymentIDType.class,
-    ReferenceIDType.class,
-    ContractedCarrierAssignedIDType.class,
-    BusinessIdentityEvidenceIDType.class,
-    OriginalContractingSystemIDType.class,
-    PreviousVersionIDType.class,
-    VersionIDType.class,
-    AttributeIDType.class,
-    ParentDocumentLineReferenceIDType.class,
-    InformationURIType.class,
-    JourneyIDType.class,
-    ConsigneeAssignedIDType.class,
-    InstructionIDType.class,
-    ValidatorIDType.class,
-    ProfileExecutionIDType.class,
-    EconomicOperatorRegistryURIType.class,
-    FreightForwarderAssignedIDType.class,
-    DocumentIDType.class,
-    TenderEnvelopeIDType.class,
-    SequenceIDType.class,
-    NetworkIDType.class,
-    SpecificationIDType.class,
-    ContractFolderIDType.class,
-    SequenceNumberIDType.class,
-    ProductTraceIDType.class,
-    SupplierAssignedAccountIDType.class,
-    LicensePlateIDType.class,
-    RegistrationNationalityIDType.class,
-    ChipApplicationIDType.class,
-    TrackingIDType.class,
-    MarkingIDType.class,
-    UpperOrangeHazardPlacardIDType.class,
-    PreviousJobIDType.class,
-    LotNumberIDType.class,
-    BrokerAssignedIDType.class,
-    TraceIDType.class,
     AdditionalAccountIDType.class,
-    VesselIDType.class,
-    VariantIDType.class,
-    RequiredCustomsIDType.class,
-    LanguageIDType.class,
-    SalesOrderIDType.class,
-    ConsignorAssignedIDType.class,
-    SalesOrderLineIDType.class,
-    ShippingOrderIDType.class,
-    PaymentTermsDetailsURIType.class,
-    ImmobilizationCertificateIDType.class,
     AgencyIDType.class,
-    ParentDocumentIDType.class,
-    LineIDType.class,
-    ReleaseIDType.class,
-    OriginalJobIDType.class,
-    WebsiteURIType.class,
-    ReferencedConsignmentIDType.class,
+    AircraftIDType.class,
+    AttributeIDType.class,
+    AuctionURIType.class,
+    AwardingCriterionIDType.class,
+    BarcodeSymbologyIDType.class,
+    BrokerAssignedIDType.class,
+    BusinessClassificationEvidenceIDType.class,
+    BusinessIdentityEvidenceIDType.class,
+    BuyerEventIDType.class,
+    BuyerProfileURIType.class,
+    CV2IDType.class,
+    CarrierAssignedIDType.class,
+    ChipApplicationIDType.class,
+    CompanyIDType.class,
+    ConsigneeAssignedIDType.class,
+    ConsignorAssignedIDType.class,
+    ConsumptionIDType.class,
+    ConsumptionReportIDType.class,
+    ContractFolderIDType.class,
+    ContractedCarrierAssignedIDType.class,
+    CustomerAssignedAccountIDType.class,
+    CustomizationIDType.class,
+    DocumentIDType.class,
+    EconomicOperatorRegistryURIType.class,
+    EndpointIDType.class,
+    ExchangeMarketIDType.class,
+    ExtendedIDType.class,
+    FreightForwarderAssignedIDType.class,
+    HazardClassIDType.class,
+    IDType.class,
     IdentificationIDType.class,
+    ImmobilizationCertificateIDType.class,
+    InformationURIType.class,
+    InstructionIDType.class,
+    IssueNumberIDType.class,
+    IssuerIDType.class,
+    JourneyIDType.class,
+    LanguageIDType.class,
+    LicensePlateIDType.class,
+    LineIDType.class,
+    LoadingSequenceIDType.class,
+    LocationIDType.class,
+    LogoReferenceIDType.class,
+    LotNumberIDType.class,
+    LowerOrangeHazardPlacardIDType.class,
+    MarkingIDType.class,
+    NationalityIDType.class,
+    NetworkIDType.class,
+    OntologyURIType.class,
+    OpenTenderIDType.class,
+    OriginalContractingSystemIDType.class,
+    OriginalJobIDType.class,
+    ParentDocumentIDType.class,
+    ParentDocumentLineReferenceIDType.class,
+    ParentDocumentVersionIDType.class,
+    PaymentIDType.class,
+    PaymentMeansIDType.class,
+    PaymentTermsDetailsURIType.class,
+    PerformingCarrierAssignedIDType.class,
+    PrepaidPaymentReferenceIDType.class,
+    PreviousJobIDType.class,
+    PreviousVersionIDType.class,
+    PrimaryAccountNumberIDType.class,
+    ProductTraceIDType.class,
+    ProfileExecutionIDType.class,
     ProfileIDType.class,
+    RadioCallSignIDType.class,
+    RailCarIDType.class,
+    ReferenceIDType.class,
+    ReferencedConsignmentIDType.class,
+    RegistrationIDType.class,
+    RegistrationNationalityIDType.class,
+    ReleaseIDType.class,
+    RequestForQuotationLineIDType.class,
+    RequiredCustomsIDType.class,
+    RevisedForecastLineIDType.class,
+    SalesOrderIDType.class,
+    SalesOrderLineIDType.class,
+    SchemeURIType.class,
+    SecurityIDType.class,
     SellerEventIDType.class,
-    ExtensionAgencyURIType.class,
-    ExtensionVersionIDType.class,
-    ExtensionURIType.class,
+    SequenceIDType.class,
+    SequenceNumberIDType.class,
+    SerialIDType.class,
+    ShippingOrderIDType.class,
+    SignatureIDType.class,
+    SpecificationIDType.class,
+    SubscriberIDType.class,
+    SuccessiveSequenceIDType.class,
+    SupplierAssignedAccountIDType.class,
+    TenderEnvelopeIDType.class,
+    TraceIDType.class,
+    TrackingIDType.class,
+    TrainIDType.class,
+    TransportExecutionPlanReferenceIDType.class,
+    TransportationServiceDetailsURIType.class,
+    UBLVersionIDType.class,
+    URIType.class,
+    UUIDType.class,
+    UpperOrangeHazardPlacardIDType.class,
+    ValidatorIDType.class,
+    VariantIDType.class,
+    VersionIDType.class,
+    VesselIDType.class,
+    WebsiteURIType.class,
     ExtensionAgencyIDType.class,
+    ExtensionAgencyURIType.class,
+    ExtensionURIType.class,
+    ExtensionVersionIDType.class,
     ReferencedSignatureIDType.class
 })
 public class IdentifierType

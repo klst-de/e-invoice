@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -37,11 +37,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link NumericType }
+     * Create an instance of {@link AmountType }
      * 
      */
-    public NumericType createNumericType() {
-        return new NumericType();
+    public AmountType createAmountType() {
+        return new AmountType();
     }
 
     /**
@@ -53,11 +53,27 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link CodeType }
+     * 
+     */
+    public CodeType createCodeType() {
+        return new CodeType();
+    }
+
+    /**
      * Create an instance of {@link DateTimeType }
      * 
      */
     public DateTimeType createDateTimeType() {
         return new DateTimeType();
+    }
+
+    /**
+     * Create an instance of {@link IdentifierType }
+     * 
+     */
+    public IdentifierType createIdentifierType() {
+        return new IdentifierType();
     }
 
     /**
@@ -69,30 +85,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link QuantityType }
-     * 
-     */
-    public QuantityType createQuantityType() {
-        return new QuantityType();
-    }
-
-    /**
-     * Create an instance of {@link AmountType }
-     * 
-     */
-    public AmountType createAmountType() {
-        return new AmountType();
-    }
-
-    /**
-     * Create an instance of {@link CodeType }
-     * 
-     */
-    public CodeType createCodeType() {
-        return new CodeType();
-    }
-
-    /**
      * Create an instance of {@link MeasureType }
      * 
      */
@@ -101,11 +93,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link IdentifierType }
+     * Create an instance of {@link NumericType }
      * 
      */
-    public IdentifierType createIdentifierType() {
-        return new IdentifierType();
+    public NumericType createNumericType() {
+        return new NumericType();
+    }
+
+    /**
+     * Create an instance of {@link QuantityType }
+     * 
+     */
+    public QuantityType createQuantityType() {
+        return new QuantityType();
     }
 
     /**

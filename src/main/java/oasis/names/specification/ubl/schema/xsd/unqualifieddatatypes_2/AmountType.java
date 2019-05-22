@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -120,13 +120,13 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ValueAmo
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="AmountType">
- *   &lt;simpleContent>
- *     &lt;restriction base="&lt;urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2>AmountType">
- *       &lt;attribute name="currencyID" use="required" type="{http://www.w3.org/2001/XMLSchema}normalizedString" />
- *     &lt;/restriction>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;complexType name="AmountType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;restriction base="&lt;urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2&gt;AmountType"&gt;
+ *       &lt;attribute name="currencyID" use="required" type="{http://www.w3.org/2001/XMLSchema}normalizedString" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -134,74 +134,74 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ValueAmo
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AmountType")
 @XmlSeeAlso({
+    AdvertisementAmountType.class,
+    AllowanceTotalAmountType.class,
+    oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.AmountType.class,
+    AnnualAverageAmountType.class,
+    AverageAmountType.class,
+    AverageSubsequentContractAmountType.class,
+    BalanceAmountType.class,
     BaseAmountType.class,
+    CallBaseAmountType.class,
+    CallExtensionAmountType.class,
+    ChargeTotalAmountType.class,
+    CorporateStockAmountType.class,
+    CorrectionAmountType.class,
+    CorrectionUnitAmountType.class,
+    CreditLineAmountType.class,
+    DebitLineAmountType.class,
+    DeclaredCarriageValueAmountType.class,
+    DeclaredCustomsValueAmountType.class,
+    DeclaredForCarriageValueAmountType.class,
     DeclaredStatisticsValueAmountType.class,
+    DocumentationFeeAmountType.class,
+    EstimatedAmountType.class,
+    EstimatedOverallContractAmountType.class,
+    FaceValueAmountType.class,
+    FeeAmountType.class,
+    FreeOnBoardValueAmountType.class,
+    HigherTenderAmountType.class,
+    InsurancePremiumAmountType.class,
+    InsuranceValueAmountType.class,
+    InventoryValueAmountType.class,
+    LiabilityAmountType.class,
+    LineExtensionAmountType.class,
+    LowerTenderAmountType.class,
+    MarketValueAmountType.class,
+    MaximumAdvertisementAmountType.class,
+    MaximumAmountType.class,
+    MaximumPaidAmountType.class,
+    MinimumAmountType.class,
+    PaidAmountType.class,
+    PartyCapacityAmountType.class,
     PayableAlternativeAmountType.class,
     PayableAmountType.class,
-    MaximumAdvertisementAmountType.class,
-    TaxEnergyAmountType.class,
-    EstimatedOverallContractAmountType.class,
-    InventoryValueAmountType.class,
-    DocumentationFeeAmountType.class,
     PayableRoundingAmountType.class,
-    MaximumAmountType.class,
-    oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.AmountType.class,
-    HigherTenderAmountType.class,
-    DeclaredCarriageValueAmountType.class,
-    ChargeTotalAmountType.class,
-    FeeAmountType.class,
-    TotalPaymentAmountType.class,
+    PenaltyAmountType.class,
+    PerUnitAmountType.class,
+    PrepaidAmountType.class,
+    PriceAmountType.class,
+    RequiredFeeAmountType.class,
+    RoundingAmountType.class,
+    SettlementDiscountAmountType.class,
+    TaxAmountType.class,
+    TaxEnergyAmountType.class,
+    TaxEnergyBalanceAmountType.class,
     TaxEnergyOnAccountAmountType.class,
     TaxExclusiveAmountType.class,
     TaxInclusiveAmountType.class,
-    LineExtensionAmountType.class,
-    DebitLineAmountType.class,
-    PartyCapacityAmountType.class,
-    ValueAmountType.class,
-    CorrectionAmountType.class,
-    PriceAmountType.class,
-    RoundingAmountType.class,
-    PenaltyAmountType.class,
-    LowerTenderAmountType.class,
-    CorrectionUnitAmountType.class,
-    BalanceAmountType.class,
-    AllowanceTotalAmountType.class,
-    TaxAmountType.class,
-    AverageSubsequentContractAmountType.class,
-    LiabilityAmountType.class,
-    TransactionCurrencyTaxAmountType.class,
-    TotalTaxAmountType.class,
-    CallBaseAmountType.class,
-    MaximumPaidAmountType.class,
-    TotalAmountType.class,
-    CorporateStockAmountType.class,
-    RequiredFeeAmountType.class,
-    AdvertisementAmountType.class,
-    PaidAmountType.class,
-    TotalInvoiceAmountType.class,
-    ThresholdAmountType.class,
     TaxableAmountType.class,
-    InsurancePremiumAmountType.class,
-    FreeOnBoardValueAmountType.class,
-    PerUnitAmountType.class,
-    CallExtensionAmountType.class,
-    CreditLineAmountType.class,
-    PrepaidAmountType.class,
-    AnnualAverageAmountType.class,
-    DeclaredForCarriageValueAmountType.class,
-    MinimumAmountType.class,
-    FaceValueAmountType.class,
-    SettlementDiscountAmountType.class,
-    TotalTaskAmountType.class,
-    TotalCreditAmountType.class,
-    EstimatedAmountType.class,
+    ThresholdAmountType.class,
+    TotalAmountType.class,
     TotalBalanceAmountType.class,
-    TaxEnergyBalanceAmountType.class,
-    InsuranceValueAmountType.class,
-    AverageAmountType.class,
+    TotalCreditAmountType.class,
     TotalDebitAmountType.class,
-    MarketValueAmountType.class,
-    DeclaredCustomsValueAmountType.class
+    TotalInvoiceAmountType.class,
+    TotalPaymentAmountType.class,
+    TotalTaskAmountType.class,
+    TotalTaxAmountType.class,
+    TransactionCurrencyTaxAmountType.class,
+    ValueAmountType.class
 })
 public class AmountType
     extends un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.AmountType

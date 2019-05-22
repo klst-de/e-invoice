@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -102,7 +102,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Variance
  * 
  *                 
  * <pre>
- * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:Definition xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;A counted number of non-monetary units, possibly including a fractional part.
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:Definition xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;A counted number of non-monetary units, possibly including a fractional part.&#13;
  *                 &lt;/ccts:Definition&gt;
  * </pre>
  * 
@@ -123,12 +123,12 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Variance
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="QuantityType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2>QuantityType">
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;complexType name="QuantityType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2&gt;QuantityType"&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -136,71 +136,71 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Variance
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "QuantityType")
 @XmlSeeAlso({
-    CrewQuantityType.class,
-    TotalConsumedQuantityType.class,
-    OperatingYearsQuantityType.class,
-    TotalMeteredQuantityType.class,
-    NormalTemperatureReductionQuantityType.class,
-    EstimatedOverallContractQuantityType.class,
-    ChargeableQuantityType.class,
-    MinimumQuantityType.class,
-    EmployeeQuantityType.class,
-    ConsignmentQuantityType.class,
-    EstimatedConsumedQuantityType.class,
-    MinimumBackorderQuantityType.class,
-    MaximumOrderQuantityType.class,
-    MaximumBackorderQuantityType.class,
-    ThresholdQuantityType.class,
-    ExpectedQuantityType.class,
-    TotalPackagesQuantityType.class,
-    ReceivedTenderQuantityType.class,
-    ExpectedOperatorQuantityType.class,
-    MaximumQuantityType.class,
-    MultipleOrderQuantityType.class,
-    MaximumOperatorQuantityType.class,
-    ConsumptionEnergyQuantityType.class,
-    BaseQuantityType.class,
-    TotalDeliveredQuantityType.class,
-    PerformanceValueQuantityType.class,
-    MinimumInventoryQuantityType.class,
-    RejectedQuantityType.class,
-    PassengerQuantityType.class,
-    ShortQuantityType.class,
-    ConsumptionWaterQuantityType.class,
-    TimeDeltaDaysQuantityType.class,
-    ContentUnitQuantityType.class,
-    DifferenceTemperatureReductionQuantityType.class,
-    ReturnableQuantityType.class,
-    TotalGoodsItemQuantityType.class,
-    PreviousMeterQuantityType.class,
-    VarianceQuantityType.class,
-    CreditedQuantityType.class,
-    CustomsTariffQuantityType.class,
     ActualTemperatureReductionQuantityType.class,
-    InvoicedQuantityType.class,
-    ConsumerUnitQuantityType.class,
-    ReceivedElectronicTenderQuantityType.class,
-    GasPressureQuantityType.class,
+    BackorderQuantityType.class,
+    BaseQuantityType.class,
     BasicConsumedQuantityType.class,
-    OutstandingQuantityType.class,
-    ValueQuantityType.class,
-    LatestMeterQuantityType.class,
-    ChildConsignmentQuantityType.class,
-    SharesNumberQuantityType.class,
-    TargetInventoryQuantityType.class,
-    TotalPackageQuantityType.class,
     BatchQuantityType.class,
-    MinimumOrderQuantityType.class,
-    OversupplyQuantityType.class,
-    MaximumVariantQuantityType.class,
-    ReceivedQuantityType.class,
+    ChargeableQuantityType.class,
+    ChildConsignmentQuantityType.class,
+    ConsignmentQuantityType.class,
+    ConsumerUnitQuantityType.class,
+    ConsumptionEnergyQuantityType.class,
+    ConsumptionWaterQuantityType.class,
+    ContentUnitQuantityType.class,
+    CreditedQuantityType.class,
+    CrewQuantityType.class,
+    CustomsTariffQuantityType.class,
     DebitedQuantityType.class,
     DeliveredQuantityType.class,
+    DifferenceTemperatureReductionQuantityType.class,
+    EmployeeQuantityType.class,
+    EstimatedConsumedQuantityType.class,
+    EstimatedOverallContractQuantityType.class,
+    ExpectedOperatorQuantityType.class,
+    ExpectedQuantityType.class,
+    GasPressureQuantityType.class,
+    InvoicedQuantityType.class,
+    LatestMeterQuantityType.class,
+    MaximumBackorderQuantityType.class,
+    MaximumOperatorQuantityType.class,
+    MaximumOrderQuantityType.class,
+    MaximumQuantityType.class,
+    MaximumVariantQuantityType.class,
+    MinimumBackorderQuantityType.class,
+    MinimumInventoryQuantityType.class,
+    MinimumOrderQuantityType.class,
+    MinimumQuantityType.class,
+    MultipleOrderQuantityType.class,
+    NormalTemperatureReductionQuantityType.class,
+    OperatingYearsQuantityType.class,
+    OutstandingQuantityType.class,
+    OversupplyQuantityType.class,
     PackQuantityType.class,
-    ReceivedForeignTenderQuantityType.class,
-    BackorderQuantityType.class,
+    PassengerQuantityType.class,
+    PerformanceValueQuantityType.class,
+    PreviousMeterQuantityType.class,
     oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.QuantityType.class,
-    TotalTransportHandlingUnitQuantityType.class
+    ReceivedElectronicTenderQuantityType.class,
+    ReceivedForeignTenderQuantityType.class,
+    ReceivedQuantityType.class,
+    ReceivedTenderQuantityType.class,
+    RejectedQuantityType.class,
+    ReturnableQuantityType.class,
+    SharesNumberQuantityType.class,
+    ShortQuantityType.class,
+    TargetInventoryQuantityType.class,
+    ThresholdQuantityType.class,
+    TimeDeltaDaysQuantityType.class,
+    TotalConsumedQuantityType.class,
+    TotalDeliveredQuantityType.class,
+    TotalGoodsItemQuantityType.class,
+    TotalMeteredQuantityType.class,
+    TotalPackageQuantityType.class,
+    TotalPackagesQuantityType.class,
+    TotalTransportHandlingUnitQuantityType.class,
+    ValueQuantityType.class,
+    VarianceQuantityType.class
 })
 public class QuantityType
     extends un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType

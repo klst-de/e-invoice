@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -52,9 +52,9 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Num
  * 
  *                 
  * <pre>
- * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:Definition xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;Numeric information that is assigned or is determined by calculation, counting, or
- *                     sequencing and is expressed as a percentage. It does not require a unit of quantity or unit of
- *                     measure.
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;ccts:Definition xmlns:ccts="urn:un:unece:uncefact:documentation:2" xmlns:ccts-cct="urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;Numeric information that is assigned or is determined by calculation, counting, or&#13;
+ *                     sequencing and is expressed as a percentage. It does not require a unit of quantity or unit of&#13;
+ *                     measure.&#13;
  *                 &lt;/ccts:Definition&gt;
  * </pre>
  * 
@@ -75,12 +75,12 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Num
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="PercentType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2>NumericType">
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;complexType name="PercentType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;urn:un:unece:uncefact:data:specification:CoreComponentTypeSchemaModule:2&gt;NumericType"&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -88,20 +88,20 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Num
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "PercentType")
 @XmlSeeAlso({
-    PenaltySurchargePercentType.class,
-    ReliabilityPercentType.class,
-    TierRatePercentType.class,
-    PaymentPercentType.class,
-    HumidityPercentType.class,
-    MinimumPercentType.class,
-    TargetServicePercentType.class,
-    ParticipationPercentType.class,
-    PartecipationPercentType.class,
-    ProgressPercentType.class,
     AirFlowPercentType.class,
+    HumidityPercentType.class,
     MaximumPercentType.class,
+    MinimumPercentType.class,
+    PartecipationPercentType.class,
+    ParticipationPercentType.class,
+    PaymentPercentType.class,
+    PenaltySurchargePercentType.class,
     oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PercentType.class,
-    SettlementDiscountPercentType.class
+    ProgressPercentType.class,
+    ReliabilityPercentType.class,
+    SettlementDiscountPercentType.class,
+    TargetServicePercentType.class,
+    TierRatePercentType.class
 })
 public class PercentType
     extends NumericType

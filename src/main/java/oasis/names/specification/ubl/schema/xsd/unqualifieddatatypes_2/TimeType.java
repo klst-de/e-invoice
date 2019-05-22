@@ -1,8 +1,8 @@
 //
-// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
-// Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+// Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
+// Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2019.05.13 um 09:58:17 AM CEST 
+// Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
 
@@ -92,12 +92,12 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Validati
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="TimeType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>time">
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;complexType name="TimeType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;time"&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -107,37 +107,37 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Validati
     "value"
 })
 @XmlSeeAlso({
+    ActualDeliveryTimeType.class,
+    ActualDespatchTimeType.class,
+    ActualPickupTimeType.class,
     AwardTimeType.class,
-    ExpiryTimeType.class,
-    RequestedDespatchTimeType.class,
-    LatestPickupTimeType.class,
-    EndTimeType.class,
-    IssueTimeType.class,
-    ResponseTimeType.class,
-    RevisionTimeType.class,
-    StartTimeType.class,
+    CallTimeType.class,
     ComparisonForecastIssueTimeType.class,
     EarliestPickupTimeType.class,
-    ActualPickupTimeType.class,
-    RequiredDeliveryTimeType.class,
-    ValidationTimeType.class,
-    ResolutionTimeType.class,
     EffectiveTimeType.class,
-    GuaranteedDespatchTimeType.class,
+    EndTimeType.class,
     EstimatedDeliveryTimeType.class,
-    ActualDeliveryTimeType.class,
-    PaidTimeType.class,
-    RegisteredTimeType.class,
-    ActualDespatchTimeType.class,
-    SourceForecastIssueTimeType.class,
-    ManufactureTimeType.class,
-    OccurrenceTimeType.class,
     EstimatedDespatchTimeType.class,
-    ReferenceTimeType.class,
+    ExpiryTimeType.class,
+    GuaranteedDespatchTimeType.class,
+    IssueTimeType.class,
     LastRevisionTimeType.class,
-    NominationTimeType.class,
     LatestDeliveryTimeType.class,
-    CallTimeType.class
+    LatestPickupTimeType.class,
+    ManufactureTimeType.class,
+    NominationTimeType.class,
+    OccurrenceTimeType.class,
+    PaidTimeType.class,
+    ReferenceTimeType.class,
+    RegisteredTimeType.class,
+    RequestedDespatchTimeType.class,
+    RequiredDeliveryTimeType.class,
+    ResolutionTimeType.class,
+    ResponseTimeType.class,
+    RevisionTimeType.class,
+    SourceForecastIssueTimeType.class,
+    StartTimeType.class,
+    ValidationTimeType.class
 })
 public class TimeType {
 
