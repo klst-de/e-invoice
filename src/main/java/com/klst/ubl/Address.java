@@ -208,9 +208,22 @@ public class Address extends AddressType implements PostalAddress {
 		return addressLines.size()<=2 ? null : addressLines.get(2).getLine().getValue();
 	}
 	
+	/**
+	 * Seller/Buyer city
+	 * <p>
+	 * The common name of the city, town or village, where the address is located.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>ID: BT-37 / BT-52
+	 * <br>Req.ID: R53
+	 *  
+	 * @return Text
+	 */
 	@Override
 	public String getCity() {
-		return super.getCityName().getValue();
+		CityNameType cityName = super.getCityName();
+		if(cityName==null) return null; 
+		return cityName.getValue();
 	}
 	
 	@Override
@@ -229,10 +242,11 @@ public class Address extends AddressType implements PostalAddress {
 	
 	@Override
 	public String getCountryCode() {
-//		CountryType country = this.getCountry();
-//		IdentificationCodeType code = country.getIdentificationCode();
-//		return code.getValue();
-		return super.getCountry().getIdentificationCode().getValue();
+		CountryType country = super.getCountry();
+		// eigentlich ist BT-40 1..1 Seller country code und BT-55 1..1 Buyer country code mandatory
+		// aber in ubl003.xml ist es null!!! daher defensiv:
+		if(country==null) return null; 
+		return country.getIdentificationCode().getValue();
 	}
 
 }
