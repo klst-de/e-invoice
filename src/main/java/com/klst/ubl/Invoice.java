@@ -521,8 +521,7 @@ SELLER CONTACT                              BG-6                        1
 		companyID.setValue(companyId);
 		partyTaxScheme.setCompanyID(companyID);
 		
-		TaxSchemeType taxScheme = VatCategory.getVatScheme();
-//		TaxSchemeType taxScheme = VatCategory.getVatScheme("DE"); TODO wg.
+		TaxSchemeType taxScheme = VatCategory.getVatScheme("DE"); // wg. https://github.com/klst-de/e-invoice/issues/1
 		partyTaxScheme.setTaxScheme(taxScheme);
 		partyTaxSchemeList.add(partyTaxScheme);	
 	}

@@ -38,12 +38,29 @@ public class VatCategory extends TaxCategoryType {
 	 */
 	public static final String VAT = "VAT";
 
-	static TaxSchemeType getVatScheme() {
+/* beim Test von 01.04a-INVOICE_ubl.xml bekommt man @see https://github.com/klst-de/e-invoice/issues/1
+Pos 	Code 	Adj. Grad (Grad) 	Text
+val-sch.1.1 	BR-O-02 	error 	[BR-O-02]-An Invoice that contains an Invoice line (BG-25) where the Invoiced item VAT category code 
+                                    (BT-151) is “Not subject to VAT” shall not contain the Seller VAT identifier (BT-31), 
+                                    the Seller tax representative VAT identifier (BT-63) or the Buyer VAT identifier (BT-46).
+                                    Pfad: /ubl:Invoice
+val-sch.1.2 	BR-CO-09 	error 	[BR-CO-09]-The Seller VAT identifier (BT-31), the Seller tax representative VAT identifier (BT-63) 
+                                    and the Buyer VAT identifier (BT-48) shall have a prefix in accordance with ISO code ISO 3166-1 alpha-2 
+                                    by which the country of issue may be identified. Nevertheless, Greece may use the prefix ‘EL’.
+                                    Pfad: /ubl:Invoice/cac:AccountingSupplierParty[1]/cac:Party[1]/cac:PartyTaxScheme[1]
+
+daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
+ */
+	static TaxSchemeType getVatScheme(String code) {
 		TaxSchemeType taxScheme = new TaxSchemeType();
 		IDType taxSchemeID = new IDType();
-		taxSchemeID.setValue(VAT); // const
+		taxSchemeID.setValue(code);
 		taxScheme.setID(taxSchemeID);
 		return taxScheme;
+	}
+
+	static TaxSchemeType getVatScheme() {
+		return getVatScheme(VAT);
 	}
 
 	public VatCategory() {
