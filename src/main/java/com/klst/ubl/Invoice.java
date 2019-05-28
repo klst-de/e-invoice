@@ -1500,11 +1500,9 @@ Connecting Europe Facility gepflegt und herausgegeben
 			
 			TaxableAmountType taxableAmount = taxSubtotal.getTaxableAmount(); // mandatory
 			map.put(TaxableAmountType.class, new Amount(taxableAmount));
-			resultList.add(map);
 			
 			TaxAmountType taxAmount = taxSubtotal.getTaxAmount(); // mandatory
 			map.put(TaxAmountType.class, new Amount(taxAmount));
-			resultList.add(map);
 			
 			TaxCategoryType taxCategory = taxSubtotal.getTaxCategory(); // mandatory
 			VatCategory vatCategory = new VatCategory(taxCategory);
@@ -1520,6 +1518,7 @@ Connecting Europe Facility gepflegt und herausgegeben
 			if(taxExemptionReasonCode!=null) {
 				vatCategory.setTaxExemptionReasonCode(taxExemptionReasonCode.getValue());
 			}
+			resultList.add(map);
 		});
 		return resultList;
 	}
