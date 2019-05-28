@@ -47,6 +47,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyI
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyLegalFormType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CustomizationIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentCurrencyCodeType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InvoiceTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDateType;
@@ -149,6 +150,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		this(getCustomizationID(invoice), getProfileID(invoice), getDocumentNameCode(invoice));
 		setId(getId(invoice));
 		setIssueDate(getIssueDateAsTimestamp(invoice));
+		setDueDate(getDueDateAsTimestamp(invoice));		
 		addNotes(invoice);
 		setPaymentCurrencyCode(getPaymentCurrency(invoice));
 		setDocumentCurrencyCode(getDocumentCurrency(invoice));
@@ -247,7 +249,68 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	/* Invoice issue date                          BT-2  Date                  1 (mandatory) 
 	 * Das Datum, an dem die Rechnung ausgestellt wurde.
 	 */
+	/**
+	 * Invoice issue date
+	 * <p>
+	 * The date when the Invoice was issued
+	 * <p>
+	 * Cardinality: 1..1 (mandatory)
+	 * <br>ID: BT-2
+	 * <br>Req.ID: R56
+	 * 
+	 * @param ymd Date
+	 */
 	public void setIssueDate(String ymd) {	
+		setIssueDate(ymdToTs(ymd));
+	}
+	public void setIssueDate(Timestamp ts) {
+		IssueDateType issueDate = new IssueDateType();
+		issueDate.setValue(tsToXMLGregorianCalendar(ts));
+		super.setIssueDate(issueDate);
+	}
+	public Timestamp getIssueDateAsTimestamp() {  // bei gleichen Namen getIssueDate() kann es nicht abgeleitet sein
+		return getIssueDateAsTimestamp(this);
+	}
+	static Timestamp getIssueDateAsTimestamp(InvoiceType invoice) {
+		IssueDateType issueDate = invoice.getIssueDate();
+		return xmlGregorianCalendarToTs(issueDate.getValue());
+	}
+	
+	/**
+	 * Payment due date 
+	 * <p>
+	 * The date when the payment is due.
+	 * <br>
+	 * The payment due date reflects the due date of the net payment. 
+	 * For partial payments it states the first net due date. 
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>ID: BT-9
+	 * <br>Req.ID: R60
+	 * 
+	 * @param ymd Date
+	 */
+	public void setDueDate(String ymd) {
+		setDueDate(ymdToTs(ymd));
+	}
+	public void setDueDate(Timestamp ts) {
+		DueDateType dueDate = new DueDateType();
+		dueDate.setValue(tsToXMLGregorianCalendar(ts));
+		super.setDueDate(dueDate);
+	}
+	public Timestamp getDueDateAsTimestamp() {  // bei gleichen Namen getIssueDate() kann es nicht abgeleitet sein
+		return getDueDateAsTimestamp(this);
+	}
+	static Timestamp getDueDateAsTimestamp(InvoiceType invoice) {
+		DueDateType dueDate = invoice.getDueDate();
+		return dueDate==null ? null : xmlGregorianCalendarToTs(dueDate.getValue());
+	}
+	
+	private static Timestamp xmlGregorianCalendarToTs(XMLGregorianCalendar cal) {
+		long timeInMillis = cal.toGregorianCalendar().getTimeInMillis();
+		return new Timestamp(timeInMillis);
+	}
+	private static Timestamp ymdToTs(String ymd) {
 		Timestamp ts = null;
 		try {
 			//Timestamp.valueOf("yyyy-[m]m-[d]d hh:mm:ss[.f...]"); // JDBC timestamp escape format
@@ -261,9 +324,10 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 				ex.printStackTrace();
 			}
 		}
-		setIssueDate(ts);
+		return ts;
 	}
-	public void setIssueDate(Timestamp ts) {
+	
+	private static XMLGregorianCalendar tsToXMLGregorianCalendar(Timestamp ts) {
         LocalDateTime ldt = ts.toLocalDateTime();
         XMLGregorianCalendar cal = null;
 		try {
@@ -278,20 +342,9 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
         cal.setHour(ldt.getHour());
         cal.setMinute(ldt.getMinute());
         cal.setSecond(ldt.getSecond());
-		IssueDateType issueDate = new IssueDateType();
-		issueDate.setValue(cal); //XMLGregorianCalendar
-		this.setIssueDate(issueDate);
+		return cal;
 	}
-	public Timestamp getIssueDateAsTimestamp() {  // bei gleichen Namen getIssueDate() kann es nicht abgeleitet sein
-		return getIssueDateAsTimestamp(this);
-	}
-	static Timestamp getIssueDateAsTimestamp(InvoiceType invoice) {
-		IssueDateType issueDate = invoice.getIssueDate();
-		XMLGregorianCalendar cal = issueDate.getValue();
-		long timeInMillis = cal.toGregorianCalendar().getTimeInMillis();
-		return new Timestamp(timeInMillis);
-	}
-	
+
 	/* INVOICE NOTE                                BG-1                        0..*
 	 * Eine Gruppe von Informationselementen für rechnungsrelevante Erläuterungen mit Hinweisen auf den Rechnungsbetreff.
 	 * 
