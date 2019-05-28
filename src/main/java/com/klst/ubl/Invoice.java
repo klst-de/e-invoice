@@ -288,12 +288,14 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * <br>ID: BT-9
 	 * <br>Req.ID: R60
 	 * 
-	 * @param ymd Date
+	 * @param ymd Date, optional: can be null
 	 */
 	public void setDueDate(String ymd) {
+		if(ymd==null) return;
 		setDueDate(ymdToTs(ymd));
 	}
 	public void setDueDate(Timestamp ts) {
+		if(ts==null) return;
 		DueDateType dueDate = new DueDateType();
 		dueDate.setValue(tsToXMLGregorianCalendar(ts));
 		super.setDueDate(dueDate);
