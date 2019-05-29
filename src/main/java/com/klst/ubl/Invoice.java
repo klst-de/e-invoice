@@ -1461,8 +1461,8 @@ Connecting Europe Facility gepflegt und herausgegeben
 	 * @param mandatory taxableAmount : VAT category taxable amount
 	 * @param mandatory tax : VAT category tax amount
 	 * @param mandatory vatCategory : VAT category code and rate
-// TODO	 * optional : VAT exemption reason text
-// TODO	 * optional : VAT exemption reason code
+// 	 * optional : VAT exemption reason text
+// 	 * optional : VAT exemption reason code
 	 */
 //	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, VatCategory vatCategory) {
@@ -1521,14 +1521,19 @@ Connecting Europe Facility gepflegt und herausgegeben
 			
 			// die optionalen "VAT exemption reason text" und "VAT exemption reason code"
 			List<TaxExemptionReasonType> taxExemptionReasons = taxCategory.getTaxExemptionReason();
+			List<String> taxExemptionReasonList = new ArrayList<String>(taxExemptionReasons.size());
 			taxExemptionReasons.forEach(taxExemptionReason -> {
 				vatCategory.addTaxExemptionReason(taxExemptionReason.getValue());
+				taxExemptionReasonList.add(taxExemptionReason.getValue());
 			});
+			map.put(TaxExemptionReasonType.class, taxExemptionReasonList);
 			
 			TaxExemptionReasonCodeType taxExemptionReasonCode = taxCategory.getTaxExemptionReasonCode();
 			if(taxExemptionReasonCode!=null) {
 				vatCategory.setTaxExemptionReasonCode(taxExemptionReasonCode.getValue());
+				map.put(TaxExemptionReasonCodeType.class, taxExemptionReasonCode.getValue());
 			}
+			
 			resultList.add(map);
 		});
 		return resultList;
