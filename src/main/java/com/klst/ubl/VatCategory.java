@@ -127,7 +127,9 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 	
 	private static final int SCALE = 2;
 	public BigDecimal getTaxRate(RoundingMode roundingMode) {
-		return this.getTaxRate().setScale(SCALE, roundingMode);
+		BigDecimal rate = this.getTaxRate();
+		if(rate==null) return rate;
+		return rate.setScale(SCALE, roundingMode);
 	}
 
 	private String getTaxRateAsString() {
