@@ -10,6 +10,11 @@ import org.junit.runners.MethodSorters;
 public class CreateUblTest {
 
 	private static final String[] UBL_XML = {
+			"ubl001.xml" ,
+			"ubl002.xml" ,
+			"ubl004.xml" ,
+			"ubl007.xml" ,
+//			"ubl008.xml" , TODO
 			"01.01a-INVOICE_ubl.xml" ,
 			"01.02a-INVOICE_ubl.xml" ,
 			"01.03a-INVOICE_ubl.xml" ,
