@@ -543,16 +543,15 @@ SELLER CONTACT                              BG-6                        1
 	 * @param sellerRegistrationName mandatory
 	 * @param postalAddress mandatory group
 	 * @param contact mandatory group
-	 * @param taxCompanyId optional / Seller VAT identifier, BT-31
 	 * @param companyId optional / Seller legal registration identifier, BT-30
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33
 	 */
 	public void setSeller(String sellerRegistrationName, PostalAddress postalAddress, IContact contact, 
-			String taxCompanyId, String companyId, String companyLegalForm) {
+			String companyId, String companyLegalForm) {
 		PartyType party = new PartyType();
 		
 		addLegalEntities(party, sellerRegistrationName, companyId, companyLegalForm);
-		addPartyTaxScheme(party, taxCompanyId);
+//		addPartyTaxScheme(party, taxCompanyId);
 		
 		party.setPostalAddress((AddressType)postalAddress);
 		party.setContact(new Contact(contact));
@@ -564,6 +563,16 @@ SELLER CONTACT                              BG-6                        1
 		this.setAccountingSupplierParty(supplierParty);
 	}
 
+	/**
+	 * set optional taxCompanyId  / Seller VAT identifier, BT-31
+	 * 
+	 * @param taxCompanyId
+	 */
+	public void setSellerTaxCompanyId(String taxCompanyId) {
+		PartyType party = getSupplierParty();
+		addPartyTaxScheme(party, taxCompanyId);
+	}
+	
 	// wg. [BR-DE-16] In der Rechnung muss mindestens eines der Elemente "Seller VAT identifier" (BT-31), 
 	//                "Seller tax registration identifier" (BT-32) 
 	//                oder "SELLER TAX REPRESENTATIVE PARTY" (BG-11) übermittelt werden. 
@@ -576,7 +585,9 @@ SELLER CONTACT                              BG-6                        1
 		companyID.setValue(companyId);
 		partyTaxScheme.setCompanyID(companyID);
 		
-		TaxSchemeType taxScheme = VatCategory.getVatScheme("DE"); // wg. https://github.com/klst-de/e-invoice/issues/1
+		// use countryCode of the party (which is mandatory) as default see https://github.com/klst-de/e-invoice/issues/1
+		TaxSchemeType taxScheme = VatCategory.getVatScheme(getPartyPostalAddress(party).getCountryCode());
+		
 		partyTaxScheme.setTaxScheme(taxScheme);
 		partyTaxSchemeList.add(partyTaxScheme);	
 	}
