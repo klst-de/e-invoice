@@ -1,8 +1,10 @@
 package com.klst.ubl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.klst.untdid.codelist.TaxCategoryCode;
 
@@ -28,6 +30,8 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
  */
 public class VatCategory extends TaxCategoryType {
 
+	private static final Logger LOG = Logger.getLogger(VatCategory.class.getName());
+	
 	/**
 	 * Value added tax. 
 	 * <p>
@@ -89,6 +93,9 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 		taxCategory.setTaxScheme(taxScheme);
 		taxCategory.setID(taxID);
 		taxCategory.setPercent(percentType);
+		super.setPercent(taxCategory.getPercent());
+		super.setID(taxCategory.getID());
+		super.setTaxScheme(taxCategory.getTaxScheme());
 	}
 
 	/**
@@ -118,8 +125,13 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 		return percent==null ? null : percent.getValue();
 	}
 	
+	private static final int SCALE = 2;
+	public BigDecimal getTaxRate(RoundingMode roundingMode) {
+		return this.getTaxRate().setScale(SCALE, roundingMode);
+	}
+
 	private String getTaxRateAsString() {
-		BigDecimal rate = getTaxRate();
+		BigDecimal rate = getTaxRate(RoundingMode.HALF_UP);
 		return rate==null ? "" : rate.toString()+"%";
 	}
 	
@@ -180,6 +192,10 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 		if(!joined.isEmpty()) {
 			joined = " + ["+joined+"]";
 		}
-		return this.getID().getValue() + " " + getTaxRateAsString()+" - " + VAT + joined;
+//		LOG.warning("ID:"+getID());
+//		LOG.warning("getTaxRateAsString:"+getTaxRateAsString());
+//		LOG.warning("joined:"+joined);
+		String id = getID()==null ? "'noID'" : getID().getValue();
+		return id + " " + getTaxRateAsString()+" - " + VAT + joined;
 	}
 }
