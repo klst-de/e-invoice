@@ -449,7 +449,7 @@ Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grun
 		return getBuyerReferenceValue(this);
 	}
 	static String getBuyerReferenceValue(InvoiceType invoice) {
-		return invoice.getBuyerReference().getValue();
+		return invoice.getBuyerReference()==null ? null : invoice.getBuyerReference().getValue();
 	}
 
 	// TODO raus oder deprecated
