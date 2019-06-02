@@ -170,6 +170,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		addPaymentTerms(invoice);
 		addVATBreakDown(invoice);
 		addInvoiceLines(invoice);
+		addDeliveries(invoice);
 	}
 	
 	public DocumentNameCode getDocumentNameCode() {
@@ -308,11 +309,11 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		return dueDate==null ? null : xmlGregorianCalendarToTs(dueDate.getValue());
 	}
 	
-	private static Timestamp xmlGregorianCalendarToTs(XMLGregorianCalendar cal) {
+	static Timestamp xmlGregorianCalendarToTs(XMLGregorianCalendar cal) {
 		long timeInMillis = cal.toGregorianCalendar().getTimeInMillis();
 		return new Timestamp(timeInMillis);
 	}
-	private static Timestamp ymdToTs(String ymd) {
+	static Timestamp ymdToTs(String ymd) {
 		Timestamp ts = null;
 		try {
 			//Timestamp.valueOf("yyyy-[m]m-[d]d hh:mm:ss[.f...]"); // JDBC timestamp escape format
@@ -329,7 +330,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		return ts;
 	}
 	
-	private static XMLGregorianCalendar tsToXMLGregorianCalendar(Timestamp ts) {
+	static XMLGregorianCalendar tsToXMLGregorianCalendar(Timestamp ts) {
         LocalDateTime ldt = ts.toLocalDateTime();
         XMLGregorianCalendar cal = null;
 		try {
@@ -1379,10 +1380,37 @@ anzugeben, wenn ein Mandat erteilt wurde und der Rechnungsbetrag per Lastschrift
 		return paymentTermsList;
 	}
 
-//	List<DeliveryType> deliveryList = this.getDelivery();   // TODO
-	public List<DeliveryType> addDelivery() {
+	// optional DELIVERY INFORMATION
+	public List<Delivery> getDeliveries() {
 		List<DeliveryType> deliveryList = this.getDelivery();
-/* TODO
+		List<Delivery> result = new ArrayList<Delivery>(deliveryList.size());
+		deliveryList.forEach(delivery -> {
+			result.add(new Delivery(delivery));
+		});
+		return result;
+	}
+	List<DeliveryType> addDeliveries(InvoiceType invoice) {
+		List<DeliveryType> deliveryList = invoice.getDelivery();
+		List<DeliveryType> result = this.getDelivery();
+		deliveryList.forEach(delivery -> {
+			result.add(new Delivery(delivery));
+		});
+		return result;
+	}
+	public List<DeliveryType> addDelivery(List<Delivery> deliveryList) {
+		deliveryList.forEach(delivery -> {
+			this.addDelivery(delivery);
+		});
+		return this.getDelivery();
+	}
+	public List<DeliveryType> addDelivery(Delivery delivery) {
+		this.getDelivery().add(delivery);
+		List<DeliveryType> deliveryList = this.getDelivery();
+/*                                            01.02a-INVOICE_ubl.xml - nur cbc:ActualDeliveryDate
+ *                                            01.05a-INVOICE_ubl.xml - cac:DeliveryLocation + DeliveryParty
+ *                                            01.06a-INVOICE_ubl.xml 
+ *                                            01.10a-INVOICE_ubl.xml
+ *                                            01.14a-INVOICE_ubl.xml
   <cac:Delivery>
     <!-- Details zur Lieferung -->
     <!-- Delivery details -->
