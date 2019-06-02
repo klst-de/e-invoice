@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import com.klst.untdid.codelist.TaxCategoryCode;
 
@@ -30,7 +29,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
  */
 public class VatCategory extends TaxCategoryType {
 
-	private static final Logger LOG = Logger.getLogger(VatCategory.class.getName());
+//	private static final Logger LOG = Logger.getLogger(VatCategory.class.getName());
 	
 	/**
 	 * Value added tax. 

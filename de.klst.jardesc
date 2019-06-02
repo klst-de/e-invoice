@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="e-invoice/de.klst.x-factur-0.0.2.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/e-invoice/de.klst.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="true">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=e-invoice/src\/main\/resources"/>
+        <file path="/e-invoice/README.md"/>
+        <file path="/e-invoice/LICENSE"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java"/>
+    </selectedElements>
+</jardesc>
