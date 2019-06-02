@@ -31,6 +31,13 @@ public class Party extends PartyType { // TODO implements ???
 		setContact(getContact(party));
 		setAddress(getPostalAddress(party));
 	}
+	
+	public Party(String name, Address address, Contact contact) {
+		this();
+		addName(name);
+		setAddress(address);
+		setContact(contact);
+	}
 
 	// PartyName
 	public void addName(String name) {

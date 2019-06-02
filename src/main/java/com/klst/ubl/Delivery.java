@@ -34,6 +34,11 @@ public class Delivery extends DeliveryType { // TODO implements IDelivery
 		setActualDate(getActualDate(delivery));
 	}
 
+	public Delivery(Party party) {
+		this();
+		setParty(party);
+	}
+
 	// Party with party name
 	public void setParty(Party party) {
 		super.setDeliveryParty((PartyType)party);

@@ -14,6 +14,7 @@ import org.junit.runners.MethodSorters;
 
 import com.klst.cius.IContact;
 import com.klst.ubl.Address;
+import com.klst.ubl.Contact;
 import com.klst.ubl.Delivery;
 import com.klst.ubl.Invoice;
 import com.klst.ubl.Party;
@@ -62,6 +63,17 @@ public class PartyTest {
 			LOG.info("party.neme(0):"+ (supplierparty.getNames().isEmpty() ? "nix" : supplierparty.getNames().get(0)) );
 		}
     }
+
+    @Test
+    public void ubl0ctor() {
+    	String name = "party name";
+    	Address address = null;
+    	Contact contact = null;
+    	Party party = new Party(name, address, contact);
+		assertEquals(name, party.getNames().get(0));
+		assertEquals(address, party.getAddress());
+		assertEquals(contact, party.getContact());
+   }
 
     @Test
     public void ublAddName() {
