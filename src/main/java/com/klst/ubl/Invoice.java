@@ -17,7 +17,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import com.klst.cius.DocumentTotals;
 import com.klst.cius.IContact;
-import com.klst.cius.PostalAddress;
 import com.klst.un.unece.uncefact.Amount;
 import com.klst.un.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.DocumentNameCode;
@@ -31,20 +30,14 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Fina
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.MonetaryTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyLegalEntityType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyNameType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyTaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentTermsType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.SupplierPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSubtotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BuyerReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyLegalFormType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CustomizationIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentCurrencyCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DueDateType;
@@ -52,13 +45,11 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InvoiceTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PayableAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentCurrencyCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ProfileIDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.RegistrationNameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;
@@ -66,8 +57,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxInclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
-import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.IdentifierType;
-import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
 
 // subklassen: CommercialInvoice , Partial invoice , Corrected invoice , Self-billed invoice
 // Credit note nicht weil es dafür ein extra ubl gibt: CreditNoteType
@@ -156,14 +145,17 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		setDocumentCurrencyCode(getDocumentCurrency(invoice));
 		setBuyerReference(getBuyerReferenceValue(invoice));
 		setOrderReferenceID(getOrderReferenceID(invoice));
-		addSellerLegalEntities(invoice);
-		addBuyerLegalEntities(invoice);
-		addSellerTaxSchemes(invoice);
-		addSellerPartyNames(invoice);
-		setSellerPostalAddress(getSellerPostalAddress(invoice));
-		setBuyerPostalAddress(getBuyerPostalAddress(invoice));
-		setSellerContact(getSellerContact(invoice));
-		setBuyerContact(getBuyerContact(invoice));
+//		addSellerLegalEntities(invoice);
+//		addBuyerLegalEntities(invoice);
+//		addSellerTaxSchemes(invoice);
+		setSellerParty(getSellerParty(invoice));
+		setBuyerParty(getBuyerParty(invoice));
+		
+//		addSellerPartyNames(invoice);
+//		setSellerPostalAddress(getSellerPostalAddress(invoice));
+//		setBuyerPostalAddress(getBuyerPostalAddress(invoice));
+//		setSellerContact(getSellerContact(invoice));
+//		setBuyerContact(getBuyerContact(invoice));
 		setDocumentTotals(invoice);
 		setInvoiceTax(getInvoiceTax(invoice));
 		addPaymentInstructions(invoice);
@@ -547,21 +539,86 @@ SELLER CONTACT                              BG-6                        1
 	 * @param companyId optional / Seller legal registration identifier, BT-30
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33
 	 */
-	public void setSeller(String sellerRegistrationName, PostalAddress postalAddress, IContact contact, 
+	public void setSeller(String sellerRegistrationName, Address address, Contact contact, 
 			String companyId, String companyLegalForm) {
-		PartyType party = new PartyType();
-		
-		addLegalEntities(party, sellerRegistrationName, companyId, companyLegalForm);
-//		addPartyTaxScheme(party, taxCompanyId);
-		
-		party.setPostalAddress((AddressType)postalAddress);
-		party.setContact(new Contact(contact));
-		
-//		List<PersonType> persons = party.getPerson(); // TODO, nicht in XRechnung-v1-2-0.pdf dokumentiert
-		
+		Party party = new Party(null, address, contact);
+		party.addLegalEntities(sellerRegistrationName, companyId, companyLegalForm);
+//		PartyType party = new PartyType();
+//		
+//		addLegalEntities(party, sellerRegistrationName, companyId, companyLegalForm);
+////		addPartyTaxScheme(party, taxCompanyId);
+//		
+//		party.setPostalAddress((AddressType)postalAddress);
+//		party.setContact(new Contact(contact));
+//		
+////		List<PersonType> persons = party.getPerson(); // TODO, nicht in XRechnung-v1-2-0.pdf dokumentiert
+//		
+//		SupplierPartyType supplierParty = new SupplierPartyType();
+//		supplierParty.setParty(party);
+//		this.setAccountingSupplierParty(supplierParty);
+		setSellerParty(party);
+	}
+
+	public Party getSellerParty() {
+		return getSellerParty(this);
+	}
+	static Party getSellerParty(InvoiceType invoice) {
+		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
+		return supplierParty==null ? null : new Party(supplierParty.getParty());
+	}
+	public void setSellerParty(Party party) {
 		SupplierPartyType supplierParty = new SupplierPartyType();
 		supplierParty.setParty(party);
-		this.setAccountingSupplierParty(supplierParty);
+		setAccountingSupplierParty(supplierParty);
+	}
+	
+	public Party getBuyerParty() {
+		return getBuyerParty(this);
+	}
+	static Party getBuyerParty(InvoiceType invoice) {
+		CustomerPartyType customerparty = invoice.getAccountingCustomerParty();
+		return customerparty==null ? null : new Party(customerparty.getParty());
+	}
+	public void setBuyerParty(Party party) {
+		CustomerPartyType customerparty = new CustomerPartyType();
+		customerparty.setParty(party);
+		setAccountingCustomerParty(customerparty);
+	}
+	
+	/**
+	 *  Buyer (AccountingCustomerParty)
+	 *  Buyer is mandatory information and provided in element cac:AccountingCustomerParty
+	 *  
+	 * @param buyerName mandatory - !!! so ist es dokumentiert, BT-44 meint aber registrationName!
+	 * @param postalAddress mandatory
+	 * @param contact optional
+	 */
+	public void setBuyer(String buyerName, Address address, Contact contact) {
+		Party party = new Party(buyerName, address, contact);
+//		PartyType party = new PartyType();
+//		
+//		addLegalEntities(party, buyerName, null, null); // ohne String companyId, String companyLegalForm
+		
+		// BT-46:
+//		List<PartyIdentificationType> partyIdentifications = party.getPartyIdentification();
+//		PartyIdentificationType partyIdentification = new PartyIdentificationType();
+//		IDType buyerID = new IDType();
+//		buyerID.setValue(buyerId);
+//		partyIdentification.setID(buyerID);
+//		partyIdentifications.add(partyIdentification);
+		
+		// => TODO name ist optional : buyerTradingName                          BT-45
+		
+//		party.setPostalAddress((AddressType)postalAddress);
+//		if(contact!=null) { // optional
+//			party.setContact(new Contact(contact));
+//		}
+
+//		CustomerPartyType customerParty = new CustomerPartyType();
+//		customerParty.setParty(party);
+//		
+//		this.setAccountingCustomerParty(customerParty);
+		setBuyerParty(party);
 	}
 
 	/**
@@ -571,27 +628,29 @@ SELLER CONTACT                              BG-6                        1
 	 */
 	public void setSellerTaxCompanyId(String taxCompanyId) {
 		PartyType party = getSupplierParty();
-		addPartyTaxScheme(party, taxCompanyId);
+		Party p = new Party(party);
+		p.addPartyTaxScheme(taxCompanyId);
+//		addPartyTaxScheme(party, taxCompanyId);            // TODO
 	}
 	
 	// wg. [BR-DE-16] In der Rechnung muss mindestens eines der Elemente "Seller VAT identifier" (BT-31), 
 	//                "Seller tax registration identifier" (BT-32) 
 	//                oder "SELLER TAX REPRESENTATIVE PARTY" (BG-11) übermittelt werden. 
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.
-	private void addPartyTaxScheme(PartyType party, String companyId)  {
-		if(companyId==null) return;
-		List<PartyTaxSchemeType> partyTaxSchemeList = party.getPartyTaxScheme();
-		PartyTaxSchemeType partyTaxScheme = new PartyTaxSchemeType();
-		CompanyIDType companyID = new CompanyIDType();
-		companyID.setValue(companyId);
-		partyTaxScheme.setCompanyID(companyID);
-		
-		// use countryCode of the party (which is mandatory) as default see https://github.com/klst-de/e-invoice/issues/1
-		TaxSchemeType taxScheme = VatCategory.getVatScheme(getPartyPostalAddress(party).getCountryCode());
-		
-		partyTaxScheme.setTaxScheme(taxScheme);
-		partyTaxSchemeList.add(partyTaxScheme);	
-	}
+//	private void addPartyTaxScheme(PartyType party, String companyId)  {  // TODO durch party ersetzt
+//		if(companyId==null) return;
+//		List<PartyTaxSchemeType> partyTaxSchemeList = party.getPartyTaxScheme();
+//		PartyTaxSchemeType partyTaxScheme = new PartyTaxSchemeType();
+//		CompanyIDType companyID = new CompanyIDType();
+//		companyID.setValue(companyId);
+//		partyTaxScheme.setCompanyID(companyID);
+//		
+//		// use countryCode of the party (which is mandatory) as default see https://github.com/klst-de/e-invoice/issues/1
+//		TaxSchemeType taxScheme = VatCategory.getVatScheme(getPartyPostalAddress(party).getCountryCode());
+//		
+//		partyTaxScheme.setTaxScheme(taxScheme);
+//		partyTaxSchemeList.add(partyTaxScheme);	
+//	}
 	
 	public List<Map<Object,String>> getSellerTaxSchemes() { 
 		return getSellerTaxSchemes(this);
@@ -602,7 +661,8 @@ SELLER CONTACT                              BG-6                        1
 		if(party==null) {
 			return new ArrayList<Map<Object,String>>();
 		}
-		return getTaxSchemes(party);
+		Party p = new Party(party);
+		return p.getTaxSchemes();
 	}
 	
 	public List<Map<Object,String>> getBuyerTaxSchemes() { 
@@ -614,62 +674,65 @@ SELLER CONTACT                              BG-6                        1
 		if(party==null) {
 			return new ArrayList<Map<Object,String>>();
 		}
-		return getTaxSchemes(party);
+		Party p = new Party(party);
+		return p.getTaxSchemes();
 	}
 	
-	private static List<Map<Object,String>> getTaxSchemes(PartyType party) { 
-		LOG.info("party:"+party);
-		List<PartyTaxSchemeType> partyTaxSchemes = party.getPartyTaxScheme();
-		List<Map<Object,String>> resultList = new ArrayList<Map<Object,String>>(partyTaxSchemes.size());
-		LOG.info("partyTaxSchemes#:"+partyTaxSchemes.size() + " resultList#:"+resultList.size());
-		partyTaxSchemes.forEach(partyTaxScheme -> {
-			Map<Object,String> map = new HashMap<Object,String>();
-			TaxSchemeType taxScheme = partyTaxScheme.getTaxScheme();
-			IdentifierType taxSchemeID = null;
-			if(taxScheme!=null) {
-				taxSchemeID = taxScheme.getID();
-			}	
-			map.put(TaxSchemeType.class, taxSchemeID.getValue());
-			resultList.add(map);
-			IdentifierType companyID = partyTaxScheme.getCompanyID();
-			map.put(CompanyIDType.class, companyID.getValue());
-			resultList.add(map);
-		});
-		LOG.info("resultList#:"+resultList.size());
-		return resultList;
-	}
+//	private static List<Map<Object,String>> getTaxSchemes(PartyType party) { // TODO durch Party ersetzt
+//		LOG.info("party:"+party);
+//		List<PartyTaxSchemeType> partyTaxSchemes = party.getPartyTaxScheme();
+//		List<Map<Object,String>> resultList = new ArrayList<Map<Object,String>>(partyTaxSchemes.size());
+//		LOG.info("partyTaxSchemes#:"+partyTaxSchemes.size() + " resultList#:"+resultList.size());
+//		partyTaxSchemes.forEach(partyTaxScheme -> {
+//			Map<Object,String> map = new HashMap<Object,String>();
+//			TaxSchemeType taxScheme = partyTaxScheme.getTaxScheme();
+//			IdentifierType taxSchemeID = null;
+//			if(taxScheme!=null) {
+//				taxSchemeID = taxScheme.getID();
+//			}	
+//			map.put(TaxSchemeType.class, taxSchemeID.getValue());
+//			resultList.add(map);
+//			IdentifierType companyID = partyTaxScheme.getCompanyID();
+//			map.put(CompanyIDType.class, companyID.getValue());
+//			resultList.add(map);
+//		});
+//		LOG.info("resultList#:"+resultList.size());
+//		return resultList;
+//	}
 	
-	List<PartyTaxSchemeType> addSellerTaxSchemes(InvoiceType invoice) {
-		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
-		PartyType party = null;
-		if(supplierParty!=null) {
-			party = supplierParty.getParty();
-		}
-		PartyType myParty = getSupplierParty();
-		LOG.info("SupplierParty:"+myParty);
-		return addPartyTaxSchemes(myParty.getPartyTaxScheme(), party);
-	}
+//	List<PartyTaxSchemeType> addSellerTaxSchemes(InvoiceType invoice) {
+//		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
+//		Party party = supplierParty==null ? null : new Party(supplierParty.getParty());
+////		PartyType party = null;
+////		if(supplierParty!=null) {
+////			party = supplierParty.getParty();
+////		}
+////		PartyType myParty = getSupplierParty();
+////		LOG.info("SupplierParty:"+myParty);
+////		return addPartyTaxSchemes(myParty.getPartyTaxScheme(), party); // TODO
+//		return party 
+//	}
 	
-	private List<PartyTaxSchemeType> addPartyTaxSchemes(List<PartyTaxSchemeType> myPartyTaxSchemes, PartyType party) {
-		if(party==null) {
-			return myPartyTaxSchemes;
-		}
-		List<PartyTaxSchemeType> partyTaxSchemes = party.getPartyTaxScheme();
-		partyTaxSchemes.forEach(partyTaxScheme -> {
-			myPartyTaxSchemes.add(partyTaxScheme);
-			IdentifierType companyID = partyTaxScheme.getCompanyID();
-			String companyIDvalue = companyID==null ? "null" : companyID.getValue();
-			TaxSchemeType taxScheme = partyTaxScheme.getTaxScheme();
-			IdentifierType taxSchemeID = null;
-			if(taxScheme!=null) {
-				taxSchemeID = taxScheme.getID();
-			}	
-			String taxSchemeIDValue = taxSchemeID==null ? "null" : taxSchemeID.getValue();
-			LOG.info("TaxSchemeID:"+taxSchemeIDValue +" CompanyID:"+companyIDvalue +" "+myPartyTaxSchemes.size());
-		});
-		LOG.info(this.getAccountingSupplierParty().getParty() +" "+myPartyTaxSchemes.size());
-		return myPartyTaxSchemes;
-	}
+//	private List<PartyTaxSchemeType> addPartyTaxSchemes(List<PartyTaxSchemeType> myPartyTaxSchemes, PartyType party) { // TODO raus
+//		if(party==null) {
+//			return myPartyTaxSchemes;
+//		}
+//		List<PartyTaxSchemeType> partyTaxSchemes = party.getPartyTaxScheme();
+//		partyTaxSchemes.forEach(partyTaxScheme -> {
+//			myPartyTaxSchemes.add(partyTaxScheme);
+//			IdentifierType companyID = partyTaxScheme.getCompanyID();
+//			String companyIDvalue = companyID==null ? "null" : companyID.getValue();
+//			TaxSchemeType taxScheme = partyTaxScheme.getTaxScheme();
+//			IdentifierType taxSchemeID = null;
+//			if(taxScheme!=null) {
+//				taxSchemeID = taxScheme.getID();
+//			}	
+//			String taxSchemeIDValue = taxSchemeID==null ? "null" : taxSchemeID.getValue();
+//			LOG.info("TaxSchemeID:"+taxSchemeIDValue +" CompanyID:"+companyIDvalue +" "+myPartyTaxSchemes.size());
+//		});
+//		LOG.info(this.getAccountingSupplierParty().getParty() +" "+myPartyTaxSchemes.size());
+//		return myPartyTaxSchemes;
+//	}
 
 	/* BUYER                                       BG-7                        1 (mandatory) 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Erwerber liefern.
@@ -733,83 +796,85 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 		party.setContact((ContactType)contact);
 	}
 	
-	public Contact getSellerContact() {
-		return getSellerContact(this);
+	public IContact getSellerContact() {
+		Party party = getSellerParty();
+		return party.getIContact();
 	}
 	
-	static Contact getSellerContact(InvoiceType invoice) {
-		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
-		PartyType party = supplierParty==null ? null : supplierParty.getParty();
-		return getPartyContact(party);
+//	static Contact getSellerContact(InvoiceType invoice) {
+//		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
+//		PartyType party = supplierParty==null ? null : supplierParty.getParty();
+//		return getPartyContact(party);
+//	}
+	
+//	public void setBuyerContact(Contact contact) {
+//		PartyType party = getCustomerParty();
+//		party.setContact((ContactType)contact);
+//	}
+	
+	public IContact getBuyerContact() {
+		Party party = getBuyerParty();
+		return party.getIContact();
 	}
 	
-	public void setBuyerContact(Contact contact) {
-		PartyType party = getCustomerParty();
-		party.setContact((ContactType)contact);
-	}
+//	static Contact getBuyerContact(InvoiceType invoice) {
+//		CustomerPartyType customerParty = invoice.getAccountingCustomerParty();
+//		PartyType party = customerParty==null ? null : customerParty.getParty();
+//		return getPartyContact(party);
+//	}
 	
-	public Contact getBuyerContact() {
-		return getBuyerContact(this);
-	}
-	
-	static Contact getBuyerContact(InvoiceType invoice) {
-		CustomerPartyType customerParty = invoice.getAccountingCustomerParty();
-		PartyType party = customerParty==null ? null : customerParty.getParty();
-		return getPartyContact(party);
-	}
-	
-	static Contact getPartyContact(PartyType party) {
-		ContactType contact = party.getContact();
-		if(contact==null) { // BuyerContact ist optional
-			return null;
-		}
-		return new Contact(contact);
-	}
+//	static Contact getPartyContact(PartyType party) {
+//		ContactType contact = party.getContact();
+//		if(contact==null) { // BuyerContact ist optional
+//			return null;
+//		}
+//		return new Contact(contact);
+//	}
 
-	public void addSellerPartyName(String name) {
-		PartyType party = getSupplierParty();
-		PartyNameType partyName = new PartyNameType();
-		NameType n = new NameType();
-		n.setValue(name);
-		partyName.setName(n);
-		party.getPartyName().add(partyName);
-	}
+//	public void addSellerPartyName(String name) {
+//		PartyType party = getSupplierParty();
+//		PartyNameType partyName = new PartyNameType();
+//		NameType n = new NameType();
+//		n.setValue(name);
+//		partyName.setName(n);
+//		party.getPartyName().add(partyName);
+//	}
 	
-	List<PartyNameType> addSellerPartyNames(InvoiceType invoice) {
-		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
-		PartyType party = null;
-		if(supplierParty!=null) {
-			party = supplierParty.getParty();
-		}
-		PartyType myParty = getSupplierParty();
-		return addSellerPartyNames(myParty.getPartyName(), party);
-	}
+//	List<PartyNameType> addSellerPartyNames(InvoiceType invoice) {
+//		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
+//		PartyType party = null;
+//		if(supplierParty!=null) {
+//			party = supplierParty.getParty();
+//		}
+//		PartyType myParty = getSupplierParty();
+//		return addSellerPartyNames(myParty.getPartyName(), party);
+//	}
 
-	private List<PartyNameType> addSellerPartyNames(List<PartyNameType> myPartyNames, PartyType party) {
-		if(party==null) {
-			return myPartyNames;
-		}
-		List<PartyNameType> partyNames = party.getPartyName();
-		partyNames.forEach(partyName -> {
-			myPartyNames.add(partyName);
-		});
-		return myPartyNames;
-	}
+//	private List<PartyNameType> addSellerPartyNames(List<PartyNameType> myPartyNames, PartyType party) {
+//		if(party==null) {
+//			return myPartyNames;
+//		}
+//		List<PartyNameType> partyNames = party.getPartyName();
+//		partyNames.forEach(partyName -> {
+//			myPartyNames.add(partyName);
+//		});
+//		return myPartyNames;
+//	}
 
-	public List<String> getSellerPartyNames() {
-		return getSellerPartyNames(this);
-	}
-	
-	static List<String> getSellerPartyNames(InvoiceType invoice) {
-		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
-		PartyType party = supplierParty==null ? null : supplierParty.getParty();
-		List<PartyNameType> partyNames = party.getPartyName();
-		List<String> result = new ArrayList<String>(partyNames.size());
-		partyNames.forEach(partyName -> {
-			result.add(partyName.getName().getValue());
-		});
-		return result;
-	}
+//	public List<String> getSellerPartyNames() {
+//		return getSellerPartyNames(this);
+//	}
+//	
+//	static List<String> getSellerPartyNames(InvoiceType invoice) {       // =========> in Party: public List<String> getNames() 
+//		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
+//		PartyType party = supplierParty==null ? null : supplierParty.getParty();
+//		List<PartyNameType> partyNames = party.getPartyName();
+//		List<String> result = new ArrayList<String>(partyNames.size());
+//		partyNames.forEach(partyName -> {
+//			result.add(partyName.getName().getValue());
+//		});
+//		return result;
+//	}
 	
 	public void setSellerPostalAddress(Address address) {
 		PartyType party = getSupplierParty();
@@ -817,131 +882,139 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	}
 	
 	public Address getSellerPostalAddress() {
-		return getSellerPostalAddress(this);
+		Party party = getSellerParty();
+		return party.getAddress();
+//		return getSellerPostalAddress(this);
 	}
 	
-	static Address getSellerPostalAddress(InvoiceType invoice) {
-		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
-		PartyType party = supplierParty==null ? null : supplierParty.getParty();
-		return getPartyPostalAddress(party);
-	}
+//	static Address getSellerPostalAddress(InvoiceType invoice) {
+//		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
+//		PartyType party = supplierParty==null ? null : supplierParty.getParty();
+//		return getPartyPostalAddress(party);
+//	}
 	
-	public void setBuyerPostalAddress(Address address) {
-		PartyType party = getCustomerParty();
-		party.setPostalAddress((AddressType)address);
-	}
+//	public void setBuyerPostalAddress(Address address) {
+//		Party party = getBuyerParty();
+//		PartyType party = getCustomerParty();
+//		party.setPostalAddress((AddressType)address);
+//	}
 	
 	public Address getBuyerPostalAddress() {
-		return getBuyerPostalAddress(this);
+		Party party = getBuyerParty();
+		return party.getAddress();
 	}
 	
-	static Address getBuyerPostalAddress(InvoiceType invoice) {
-		CustomerPartyType customerParty = invoice.getAccountingCustomerParty();
-		PartyType party = customerParty==null ? null : customerParty.getParty();
-		return getPartyPostalAddress(party);
-	}
+//	static Address getBuyerPostalAddress(InvoiceType invoice) {
+//		CustomerPartyType customerParty = invoice.getAccountingCustomerParty();
+//		PartyType party = customerParty==null ? null : customerParty.getParty();
+//		return getPartyPostalAddress(party);
+//	}
 	
-	static Address getPartyPostalAddress(PartyType party) {
-		AddressType address = party.getPostalAddress();
-		return new Address(address);
-	}
+//	static Address getPartyPostalAddress(PartyType party) {
+//		AddressType address = party.getPostalAddress();
+//		return new Address(address);
+//	}
 
-	/**
-	 * add LegalEntities for seller or buyer
-	 * 
-	 * @param party, seller or buyer
-	 * @param registrationName mandatory
-	 * @param companyId optional / legal registration identifier, BT-30
-	 * @param companyLegalForm optional / additional legal information, BT-33
-	 */
-	private void addLegalEntities(PartyType party, String name, String companyId, String companyLegalForm)  {
-		List<PartyLegalEntityType> partyLegalEntities = party.getPartyLegalEntity();
-		PartyLegalEntityType partyLegalEntity = new PartyLegalEntityType();
-		RegistrationNameType registrationName = new RegistrationNameType();
-		registrationName.setValue(name);
-		partyLegalEntity.setRegistrationName(registrationName);
-		if(companyId!=null) {
-			CompanyIDType companyID = new CompanyIDType();
-			companyID.setValue(companyId);
-			partyLegalEntity.setCompanyID(companyID);
-		}
-		if(companyLegalForm!=null) {
-			CompanyLegalFormType clf = new CompanyLegalFormType();
-			clf.setValue(companyLegalForm);
-			partyLegalEntity.setCompanyLegalForm(clf);
-		}
-		partyLegalEntities.add(partyLegalEntity);
-	}
+//	/**
+//	 * add LegalEntities for seller or buyer
+//	 * 
+//	 * @param party, seller or buyer
+//	 * @param registrationName mandatory
+//	 * @param companyId optional / legal registration identifier, BT-30
+//	 * @param companyLegalForm optional / additional legal information, BT-33
+//	 */
+//	private void addLegalEntities(PartyType party, String name, String companyId, String companyLegalForm)  {
+//		List<PartyLegalEntityType> partyLegalEntities = party.getPartyLegalEntity();
+//		PartyLegalEntityType partyLegalEntity = new PartyLegalEntityType();
+//		RegistrationNameType registrationName = new RegistrationNameType();
+//		registrationName.setValue(name);
+//		partyLegalEntity.setRegistrationName(registrationName);
+//		if(companyId!=null) {
+//			CompanyIDType companyID = new CompanyIDType();
+//			companyID.setValue(companyId);
+//			partyLegalEntity.setCompanyID(companyID);
+//		}
+//		if(companyLegalForm!=null) {
+//			CompanyLegalFormType clf = new CompanyLegalFormType();
+//			clf.setValue(companyLegalForm);
+//			partyLegalEntity.setCompanyLegalForm(clf);
+//		}
+//		partyLegalEntities.add(partyLegalEntity);
+//	}
 	
 	public List<Map<Object,String>> getSellerLegalEntities() { 
-		return getSellerLegalEntities(this);
+		Party party = getSellerParty();
+		return party.getPartyLegalEntities();
+//		return getSellerLegalEntities(this);
 	}
 	
 	public List<Map<Object,String>> getBuyerLegalEntities() { 
-		return getBuyerLegalEntities(this);
+		Party party = getBuyerParty();
+		return party.getPartyLegalEntities();
+//		return getBuyerLegalEntities(this);
 	}
 	
-	static List<Map<Object,String>> getSellerLegalEntities(InvoiceType invoice) { 
-		PartyType party = invoice.getAccountingSupplierParty().getParty();
-		if(party==null) {
-			return new ArrayList<Map<Object,String>>();
-		}
-		return getPartyLegalEntities(party);
-	}
+//	static List<Map<Object,String>> getSellerLegalEntities(InvoiceType invoice) { 
+//		PartyType party = invoice.getAccountingSupplierParty().getParty();
+//		if(party==null) {
+//			return new ArrayList<Map<Object,String>>();
+//		}
+//		return getPartyLegalEntities(party);
+//	}
+//	
+//	static List<Map<Object,String>> getBuyerLegalEntities(InvoiceType invoice) { 
+//		PartyType party = invoice.getAccountingCustomerParty().getParty();
+//		if(party==null) {
+//			return new ArrayList<Map<Object,String>>();
+//		}
+//		return getPartyLegalEntities(party);
+//	}
 	
-	static List<Map<Object,String>> getBuyerLegalEntities(InvoiceType invoice) { 
-		PartyType party = invoice.getAccountingCustomerParty().getParty();
-		if(party==null) {
-			return new ArrayList<Map<Object,String>>();
-		}
-		return getPartyLegalEntities(party);
-	}
+//	private static List<Map<Object,String>> getPartyLegalEntities(PartyType party) { 
+//		List<PartyLegalEntityType> partyLegalEntities = party.getPartyLegalEntity();
+//		SupplierPartyType supplierParty = new SupplierPartyType();
+//		PartyType myParty = new PartyType();
+//		supplierParty.setParty(myParty);
+//		List<PartyLegalEntityType> myPartyLegalEntities = myParty.getPartyLegalEntity(); // nur wg info TODO raus
+//		List<Map<Object,String>> result = new ArrayList<Map<Object,String>>(partyLegalEntities.size());
+//		partyLegalEntities.forEach(partyLegalEntity -> {
+//			Map<Object,String> map = new HashMap<Object,String>();
+//			myPartyLegalEntities.add(partyLegalEntity);
+//			RegistrationNameType registrationName = partyLegalEntity.getRegistrationName();
+//			String name = registrationName==null ? "null" : registrationName.getValue();
+//			map.put(RegistrationNameType.class, name);
+//			IdentifierType companyID = partyLegalEntity.getCompanyID();
+//			String companyIDvalue = companyID==null ? "null" : companyID.getValue();
+//			map.put(CompanyIDType.class, companyIDvalue);			
+//			TextType companyLegalForm = partyLegalEntity.getCompanyLegalForm();
+//			String companyLegalFormValue = companyLegalForm==null ? "null" : companyLegalForm.getValue();
+//			map.put(CompanyLegalFormType.class, companyLegalFormValue);	
+//			LOG.info("getPartyLegalEntities RegistrationName:"+name +" CompanyID:"+companyIDvalue +" CompanyLegalForm:"+companyLegalFormValue +" "+myPartyLegalEntities.size());
+//			result.add(map);
+//		});
+//		return result;
+//	}
 	
-	private static List<Map<Object,String>> getPartyLegalEntities(PartyType party) { 
-		List<PartyLegalEntityType> partyLegalEntities = party.getPartyLegalEntity();
-		SupplierPartyType supplierParty = new SupplierPartyType();
-		PartyType myParty = new PartyType();
-		supplierParty.setParty(myParty);
-		List<PartyLegalEntityType> myPartyLegalEntities = myParty.getPartyLegalEntity(); // nur wg info TODO raus
-		List<Map<Object,String>> result = new ArrayList<Map<Object,String>>(partyLegalEntities.size());
-		partyLegalEntities.forEach(partyLegalEntity -> {
-			Map<Object,String> map = new HashMap<Object,String>();
-			myPartyLegalEntities.add(partyLegalEntity);
-			RegistrationNameType registrationName = partyLegalEntity.getRegistrationName();
-			String name = registrationName==null ? "null" : registrationName.getValue();
-			map.put(RegistrationNameType.class, name);
-			IdentifierType companyID = partyLegalEntity.getCompanyID();
-			String companyIDvalue = companyID==null ? "null" : companyID.getValue();
-			map.put(CompanyIDType.class, companyIDvalue);			
-			TextType companyLegalForm = partyLegalEntity.getCompanyLegalForm();
-			String companyLegalFormValue = companyLegalForm==null ? "null" : companyLegalForm.getValue();
-			map.put(CompanyLegalFormType.class, companyLegalFormValue);	
-			LOG.info("getPartyLegalEntities RegistrationName:"+name +" CompanyID:"+companyIDvalue +" CompanyLegalForm:"+companyLegalFormValue +" "+myPartyLegalEntities.size());
-			result.add(map);
-		});
-		return result;
-	}
-	
-	List<PartyLegalEntityType> addSellerLegalEntities(InvoiceType invoice) {
-		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
-		PartyType party = null;
-		if(supplierParty!=null) {
-			party = supplierParty.getParty();
-		}
-		PartyType myParty = getSupplierParty();
-		LOG.info("SupplierParty:"+myParty);
-		return addPartyLegalEntities(myParty.getPartyLegalEntity(), party);
-	}
-	
-	List<PartyLegalEntityType> addBuyerLegalEntities(InvoiceType invoice) {
-		CustomerPartyType customerParty = invoice.getAccountingCustomerParty();
-		PartyType party = null;
-		if(customerParty!=null) {
-			party = customerParty.getParty();
-		}
-		PartyType myParty = getCustomerParty();
-		return addPartyLegalEntities(myParty.getPartyLegalEntity(), party);
-	}
+//	List<PartyLegalEntityType> addSellerLegalEntities(InvoiceType invoice) {
+//		SupplierPartyType supplierParty = invoice.getAccountingSupplierParty();
+//		PartyType party = null;
+//		if(supplierParty!=null) {
+//			party = supplierParty.getParty();
+//		}
+//		PartyType myParty = getSupplierParty();
+//		LOG.info("SupplierParty:"+myParty);
+//		return addPartyLegalEntities(myParty.getPartyLegalEntity(), party);
+//	}
+//	
+//	List<PartyLegalEntityType> addBuyerLegalEntities(InvoiceType invoice) {
+//		CustomerPartyType customerParty = invoice.getAccountingCustomerParty();
+//		PartyType party = null;
+//		if(customerParty!=null) {
+//			party = customerParty.getParty();
+//		}
+//		PartyType myParty = getCustomerParty();
+//		return addPartyLegalEntities(myParty.getPartyLegalEntity(), party);
+//	}
 	
 	private PartyType getSupplierParty() {
 		SupplierPartyType supplierParty = this.getAccountingSupplierParty();
@@ -956,72 +1029,38 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 		return party;
 	}
 	
-	private PartyType getCustomerParty() {
-		CustomerPartyType customerParty = this.getAccountingCustomerParty();
-		if(customerParty!=null) {
-			return customerParty.getParty();
-		}
-		// add empty customerParty and party to this:
-		customerParty = new CustomerPartyType();
-		PartyType party = new PartyType();
-		customerParty.setParty(party);
-		this.setAccountingCustomerParty(customerParty);
-		return party;
-	}
+//	private PartyType getCustomerParty() {
+//		CustomerPartyType customerParty = this.getAccountingCustomerParty();
+//		if(customerParty!=null) {
+//			return customerParty.getParty();
+//		}
+//		// add empty customerParty and party to this:
+//		customerParty = new CustomerPartyType();
+//		PartyType party = new PartyType();
+//		customerParty.setParty(party);
+//		this.setAccountingCustomerParty(customerParty);
+//		return party;
+//	}
 
 	
-	private List<PartyLegalEntityType> addPartyLegalEntities(List<PartyLegalEntityType> myPartyLegalEntities, PartyType party) {
-		if(party==null) {
-			return myPartyLegalEntities;
-		}
-		List<PartyLegalEntityType> partyLegalEntities = party.getPartyLegalEntity();
-		partyLegalEntities.forEach(partyLegalEntity -> {
-			myPartyLegalEntities.add(partyLegalEntity);
-			RegistrationNameType registrationName = partyLegalEntity.getRegistrationName();
-			String name = registrationName==null ? "null" : registrationName.getValue();
-			IdentifierType companyID = partyLegalEntity.getCompanyID();
-			String companyIDvalue = companyID==null ? "null" : companyID.getValue();
-			TextType companyLegalForm = partyLegalEntity.getCompanyLegalForm();
-			String companyLegalFormValue = companyLegalForm==null ? "null" : companyLegalForm.getValue();
-			LOG.info("addPartyLegalEntities RegistrationName:"+name +" CompanyID:"+companyIDvalue +" CompanyLegalForm:"+companyLegalFormValue +" "+myPartyLegalEntities.size());
-		});
-		LOG.info(this.getAccountingSupplierParty().getParty() +" "+myPartyLegalEntities.size());
-		return myPartyLegalEntities;
-	}
-
-	/**
-	 *  Buyer (AccountingCustomerParty)
-	 *  Buyer is mandatory information and provided in element cac:AccountingCustomerParty
-	 *  
-	 * @param buyerName mandatory - !!! so ist es dokumentiert, BT-44 meint aber registrationName!
-	 * @param postalAddress mandatory
-	 * @param contact optional
-	 */
-	public void setBuyer(String buyerName, PostalAddress postalAddress, IContact contact) {
-		PartyType party = new PartyType();
-		
-		addLegalEntities(party, buyerName, null, null); // ohne String companyId, String companyLegalForm
-		
-		// BT-46:
-//		List<PartyIdentificationType> partyIdentifications = party.getPartyIdentification();
-//		PartyIdentificationType partyIdentification = new PartyIdentificationType();
-//		IDType buyerID = new IDType();
-//		buyerID.setValue(buyerId);
-//		partyIdentification.setID(buyerID);
-//		partyIdentifications.add(partyIdentification);
-		
-		// => TODO name ist optional : buyerTradingName                          BT-45
-		
-		party.setPostalAddress((AddressType)postalAddress);
-		if(contact!=null) { // optional
-			party.setContact(new Contact(contact));
-		}
-
-		CustomerPartyType customerParty = new CustomerPartyType();
-		customerParty.setParty(party);
-		
-		this.setAccountingCustomerParty(customerParty);
-	}
+//	private List<PartyLegalEntityType> addPartyLegalEntities(List<PartyLegalEntityType> myPartyLegalEntities, PartyType party) { // TODO raus
+//		if(party==null) {
+//			return myPartyLegalEntities;
+//		}
+//		List<PartyLegalEntityType> partyLegalEntities = party.getPartyLegalEntity();
+//		partyLegalEntities.forEach(partyLegalEntity -> {
+//			myPartyLegalEntities.add(partyLegalEntity);
+//			RegistrationNameType registrationName = partyLegalEntity.getRegistrationName();
+//			String name = registrationName==null ? "null" : registrationName.getValue();
+//			IdentifierType companyID = partyLegalEntity.getCompanyID();
+//			String companyIDvalue = companyID==null ? "null" : companyID.getValue();
+//			TextType companyLegalForm = partyLegalEntity.getCompanyLegalForm();
+//			String companyLegalFormValue = companyLegalForm==null ? "null" : companyLegalForm.getValue();
+//			LOG.info("addPartyLegalEntities RegistrationName:"+name +" CompanyID:"+companyIDvalue +" CompanyLegalForm:"+companyLegalFormValue +" "+myPartyLegalEntities.size());
+//		});
+//		LOG.info(this.getAccountingSupplierParty().getParty() +" "+myPartyLegalEntities.size());
+//		return myPartyLegalEntities;
+//	}
 
 	/* DOCUMENT TOTALS                             BG-22                       1 (mandatory)
 	 * Eine Gruppe von Informationselementen, die die monetären Gesamtbeträge der Rechnung liefern.
