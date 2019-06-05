@@ -140,7 +140,7 @@ public class Party extends PartyType { // TODO implements ???
 	// wg copy ctor
 	void addTaxSchemes(List<Map<Object,String>> partyTaxSchemes)  {
 		partyTaxSchemes.forEach(partyTaxScheme -> {
-			String taxScheme = partyTaxScheme==null ? null : partyTaxScheme.get(TaxSchemeType.class); // wird immer weggeworfen???????
+//			String taxScheme = partyTaxScheme==null ? null : partyTaxScheme.get(TaxSchemeType.class); // wird immer weggeworfen???????
 			String companyId = partyTaxScheme==null ? null : partyTaxScheme.get(CompanyIDType.class);
 			addPartyTaxScheme(companyId);
 		});
