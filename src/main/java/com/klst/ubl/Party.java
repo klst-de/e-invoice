@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.klst.cius.IContact;
 
@@ -30,6 +31,8 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Tex
  */
 public class Party extends PartyType { // TODO implements ???
 
+	private static final Logger LOG = Logger.getLogger(Party.class.getName());
+	
 	Party() {
 		super();
 	}
@@ -53,6 +56,7 @@ public class Party extends PartyType { // TODO implements ???
 
 	// PartyName
 	public void addName(String name) {
+		LOG.info("nmae:"+name);
 		if(name==null) return;
 		NameType n = new NameType();
 		n.setValue(name);
@@ -149,7 +153,7 @@ public class Party extends PartyType { // TODO implements ???
 //		LOG.info("party:"+party);
 		List<PartyTaxSchemeType> partyTaxSchemes = party.getPartyTaxScheme();
 		List<Map<Object,String>> resultList = new ArrayList<Map<Object,String>>(partyTaxSchemes.size());
-//		LOG.info("partyTaxSchemes#:"+partyTaxSchemes.size() + " resultList#:"+resultList.size());
+//		LOG.info("partyTaxSchemes#:"+partyTaxSchemes.size() + "== resultList#:"+resultList.size());
 		partyTaxSchemes.forEach(partyTaxScheme -> {
 			Map<Object,String> map = new HashMap<Object,String>();
 			TaxSchemeType taxScheme = partyTaxScheme.getTaxScheme();
@@ -158,7 +162,6 @@ public class Party extends PartyType { // TODO implements ???
 				taxSchemeID = taxScheme.getID();
 			}	
 			map.put(TaxSchemeType.class, taxSchemeID.getValue());
-			resultList.add(map);
 			IdentifierType companyID = partyTaxScheme.getCompanyID();
 			map.put(CompanyIDType.class, companyID.getValue());
 			resultList.add(map);
@@ -166,32 +169,11 @@ public class Party extends PartyType { // TODO implements ???
 //		LOG.info("resultList#:"+resultList.size());
 		return resultList;
 	}
-//	private List<PartyTaxSchemeType> addPartyTaxSchemes(List<PartyTaxSchemeType> myPartyTaxSchemes) {
-////		if(party==null) {
-////			return myPartyTaxSchemes;
-////		}
-//		List<PartyTaxSchemeType> partyTaxSchemes = super.getPartyTaxScheme();
-//		partyTaxSchemes.forEach(partyTaxScheme -> {
-//			myPartyTaxSchemes.add(partyTaxScheme);
-//			IdentifierType companyID = partyTaxScheme.getCompanyID();
-//			String companyIDvalue = companyID==null ? "null" : companyID.getValue();
-//			TaxSchemeType taxScheme = partyTaxScheme.getTaxScheme();
-//			IdentifierType taxSchemeID = null;
-//			if(taxScheme!=null) {
-//				taxSchemeID = taxScheme.getID();
-//			}	
-//			String taxSchemeIDValue = taxSchemeID==null ? "null" : taxSchemeID.getValue();
-////			LOG.info("TaxSchemeID:"+taxSchemeIDValue +" CompanyID:"+companyIDvalue +" "+myPartyTaxSchemes.size());
-//		});
-////		LOG.info(this.getAccountingSupplierParty().getParty() +" "+myPartyTaxSchemes.size());
-//		return myPartyTaxSchemes;
-//	}
 
 	// PartyLegalEntity
 	/**
 	 * add LegalEntities for seller or buyer party
 	 * 
-	 *                                                      TODO raus     @param party, seller or buyer
 	 * @param registrationName mandatory
 	 * @param companyId optional / legal registration identifier, BT-30
 	 * @param companyLegalForm optional / additional legal information, BT-33
@@ -224,38 +206,14 @@ public class Party extends PartyType { // TODO implements ???
 		});
 	}
 
-//	static List<PartyLegalEntityType> addPartyLegalEntities(List<PartyLegalEntityType> myPartyLegalEntities, PartyType party) {
-//		if(party==null) {
-//			return myPartyLegalEntities;
-//		}
-//		List<PartyLegalEntityType> partyLegalEntities = party.getPartyLegalEntity();
-//		partyLegalEntities.forEach(partyLegalEntity -> {
-//			myPartyLegalEntities.add(partyLegalEntity);
-//			RegistrationNameType registrationName = partyLegalEntity.getRegistrationName();
-//			String name = registrationName==null ? "null" : registrationName.getValue();
-//			IdentifierType companyID = partyLegalEntity.getCompanyID();
-//			String companyIDvalue = companyID==null ? "null" : companyID.getValue();
-//			TextType companyLegalForm = partyLegalEntity.getCompanyLegalForm();
-//			String companyLegalFormValue = companyLegalForm==null ? "null" : companyLegalForm.getValue();
-////			LOG.info("addPartyLegalEntities RegistrationName:"+name +" CompanyID:"+companyIDvalue +" CompanyLegalForm:"+companyLegalFormValue +" "+myPartyLegalEntities.size());
-//		});
-////		LOG.info(this.getAccountingSupplierParty().getParty() +" "+myPartyLegalEntities.size());
-//		return myPartyLegalEntities;
-//	}
-
 	public List<Map<Object,String>> getPartyLegalEntities() { 
 		return getPartyLegalEntities(this);
 	}
 	static List<Map<Object,String>> getPartyLegalEntities(PartyType party) { 
 		List<PartyLegalEntityType> partyLegalEntities = party.getPartyLegalEntity();
-//		SupplierPartyType supplierParty = new SupplierPartyType();
-//		PartyType myParty = new PartyType();
-//		supplierParty.setParty(myParty);
-//		List<PartyLegalEntityType> myPartyLegalEntities = myParty.getPartyLegalEntity(); // nur wg info TODO raus
 		List<Map<Object,String>> result = new ArrayList<Map<Object,String>>(partyLegalEntities.size());
 		partyLegalEntities.forEach(partyLegalEntity -> {
 			Map<Object,String> map = new HashMap<Object,String>();
-//			myPartyLegalEntities.add(partyLegalEntity);
 			RegistrationNameType registrationName = partyLegalEntity.getRegistrationName();
 			String name = registrationName==null ? null : registrationName.getValue();
 			map.put(RegistrationNameType.class, name);
@@ -265,7 +223,6 @@ public class Party extends PartyType { // TODO implements ???
 			TextType companyLegalForm = partyLegalEntity.getCompanyLegalForm();
 			String companyLegalFormValue = companyLegalForm==null ? null : companyLegalForm.getValue();
 			map.put(CompanyLegalFormType.class, companyLegalFormValue);	
-//			LOG.info("getPartyLegalEntities RegistrationName:"+name +" CompanyID:"+companyIDvalue +" CompanyLegalForm:"+companyLegalFormValue +" "+myPartyLegalEntities.size());
 			result.add(map);
 		});
 		return result;

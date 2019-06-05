@@ -25,6 +25,7 @@ import com.klst.ubl.Party;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.SupplierPartyType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyLegalFormType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.RegistrationNameType;
@@ -167,7 +168,17 @@ public class PartyTest {
     	IContact contact = supplierparty.getIContact();
     	assertNotNull(address);
     	assertNotNull(contact);
-    	LOG.info("supplierparty address:" + addressAsString(address) + contactAsString(contact));
+    	LOG.info("supplierparty address:" + addressAsString(address) + contactAsString(contact) + 
+    			" TaxSchemes #:"+supplierparty.getTaxSchemes().size());
+    	assertEquals(1, supplierparty.getTaxSchemes().size());
+    	List<Map<Object,String>> taxSchemes = supplierparty.getTaxSchemes();
+    	assertEquals("DE123456789", taxSchemes.get(0).get(CompanyIDType.class));
+    	LOG.info("supplierparty taxScheme:" + taxSchemes.get(0).get(CompanyIDType.class) + "/" + taxSchemes.get(0).get(TaxSchemeType.class));
+    	supplierparty.addPartyTaxScheme("Umsatzsteuer-Identifikationsnummer des Verkäufers");
+    	LOG.info("TaxSchemes #:"+supplierparty.getTaxSchemes().size());
+    	LOG.info("supplierparty taxScheme:" + supplierparty.getTaxSchemes().get(1).get(CompanyIDType.class) + "/" + supplierparty.getTaxSchemes().get(1).get(TaxSchemeType.class));
+  	
+    	// Seller überschreiben: 
     	invoice.setSeller("sellerRegistrationName", testAddress, null, null, null); //contact, companyId, companyLegalForm);
     	LOG.info("testAddress:" + addressAsString(testAddress));
     	SupplierPartyType sp = invoice.getAccountingSupplierParty();
@@ -175,6 +186,12 @@ public class PartyTest {
     	LOG.info("seller address:" + addressAsString(sellerparty.getAddress()) + " contact:"+sellerparty.getIContact());
     	assertEquals(testAddress.getCountryCode(), sellerparty.getAddress().getCountryCode());	
     	assertNull(sellerparty.getIContact());
+    	LOG.info("??????????????? invoice.getSellerTaxSchemes().size() "+invoice.getSellerTaxSchemes().size()); // Seller wurde überschrieben!
+    	assertEquals(0, invoice.getSellerTaxSchemes().size());
+    	invoice.setSellerTaxCompanyId("Umsatzsteuer-Identifikationsnummer des Verkäufers");
+    	taxSchemes = invoice.getSellerTaxSchemes();
+    	assertEquals(1, taxSchemes.size());
+    	LOG.info("seller taxScheme:" + taxSchemes.get(0).get(CompanyIDType.class) + "/" + taxSchemes.get(0).get(TaxSchemeType.class));
     }
     
     @Test
