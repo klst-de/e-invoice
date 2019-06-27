@@ -24,6 +24,7 @@ import com.klst.untdid.codelist.PaymentMeansCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.MonetaryTotalType;
@@ -1275,6 +1276,38 @@ Connecting Europe Facility gepflegt und herausgegeben
 		return taxTotals.get(0);
 	}
 	
+	/* ADDITIONAL SUPPORTING DOCUMENTS             BG-24                       0..* (optional)
+	 * Eine Gruppe von Informationselementen mit Informationen über rechnungsbegründende Unterlagen, 
+	 * die Belege für die in der Rechnung gestellten Ansprüche enthalten.
+	 */
+	public List<DocumentReferenceType> addAdditionalSupportingDocument(DocumentReferenceType asd) {
+		List<DocumentReferenceType> documentReferenceList = this.getAdditionalDocumentReference();
+		documentReferenceList.add(asd);
+		return documentReferenceList;
+	}
+	
+	public List<DocumentReferenceType> addAdditionalSupportingDocuments(InvoiceType invoice) {
+		List<DocumentReferenceType> documentReferenceList = invoice.getAdditionalDocumentReference();
+		List<DocumentReferenceType> resultList = this.getAdditionalDocumentReference();
+		documentReferenceList.forEach(document -> {
+			resultList.add(document);
+		});
+		return resultList;
+	}
+	
+	public List<DocumentReferenceType> getAdditionalSupportingDocuments() {
+		return getAdditionalSupportingDocuments(this);
+	}
+
+	static List<DocumentReferenceType> getAdditionalSupportingDocuments(InvoiceType invoice) {
+		List<DocumentReferenceType> documentReferenceList = invoice.getAdditionalDocumentReference();
+		List<DocumentReferenceType> resultList = new ArrayList<DocumentReferenceType>(documentReferenceList.size());
+		documentReferenceList.forEach(document -> {
+			resultList.add(new AdditionalSupportingDocument(document));
+		});
+		return resultList;
+	}
+	
 	/* INVOICE LINE                                BG-25                       1..* (mandatory)
 	 * Eine Gruppe von Informationselementen, die Informationen über einzelne Rechnungspositionen liefern.
 	 */
@@ -1299,7 +1332,7 @@ Connecting Europe Facility gepflegt und herausgegeben
 		return resultLines;
 	}
 	
-	public List<InvoiceLineType> addInvoiceLine(InvoiceLine invoiceLine) {
+	public List<InvoiceLineType> addInvoiceLine(InvoiceLine invoiceLine) { // TODO braucht man das?
 		List<InvoiceLineType> resultLines = this.getInvoiceLine();
 		resultLines.add(invoiceLine);
 		return resultLines;

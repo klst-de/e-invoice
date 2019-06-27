@@ -2,7 +2,20 @@
 <classpath>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="lib/de.klst.x-factur.jar"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="src" path="src/test/kositresources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<accessrules>
+			<accessrule kind="discouraged" pattern="com/sun/xml/internal/bind/marshaller/NamespacePrefixMapper"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="lib" path="/tools/lib/javax.inject-1.jar"/>
+	<classpathentry kind="lib" path="src/test/lib/assertj-core-3.8.0.jar"/>
+	<classpathentry kind="lib" path="src/test/lib/Saxon-HE-9.9.1-1.jar"/>
+	<classpathentry kind="lib" path="src/test/lib/validationtool-1.1.0-SNAPSHOT.jar" sourcepath="/kosit-validator/src/main/java"/>
+	<classpathentry kind="lib" path="src/test/lib/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="lib" path="src/test/lib/slf4j-simple-1.7.25.jar"/>
+	<classpathentry kind="lib" path="src/test/lib/commons-lang3-3.5.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
