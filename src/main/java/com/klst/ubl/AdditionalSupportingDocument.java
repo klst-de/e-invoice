@@ -7,8 +7,10 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Atta
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ExternalReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentDescriptionType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EmbeddedDocumentBinaryObjectType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.URIType;
+import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.BinaryObjectType;
 
 /* ADDITIONAL SUPPORTING DOCUMENTS             BG-24                       0..*  
  * 
@@ -117,7 +119,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType { // TOD
 	 * <br>ID: BT-124
 	 * <br>Req.ID: R36
 	 * 
-	 * @param amount , Allowances on line level are included in the Invoice line net amount which is summed up into the Sum of Invoice line net amount.
+	 * @param url
 	 */
 	public void setExternalDocumentLocation(String url) {
 		URIType uri = new URIType();
@@ -141,5 +143,38 @@ public class AdditionalSupportingDocument extends DocumentReferenceType { // TOD
 		
 		return uri.getValue();
 	}
+
+	/**
+	 * Attached document
+	 * An attached document embedded as binary object or sent together with the invoice.
+	 * 
+	 * Attached document is used when documentation shall be stored with the Invoice 
+	 * for future reference or audit purposes.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>ID: BT-125
+	 * <br>Req.ID: R35
+	 * 
+	 * @param uncefact binaryObject
+	 */
+	public void setAttachedDocument(BinaryObjectType binaryObject) {
+		String mimeCode = binaryObject.getMimeCode(); // mandatory
+		String filename = binaryObject.getFilename(); // mandatory
+		byte[] value = binaryObject.getValue(); // content
+		EmbeddedDocumentBinaryObjectType embeddedDocumentBinaryObject = new EmbeddedDocumentBinaryObjectType();
+		embeddedDocumentBinaryObject.setMimeCode(mimeCode);
+		embeddedDocumentBinaryObject.setFilename(filename);
+		embeddedDocumentBinaryObject.setValue(value);
+		AttachmentType attachment = new AttachmentType();
+		attachment.setEmbeddedDocumentBinaryObject(embeddedDocumentBinaryObject);
+		super.setAttachment(attachment);
+	}
 	
+	public BinaryObjectType getAttachedDocument() {
+		AttachmentType attachment = super.getAttachment();
+		if(attachment==null) return null;
+
+		return attachment.getEmbeddedDocumentBinaryObject();
+	}
+
 }
