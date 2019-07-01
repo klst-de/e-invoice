@@ -121,15 +121,10 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		this(customization, null, documentNameCode);
 	}
 	
-	public Invoice(String customization, String profile, DocumentNameCode documentNameCode) {
+	public Invoice(String customization, String profile, DocumentNameCode code) {
 		this();
 		setProcessControl(customization, profile);
-			
-		// Invoice type code                           BT-3
-		// Ein Code, der den Funktionstyp der Rechnung angibt.
-		InvoiceTypeCodeType itc = new InvoiceTypeCodeType();
-		itc.setValue(documentNameCode.getValueAsString());
-		this.setInvoiceTypeCode(itc);
+		setTypeCode(code); // BT-3	
 		sellerParty = null;
 		buyerParty = null;		
 	}
@@ -140,7 +135,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	
 	// copy-ctor
 	Invoice(InvoiceType invoice) {
-		this(getCustomizationID(invoice), getProfileID(invoice), getDocumentNameCode(invoice));
+		this(getCustomizationID(invoice), getProfileID(invoice), getTypeCode(invoice));
 		setId(getId(invoice));
 		setIssueDate(getIssueDateAsTimestamp(invoice));
 		setDueDate(getDueDateAsTimestamp(invoice));		
@@ -161,13 +156,91 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		addDeliveries(invoice);
 	}
 	
-	public DocumentNameCode getDocumentNameCode() {
-		return getDocumentNameCode(this);
+	/* Invoice number                              BT-1  Identifier            1 (mandatory) 
+	 * Eine eindeutige Kennung der Rechnung, die diese im System des Verkäufers identifiziert.
+	 * Anmerkung: Es ist kein „identification scheme“ zu verwenden.
+	 */
+	/**
+	 * Invoice number   - A unique identification of the Invoice.
+	 * <p>
+	 * The sequential number required in Article 226(2) of the directive 2006/112/EC [2],
+	 * to uniquely identify the Invoice within the business context, time-frame, operating systems and records of the Seller. 
+	 * It may be based on one or more series of numbers, which may include alphanumeric characters. 
+	 * No identification scheme is to be used.
+	 * <p>
+	 * Cardinality: 1..1 (mandatory)
+	 * <br>ID: BT-1
+	 * <br>Req.ID: R56
+	 * 
+	 * @param id Identifier
+	 */
+	public void setId(String id) {
+		IDType mID = new IDType();
+		mID.setValue(id);
+		this.setID(mID);
 	}
-	static DocumentNameCode getDocumentNameCode(InvoiceType invoice) {
-		return DocumentNameCode.valueOf(invoice.getInvoiceTypeCode());
+	public String getId() {
+		return getId(this);
+	}
+	static String getId(InvoiceType doc) {
+		return doc.getID().getValue();
 	}
 
+	/* Invoice issue date                          BT-2  Date                  1 (mandatory) 
+	 * Das Datum, an dem die Rechnung ausgestellt wurde.
+	 */
+	/**
+	 * Invoice issue date
+	 * <p>
+	 * The date when the Invoice was issued
+	 * <p>
+	 * Cardinality: 1..1 (mandatory)
+	 * <br>ID: BT-2
+	 * <br>Req.ID: R56
+	 * 
+	 * @param ymd Date
+	 */
+	public void setIssueDate(String ymd) {	
+		setIssueDate(ymdToTs(ymd));
+	}
+	public void setIssueDate(Timestamp ts) {
+		IssueDateType issueDate = new IssueDateType();
+		issueDate.setValue(tsToXMLGregorianCalendar(ts));
+		super.setIssueDate(issueDate);
+	}
+	public Timestamp getIssueDateAsTimestamp() {  // bei gleichen Namen getIssueDate() kann es nicht abgeleitet sein
+		return getIssueDateAsTimestamp(this);
+	}
+	static Timestamp getIssueDateAsTimestamp(InvoiceType doc) {
+		IssueDateType issueDate = doc.getIssueDate();
+		return xmlGregorianCalendarToTs(issueDate.getValue());
+	}
+	
+	/**
+	 * Invoice type code - A code specifying the functional type of the Invoice.
+	 * <p>
+	 * Commercial invoices and credit notes are defined according the entries in UNTDID 1001.
+	 * Other entries of UNTDID 1001 with specific invoices or credit notes may be used if applicable.
+	 * <p>
+	 * Cardinality: 1..1 (mandatory)
+	 * <br>ID: BT-3
+	 * <br>Req.ID: R44
+	 * 
+	 * @param code
+	 */
+	void setTypeCode(DocumentNameCode code) {
+		InvoiceTypeCodeType typeCode = new InvoiceTypeCodeType();
+		typeCode.setValue(code.getValueAsString());
+		super.setInvoiceTypeCode(typeCode);
+	}
+	public DocumentNameCode getTypeCode() {
+		return getTypeCode(this);
+	}
+	static DocumentNameCode getTypeCode(InvoiceType doc) {
+		return DocumentNameCode.valueOf(doc.getInvoiceTypeCode());
+	}
+
+	
 	/* PROCESS CONTROL                             BG-2                        1 (mandatory) 
 	 * Eine Gruppe von Informationselementen, 
 	 * die Informationen über den Geschäftsprozess und für die Rechnung geltende Regeln liefern.
@@ -219,52 +292,6 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		return profileID.getValue();
 	}
 
-	/* Invoice number                              BT-1  Identifier            1 (mandatory) 
-	 * Eine eindeutige Kennung der Rechnung, die diese im System des Verkäufers identifiziert.
-	 * Anmerkung: Es ist kein „identification scheme“ zu verwenden.
-	 */
-	public void setId(String id) {
-		IDType mID = new IDType();
-		mID.setValue(id);
-		this.setID(mID);
-	}
-	public String getId() {
-		return getId(this);
-	}
-	static String getId(InvoiceType invoice) {
-		return invoice.getID().getValue();
-	}
-
-	/* Invoice issue date                          BT-2  Date                  1 (mandatory) 
-	 * Das Datum, an dem die Rechnung ausgestellt wurde.
-	 */
-	/**
-	 * Invoice issue date
-	 * <p>
-	 * The date when the Invoice was issued
-	 * <p>
-	 * Cardinality: 1..1 (mandatory)
-	 * <br>ID: BT-2
-	 * <br>Req.ID: R56
-	 * 
-	 * @param ymd Date
-	 */
-	public void setIssueDate(String ymd) {	
-		setIssueDate(ymdToTs(ymd));
-	}
-	public void setIssueDate(Timestamp ts) {
-		IssueDateType issueDate = new IssueDateType();
-		issueDate.setValue(tsToXMLGregorianCalendar(ts));
-		super.setIssueDate(issueDate);
-	}
-	public Timestamp getIssueDateAsTimestamp() {  // bei gleichen Namen getIssueDate() kann es nicht abgeleitet sein
-		return getIssueDateAsTimestamp(this);
-	}
-	static Timestamp getIssueDateAsTimestamp(InvoiceType invoice) {
-		IssueDateType issueDate = invoice.getIssueDate();
-		return xmlGregorianCalendarToTs(issueDate.getValue());
-	}
-	
 	/**
 	 * Payment due date 
 	 * <p>
