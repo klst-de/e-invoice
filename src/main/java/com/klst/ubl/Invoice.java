@@ -157,7 +157,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		setInvoiceTax(getInvoiceTax(doc));
 		
 		addVATBreakDown(doc);
-		addInvoiceLines(doc);
+		addLines(doc);
 	}
 	
 	/* Invoice number                              BT-1  Identifier            1 (mandatory) 
@@ -1418,39 +1418,33 @@ Connecting Europe Facility gepflegt und herausgegeben
 	/**
 	 * Adds a mandatory invoice line element
 	 * 
-	 * @param invoiceLine
+	 * @param line
 	 * @return
 	 */
-	public List<InvoiceLineType> addInvoiceLine(InvoiceLineType invoiceLine) {
-		List<InvoiceLineType> invoiceLines = this.getInvoiceLine();
-		invoiceLines.add(invoiceLine);
-		return invoiceLines;
+	public List<InvoiceLineType> addLine(InvoiceLineType line) {
+		List<InvoiceLineType> lines = this.getInvoiceLine();
+		lines.add(line);
+		return lines;
 	}
 
-	public List<InvoiceLineType> addInvoiceLines(InvoiceType doc) {
-		List<InvoiceLineType> invoiceLines = doc.getInvoiceLine();
+	public List<InvoiceLineType> addLines(InvoiceType doc) {
+		List<InvoiceLineType> lines = doc.getInvoiceLine();
 		List<InvoiceLineType> resultLines = this.getInvoiceLine();
-		invoiceLines.forEach(invoiceLine -> {
-			resultLines.add(invoiceLine);
+		lines.forEach(line -> {
+			resultLines.add(line);
 		});
 		return resultLines;
 	}
 	
-	public List<InvoiceLineType> addInvoiceLine(InvoiceLine invoiceLine) { // TODO braucht man das?
-		List<InvoiceLineType> resultLines = this.getInvoiceLine();
-		resultLines.add(invoiceLine);
-		return resultLines;
-	}
-	
-	public List<InvoiceLine> getInvoiceLines() {
-		return getInvoiceLines(this);
+	public List<InvoiceLine> getLines() {
+		return getLines(this);
 	}
 
-	static List<InvoiceLine> getInvoiceLines(InvoiceType doc) {
-		List<InvoiceLineType> invoiceLines = doc.getInvoiceLine();
-		List<InvoiceLine> resultLines = new ArrayList<InvoiceLine>(invoiceLines.size());
-		invoiceLines.forEach(invoiceLine -> {
-			resultLines.add(new InvoiceLine(invoiceLine));
+	static List<InvoiceLine> getLines(InvoiceType doc) {
+		List<InvoiceLineType> lines = doc.getInvoiceLine();
+		List<InvoiceLine> resultLines = new ArrayList<InvoiceLine>(lines.size());
+		lines.forEach(line -> {
+			resultLines.add(new InvoiceLine(line));
 		});
 		return resultLines;
 	}

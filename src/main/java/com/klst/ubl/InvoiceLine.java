@@ -53,16 +53,16 @@ public class InvoiceLine extends InvoiceLineType {
 	}
 	
 	// copy ctor
-	public InvoiceLine(InvoiceLineType invoiceLine) {
+	public InvoiceLine(InvoiceLineType line) {
 		this();
-		super.setID(invoiceLine.getID());
-		super.setInvoicedQuantity(invoiceLine.getInvoicedQuantity());
-		super.setLineExtensionAmount(invoiceLine.getLineExtensionAmount());
-		super.setPrice(invoiceLine.getPrice());
-		super.setItem(invoiceLine.getItem());
+		super.setID(line.getID());
+		super.setInvoicedQuantity(line.getInvoicedQuantity());
+		super.setLineExtensionAmount(line.getLineExtensionAmount());
+		super.setPrice(line.getPrice());
+		super.setItem(line.getItem());
 		
 		List<OrderLineReferenceType> olReferences = super.getOrderLineReference();
-		List<OrderLineReferenceType> orderLineReferences = invoiceLine.getOrderLineReference();
+		List<OrderLineReferenceType> orderLineReferences = line.getOrderLineReference();
 		orderLineReferences.forEach(orderLineReference -> {
 			olReferences.add(orderLineReference);
 		});

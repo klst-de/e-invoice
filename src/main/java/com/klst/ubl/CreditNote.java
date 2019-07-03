@@ -10,9 +10,11 @@ import com.klst.un.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansCode;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.MonetaryTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
@@ -36,6 +38,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExclu
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxInclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPointDateType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
+import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
 public class CreditNote extends CreditNoteType implements DocumentTotals {
 
@@ -597,4 +600,36 @@ public class CreditNote extends CreditNoteType implements DocumentTotals {
 		return taxTotals.get(0);
 	}
 
+	// TODO BG-23  VAT BREAKDOWN
+	// TODO BG-24  ADDITIONAL SUPPORTING DOCUMENTS
+	
+	// wie BG-25  INVOICE LINE
+	public List<CreditNoteLineType> addLine(CreditNoteLineType line) {
+		List<CreditNoteLineType> lines = this.getCreditNoteLine();
+		lines.add(line);
+		return lines;
+	}
+
+	public List<CreditNoteLineType> addLines(CreditNoteType doc) {
+		List<CreditNoteLineType> lines = doc.getCreditNoteLine();
+		List<CreditNoteLineType> resultLines = super.getCreditNoteLine();
+		lines.forEach(line -> {
+			resultLines.add(line);
+		});
+		return resultLines;
+	}
+	
+	public List<CreditNoteLine> getLines() {
+		return getLines(this);
+	}
+
+	static List<CreditNoteLine> getLines(CreditNoteType doc) {
+		List<CreditNoteLineType> lines = doc.getCreditNoteLine();
+		List<CreditNoteLine> resultLines = new ArrayList<CreditNoteLine>(lines.size());
+		lines.forEach(line -> {
+			resultLines.add(new CreditNoteLine(line));
+		});
+		return resultLines;
+	}
+	
 }
