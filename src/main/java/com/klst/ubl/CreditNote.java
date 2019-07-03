@@ -3,6 +3,8 @@ package com.klst.ubl;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 import com.klst.cius.DocumentTotals;
 import com.klst.un.unece.uncefact.Amount;
@@ -14,12 +16,12 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Cred
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.MonetaryTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentTermsType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.SupplierPartyType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSubtotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BuyerReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditNoteTypeCodeType;
@@ -37,11 +39,13 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmoun
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxInclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPointDateType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
-import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
 public class CreditNote extends CreditNoteType implements DocumentTotals {
 
+	private static final Logger LOG = Logger.getLogger(CreditNote.class.getName());
+	
 	CreditNote() {
 		super();
 	}
@@ -74,6 +78,8 @@ public class CreditNote extends CreditNoteType implements DocumentTotals {
 		addPaymentInstructions(doc);
 		setDocumentTotals(doc);
 		setInvoiceTax(getInvoiceTax(doc));
+		addVATBreakDown(doc);
+		addLines(doc);
 	}
 	
 	// wie BT-1  Identifier
@@ -274,10 +280,10 @@ public class CreditNote extends CreditNoteType implements DocumentTotals {
 	}
 	static String getCustomizationID(CreditNoteType doc) {
 		CustomizationIDType customizationID =doc.getCustomizationID();
-//		LOG.info("getSchemeAgencyID:"+customizationID.getSchemeAgencyID() +
-//				" SchemeAgencyName:"+customizationID.getSchemeAgencyName() +
-//				" Value:"+customizationID.getValue()
-//				);
+		LOG.info("getSchemeAgencyID:"+customizationID.getSchemeAgencyID() +
+				" SchemeAgencyName:"+customizationID.getSchemeAgencyName() +
+				" Value:"+customizationID.getValue()
+				);
 		return customizationID.getValue();
 	}
 	
@@ -572,7 +578,7 @@ public class CreditNote extends CreditNoteType implements DocumentTotals {
 //			LOG.info("taxAmount "+taxAmount);
 		});
 		if(taxTotals.size()>1) {
-//			LOG.warning("inkonsistent: taxTotals.size="+taxTotals.size() + " darf maximal 1 sein" );
+			LOG.warning("inkonsistent: taxTotals.size="+taxTotals.size() + " darf maximal 1 sein" );
 		}
 		
 		TaxTotalType taxTotal = getFirstTaxTotal();
@@ -601,6 +607,44 @@ public class CreditNote extends CreditNoteType implements DocumentTotals {
 	}
 
 	// TODO BG-23  VAT BREAKDOWN
+	public void addVATBreakDown(Amount taxableAmount, Amount tax, VatCategory vatCategory) {
+		TaxTotalType taxTotal = getFirstTaxTotal();
+		TaxSubtotalType taxSubtotal = new TaxSubtotalType();
+		
+		TaxableAmountType taxableAmt = new TaxableAmountType();
+		taxableAmount.copyTo(taxableAmt);
+		taxSubtotal.setTaxableAmount(taxableAmt);
+
+		TaxAmountType taxAmount = new TaxAmountType();
+		tax.copyTo(taxAmount);
+		taxSubtotal.setTaxAmount(taxAmount);
+		
+		taxSubtotal.setTaxCategory(vatCategory);
+
+		List<TaxSubtotalType> taxSubtotals = taxTotal.getTaxSubtotal();
+		taxSubtotals.add(taxSubtotal);
+	}
+
+	public void addVATBreakDown(CreditNoteType doc) {
+		TaxTotalType myTaxTotal = getFirstTaxTotal();
+		List<TaxSubtotalType> myTaxSubtotals = myTaxTotal.getTaxSubtotal();
+		TaxTotalType taxTotal = getFirstTaxTotal(doc);
+		List<TaxSubtotalType> taxSubtotals = taxTotal.getTaxSubtotal();
+		taxSubtotals.forEach(taxSubtotal -> {
+			myTaxSubtotals.add(taxSubtotal);
+		});
+	}
+
+	// key TaxableAmountType.class ... oder TaxCategory
+	// val amount ... oder TaxCategory-Objekt%
+	public List<Map<Object,Object>> getVATBreakDown() {
+		return getVATBreakDown(this);
+	}
+	List<Map<Object,Object>> getVATBreakDown(CreditNoteType doc) {
+		TaxTotalType taxTotal = getFirstTaxTotal(doc);
+		return Invoice.getVATBreakDown(taxTotal);
+	}
+
 	// TODO BG-24  ADDITIONAL SUPPORTING DOCUMENTS
 	
 	// wie BG-25  INVOICE LINE

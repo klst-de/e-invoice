@@ -1,6 +1,8 @@
 package com.klst.ubl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.klst.un.unece.uncefact.Amount;
 import com.klst.un.unece.uncefact.Quantity;
@@ -12,6 +14,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Orde
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PriceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditedQuantityType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DescriptionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
@@ -20,6 +23,8 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Qua
 
 public class CreditNoteLine extends CreditNoteLineType {
 
+	private static final Logger LOG = Logger.getLogger(CreditNoteLine.class.getName());
+	
 	public CreditNoteLine() {
 		super();
 	}
@@ -67,6 +72,7 @@ public class CreditNoteLine extends CreditNoteLineType {
 		setItemName(itemName);
 		
 		List<TaxCategoryType> taxCategories = item.getClassifiedTaxCategory();
+		taxCategories.add(vatCategory);
 	}
 	
 	public String getId() {
@@ -126,6 +132,38 @@ public class CreditNoteLine extends CreditNoteLineType {
 		item = new ItemType();
 		super.setItem(item);
 		return item;
+	}
+
+	public List<String> getItemDescriptions() {
+		List<DescriptionType> descriptions = getItemInformation().getDescription();
+		List<String> result = new ArrayList<String>(descriptions.size());
+		descriptions.forEach(description -> {
+			// DescriptionType extends TextType extends un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType
+			result.add(description.getValue());
+		});
+		return result;
+	}
+	public void addItemDescription(String descriptionText) {
+		List<DescriptionType> descriptions = getItemInformation().getDescription();
+		DescriptionType description = new DescriptionType();
+		description.setValue(descriptionText);
+		descriptions.add(description);
+	}
+
+	public VatCategory getVatCategory() {
+		List<VatCategory> taxCategories = getVatCategories();
+		if(taxCategories.size()!=1) {
+			LOG.warning("inkonsistent: taxCategories.size="+taxCategories.size() + " muss 1 sein" );
+		}
+		return taxCategories.get(0);
+	}
+	private List<VatCategory> getVatCategories() {
+		List<TaxCategoryType> taxCategories = getItemInformation().getClassifiedTaxCategory();
+		List<VatCategory> result = new ArrayList<VatCategory>(taxCategories.size());
+		taxCategories.forEach(taxCategory -> {
+			result.add(new VatCategory(taxCategory));
+		});
+		return result;
 	}
 
 }

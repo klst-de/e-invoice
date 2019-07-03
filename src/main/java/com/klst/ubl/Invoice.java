@@ -155,7 +155,6 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		addPaymentInstructions(doc);		
 		setDocumentTotals(doc);
 		setInvoiceTax(getInvoiceTax(doc));
-		
 		addVATBreakDown(doc);
 		addLines(doc);
 	}
@@ -1341,10 +1340,10 @@ Connecting Europe Facility gepflegt und herausgegeben
 		return getVATBreakDown(this);
 	}
 	List<Map<Object,Object>> getVATBreakDown(InvoiceType doc) {
-		TaxTotalType taxTotal = getFirstTaxTotal(); // !!!!!!!!!!!!!!!!!!!!!! TODO
+		TaxTotalType taxTotal = getFirstTaxTotal(doc);
 		return getVATBreakDown(taxTotal);
 	}
-	private static List<Map<Object,Object>> getVATBreakDown(TaxTotalType taxTotal) {
+	static List<Map<Object,Object>> getVATBreakDown(TaxTotalType taxTotal) {
 		List<TaxSubtotalType> taxSubtotals = taxTotal.getTaxSubtotal();
 		List<Map<Object,Object>> resultList = new ArrayList<Map<Object,Object>>(taxSubtotals.size());
 		taxSubtotals.forEach(taxSubtotal -> {
