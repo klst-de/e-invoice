@@ -2,21 +2,15 @@ package com.klst.un.unece.uncefact;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-
+import com.klst.cius.CoreInvoice;
 import com.klst.cius.DocumentTotals;
 import com.klst.cius.IContact;
 import com.klst.cius.PostalAddress;
+import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansCode;
 import com.klst.untdid.codelist.TaxCategoryCode;
@@ -56,6 +50,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
@@ -63,10 +58,37 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 // @see https://www.unece.org/fileadmin/DAM/cefact/rsm/RSM_CrossIndustryInvoice_v2.0.pdf
 //      https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=2ahUKEwijlav-gPjhAhUGU1AKHSv2CIoQFjAAegQIARAC&url=https%3A%2F%2Fwww.unece.org%2Ffileadmin%2FDAM%2Fcefact%2Frsm%2FRSM_CrossIndustryInvoice_v2.0.pdf&usg=AOvVaw0yPVFpbRqJ50xaDMUaYm62
-public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements DocumentTotals {
+// ZUGFeRD 2.0 Spezifikation - Technischer Anhang : ZUGFeRD-2.0-Spezifikation-TA.pdf
+public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements CoreInvoice, DocumentTotals {
 
 	private static final Logger LOG = Logger.getLogger(CrossIndustryInvoice.class.getName());
 	
+/*
+1 .. 1 ExchangedDocumentContext Prozesssteuerung BG-2 xs:sequence 
+0 .. 1 TestIndicator Testkennzeichen                  xs:choice 
+1 .. 1 Indicator Testkennzeichen, Wert
+0 .. 1 BusinessProcessSpecifiedDocumentContextParameter Gruppierung der Geschäftsprozessinformationen xs:sequence 
+0 .. 1 ID Geschäftsprozesstyp                    BT-23 
+1 .. 1 GuidelineSpecifiedDocumentContextParameter Gruppierung der Anwendungsempfehlungsinformationen xs:sequence 
+1 .. 1 ID Spezifikationskennung                  BT-24
+
+1 .. 1 ExchangedDocument Gruppierung der Eigenschaften, die das gesamte Dokument betreffen. xs:sequence 
+1 .. 1 ID Rechnungsnummer                        BT-1 
+0 .. 1 Name Dokumentenart (Freitext) 
+1 .. 1 TypeCode Code für den Rechnungstyp        BT-3 
+1 .. 1 IssueDateTime Rechnungsdatum xs:choice 
+1 .. 1 DateTimeString Rechnungsdatum             BT-2 required format Datum, Format BT-2-0 
+0 .. 1 CopyIndicator xs:choice 
+1 .. 1 Indicator 
+0 .. 1 LanguageID Sprachkennzeichen 
+0 .. n IncludedNote Freitext zur Rechnung        BG-1 xs:sequence
+0 .. 1 ContentCode Freitext auf Dokumentenebene 
+1 .. 1 Content Freitext zur Rechnung             BT-22 
+0 .. 1 SubjectCode Code zur Qualifizierung des Freitextes zur Rechnung BT-21 
+0 .. 1 EffectiveSpecifiedPeriod Vertragliches Fälligkeitsdatum der Rechnung xs:sequence 
+1 .. 1 CompleteDateTime Vertragliches Fälligkeitsdatum der Rechnung xs:choice 
+1 .. 1 DateTimeString Vertragliches Fälligkeitsdatum der Rechnung, Wert required format Datum, Format
+ */
 	CrossIndustryInvoice() {
 		super();
 	}
@@ -146,59 +168,210 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Do
 	/* Invoice number                              BT-1  Identifier            1 (mandatory) 
 	 * Eine eindeutige Kennung der Rechnung, die diese im System des Verkäufers identifiziert.
 	 * Anmerkung: Es ist kein „identification scheme“ zu verwenden.
+
+ID Spezifikationskennung . 
+Datentyp: udt:IDType . 
+Beschreibung: Eine Kennung der Spezifikation, die das gesamte Regelwerk zum semantischen Inhalt, zu den Kardinalitäten und den Geschäftsregeln enthält und zu denen die im Instanzdokument enthaltenen Daten conformant sind . 
+Hinweis: In diesem wird die Compliance oder Conformance der Instanz mit diesem Dokument angegeben. Rechnungen, die compliant sind, geben folgendes an: urn:cen.eu:en16931:2017. Rechnungen, die compliant mit einer Benutzerspezifikation sind, dürfen diese Benutzerspezifikation an dieser Stelle angeben. Es ist kein Identifikationsschema zu verwenden. . 
+Synonym: Anwendungsempfehlung . 
+Kardinalität: 1 .. 1 . 
+EN16931-ID: BT-24 . 
+Anwendung: Profil EXTENDED: urn:cen.eu:EN16931:2017#conformant#urn:zugferd.de:2p0:extended 
+           Profil EN 16931 (COMFORT): urn:cen.eu:EN16931:2017 
+           Profil BASIC: urn:cen.eu:EN16931:2017#compliant#urn:zugferd.de:2p0:basic 
+           Profil BASIC WL: urn:zugferd.de:2p0:basicwl 
+           Profil MINIMUM: urn:zugferd.de:2p0:minimum . 
+Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationskennung (BT-24) haben.
+
 	 */
+	@Override
 	public void setId(String id) {
 		ExchangedDocumentType ed = this.getExchangedDocument();
 		IDType mID = new IDType();
 		mID.setValue(id);
 		ed.setID(mID);
 	}
+	
+	@Override
+	public String getId() {
+		return getId(this);
+	}
+	static String getId(CrossIndustryInvoice doc) {
+		return doc.getExchangedDocument().getID().getValue();
+	}
 
 	/* Invoice issue date                          BT-2  Date                  1 (mandatory) 
 	 * Das Datum, an dem die Rechnung ausgestellt wurde.
 	 */
+	@Override
 	public void setIssueDate(String ymd) {	
-		Timestamp ts = null;
-		try {
-			//Timestamp.valueOf("yyyy-[m]m-[d]d hh:mm:ss[.f...]"); // JDBC timestamp escape format
-			ts = Timestamp.valueOf(ymd);
-		} catch (IllegalArgumentException e) {
-			try {
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-				ts = new Timestamp(((java.util.Date)df.parse(ymd)).getTime());
-			} catch (ParseException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-		}
-		setIssueDate(ts);
+		setIssueDate(DateTimeFormats.ymdToTs(ymd));
 	}
+	
+	@Override
 	public void setIssueDate(Timestamp ts) {
-        LocalDateTime ldt = ts.toLocalDateTime();
-        XMLGregorianCalendar cal = null;
-		try {
-			cal = DatatypeFactory.newInstance().newXMLGregorianCalendar();
-		} catch (DatatypeConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        cal.setYear(ldt.getYear());
-        cal.setMonth(ldt.getMonthValue());
-        cal.setDay(ldt.getDayOfMonth());
-        cal.setHour(ldt.getHour());
-        cal.setMinute(ldt.getMinute());
-        cal.setSecond(ldt.getSecond());
 		ExchangedDocumentType ed = this.getExchangedDocument();
 		DateTimeType dateTime = new DateTimeType();
-//		dateTime.setDateTime(cal); //XMLGregorianCalendar : <udt:DateTime>2018-01-01T00:00:00</udt:DateTime>
-// das liefert  	[CII-SR-015] - DateTime should not be present
-		DateTimeType.DateTimeString dts = new DateTimeType.DateTimeString();
-		dts.setValue(ldt.format(DateTimeFormatter.BASIC_ISO_DATE));
-		dts.setFormat("102");
+		DateTimeType.DateTimeString dts = new DateTimeType.DateTimeString(); // DateTimeString ist inner class in DateTimeType
+		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
+		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
 		dateTime.setDateTimeString(dts);
+//		dateTime.setDateTime(DateTimeFormats.tsToXMLGregorianCalendar(ts));
 		ed.setIssueDateTime(dateTime);
 	}
 
+	@Override
+	public Timestamp getIssueDateAsTimestamp() {
+		return getIssueDateAsTimestamp(this);
+	}
+	static Timestamp getIssueDateAsTimestamp(CrossIndustryInvoice doc) {
+		DateTimeType dateTime = doc.getExchangedDocument().getIssueDateTime();
+//		return Invoice.xmlGregorianCalendarToTs(dateTime.getDateTime());
+		return DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
+
+	@Override
+	public void setTypeCode(DocumentNameCode code) {
+		ExchangedDocumentType ed = this.getExchangedDocument();
+		DocumentCodeType documentCode = new DocumentCodeType();
+		documentCode.setValue(code.getValueAsString());
+		ed.setTypeCode(documentCode);
+	}
+
+	@Override
+	public DocumentNameCode getTypeCode() {
+		return getTypeCode(this);
+	}
+	static DocumentNameCode getTypeCode(CrossIndustryInvoice doc) {
+		return DocumentNameCode.valueOf(doc.getExchangedDocument().getTypeCode().getValue());
+	}
+
+	@Override
+	public void setDocumentCurrency(String isoCurrencyCode) {
+		// SupplyChainTradeTransaction
+		// ApplicableHeaderTradeSettlement
+		// 1 .. 1 InvoiceCurrencyCode Code für die Rechnungswährung BT-5
+		CurrencyCodeType currencyCode = new CurrencyCodeType();
+		currencyCode.setValue(isoCurrencyCode);
+		HeaderTradeSettlementType headerTradeSettlement = getApplicableHeaderTradeSettlement();
+		headerTradeSettlement.setInvoiceCurrencyCode(currencyCode);
+		
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(headerTradeSettlement);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
+	}
+
+	@Override
+	public String getDocumentCurrency() {
+		return getDocumentCurrency(this);
+	}
+	static String getDocumentCurrency(CrossIndustryInvoice doc) {
+		return doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getInvoiceCurrencyCode().getValue();
+	}
+
+	@Override // internal use only
+	public SupplyChainTradeTransactionType getSupplyChainTradeTransaction() {
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = super.getSupplyChainTradeTransaction();
+		if(supplyChainTradeTransaction==null) {
+			supplyChainTradeTransaction = new SupplyChainTradeTransactionType();
+			LOG.info("new SupplyChainTradeTransactionType:"+supplyChainTradeTransaction);
+		}
+		return supplyChainTradeTransaction;
+	}
+	
+	HeaderTradeSettlementType getApplicableHeaderTradeSettlement() {
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		HeaderTradeSettlementType headerTradeSettlement = supplyChainTradeTransaction.getApplicableHeaderTradeSettlement();
+		if(headerTradeSettlement==null) {
+			headerTradeSettlement = new HeaderTradeSettlementType();
+			LOG.info("new HeaderTradeSettlementType:"+headerTradeSettlement);
+		}
+		return headerTradeSettlement;
+	}
+	
+	@Override
+	public void setTaxCurrency(String isoCurrencyCode) {
+		if(isoCurrencyCode==null) return;  // optional
+		CurrencyCodeType currencyCode = new CurrencyCodeType();
+		currencyCode.setValue(isoCurrencyCode);
+		HeaderTradeSettlementType headerTradeSettlement = getApplicableHeaderTradeSettlement();
+		headerTradeSettlement.setTaxCurrencyCode(currencyCode);
+		
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(headerTradeSettlement);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
+	}
+
+	@Override
+	public String getTaxCurrency() {
+		return getTaxCurrency(this);
+	}
+	static String getTaxCurrency(CrossIndustryInvoice doc) {
+		CurrencyCodeType currencyCode = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getTaxCurrencyCode();
+		return currencyCode==null ? null : currencyCode.getValue();
+	}
+
+	/*
+1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
+0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung BG-23
+
+0 .. 1 TaxPointDate Datum der Steuerfälligkeit xs:choice 
+1 .. 1 DateString Datum der Steuerfälligkeit, Wert BT-7 
+required format Datum, Format BT-7-0
+
+Anwendung: In Deutschland wird dieses nicht verwendet. 
+Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
+	 */
+	@Override
+	public void setTaxPointDate(String ymd) {
+		setTaxPointDate(DateTimeFormats.ymdToTs(ymd));
+	}
+
+	@Override
+	public void setTaxPointDate(Timestamp ts) {
+		if(ts==null) return;  // optional
+		HeaderTradeSettlementType headerTradeSettlement = getApplicableHeaderTradeSettlement();
+		List<TradeTaxType> tradeTaxList = headerTradeSettlement.getApplicableTradeTax();
+		
+		DateType.DateString dateString = new DateType.DateString(); // DateString ist inner class in DateType
+		dateString.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
+		dateString.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
+		
+		DateType date = new DateType();
+		date.setDateString(dateString);
+		
+		TradeTaxType tradeTax = new TradeTaxType();
+		tradeTax.setTaxPointDate(date);
+		
+		tradeTaxList.add(tradeTax);
+	}
+
+	@Override
+	public Timestamp getTaxPointDateAsTimestamp() {
+		return getTaxPointDateAsTimestamp(this);
+	}
+	static Timestamp getTaxPointDateAsTimestamp(CrossIndustryInvoice doc) {
+		HeaderTradeSettlementType headerTradeSettlement = doc.getApplicableHeaderTradeSettlement();
+		List<TradeTaxType> tradeTaxList = headerTradeSettlement.getApplicableTradeTax();
+		if(tradeTaxList.isEmpty()) return null;
+		
+		List<Timestamp> results = new ArrayList<Timestamp>(tradeTaxList.size());
+		tradeTaxList.forEach(tradeTax -> {
+			DateType date = tradeTax.getTaxPointDate();
+			if("102".equals(date.getDateString().getFormat())) {
+				results.add(DateTimeFormats.ymdToTs(date.getDateString().getValue()));
+			} else {
+				LOG.warning("not 102-Format:"+date.getDateString().getFormat() + " value:"+date.getDateString().getValue());
+			}		
+		});
+		if(results.isEmpty()) return null;
+		if(results.size()>1) {
+			LOG.warning("results.size()>1:"+results.size());
+		}
+		return results.get(0);
+	}
+
+// --------------------------------
 	/* INVOICE NOTE                                BG-1                        0..*
 	 * Eine Gruppe von Informationselementen für rechnungsrelevante Erläuterungen mit Hinweisen auf den Rechnungsbetreff.
 	 * 
@@ -239,33 +412,10 @@ Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grun
 		return notes;
 	}
 
-	/* Invoice currency code                       BT-5  Code                  1 (mandatory) 
-	 * Die Währung, in der alle Rechnungsbeträge angegeben werden, 
-	 * ausgenommen ist der Umsatzsteuer-Gesamtbetrag, der in der Abrechnungswährung anzugeben ist.
-	 * Anmerkung: Nur eine Währung ist in der Rechnung zu verwenden, 
-	 * der „Invoice total VAT amount in accounting currency“ (BT-111) ist in der Abrechnungswährung auszuweisen. 
-	 * Die gültigen Währungen sind bei der ISO 4217 „Codes for the representation of currencies and funds“ registriert.
-	 */
-	public void setPaymentCurrencyCode(String isoCurrencyCode) {
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-//		HeaderTradeSettlementType headerTradeSettlement = supplyChainTradeTransaction.getApplicableHeaderTradeSettlement();
-//		if(headerTradeSettlement==null) {
-//			headerTradeSettlement = new HeaderTradeSettlementType();
-//			LOG.info("new HeaderTradeSettlementType:"+headerTradeSettlement);
-//		}
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = getHeaderTradeSettlement(supplyChainTradeTransaction);
-		CurrencyCodeType currencyCode = new CurrencyCodeType();
-		currencyCode.setValue(isoCurrencyCode);
-		
-		applicableHeaderTradeSettlement.setInvoiceCurrencyCode(currencyCode);
-		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
-	}
-	
 	// nicht in XRechnung-v1-2-0.pdf dokumentiert
-	public void setDocumentCurrencyCode(String isoCurrencyCode) {
-		LOG.warning("für cii nicht implementiert");
-	}
+//	public void setDocumentCurrencyCode(String isoCurrencyCode) {
+//		LOG.warning("für cii nicht implementiert");
+//	}
 
 	/* Buyer reference                             BT-10 Text                  1 (mandatory) 
 	 * Ein vom Erwerber zugewiesener und für interne Lenkungszwecke benutzter Bezeichner
@@ -836,16 +986,6 @@ Pfad: /rsm:CrossIndustryInvoice/rsm:SupplyChainTradeTransaction[1]/ram:IncludedS
 		return tradeTax;
 	}
 	
-	@Override
-	public SupplyChainTradeTransactionType getSupplyChainTradeTransaction() {
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = super.getSupplyChainTradeTransaction();
-		if(supplyChainTradeTransaction==null) {
-			supplyChainTradeTransaction = new SupplyChainTradeTransactionType();
-			LOG.info("new SupplyChainTradeTransactionType:"+supplyChainTradeTransaction);
-		}
-		return supplyChainTradeTransaction;
-	}
-	
 	private TradeSettlementHeaderMonetarySummationType getTradeSettlementHeaderMonetarySummation(HeaderTradeSettlementType applicableHeaderTradeSettlement) {
 		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation();
 		if(tradeSettlementHeaderMonetarySummationType==null) {
@@ -872,5 +1012,6 @@ Pfad: /rsm:CrossIndustryInvoice/rsm:SupplyChainTradeTransaction[1]/ram:IncludedS
 		}
 		return headerTradeAgreement;
 	}
+
 
 }

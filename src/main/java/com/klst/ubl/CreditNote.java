@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.klst.cius.CoreInvoice;
 import com.klst.cius.DocumentTotals;
 import com.klst.un.unece.uncefact.Amount;
 import com.klst.un.unece.uncefact.IBANId;
+import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansCode;
 
@@ -42,7 +44,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPoint
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
 
-public class CreditNote extends CreditNoteType implements DocumentTotals {
+public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentTotals {
 
 	private static final Logger LOG = Logger.getLogger(CreditNote.class.getName());
 	
@@ -65,8 +67,8 @@ public class CreditNote extends CreditNoteType implements DocumentTotals {
 		this(getCustomizationID(doc), getProfileID(doc), getTypeCode(doc));
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));
-		setDocumentCurrencyCode(getDocumentCurrency(doc));
-		setPaymentCurrencyCode(getPaymentCurrency(doc)); // optional
+		setDocumentCurrency(getDocumentCurrency(doc));
+		setTaxCurrency(getTaxCurrency(doc)); // optional
 		setTaxPointDate(getTaxPointDateAsTimestamp(doc)); // optional
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional
 		setOrderReferenceID(getOrderReferenceID(doc)); // optional
@@ -97,11 +99,11 @@ public class CreditNote extends CreditNoteType implements DocumentTotals {
 
 	// wie BT-2  Date
 	public void setIssueDate(String ymd) {	
-		setIssueDate(Invoice.ymdToTs(ymd));
+		setIssueDate(DateTimeFormats.ymdToTs(ymd));
 	}
 	public void setIssueDate(Timestamp ts) {
 		IssueDateType issueDate = new IssueDateType();
-		issueDate.setValue(Invoice.tsToXMLGregorianCalendar(ts));
+		issueDate.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
 		super.setIssueDate(issueDate);
 	}
 	public Timestamp getIssueDateAsTimestamp() {  // bei gleichen Namen getIssueDate() kann es nicht abgeleitet sein
@@ -109,16 +111,16 @@ public class CreditNote extends CreditNoteType implements DocumentTotals {
 	}
 	static Timestamp getIssueDateAsTimestamp(CreditNoteType doc) {
 		IssueDateType issueDate = doc.getIssueDate();
-		return Invoice.xmlGregorianCalendarToTs(issueDate.getValue());
+		return DateTimeFormats.xmlGregorianCalendarToTs(issueDate.getValue());
 	}
 	
 	// wie BT-3  Code
-	void setTypeCode(DocumentNameCode code) {
+	public void setTypeCode(DocumentNameCode code) {
 		CreditNoteTypeCodeType typeCode = new CreditNoteTypeCodeType();
 		typeCode.setValue(code.getValueAsString());
 		super.setCreditNoteTypeCode(typeCode);
 	}
-	public DocumentNameCode getTypeCodee() {
+	public DocumentNameCode getTypeCode() {
 		return getTypeCode(this);
 	}
 	static DocumentNameCode getTypeCode(CreditNoteType doc) {
@@ -126,7 +128,7 @@ public class CreditNote extends CreditNoteType implements DocumentTotals {
 	}
 	
 	// wie BT-5  Code
-	public void setDocumentCurrencyCode(String isoCurrencyCode) {
+	public void setDocumentCurrency(String isoCurrencyCode) {
 		DocumentCurrencyCodeType documentCurrencyCode = new DocumentCurrencyCodeType();
 		documentCurrencyCode.setValue(isoCurrencyCode);
 		this.setDocumentCurrencyCode(documentCurrencyCode);
@@ -140,27 +142,27 @@ public class CreditNote extends CreditNoteType implements DocumentTotals {
 	}
 
 	// wie BT-6  Code
-	public void setPaymentCurrencyCode(String isoCurrencyCode) {
+	public void setTaxCurrency(String isoCurrencyCode) {
 		PaymentCurrencyCodeType paymentCurrencyCode = new PaymentCurrencyCodeType();
 		paymentCurrencyCode.setValue(isoCurrencyCode); 
 		this.setPaymentCurrencyCode(paymentCurrencyCode);
 	}
-	public String getPaymentCurrency() {
-		return getPaymentCurrency(this);
+	public String getTaxCurrency() {
+		return getTaxCurrency(this);
 	}
-	static String getPaymentCurrency(CreditNoteType doc) {
+	static String getTaxCurrency(CreditNoteType doc) {
 		PaymentCurrencyCodeType code = doc.getPaymentCurrencyCode();
 		return code==null ? null : code.getValue();
 	}
 
 	// wie BT-7  Date
 	public void setTaxPointDate(String ymd) {	
-		setTaxPointDate(Invoice.ymdToTs(ymd));
+		setTaxPointDate(DateTimeFormats.ymdToTs(ymd));
 	}
 	public void setTaxPointDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		TaxPointDateType taxPointDate = new TaxPointDateType();
-		taxPointDate.setValue(Invoice.tsToXMLGregorianCalendar(ts));
+		taxPointDate.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
 		super.setTaxPointDate(taxPointDate);
 	}
 	public Timestamp getTaxPointDateAsTimestamp() {
@@ -168,7 +170,7 @@ public class CreditNote extends CreditNoteType implements DocumentTotals {
 	}
 	static Timestamp getTaxPointDateAsTimestamp(CreditNoteType doc) {
 		TaxPointDateType taxPointDate = doc.getTaxPointDate();
-		return taxPointDate==null ? null : Invoice.xmlGregorianCalendarToTs(taxPointDate.getValue());
+		return taxPointDate==null ? null : DateTimeFormats.xmlGregorianCalendarToTs(taxPointDate.getValue());
 	}
 
 	// wie BT-10  Text

@@ -1,24 +1,18 @@
 package com.klst.ubl;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-
+import com.klst.cius.CoreInvoice;
 import com.klst.cius.DocumentTotals;
 import com.klst.cius.IContact;
 import com.klst.un.unece.uncefact.Amount;
 import com.klst.un.unece.uncefact.IBANId;
+import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansCode;
 
@@ -100,7 +94,7 @@ Von der Möglichkeit der Trennung von Rechnung und rechnungsbegründenden Unterl
 oder sensibler Daten Gebrauch gemacht werden.
 INVOICE LINE                                BG-25                       1..*
  */
-public class Invoice extends InvoiceType implements DocumentTotals {
+public class Invoice extends InvoiceType implements CoreInvoice, DocumentTotals {
 
 	/*
 		customizationIDType.setValue("urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2");
@@ -141,8 +135,8 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		this(getCustomizationID(doc), getProfileID(doc), getTypeCode(doc));
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));
-		setDocumentCurrencyCode(getDocumentCurrency(doc));
-		setPaymentCurrencyCode(getPaymentCurrency(doc)); // optional
+		setDocumentCurrency(getDocumentCurrency(doc));
+		setTaxCurrency(getTaxCurrency(doc)); // optional
 		setTaxPointDate(getTaxPointDateAsTimestamp(doc)); // optional
 		setDueDate(getDueDateAsTimestamp(doc)); // optional
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional
@@ -177,11 +171,14 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * 
 	 * @param id Identifier
 	 */
+	@Override
 	public void setId(String id) {
 		IDType mID = new IDType();
 		mID.setValue(id);
 		this.setID(mID);
 	}
+	
+	@Override
 	public String getId() {
 		return getId(this);
 	}
@@ -203,20 +200,24 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * 
 	 * @param ymd Date
 	 */
+	@Override
 	public void setIssueDate(String ymd) {	
-		setIssueDate(ymdToTs(ymd));
+		setIssueDate(DateTimeFormats.ymdToTs(ymd));
 	}
+	@Override
 	public void setIssueDate(Timestamp ts) {
 		IssueDateType issueDate = new IssueDateType();
-		issueDate.setValue(tsToXMLGregorianCalendar(ts));
+		issueDate.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
 		super.setIssueDate(issueDate);
 	}
+	
+	@Override
 	public Timestamp getIssueDateAsTimestamp() {  // bei gleichen Namen getIssueDate() kann es nicht abgeleitet sein
 		return getIssueDateAsTimestamp(this);
 	}
 	static Timestamp getIssueDateAsTimestamp(InvoiceType doc) {
 		IssueDateType issueDate = doc.getIssueDate();
-		return xmlGregorianCalendarToTs(issueDate.getValue());
+		return DateTimeFormats.xmlGregorianCalendarToTs(issueDate.getValue());
 	}
 	
 	/**
@@ -231,11 +232,14 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * 
 	 * @param code
 	 */
-	void setTypeCode(DocumentNameCode code) {
+	@Override // use only via ctor
+	public void setTypeCode(DocumentNameCode code) {
 		InvoiceTypeCodeType typeCode = new InvoiceTypeCodeType();
 		typeCode.setValue(code.getValueAsString());
 		super.setInvoiceTypeCode(typeCode);
 	}
+	
+	@Override
 	public DocumentNameCode getTypeCode() {
 		return getTypeCode(this);
 	}
@@ -262,11 +266,14 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * @param code, The lists of valid currencies are registered with the ISO 4217 
 	 * Maintenance Agency “Codes for the representation of currencies and funds”.
 	 */
-	public void setDocumentCurrencyCode(String isoCurrencyCode) {
+	@Override
+	public void setDocumentCurrency(String isoCurrencyCode) { // TODO umbenneen aus interface CoreInvoice
 		DocumentCurrencyCodeType documentCurrencyCode = new DocumentCurrencyCodeType();
 		documentCurrencyCode.setValue(isoCurrencyCode);
 		this.setDocumentCurrencyCode(documentCurrencyCode);
 	}
+	
+	@Override
 	public String getDocumentCurrency() {
 		return getDocumentCurrency(this);
 	}
@@ -292,21 +299,27 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * @param code, The lists of valid currencies are registered with the ISO 4217 
 	 * Maintenance Agency “Codes for the representation of currencies and funds”.
 	 */
-	public void setPaymentCurrencyCode(String isoCurrencyCode) {
+	@Override
+	public void setTaxCurrency(String isoCurrencyCode) { // TODO umbenneen aus interface CoreInvoice
 		PaymentCurrencyCodeType paymentCurrencyCode = new PaymentCurrencyCodeType();
 		paymentCurrencyCode.setValue(isoCurrencyCode); 
 		this.setPaymentCurrencyCode(paymentCurrencyCode);
 	}
-	public String getPaymentCurrency() {
-		return getPaymentCurrency(this);
+	
+	@Override
+	public String getTaxCurrency() {
+		return getTaxCurrency(this);
 	}
-	static String getPaymentCurrency(InvoiceType doc) {
+	static String getTaxCurrency(InvoiceType doc) {
 		PaymentCurrencyCodeType code = doc.getPaymentCurrencyCode();
 		return code==null ? null : code.getValue();
 	}
 
 	/* Das Datum, zu dem die Umsatzsteuer für den Verkäufer und für den Erwerber abrechnungsrelevant wird.
 	 * Die Anwendung von BT-7 und BT-8 schließen sich gegenseitig aus.
+	 * 
+	 * Anwendung: In Deutschland wird dieses nicht verwendet. 
+	 *            Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 */
 	/**
 	 * Value added tax point date
@@ -326,21 +339,25 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * 
 	 * @param ymd Date
 	 */
+	@Override
 	public void setTaxPointDate(String ymd) {	
-		setTaxPointDate(ymdToTs(ymd));
+		setTaxPointDate(DateTimeFormats.ymdToTs(ymd));
 	}
+	@Override
 	public void setTaxPointDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		TaxPointDateType taxPointDate = new TaxPointDateType();
-		taxPointDate.setValue(tsToXMLGregorianCalendar(ts));
+		taxPointDate.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
 		super.setTaxPointDate(taxPointDate);
 	}
+	
+	@Override
 	public Timestamp getTaxPointDateAsTimestamp() {
-		return getIssueDateAsTimestamp(this);
+		return getTaxPointDateAsTimestamp(this);
 	}
 	static Timestamp getTaxPointDateAsTimestamp(InvoiceType doc) {
 		TaxPointDateType taxPointDate = doc.getTaxPointDate();
-		return taxPointDate==null ? null : xmlGregorianCalendarToTs(taxPointDate.getValue());
+		return taxPointDate==null ? null : DateTimeFormats.xmlGregorianCalendarToTs(taxPointDate.getValue());
 	}
 	
 	// BT-8 Value added tax point date code - in ubl nicht definiert ???
@@ -363,12 +380,12 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * @param ymd Date, optional: can be null
 	 */
 	public void setDueDate(String ymd) {
-		setDueDate(ymdToTs(ymd));
+		setDueDate(DateTimeFormats.ymdToTs(ymd));
 	}
 	public void setDueDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		DueDateType dueDate = new DueDateType();
-		dueDate.setValue(tsToXMLGregorianCalendar(ts));
+		dueDate.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
 		super.setDueDate(dueDate);
 	}
 	public Timestamp getDueDateAsTimestamp() {
@@ -376,7 +393,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	}
 	static Timestamp getDueDateAsTimestamp(InvoiceType doc) {
 		DueDateType dueDate = doc.getDueDate();
-		return dueDate==null ? null : xmlGregorianCalendarToTs(dueDate.getValue());
+		return dueDate==null ? null : DateTimeFormats.xmlGregorianCalendarToTs(dueDate.getValue());
 	}
 	
 	/* Buyer reference                             BT-10 Text                  1 (mandatory in XRechnung) 
@@ -1510,45 +1527,6 @@ Connecting Europe Facility gepflegt und herausgegeben
 	public List<Map<Object,String>> getBuyerLegalEntities() { 
 		Party party = getBuyerParty();
 		return party.getPartyLegalEntities();
-	}
-
-	static Timestamp xmlGregorianCalendarToTs(XMLGregorianCalendar cal) {
-		long timeInMillis = cal.toGregorianCalendar().getTimeInMillis();
-		return new Timestamp(timeInMillis);
-	}
-	static Timestamp ymdToTs(String ymd) {
-		Timestamp ts = null;
-		if(ymd!=null) try {
-			//Timestamp.valueOf("yyyy-[m]m-[d]d hh:mm:ss[.f...]"); // JDBC timestamp escape format
-			ts = Timestamp.valueOf(ymd);
-		} catch (IllegalArgumentException e) {
-			try {
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-				ts = new Timestamp(((java.util.Date)df.parse(ymd)).getTime());
-			} catch (ParseException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-		}
-		return ts;
-	}
-	
-	static XMLGregorianCalendar tsToXMLGregorianCalendar(Timestamp ts) {
-        LocalDateTime ldt = ts.toLocalDateTime();
-        XMLGregorianCalendar cal = null;
-		try {
-			cal = DatatypeFactory.newInstance().newXMLGregorianCalendar();
-		} catch (DatatypeConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        cal.setYear(ldt.getYear());
-        cal.setMonth(ldt.getMonthValue());
-        cal.setDay(ldt.getDayOfMonth());
-        cal.setHour(ldt.getHour());
-        cal.setMinute(ldt.getMinute());
-        cal.setSecond(ldt.getSecond());
-		return cal;
 	}
 
 }

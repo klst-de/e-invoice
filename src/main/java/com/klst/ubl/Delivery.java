@@ -2,6 +2,8 @@ package com.klst.ubl;
 
 import java.sql.Timestamp;
 
+import com.klst.untdid.codelist.DateTimeFormats;
+
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.LocationType;
@@ -76,13 +78,13 @@ public class Delivery extends DeliveryType { // TODO implements IDelivery
 	// ActualDeliveryDate
 	public void setActualDate(String ymd) {
 		if(ymd==null) return;
-		setActualDate(Invoice.ymdToTs(ymd));
+		setActualDate(DateTimeFormats.ymdToTs(ymd));
 	}
 	
 	public void setActualDate(Timestamp ts) {
 		if(ts==null) return;
 		ActualDeliveryDateType dueDate = new ActualDeliveryDateType();
-		dueDate.setValue(Invoice.tsToXMLGregorianCalendar(ts));
+		dueDate.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
 		super.setActualDeliveryDate(dueDate);
 	}
 
@@ -92,7 +94,7 @@ public class Delivery extends DeliveryType { // TODO implements IDelivery
 	
 	static Timestamp getActualDate(DeliveryType delivery) {
 		ActualDeliveryDateType actualDeliveryDate = delivery.getActualDeliveryDate();
-		return actualDeliveryDate==null ? null : Invoice.xmlGregorianCalendarToTs(actualDeliveryDate.getValue());
+		return actualDeliveryDate==null ? null : DateTimeFormats.xmlGregorianCalendarToTs(actualDeliveryDate.getValue());
 	}
 
 }

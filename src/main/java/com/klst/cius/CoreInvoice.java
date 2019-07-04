@@ -4,10 +4,6 @@ import java.sql.Timestamp;
 
 import com.klst.untdid.codelist.DocumentNameCode;
 
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentCurrencyCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentCurrencyCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPointDateType;
-
 /*
 
 Ich wähle den Begriff CoreInvoice für das Interface, das die gemeinsamen Methoden des sematischen Datenmodells beschreibz.
