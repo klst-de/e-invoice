@@ -132,7 +132,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	
 	// copy-ctor
 	Invoice(InvoiceType doc) {
-		this(getCustomizationID(doc), getProfileID(doc), getTypeCode(doc));
+		this(getCustomization(doc), getProfile(doc), getTypeCode(doc));
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));
 		setDocumentCurrency(getDocumentCurrency(doc));
@@ -374,20 +374,25 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * For partial payments it states the first net due date. 
 	 * <p>
 	 * Cardinality: 0..1 (optional)
-	 * <br>ID: BT-9
-	 * <br>Req.ID: R60
+	 * <br>EN16931-ID: 	BT-9
+	 * <br>Rule ID: 	BR-CO-25
+	 * <br>Request ID: 	R60
 	 * 
-	 * @param ymd Date, optional: can be null
+	 * @param ts Date, optional: can be null
 	 */
-	public void setDueDate(String ymd) {
-		setDueDate(DateTimeFormats.ymdToTs(ymd));
-	}
-	public void setDueDate(Timestamp ts) {
+//	@Override
+//	public void setDueDate(String ymd) {
+//		setDueDate(DateTimeFormats.ymdToTs(ymd));
+//	}
+//	@Override
+	void setDueDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		DueDateType dueDate = new DueDateType();
 		dueDate.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
 		super.setDueDate(dueDate);
 	}
+	
+	@Override
 	public Timestamp getDueDateAsTimestamp() {
 		return getDueDateAsTimestamp(this);
 	}
@@ -396,6 +401,18 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		return dueDate==null ? null : DateTimeFormats.xmlGregorianCalendarToTs(dueDate.getValue());
 	}
 	
+	@Override
+	public void setPaymentTermsAndDate(String description, String ymd) {
+		setPaymentTermsAndDate(description, DateTimeFormats.ymdToTs(ymd));
+	}
+
+	@Override
+	public void setPaymentTermsAndDate(String description, Timestamp ts) {
+		addPaymentTerms(description); // BT-20 optional
+		setDueDate(ts); // BT-9 optional
+	}
+
+
 	/* Buyer reference                             BT-10 Text                  1 (mandatory in XRechnung) 
 	 * Ein vom Erwerber zugewiesener und für interne Lenkungszwecke benutzter Bezeichner / Leitweg-ID
 	 */
@@ -405,7 +422,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * The identifier is defined by the Buyer (e.g. contact ID, department, office id, project code), 
 	 * but provided by the Seller in the Invoice.
 	 * <p>
-	 * Cardinality: 0..1 (optional)
+	 * Cardinality: 0..1 (optional), but mandatory due to BR-DE-15
 	 * <br>ID: BT-10
 	 * <br>Req.ID: R8
 	 * 
@@ -502,10 +519,18 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * A textual description of the payment terms that apply to the amount due for payment (Including description of possible penalties).
 	 * This element may contain multiple lines and multiple terms.
 	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>ID: BT-20
-	 * <br>Req.ID: R60
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BT-20
+	 * <br>Rule ID: 	BR-CO-25
+	 * <br>Request ID: 	R60
 	 */
+	@Override
+	public String getPaymentTerm() {
+		List<PaymentTerms> ptList = getPaymentTermList();
+		if(ptList.isEmpty()) return null;
+		return ptList.get(0).getFirstNote(); // da Cardinality 0..1
+	}
+
 	public List<PaymentTerms> getPaymentTermList() {
 		return getPaymentTermList(this);
 	}
@@ -528,7 +553,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		return result;
 	}
 	
-	public List<PaymentTermsType> addPaymentTerms(String paymentTermsNote) {
+	List<PaymentTermsType> addPaymentTerms(String paymentTermsNote) {
 		PaymentTermsType paymentTerms = new PaymentTerms(paymentTermsNote);
 		List<PaymentTermsType> paymentTermsList = this.getPaymentTerms();
 		paymentTermsList.add(paymentTerms);
@@ -549,22 +574,15 @@ Erforderlichenfalls können Angaben zur Aufbewahrungspflicht gem. § 14 Abs. 4 U
 Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grund der Korrektur angegeben werden
 
 	 */
-	/**
-	 * INVOICE NOTE
-	 * <p>
-	 * A group of business terms providing textual notes that are relevant for the invoice, 
-	 * together with an indication of the note subject.
-	 * <p>
-	 * Cardinality: 0..n (optional)
-	 * <br>ID: BG-1
-	 * <br>Req.ID: R56
-	 * 
-	 * @param subject code - BT-21 NOT_IMPEMENTED in ubl
-	 * @param invoiceNote 
-	 * A textual note that gives unstructured information that is relevant to the Invoice as a whole.
-	 * Such as the reason for any correction or assignment note in case the invoice hasbeen factored
-	 */
-	public List<NoteType> addNote(String invoiceNote) {
+	@Override
+	public void setNote(String subjectCode, String content) {
+		setNote(content);
+	}
+	@Override
+	public void setNote(String content) {
+		addNote(content);
+	}
+	List<NoteType> addNote(String invoiceNote) {
 		List<NoteType> notes = this.getNote();
 		NoteType note = new NoteType();
 		note.setValue(invoiceNote);
@@ -634,10 +652,10 @@ Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grun
 	}
 	
 	public String getCustomization() {
-		return getCustomizationID(this);
+		return getCustomization(this);
 	}
-	static String getCustomizationID(InvoiceType doc) {
-		CustomizationIDType customizationID =doc.getCustomizationID();
+	static String getCustomization(InvoiceType doc) {
+		CustomizationIDType customizationID = doc.getCustomizationID();
 		LOG.info("getSchemeAgencyID:"+customizationID.getSchemeAgencyID() +
 				" SchemeAgencyName:"+customizationID.getSchemeAgencyName() +
 				" Value:"+customizationID.getValue()
@@ -646,9 +664,9 @@ Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grun
 	}
 	
 	public String getProfile() {
-		return getProfileID(this);
+		return getProfile(this);
 	}
-	static String getProfileID(InvoiceType doc) {
+	static String getProfile(InvoiceType doc) {
 		ProfileIDType profileID = doc.getProfileID();
 		return profileID==null ? null : profileID.getValue();
 	}

@@ -175,7 +175,7 @@ Sowohl der Käufer als auch der Verkäufer sollten das Lieferdatum für die Umsa
 wenn dieses vom Verkäufer angegeben wird. Die Verwendung von BT-7 und BT-8 schließt sich gegenseitig aus. . 
 Kardinalität: 0 .. 1 . 
 
-Anwendung: In Deutschland wird dieses nicht verwendet. Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
+Anwendung: In Deutschland wird dieses nicht verwendet. Statt dessen ist das Liefer- und Leistungsdatum anzugeben. (BT-72)
 
 Verwendung ab: EN 16931 (COMFORT)
 
@@ -204,7 +204,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * The use of BT-7 and BT-8 is mutually exclusive.
 	 * <p>
 	 * Cardinality: 0..1 (optional)
-	 * <br>EN16931-ID: 	BT-7
+	 * <br>EN16931-ID: 	BT-7 BT-7-0
 	 * <br>Rule ID: 	BR-CO-3
 	 * <br>Request ID: 	R45 R46
 	 * 
@@ -213,6 +213,137 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void setTaxPointDate(String ymd);	
 	public void setTaxPointDate(Timestamp ts);
 	public Timestamp getTaxPointDateAsTimestamp();
+
+	/**
+	 * Value added tax point date code
+	 * <p>
+	 * The code of the date when the VAT becomes accountable for the Seller and for the Buyer.
+	 * The code shall distinguish between the following entries of UNTDID 2005 [6]:
+	 * <br> - Invoice document issue date
+	 * <br> - Delivery date, actual
+	 * <br> - Paid to dateThe Value added tax point
+	 * <p>
+	 * date code is used if the Value added tax point date is not known when the invoice is issued. 
+	 * The use of BT-8 and BT-7 is mutually exclusive.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-8
+	 * <br>Rule ID: 	BR-CO-3
+	 * <br>Request ID: 	R45 R46
+	 * 
+	 * @param code
+	 */
+	// BT-8 Value added tax point date code - in ubl nicht definiert ???
+	// In Deutschland ist das Liefer- und Leistungsdatum maßgebend (BT-72)
+//	public void setTaxPointDateCode(String code);
+//	public String getTaxPointDateCode();
+
+//	/**
+//	 * Payment due date 
+//	 * <p>
+//	 * The date when the payment is due.
+//	 * <br>
+//	 * The payment due date reflects the due date of the net payment. 
+//	 * For partial payments it states the first net due date. 
+//	 * <p>
+//	 * Cardinality: 0..1 (optional)
+//	 * <br>EN16931-ID: 	BT-9
+//	 * <br>Rule ID: 	BR-CO-25
+//	 * <br>Request ID: 	R60
+//	 * 
+//	 * @param ymd Date, optional: can be null
+//	 */
+//	public void setDueDate(String ymd);
+//	public void setDueDate(Timestamp ts);
+	public Timestamp getDueDateAsTimestamp();
+
+	/**
+	 * Payment terms & Payment due date
+	 * <p>
+	 * A textual description of the payment terms that apply to the amount due for payment (Including description of possible penalties).
+	 * This element may contain multiple lines and multiple terms.
+	 * <p>
+	 * The date when the payment is due.
+	 * <br>
+	 * The payment due date reflects the due date of the net payment. 
+	 * For partial payments it states the first net due date. 
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-9 & BT-20
+	 * <br>Rule ID: 	BR-CO-25
+	 * <br>Request ID: 	R60
+	 * 
+	 * @param description, optional: can be null
+	 * @param ymd Date, optional: can be null
+	 */
+	public void setPaymentTermsAndDate(String description, String ymd);
+	public void setPaymentTermsAndDate(String description, Timestamp ts);
+
+	public String getPaymentTerm();
+
+	/**
+	 * Buyer reference - An identifier assigned by the Buyer used for internal routing purposes.
+	 * <p>
+	 * The identifier is defined by the Buyer (e.g. contact ID, department, office id, project code), 
+	 * but provided by the Seller in the Invoice.
+	 * <p>
+	 * Cardinality: 0..1 (optional), but mandatory due to BR-DE-15
+	 * <br>EN16931-ID: 	BT-10
+	 * <br>Rule ID: 	BR-DE-15
+	 * <br>Request ID: 	R8
+	 * 
+	 * @param Text
+	 */
+	public void setBuyerReference(String reference);
+	public String getBuyerReferenceValue();
+
+	/**
+	 * INVOICE NOTE
+	 * <p>
+	 * A group of business terms providing textual notes that are relevant for the invoice, 
+	 * together with an indication of the note subject.
+	 * <p>
+	 * Cardinality: 	0..n (optional)
+	 * <br>EN16931-ID: 	BG-1
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R56
+	 * 
+	 * @param SubjectCode - To be chosen from the entries in UNTDID 4451, BT-21 / 0..1
+	 * @param Invoice note Content - BT-22 / 1..1
+	 * A textual note that gives unstructured information that is relevant to the Invoice as a whole.
+	 * Such as the reason for any correction or assignment note in case the invoice has been factored.
+	 */
+	public void setNote(String subjectCode, String content);
+	public void setNote(String content);
+
+	/**
+	 * PROCESS CONTROL
+	 * <p>
+	 * A group of business terms providing information on the business process and rules applicable to the Invoice document.
+	 * Contains ProfileID (BT-23 0..1) and CustomizationID/Specification identifier (BT-24 1..1)
+	 * <br>
+	 * ProfileID identifies what business process a given message is part of, 
+	 * and CustomizationID identifies the kind of message and the rules applied.
+	 * <p>
+	 * Cardinality: 1..1 (mandatory)
+	 * <br>ID: BG-2 , BT-23 , BT-24
+	 * <br>Req.ID: R44
+	 * <p>
+	 * ProfileID/Business process type - Identifies the business process context in which the transaction appears, 
+	 * to enable the Buyer to process the Invoice in an appropriate way.
+	 * <p>
+	 * Specification identifier - An identification of the specification containing the total set of rules regarding semantic content,
+	 * cardinalities and business rules to which the data contained in the instance document conforms.
+	 * This identifies compliance or conformance to this document. 
+	 * Compliant invoices specify: urn:cen.eu:en16931:2017. Invoices, compliant to a user specification may identify that user specification here.
+	 * No identification scheme is to be used.
+	 * 
+	 * @param customization, not null
+	 * @param profile (optional)
+	 */
+//	public void setProcessControl(String customization, String profile);
+	public String getCustomization();
+	public String getProfile();
 
 // CopyIndicator . Datentyp: udt:IndicatorType . Kardinalität: 0 .. 1 , nur EXTENDED
 // LanguageID Sprachkennzeichen . Datentyp: udt:IDType . Kardinalität: 0 .. 1 , nur EXTENDED

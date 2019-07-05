@@ -27,7 +27,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeDeliveryType;
@@ -100,7 +99,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 	public CrossIndustryInvoice(String customization, String profile, DocumentNameCode documentNameCode) {
 		this();
 		setProcessControl(customization, profile);
-			
+
 		// Invoice type code                           BT-3
 		// Ein Code, der den Funktionstyp der Rechnung angibt.
 /*
@@ -124,46 +123,29 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		this.setExchangedDocument(ed);
 	}
 
-	/* PROCESS CONTROL                             BG-2                        1 (mandatory) 
-	 * Eine Gruppe von Informationselementen, 
-	 * die Informationen über den Geschäftsprozess und für die Rechnung geltende Regeln liefern.
-
-    <rsm:ExchangedDocumentContext>
-        <ram:GuidelineSpecifiedDocumentContextParameter>
-            <ram:ID>urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2</ram:ID>
-        </ram:GuidelineSpecifiedDocumentContextParameter>
-    </rsm:ExchangedDocumentContext>
-
-
-	 */
-	/**
-	 * mandatory group PROCESS CONTROL
-	 * contains ProfileID and CustomizationID. 
-	 * 
-	 * ProfileID identifies what business process a given message is part of, 
-	 * and CustomizationID identifies the kind of message and the rules applied.
-	 * 
-	 * @param customization, not null
-	 * @param profile (optional)
-	 */
-	void setProcessControl(String customization, String profile) {
-		ExchangedDocumentContextType exchangedDocumentContext = new ExchangedDocumentContextType();
-		List<DocumentContextParameterType> documentContextParameterList = exchangedDocumentContext.getGuidelineSpecifiedDocumentContextParameter();
-		DocumentContextParameterType documentContextParameter = new DocumentContextParameterType();
-		IDType iDTyp = new IDType();
-		iDTyp.setValue(customization);
-		iDTyp.setSchemeID("XRECHNUNG");
-		documentContextParameter.setID(iDTyp);
-		documentContextParameterList.add(documentContextParameter);
-		this.setExchangedDocumentContext(exchangedDocumentContext);
-		if(profile==null) {
-			// profileIDType ist optional, nicht in cii
-		} else {
-//			ProfileIDType profileIDType = new ProfileIDType();
-//			profileIDType.setValue(profile);
-//			this.setProfileID(profileIDType);
-		}
+	// copy-ctor
+	CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
+		this(getCustomization(doc), getProfile(doc), getTypeCode(doc));
+		setId(getId(doc));
+		setIssueDate(getIssueDateAsTimestamp(doc));
+		setDocumentCurrency(getDocumentCurrency(doc));
+		setTaxCurrency(getTaxCurrency(doc)); // optional
+		setTaxPointDate(getTaxPointDateAsTimestamp(doc)); // optional
+		setPaymentTermsAndDate(getPaymentTerm(doc), getDueDateAsTimestamp(doc)); // optional
+//		setBuyerReference(getBuyerReferenceValue(doc)); // optional
+//		setOrderReferenceID(getOrderReferenceID(doc)); // optional
+//		addPaymentTerms(doc);
+//		addNotes(doc);	
+//		setSellerParty(getSellerParty(doc));
+//		setBuyerParty(getBuyerParty(doc));
+//		addDeliveries(doc);
+//		addPaymentInstructions(doc);		
+//		setDocumentTotals(doc);
+//		setInvoiceTax(getInvoiceTax(doc));
+//		addVATBreakDown(doc);
+//		addLines(doc);
 	}
+
 
 	/* Invoice number                              BT-1  Identifier            1 (mandatory) 
 	 * Eine eindeutige Kennung der Rechnung, die diese im System des Verkäufers identifiziert.
@@ -196,7 +178,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	public String getId() {
 		return getId(this);
 	}
-	static String getId(CrossIndustryInvoice doc) {
+	static String getId(CrossIndustryInvoiceType doc) {
 		return doc.getExchangedDocument().getID().getValue();
 	}
 
@@ -210,23 +192,16 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	
 	@Override
 	public void setIssueDate(Timestamp ts) {
-		ExchangedDocumentType ed = this.getExchangedDocument();
-		DateTimeType dateTime = new DateTimeType();
-		DateTimeType.DateTimeString dts = new DateTimeType.DateTimeString(); // DateTimeString ist inner class in DateTimeType
-		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
-		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
-		dateTime.setDateTimeString(dts);
-//		dateTime.setDateTime(DateTimeFormats.tsToXMLGregorianCalendar(ts));
-		ed.setIssueDateTime(dateTime);
+		DateTimeType dateTime = newDateTime(ts);
+		this.getExchangedDocument().setIssueDateTime(dateTime);
 	}
 
 	@Override
 	public Timestamp getIssueDateAsTimestamp() {
 		return getIssueDateAsTimestamp(this);
 	}
-	static Timestamp getIssueDateAsTimestamp(CrossIndustryInvoice doc) {
+	static Timestamp getIssueDateAsTimestamp(CrossIndustryInvoiceType doc) {
 		DateTimeType dateTime = doc.getExchangedDocument().getIssueDateTime();
-//		return Invoice.xmlGregorianCalendarToTs(dateTime.getDateTime());
 		return DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
 	}
 
@@ -242,7 +217,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	public DocumentNameCode getTypeCode() {
 		return getTypeCode(this);
 	}
-	static DocumentNameCode getTypeCode(CrossIndustryInvoice doc) {
+	static DocumentNameCode getTypeCode(CrossIndustryInvoiceType doc) {
 		return DocumentNameCode.valueOf(doc.getExchangedDocument().getTypeCode().getValue());
 	}
 
@@ -265,7 +240,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	public String getDocumentCurrency() {
 		return getDocumentCurrency(this);
 	}
-	static String getDocumentCurrency(CrossIndustryInvoice doc) {
+	static String getDocumentCurrency(CrossIndustryInvoiceType doc) {
 		return doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getInvoiceCurrencyCode().getValue();
 	}
 
@@ -277,16 +252,6 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 			LOG.info("new SupplyChainTradeTransactionType:"+supplyChainTradeTransaction);
 		}
 		return supplyChainTradeTransaction;
-	}
-	
-	HeaderTradeSettlementType getApplicableHeaderTradeSettlement() {
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-		HeaderTradeSettlementType headerTradeSettlement = supplyChainTradeTransaction.getApplicableHeaderTradeSettlement();
-		if(headerTradeSettlement==null) {
-			headerTradeSettlement = new HeaderTradeSettlementType();
-			LOG.info("new HeaderTradeSettlementType:"+headerTradeSettlement);
-		}
-		return headerTradeSettlement;
 	}
 	
 	@Override
@@ -306,7 +271,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	public String getTaxCurrency() {
 		return getTaxCurrency(this);
 	}
-	static String getTaxCurrency(CrossIndustryInvoice doc) {
+	static String getTaxCurrency(CrossIndustryInvoiceType doc) {
 		CurrencyCodeType currencyCode = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getTaxCurrencyCode();
 		return currencyCode==null ? null : currencyCode.getValue();
 	}
@@ -331,7 +296,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public void setTaxPointDate(Timestamp ts) {
 		if(ts==null) return;  // optional
 		HeaderTradeSettlementType headerTradeSettlement = getApplicableHeaderTradeSettlement();
-		List<TradeTaxType> tradeTaxList = headerTradeSettlement.getApplicableTradeTax();
+//		List<TradeTaxType> tradeTaxList = headerTradeSettlement.getApplicableTradeTax();
 		
 		DateType.DateString dateString = new DateType.DateString(); // DateString ist inner class in DateType
 		dateString.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
@@ -343,15 +308,20 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		TradeTaxType tradeTax = new TradeTaxType();
 		tradeTax.setTaxPointDate(date);
 		
-		tradeTaxList.add(tradeTax);
+//		tradeTaxList.add(tradeTax);
+		headerTradeSettlement.getApplicableTradeTax().add(tradeTax);
+		
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(headerTradeSettlement);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
 	}
 
 	@Override
 	public Timestamp getTaxPointDateAsTimestamp() {
 		return getTaxPointDateAsTimestamp(this);
 	}
-	static Timestamp getTaxPointDateAsTimestamp(CrossIndustryInvoice doc) {
-		HeaderTradeSettlementType headerTradeSettlement = doc.getApplicableHeaderTradeSettlement();
+	static Timestamp getTaxPointDateAsTimestamp(CrossIndustryInvoiceType doc) {
+		HeaderTradeSettlementType headerTradeSettlement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement();
 		List<TradeTaxType> tradeTaxList = headerTradeSettlement.getApplicableTradeTax();
 		if(tradeTaxList.isEmpty()) return null;
 		
@@ -371,33 +341,165 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		return results.get(0);
 	}
 
-// --------------------------------
+	/*
+DueDateDateTime Fälligkeitsdatum
+
+1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
+0 .. n SpecifiedTradePaymentTerms Detailinformationen zu Zahlungsbedingungen xs:sequence 
+0 .. 1 Description Zahlungsbedingungen BT-20 
+0 .. 1 DueDateDateTime Fälligkeitsdatum xs:choice 
+1 .. 1 DateTimeString Fälligkeitsdatum der Zahlung BT-9 
+       required format Datum, Format BT-9-0
+
+	 */
+	
+////	@Override
+//	public void setDueDate(String ymd) {
+//		setDueDate(DateTimeFormats.ymdToTs(ymd));
+//	}
+////	@Override
+//	public void setDueDate(Timestamp ts) { // TODO zusammen mit BT20
+//		if(ts==null) return;  // optional
+//		HeaderTradeSettlementType headerTradeSettlement = getApplicableHeaderTradeSettlement();
+////		List<TradePaymentTermsType> tradePaymentTermsList = headerTradeSettlement.getSpecifiedTradePaymentTerms();
+//		
+//		TradePaymentTermsType tradePaymentTerms = new TradePaymentTermsType();
+//		// TODO befüllen:
+////		List<TextType> textList = tradePaymentTerms.getDescription(); // Liste Zahlungsbedingungen BT-20
+//		DateTimeType dateTime = new DateTimeType();
+//		DateTimeType.DateTimeString dts = new DateTimeType.DateTimeString(); // DateTimeString ist inner class in DateTimeType
+//		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
+//		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
+//		dateTime.setDateTimeString(dts);
+//		tradePaymentTerms.setDueDateDateTime(dateTime);
+//		
+////		tradePaymentTermsList.add(tradePaymentTerms);
+//		headerTradeSettlement.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
+//		
+//		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+//		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(headerTradeSettlement);
+//		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+//	}
+
+	@Override
+	public Timestamp getDueDateAsTimestamp() {
+		return getDueDateAsTimestamp(this);
+	}
+	static Timestamp getDueDateAsTimestamp(CrossIndustryInvoiceType doc) {
+		return null; // TODO
+	}
+
+	@Override
+	public void setPaymentTermsAndDate(String description, String ymd) {
+		setPaymentTermsAndDate(description, DateTimeFormats.ymdToTs(ymd));
+	}
+
+	@Override
+	public void setPaymentTermsAndDate(String description, Timestamp ts) {
+		TradePaymentTermsType tradePaymentTerms = new TradePaymentTermsType();
+		if(description==null) {
+			LOG.warning("text==null");
+		} else {
+			TextType text = new TextType();
+			text.setValue(description);
+			tradePaymentTerms.getDescription().add(text); // returns List<TextType>
+		}
+		if(ts==null) {
+			LOG.warning("Timestamp ts==null");
+		} else {
+			tradePaymentTerms.setDueDateDateTime(newDateTime(ts));
+		}
+		
+		HeaderTradeSettlementType headerTradeSettlement = getApplicableHeaderTradeSettlement();
+		headerTradeSettlement.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
+		
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(headerTradeSettlement);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+	}
+	
+	DateTimeType newDateTime(Timestamp ts) {
+		if(ts==null) return null;
+		
+		DateTimeType dateTime = new DateTimeType();
+		DateTimeType.DateTimeString dts = new DateTimeType.DateTimeString(); // DateTimeString ist inner class in DateTimeType
+		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
+		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
+		dateTime.setDateTimeString(dts);
+		return dateTime;
+	}
+
+	@Override
+	public String getPaymentTerm() {
+		return getPaymentTerm(this);
+	}
+	static String getPaymentTerm(CrossIndustryInvoiceType doc) {
+		HeaderTradeSettlementType headerTradeSettlement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement();
+		List<TradePaymentTermsType> tradePaymentTermsList = headerTradeSettlement.getSpecifiedTradePaymentTerms();
+		if(tradePaymentTermsList.isEmpty()) return null;
+		
+		TradePaymentTermsType tradePaymentTerms = tradePaymentTermsList.get(0); // da Cardinality 0..1 kann es nur einen geben
+		List<TextType> textList = tradePaymentTerms.getDescription();
+		return textList.isEmpty() ? null : textList.get(0).getValue();
+	}
+
+/*
+
+1 .. 1 SupplyChainTradeTransaction Gruppierung der Informationen zum Geschäftsvorfall
+1 .. 1 ApplicableHeaderTradeAgreement Gruppierung der Vertragsangaben
+0 .. 1 BuyerReference Referenz des Käufers BT-10
+ 
+ */
+	@Override
+	public void setBuyerReference(String reference) {
+		TextType text = new TextType();
+		text.setValue(reference);
+		
+		// headerTradeAgreement cachen wg SellerTradeParty , ...
+		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
+		headerTradeAgreement.setBuyerReference(text);
+		
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+	}
+
+	@Override
+	public String getBuyerReferenceValue() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/* INVOICE NOTE                                BG-1                        0..*
 	 * Eine Gruppe von Informationselementen für rechnungsrelevante Erläuterungen mit Hinweisen auf den Rechnungsbetreff.
 	 * 
 
-Invoice note subject code BT-21 Code 0..1 56  ???? TODO finde ich nicht in UBL, nur in cii
-Der Betreff für den nachfolgenden Textvermerk zur Rechnung.
-Anmerkung: Die Auswahl erfolgt aus UNTDID 4451a.
-
-Invoice note BT-22 Text 1 58
-Ein Textvermerk, der unstrukturierte Informationen enthält, die für die Rechnung als Ganzes maßgeblich sind. 
-Erforderlichenfalls können Angaben zur Aufbewahrungspflicht gem. § 14 Abs. 4 UStG hier aufgenommen werden.
-Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grund der Korrektur angegeben werden
+1 .. 1 ExchangedDocument Gruppierung der Eigenschaften, die das gesamte Dokument betreffen. xs:sequence 
+1 .. 1 ID Rechnungsnummer                        BT-1 
+0 .. 1 Name Dokumentenart (Freitext) 
+1 .. 1 TypeCode Code für den Rechnungstyp        BT-3 
+1 .. 1 IssueDateTime Rechnungsdatum xs:choice 
+1 .. 1 DateTimeString Rechnungsdatum             BT-2 required format Datum, Format BT-2-0 
+0 .. 1 CopyIndicator xs:choice 
+1 .. 1 Indicator 
+0 .. 1 LanguageID Sprachkennzeichen 
+0 .. n IncludedNote Freitext zur Rechnung        BG-1 xs:sequence
+0 .. 1 ContentCode Freitext auf Dokumentenebene 
+1 .. 1 Content Freitext zur Rechnung             BT-22 
+0 .. 1 SubjectCode Code zur Qualifizierung des Freitextes zur Rechnung BT-21 
 
 	 */
-	/**
-	 * Adds an optional INVOICE NOTE 
-	 * 
-	 * @param invoiceNote
-	 * @return noteList
-	 */
-	public List<NoteType> addNote(String invoiceNote) {
-		return addNote(invoiceNote, null);
+	@Override
+	public void setNote(String subjectCode, String content) {
+		addNote(subjectCode, content);
 	}
-	public List<NoteType> addNote(String invoiceNote, String subjectCode) {
+	@Override
+	public void setNote(String content) {
+		setNote(null, content);
+	}
+	List<NoteType> addNote(String subjectCode, String noteContent) {
 		ExchangedDocumentType ed = this.getExchangedDocument();
-		List<NoteType> notes = ed.getIncludedNote();
+		List<NoteType> noteList = ed.getIncludedNote();
 		NoteType note = new NoteType();
 		if(subjectCode!=null) {
 			CodeType code = new CodeType();
@@ -406,46 +508,88 @@ Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grun
 		}
 		List<TextType> textList = note.getContent();
 		TextType text = new TextType();
-		text.setValue(invoiceNote);
+		text.setValue(noteContent);
 		textList.add(text);
-		notes.add(note);
-		return notes;
+		noteList.add(note);
+		return noteList;
+	}
+	public List<String> getNotes() {
+		return getNotes(this);
+	}
+	static List<String> getNotes(CrossIndustryInvoiceType doc) {
+		ExchangedDocumentType ed = doc.getExchangedDocument();
+		List<NoteType> noteList = ed.getIncludedNote();
+		List<String> res = new ArrayList<String>(noteList.size());
+		noteList.forEach(note -> res.add(note.getContent().get(0).getValue()));
+		return res;
 	}
 
-	// nicht in XRechnung-v1-2-0.pdf dokumentiert
-//	public void setDocumentCurrencyCode(String isoCurrencyCode) {
-//		LOG.warning("für cii nicht implementiert");
-//	}
+	/* PROCESS CONTROL                             BG-2                        1 (mandatory) 
+	 * Eine Gruppe von Informationselementen, 
+	 * die Informationen über den Geschäftsprozess und für die Rechnung geltende Regeln liefern.
 
-	/* Buyer reference                             BT-10 Text                  1 (mandatory) 
-	 * Ein vom Erwerber zugewiesener und für interne Lenkungszwecke benutzter Bezeichner
+    <rsm:ExchangedDocumentContext>
+        <ram:GuidelineSpecifiedDocumentContextParameter>
+            <ram:ID>urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2</ram:ID>
+        </ram:GuidelineSpecifiedDocumentContextParameter>
+    </rsm:ExchangedDocumentContext>
+
+
 	 */
-	public void setBuyerReference(String reference) {
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-		HeaderTradeAgreementType headerTradeAgreement = getHeaderTradeAgreement(supplyChainTradeTransaction);
-		
-		TextType text = new TextType();
-		text.setValue(reference);
-		headerTradeAgreement.setBuyerReference(text);
-		
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-/* TODO es gibt noch diesen Fehler:
-val-xsd.1 	cvc-complex-type.2.4.a 	error 	
-Ungültiger Content wurde beginnend mit Element 'ram:ApplicableHeaderTradeSettlement' gefunden. 
-'{"urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100":ApplicableHeaderTradeDelivery}' wird erwartet.
-Zeile: 104 Spalte: 46
-
-wg.         <ram:ApplicableHeaderTradeDelivery/>
-
- */
-		// TODO Baustelle wg <ram:ApplicableHeaderTradeDelivery/> empty:
-		HeaderTradeDeliveryType headerTradeDelivery = new HeaderTradeDeliveryType();
-		headerTradeDelivery.getAdditionalReferencedDocument();
-		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(headerTradeDelivery);
-		
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction); 
+	/**
+	 * mandatory group PROCESS CONTROL BG-2
+	 * contains ProfileID and CustomizationID. 
+	 * 
+	 * ProfileID identifies what business process a given message is part of, 
+	 * and CustomizationID identifies the kind of message and the rules applied.
+	 * 
+	 * @param customization, not null
+	 * @param profile (optional)
+	 */
+	void setProcessControl(String customization, String profile) {
+		ExchangedDocumentContextType exchangedDocumentContext = new ExchangedDocumentContextType();
+		List<DocumentContextParameterType> documentContextParameterList = exchangedDocumentContext.getGuidelineSpecifiedDocumentContextParameter();
+		DocumentContextParameterType documentContextParameter = new DocumentContextParameterType();
+		IDType iDTyp = new IDType();
+		iDTyp.setValue(customization);
+		iDTyp.setSchemeID("XRECHNUNG");
+		documentContextParameter.setID(iDTyp);
+		documentContextParameterList.add(documentContextParameter);
+		this.setExchangedDocumentContext(exchangedDocumentContext);
+		if(profile==null) {
+			// profileIDType ist optional, nicht in cii
+		} else { // BusinessProcessSpecifiedDocumentContextParameter
+//			ProfileIDType profileIDType = new ProfileIDType();
+//			profileIDType.setValue(profile);
+//			this.setProfileID(profileIDType);
+		}
 	}
 
+	public String getCustomization() {
+		return getCustomization(this);
+	}
+	static String getCustomization(CrossIndustryInvoiceType doc) {
+		List<DocumentContextParameterType> documentContextParameterList = doc.getExchangedDocumentContext().getGuidelineSpecifiedDocumentContextParameter();
+		List<String> res = new ArrayList<String>(documentContextParameterList.size());
+		documentContextParameterList.forEach(documentContextParameter -> {
+			res.add(documentContextParameter.getID().getValue());
+		});
+		return res.isEmpty() ? null : res.get(0);
+	}
+	public String getProfile() {
+		return getProfile(this);
+	}
+	static String getProfile(CrossIndustryInvoiceType doc) {
+		List<DocumentContextParameterType> documentContextParameterList = doc.getExchangedDocumentContext().getBusinessProcessSpecifiedDocumentContextParameter();
+		List<String> res = new ArrayList<String>(documentContextParameterList.size());
+		documentContextParameterList.forEach(documentContextParameter -> {
+			res.add(documentContextParameter.getID().getValue());
+		});
+		return res.isEmpty() ? null : res.get(0);
+	}
+
+
+// --------------------------------
 	// nicht in XRechnung-v1-2-0.pdf beschrieben
 	public void setOrderReference(String id) {
 		LOG.warning("für cii nicht implementiert");
@@ -547,7 +691,7 @@ wg.         <ram:ApplicableHeaderTradeDelivery/>
 	 */
 	public List<TradeSettlementPaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, CreditorFinancialAccountType financialAccount, String remittanceInformation) {
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = getHeaderTradeSettlement(supplyChainTradeTransaction);
+		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
 		
 		TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = new TradeSettlementPaymentMeansType();
 		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); 
@@ -572,7 +716,7 @@ either the Payment due date (BT-9) or the Payment terms (BT-20) shall be present
 	 */
 	public void addPaymentTerms(String paymentTerms) {
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = getHeaderTradeSettlement(supplyChainTradeTransaction);
+		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
 		
 		TradePaymentTermsType tradePaymentTerm = new TradePaymentTermsType(); 
 		TextType text = new TextType();
@@ -591,7 +735,7 @@ either the Payment due date (BT-9) or the Payment terms (BT-20) shall be present
 	 */
 	public void setBuyer(String buyerName, PostalAddress postalAddress, IContact contact) {
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-		HeaderTradeAgreementType headerTradeAgreement = getHeaderTradeAgreement(supplyChainTradeTransaction);
+		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement(supplyChainTradeTransaction);
 		
 		TradePartyType tradePartyType = new TradePartyType();
 		TextType text = new TextType();
@@ -644,7 +788,7 @@ either the Payment due date (BT-9) or the Payment terms (BT-20) shall be present
 	public void setSeller(String sellerName, PostalAddress postalAddress, IContact contact, String sellerVATid) {
 		
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-		HeaderTradeAgreementType headerTradeAgreement = getHeaderTradeAgreement(supplyChainTradeTransaction);
+		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement(supplyChainTradeTransaction);
 		
 		TradePartyType tradeParty = new TradePartyType();
 		TextType text = new TextType();
@@ -712,7 +856,7 @@ either the Payment due date (BT-9) or the Payment terms (BT-20) shall be present
 	@Override
 	public void setDocumentTotals(Amount lineExtension, Amount taxExclusive, Amount taxInclusive, Amount payable) {
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = getHeaderTradeSettlement(supplyChainTradeTransaction);
+		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
 		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = getTradeSettlementHeaderMonetarySummation(applicableHeaderTradeSettlement);
 		
 		AmountType lineTotalAmt = new AmountType();
@@ -752,7 +896,7 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 	@Override
 	public void setInvoiceTax(Amount taxTotalAmount) {
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = getHeaderTradeSettlement(supplyChainTradeTransaction);
+		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
 		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = getTradeSettlementHeaderMonetarySummation(applicableHeaderTradeSettlement);
 		
 		AmountType taxTotalAmt = new AmountType();
@@ -806,7 +950,7 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 	 */
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = getHeaderTradeSettlement(supplyChainTradeTransaction);
+		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
 
 		TradeTaxType tradeTax = makeTradeTaxType(taxCategoryCode, taxRate);
 		
@@ -995,7 +1139,10 @@ Pfad: /rsm:CrossIndustryInvoice/rsm:SupplyChainTradeTransaction[1]/ram:IncludedS
 		return tradeSettlementHeaderMonetarySummationType;
 	}
 
-	private HeaderTradeSettlementType getHeaderTradeSettlement(SupplyChainTradeTransactionType supplyChainTradeTransaction) {
+	private HeaderTradeSettlementType getApplicableHeaderTradeSettlement() {
+		return getApplicableHeaderTradeSettlement(this.getSupplyChainTradeTransaction());
+	}
+	private HeaderTradeSettlementType getApplicableHeaderTradeSettlement(SupplyChainTradeTransactionType supplyChainTradeTransaction) {
 		HeaderTradeSettlementType headerTradeSettlement = supplyChainTradeTransaction.getApplicableHeaderTradeSettlement();
 		if(headerTradeSettlement==null) {
 			headerTradeSettlement = new HeaderTradeSettlementType();
@@ -1004,14 +1151,16 @@ Pfad: /rsm:CrossIndustryInvoice/rsm:SupplyChainTradeTransaction[1]/ram:IncludedS
 		return headerTradeSettlement;
 	}
 
-	private HeaderTradeAgreementType getHeaderTradeAgreement(SupplyChainTradeTransactionType supplyChainTradeTransaction) {
+	private HeaderTradeAgreementType getApplicableHeaderTradeAgreement() {
+		return getApplicableHeaderTradeAgreement(this.getSupplyChainTradeTransaction());
+	}
+	private HeaderTradeAgreementType getApplicableHeaderTradeAgreement(SupplyChainTradeTransactionType supplyChainTradeTransaction) {
 		HeaderTradeAgreementType headerTradeAgreement = supplyChainTradeTransaction.getApplicableHeaderTradeAgreement();
 		if(headerTradeAgreement==null) {
 			headerTradeAgreement = new HeaderTradeAgreementType();
 			LOG.info("new HeaderTradeAgreementType:"+headerTradeAgreement);
 		}
 		return headerTradeAgreement;
-	}
-
+	}	
 
 }

@@ -29,6 +29,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BuyerRef
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditNoteTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CustomizationIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentCurrencyCodeType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
@@ -155,7 +156,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		return code==null ? null : code.getValue();
 	}
 
-	// wie BT-7  Date
+	// wie BT-7  Date / Anwendung: In Deutschland wird dieses nicht verwendet.
 	public void setTaxPointDate(String ymd) {	
 		setTaxPointDate(DateTimeFormats.ymdToTs(ymd));
 	}
@@ -172,6 +173,30 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		TaxPointDateType taxPointDate = doc.getTaxPointDate();
 		return taxPointDate==null ? null : DateTimeFormats.xmlGregorianCalendarToTs(taxPointDate.getValue());
 	}
+
+	// wie BT-9  Payment due date
+//	public void setDueDate(String ymd) {
+//		setDueDate(DateTimeFormats.ymdToTs(ymd));
+//	}
+	public void setDueDate(Timestamp ts) {
+		if(ts==null) return; // optional
+		return; // TODO not implemented
+	}
+	public Timestamp getDueDateAsTimestamp() {
+		return null; // TODO not implemented
+	}
+
+	@Override // wie BT-9  Payment due date & BT-20 Payment terms
+	public void setPaymentTermsAndDate(String description, String ymd) {
+		setPaymentTermsAndDate(description, DateTimeFormats.ymdToTs(ymd));
+	}
+
+	@Override
+	public void setPaymentTermsAndDate(String description, Timestamp ts) {
+		addPaymentTerms(description); // BT-20 optional
+		setDueDate(ts); // BT-9 optional
+	}
+	
 
 	// wie BT-10  Text
 	public void setBuyerReference(String reference) {
@@ -206,6 +231,13 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	}
 
 	// wie BT-20  PaymentTerms
+	@Override
+	public String getPaymentTerm() {
+		List<PaymentTerms> ptList = getPaymentTermList();
+		if(ptList.isEmpty()) return null;
+		return ptList.get(0).getFirstNote(); // da Cardinality 0..1
+	}
+
 	public List<PaymentTerms> getPaymentTermList() {
 		return getPaymentTermList(this);
 	}
@@ -236,6 +268,14 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	}
 
 	// wie BG-1  INVOICE NOTE
+	@Override
+	public void setNote(String subjectCode, String content) {
+		setNote(content);
+	}
+	@Override
+	public void setNote(String content) {
+		addNote(content);
+	}
 	public List<NoteType> addNote(String invoiceNote) {
 		List<NoteType> notes = this.getNote();
 		NoteType note = new NoteType();
@@ -677,5 +717,5 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		});
 		return resultLines;
 	}
-	
+
 }
