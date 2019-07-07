@@ -72,7 +72,7 @@ public class PartyTest {
     
 	@Before 
     public void setup() {
-    	UblInvoiceFactory factory = new CreateUblXXXInvoice(UBL_XML[5]);
+    	InvoiceFactory factory = new CreateUblXXXInvoice(UBL_XML[5]);
     	invoice = factory.getTestDoc();
     	supplierparty = null;
 		supplierParty = invoice.getAccountingSupplierParty();

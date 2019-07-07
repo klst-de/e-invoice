@@ -1,6 +1,7 @@
 package com.klst.xrechnung.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -20,6 +21,11 @@ import com.klst.untdid.codelist.DocumentNameCode;
 public class CiiTest {
 
 	private static final Logger LOG = Logger.getLogger(CiiTest.class.getName());
+	
+	private static final String[] CII_XML = {
+			"01.01a-INVOICE_uncefact.xml" ,
+			// ...
+			"01.15a-INVOICE_uncefact.xml" };
 	
 	private static final String XRECHNUNG_12 = "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2";
 
@@ -62,6 +68,15 @@ public class CiiTest {
 		
     	assertEquals(ID, invoice.getId());
     	assertEquals(DateTimeFormats.ymdToTs(ISSUE_DATE), invoice.getIssueDateAsTimestamp());
+   }
+
+	@Test
+    public void ciixml0() {
+    	InvoiceFactory factory = new CreateCiiXXXInvoice(CII_XML[0]);
+    	byte[] bytes = factory.toCii(); // the xml
+    	String xml = new String(bytes);
+    	LOG.info("xml=\n"+xml);
+//    	assertTrue(check(bytes));
    }
 
 }

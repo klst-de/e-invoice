@@ -44,6 +44,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxInclu
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPointDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
+import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
 public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentTotals {
 
@@ -71,9 +72,10 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		setDocumentCurrency(getDocumentCurrency(doc));
 		setTaxCurrency(getTaxCurrency(doc)); // optional
 		setTaxPointDate(getTaxPointDateAsTimestamp(doc)); // optional
+		setPaymentTermsAndDate(getPaymentTerm(doc), (Timestamp)null); // optional, DueDateAsTimestamp==null
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional
 		setOrderReferenceID(getOrderReferenceID(doc)); // optional
-		addPaymentTerms(doc);
+//		addPaymentTerms(doc);
 		addNotes(doc);
 		setSellerParty(getSellerParty(doc));
 		setBuyerParty(getBuyerParty(doc));
@@ -238,6 +240,12 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		return ptList.get(0).getFirstNote(); // da Cardinality 0..1
 	}
 
+	public String getPaymentTerm(CreditNoteType doc) {
+		List<PaymentTerms> ptList = getPaymentTermList(this);
+		if(ptList.isEmpty()) return null;
+		return ptList.get(0).getFirstNote(); // da Cardinality 0..1
+	}
+	
 	public List<PaymentTerms> getPaymentTermList() {
 		return getPaymentTermList(this);
 	}

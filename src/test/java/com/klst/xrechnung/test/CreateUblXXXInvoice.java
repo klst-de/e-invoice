@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.klst.cius.IContact;
+import com.klst.marshaller.UblInvoiceTransformer;
 import com.klst.ubl.CommercialInvoice;
 import com.klst.ubl.Contact;
 import com.klst.ubl.CreditTransfer;
@@ -33,7 +34,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
-public class CreateUblXXXInvoice extends UblInvoiceFactory {
+public class CreateUblXXXInvoice extends InvoiceFactory {
 
 	private static final Logger LOG = Logger.getLogger(CreateUblXXXInvoice.class.getName());
 	
@@ -44,10 +45,10 @@ public class CreateUblXXXInvoice extends UblInvoiceFactory {
 	
 	// ctor
 	public CreateUblXXXInvoice() {
-		super();
+		super(UblInvoiceTransformer.getInstance());
 	}
 	CreateUblXXXInvoice(String ublXml) {
-		super();
+		super(UblInvoiceTransformer.getInstance());
 		testFile = getTestFile(TESTDIR+ublXml);
 		if(transformer.isValid(testFile)) {
 			testDoc = toModel(testFile);
@@ -251,14 +252,15 @@ public class CreateUblXXXInvoice extends UblInvoiceFactory {
 					paymentInstruction = paymentInstructions.get(0); // first
 				}
 				
-				List<PaymentTerms> paymentTermsList = cmInvoice.getPaymentTermList();
-				PaymentTerms paymentTerms = null;
-				if(paymentTermsList.isEmpty()) {
-					LOG.warning("paymentTermsList is empty");
-					paymentTerms = new PaymentTerms("nix");
-				} else {
-					paymentTerms = paymentTermsList.get(0); // first
-				}
+//				List<PaymentTerms> paymentTermsList = cmInvoice.getPaymentTermList();
+//				PaymentTerms paymentTerms = null;
+//				if(paymentTermsList.isEmpty()) {
+//					LOG.severe("paymentTermsList is empty");
+//					paymentTerms = new PaymentTerms("nix");
+//				} else {
+//					paymentTerms = paymentTermsList.get(0); // first
+//				}
+				String paymentTerm = cmInvoice.getPaymentTerm();
 				
 				List<Map<Object,Object>> vatBreakDownList = cmInvoice.getVATBreakDown();
 				Map<Object, Object> vatBreakDown = null;
@@ -315,7 +317,7 @@ public class CreateUblXXXInvoice extends UblInvoiceFactory {
 						" \ninvoice InvoiceTax="+				cmInvoice.getInvoiceTax() +					
 						" \ninvoice paymentInstructions#:"+		cmInvoice.getPaymentInstructions().size() +					
 						" \ninvoice paymentInstruction.PaymentMeans="+	paymentInstruction.getPaymentMeans()+" "+paymentInstruction.getFinancialAccount().getID().getValue() +				
-						" \ninvoice paymentTerms.1st Note="+	paymentTerms.getFirstNote() +				
+						" \ninvoice paymentTerms.1st Note="+	paymentTerm +				
 						" \ninvoice VATBreakDown.TaxableAmount="+	vatBreakDown.get(TaxableAmountType.class) +					
 						" \ninvoice VATBreakDown.TaxAmount="+		vatBreakDown.get(TaxAmountType.class) +					
 						" \ninvoice VATBreakDown.VatCategory="+		vatBreakDown.get(VatCategory.class) +					

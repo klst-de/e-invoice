@@ -124,7 +124,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 	}
 
 	// copy-ctor
-	CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
+	public CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
 		this(getCustomization(doc), getProfile(doc), getTypeCode(doc));
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));
@@ -218,7 +218,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 		return getTypeCode(this);
 	}
 	static DocumentNameCode getTypeCode(CrossIndustryInvoiceType doc) {
-		return DocumentNameCode.valueOf(doc.getExchangedDocument().getTypeCode().getValue());
+		return DocumentNameCode.valueOf(doc.getExchangedDocument().getTypeCode());
 	}
 
 	@Override
@@ -328,10 +328,12 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		List<Timestamp> results = new ArrayList<Timestamp>(tradeTaxList.size());
 		tradeTaxList.forEach(tradeTax -> {
 			DateType date = tradeTax.getTaxPointDate();
-			if("102".equals(date.getDateString().getFormat())) {
+			if(date==null) {
+				LOG.warning("TaxPointDate is null");
+			} else if(DateTimeFormats.CCYYMMDD_QUALIFIER.equals(date.getDateString().getFormat())) {
 				results.add(DateTimeFormats.ymdToTs(date.getDateString().getValue()));
 			} else {
-				LOG.warning("not 102-Format:"+date.getDateString().getFormat() + " value:"+date.getDateString().getValue());
+				LOG.warning("not CCYYMMDD-Format:"+date.getDateString().getFormat() + " value:"+date.getDateString().getValue());
 			}		
 		});
 		if(results.isEmpty()) return null;

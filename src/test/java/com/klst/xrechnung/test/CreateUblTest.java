@@ -182,7 +182,7 @@ Die für die maschinelle Auswertung des Prüfberichts wesentlichsten Angaben sin
 
 	@Test
     public void ubl0() {
-    	UblInvoiceFactory factory = new CreateUblXXXInvoice(UBL_XML[1]);
+    	InvoiceFactory factory = new CreateUblXXXInvoice(UBL_XML[1]);
     	byte[] bytes = factory.toUbl(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
@@ -193,7 +193,7 @@ Die für die maschinelle Auswertung des Prüfberichts wesentlichsten Angaben sin
     public void ublAll() {
     	for(int i=0; i<UBL_XML.length; i++) {
     		String fileName = UBL_XML[i];
-        	UblInvoiceFactory factory = new CreateUblXXXInvoice(fileName);
+        	InvoiceFactory factory = new CreateUblXXXInvoice(fileName);
         	byte[] bytes = factory.toUbl(); // the xml
         	LOG.info("\n-------------------------------- "+fileName);
         	assertTrue(check(bytes));
