@@ -64,8 +64,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		Invoice ublInvoice = new CommercialInvoice(testDoc.getCustomization(), testDoc.getProfile());
 		ublInvoice.setId(testDoc.getId());
 		ublInvoice.setIssueDate(testDoc.getIssueDateAsTimestamp());
-		ublInvoice.setDocumentCurrencyCode(testDoc.getDocumentCurrencyCode());
-		ublInvoice.setTaxCurrencyCode(testDoc.getTaxCurrencyCode());
+		ublInvoice.setDocumentCurrency(testDoc.getDocumentCurrency());
+		ublInvoice.setTaxCurrency(testDoc.getTaxCurrency());
 		ublInvoice.setBuyerReference(testDoc.getBuyerReferenceValue());
 		
 		makeOptionals(ublInvoice);
@@ -81,6 +81,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 
 	void makeOptionals(Invoice ublInvoice) {	
+		ublInvoice.setOrderReferenceID(testDoc.getOrderReferenceID());
 		List<String> notes = testDoc.getNotes();
 		notes.forEach(note -> {
 			ublInvoice.setNote(note);

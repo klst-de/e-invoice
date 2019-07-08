@@ -71,7 +71,7 @@ public class CiiTest {
    }
 
 	@Test
-    public void ciixml0() {
+    public void ciixml01() {
     	InvoiceFactory factory = new CreateCiiXXXInvoice(CII_XML[0]);
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);
@@ -79,4 +79,12 @@ public class CiiTest {
 //    	assertTrue(check(bytes));
    }
 
+	@Test
+    public void ciixml_last() {
+    	InvoiceFactory factory = new CreateCiiXXXInvoice(CII_XML[CII_XML.length-1]);
+    	byte[] bytes = factory.toCii(); // the xml
+    	String xml = new String(bytes);
+    	LOG.info("xml=\n"+xml);
+//    	assertTrue(check(bytes));
+   }
 }

@@ -3,10 +3,12 @@ package com.klst.xrechnung.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.marshaller.CiiTransformer;
 import com.klst.ubl.CommercialInvoice;
+import com.klst.ubl.Invoice;
 import com.klst.un.unece.uncefact.CrossIndustryInvoice;
 import com.klst.untdid.codelist.DocumentNameCode;
 
@@ -36,14 +38,25 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 	@Override
 	CrossIndustryInvoice makeInvoice() {
 		CrossIndustryInvoice cii = new CrossIndustryInvoice(testDoc.getCustomization(), testDoc.getTypeCode());
-//		ublInvoice.setId(testDoc.getId());
-//		ublInvoice.setIssueDate(testDoc.getIssueDateAsTimestamp());
-//		ublInvoice.setDocumentCurrencyCode(testDoc.getDocumentCurrencyCode());
-//		ublInvoice.setTaxCurrencyCode(testDoc.getTaxCurrencyCode());
-//		ublInvoice.setBuyerReference(testDoc.getBuyerReferenceValue());
-		// ...
+		cii.setId(testDoc.getId());
+		cii.setIssueDate(testDoc.getIssueDateAsTimestamp());
+		cii.setDocumentCurrency(testDoc.getDocumentCurrency());
+		cii.setTaxCurrency(testDoc.getTaxCurrency());
+		cii.setBuyerReference(testDoc.getBuyerReferenceValue());
+		
+		makeOptionals(cii);
+		// ... TODO
 		return cii;
 	}
+	void makeOptionals(CrossIndustryInvoice cii) {	
+		cii.setOrderReferenceID(testDoc.getOrderReferenceID());
+		List<String> notes = testDoc.getNotes();
+		notes.forEach(note -> {
+			cii.setNote(note);
+		});
+		LOG.info("finished.");
+	}
+
 
 	private File getTestFile(String uri) {
 		File file = new File(uri);

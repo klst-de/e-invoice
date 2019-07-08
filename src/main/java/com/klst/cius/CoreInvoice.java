@@ -1,6 +1,7 @@
 package com.klst.cius;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import com.klst.untdid.codelist.DocumentNameCode;
 
@@ -297,6 +298,33 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void setBuyerReference(String reference);
 	public String getBuyerReferenceValue();
 
+	// BT-11 Project reference                                         TODO
+	// BT-12 Contract reference                                        TODO
+	// BT-13 Purchase order reference                                  TODO
+	
+	/**
+	 * Sales order reference
+	 * <p>
+	 * An identifier of a referenced sales order, issued by the Seller.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-14
+	 * <br>Rule ID: 	 
+	 * <br>Request ID: 	R41
+	 * 
+	 * @param Document reference
+	 */
+	public void setOrderReferenceID(String docRefId);
+	public String getOrderReferenceID();
+
+	// BT-15 Receiving advice reference                                TODO 
+	// BT-16 Despatch advice reference                                 TODO
+	// BT-17 Tender or lot reference                                   TODO
+	// BT-18 Invoiced object identifier                                TODO
+	// BT-19 Buyer accounting reference                                TODO
+
+	// BT-20 @see setPaymentTermsAndDate
+	
 	/**
 	 * INVOICE NOTE
 	 * <p>
@@ -304,7 +332,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * together with an indication of the note subject.
 	 * <p>
 	 * Cardinality: 	0..n (optional)
-	 * <br>EN16931-ID: 	BG-1
+	 * <br>EN16931-ID: 	BG-1 , BT-21,BT-22
 	 * <br>Rule ID: 	
 	 * <br>Request ID: 	R56
 	 * 
@@ -315,6 +343,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 */
 	public void setNote(String subjectCode, String content);
 	public void setNote(String content);
+	public List<String> getNotes();
 
 	/**
 	 * PROCESS CONTROL

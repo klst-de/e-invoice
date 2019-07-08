@@ -268,7 +268,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * Maintenance Agency “Codes for the representation of currencies and funds”.
 	 */
 	@Override
-	public void setDocumentCurrency(String isoCurrencyCode) { // TODO umbenneen aus interface CoreInvoice
+	public void setDocumentCurrency(String isoCurrencyCode) {
 		DocumentCurrencyCodeType documentCurrencyCode = new DocumentCurrencyCodeType();
 		documentCurrencyCode.setValue(isoCurrencyCode);
 		this.setDocumentCurrencyCode(documentCurrencyCode);
@@ -301,7 +301,9 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * Maintenance Agency “Codes for the representation of currencies and funds”.
 	 */
 	@Override
-	public void setTaxCurrency(String isoCurrencyCode) { // TODO umbenneen aus interface CoreInvoice
+	public void setTaxCurrency(String isoCurrencyCode) {
+//		LOG.info("isoCurrencyCode="+isoCurrencyCode);
+		if(isoCurrencyCode==null) return;
 		PaymentCurrencyCodeType paymentCurrencyCode = new PaymentCurrencyCodeType();
 		paymentCurrencyCode.setValue(isoCurrencyCode); 
 		this.setPaymentCurrencyCode(paymentCurrencyCode);
@@ -469,6 +471,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 * 
 	 * @param Document reference
 	 */
+	@Override
 	public void setOrderReferenceID(String docRefId) {
 		if(docRefId==null) return; // optional
 		OrderReferenceType orderReference = new OrderReferenceType();
@@ -477,6 +480,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		orderReference.setID(mID);
 		this.setOrderReference(orderReference);
 	}
+	@Override
 	public String getOrderReferenceID() {
 		return getOrderReferenceID(this);
 	}
@@ -596,6 +600,8 @@ Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grun
 		notes.add(note);
 		return notes;
 	}
+	
+	@Override
 	public List<String> getNotes() {
 		return getNotes(this);
 	}
@@ -611,7 +617,7 @@ Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grun
 		notes.forEach(note -> {
 			n.add(note);
 			LOG.fine(note.getValue() +" "+n.size());
-			});
+		});
 		LOG.fine(this.getNote().size() +" "+n.size());
 		return n;
 	}

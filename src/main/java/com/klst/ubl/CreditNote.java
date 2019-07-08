@@ -29,7 +29,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BuyerRef
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditNoteTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CustomizationIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentCurrencyCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
@@ -44,7 +43,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxInclu
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPointDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
-import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
 public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentTotals {
 
@@ -146,6 +144,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 
 	// wie BT-6  Code
 	public void setTaxCurrency(String isoCurrencyCode) {
+		if(isoCurrencyCode==null) return;
 		PaymentCurrencyCodeType paymentCurrencyCode = new PaymentCurrencyCodeType();
 		paymentCurrencyCode.setValue(isoCurrencyCode); 
 		this.setPaymentCurrencyCode(paymentCurrencyCode);

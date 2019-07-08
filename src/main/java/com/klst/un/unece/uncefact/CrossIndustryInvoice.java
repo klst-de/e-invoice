@@ -132,10 +132,10 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setTaxCurrency(getTaxCurrency(doc)); // optional
 		setTaxPointDate(getTaxPointDateAsTimestamp(doc)); // optional
 		setPaymentTermsAndDate(getPaymentTerm(doc), getDueDateAsTimestamp(doc)); // optional
-//		setBuyerReference(getBuyerReferenceValue(doc)); // optional
-//		setOrderReferenceID(getOrderReferenceID(doc)); // optional
+		setBuyerReference(getBuyerReferenceValue(doc)); // optional
+		setOrderReferenceID(getOrderReferenceID(doc)); // optional
 //		addPaymentTerms(doc);
-//		addNotes(doc);	
+		addNotes(doc);	
 //		setSellerParty(getSellerParty(doc));
 //		setBuyerParty(getBuyerParty(doc));
 //		addDeliveries(doc);
@@ -329,7 +329,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		tradeTaxList.forEach(tradeTax -> {
 			DateType date = tradeTax.getTaxPointDate();
 			if(date==null) {
-				LOG.warning("TaxPointDate is null");
+				LOG.warning("getTaxPointDateAsTimestamp(doc) TaxPointDate is null");
 			} else if(DateTimeFormats.CCYYMMDD_QUALIFIER.equals(date.getDateString().getFormat())) {
 				results.add(DateTimeFormats.ymdToTs(date.getDateString().getValue()));
 			} else {
@@ -468,8 +468,45 @@ DueDateDateTime Fälligkeitsdatum
 
 	@Override
 	public String getBuyerReferenceValue() {
-		// TODO Auto-generated method stub
-		return null;
+		return getBuyerReferenceValue(this);
+	}
+	static String getBuyerReferenceValue(CrossIndustryInvoiceType doc) {
+		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		TextType text = headerTradeAgreement.getBuyerReference();
+		return text==null ? null : text.getValue();
+	}
+
+/* IssuerAssignedID Verkaufsauftragsreferenz
+	1 .. 1 ApplicableHeaderTradeAgreement Gruppierung der Vertragsangaben
+	0 .. 1 SellerOrderReferencedDocument Detailangaben zur zugehörigen Auftragsbestätigung xs:sequence 
+	1 .. 1 IssuerAssignedID Verkaufsauftragsreferenz BT-14 
+	0 .. 1 FormattedIssueDateTime Details zum Auftragsbestätigungsdatum xs:sequence 
+	1 .. 1 DateTimeString Auftragsbestätigungsdatum, Wert required format Datum, Format
+ */
+	@Override
+	public void setOrderReferenceID(String docRefId) {
+		if(docRefId==null) return; // optional
+		IDType iDTyp = new IDType();
+		iDTyp.setValue(docRefId);
+		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
+		referencedDocument.setIssuerAssignedID(iDTyp);
+		
+		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
+		headerTradeAgreement.setSellerOrderReferencedDocument(referencedDocument);
+
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+	}
+	@Override
+	public String getOrderReferenceID() {
+		return getOrderReferenceID(this);
+	}
+	static String getOrderReferenceID(CrossIndustryInvoiceType doc) {
+		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		ReferencedDocumentType referencedDocument = headerTradeAgreement.getSellerOrderReferencedDocument();
+		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();
+		
 	}
 
 	/* INVOICE NOTE                                BG-1                        0..*
@@ -515,6 +552,14 @@ DueDateDateTime Fälligkeitsdatum
 		noteList.add(note);
 		return noteList;
 	}
+	List<NoteType> addNotes(CrossIndustryInvoiceType doc) {
+		List<String> noteContentList = getNotes(doc);
+		noteContentList.forEach(noteContent -> {
+			this.addNote(null, noteContent);
+		});
+		return this.getExchangedDocument().getIncludedNote();
+	}
+
 	public List<String> getNotes() {
 		return getNotes(this);
 	}
