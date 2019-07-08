@@ -18,6 +18,7 @@ import com.klst.untdid.codelist.TaxCategoryCode;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CurrencyCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
@@ -296,24 +297,24 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public void setTaxPointDate(Timestamp ts) {
 		if(ts==null) return;  // optional
 		HeaderTradeSettlementType headerTradeSettlement = getApplicableHeaderTradeSettlement();
-//		List<TradeTaxType> tradeTaxList = headerTradeSettlement.getApplicableTradeTax();
-		
-		DateType.DateString dateString = new DateType.DateString(); // DateString ist inner class in DateType
-		dateString.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
-		dateString.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
-		
-		DateType date = new DateType();
-		date.setDateString(dateString);
-		
 		TradeTaxType tradeTax = new TradeTaxType();
-		tradeTax.setTaxPointDate(date);
-		
-//		tradeTaxList.add(tradeTax);
+		tradeTax.setTaxPointDate(newDateType(ts));
 		headerTradeSettlement.getApplicableTradeTax().add(tradeTax);
 		
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
 		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(headerTradeSettlement);
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
+	}
+
+	DateType newDateType(Timestamp ts) {
+		if(ts==null) return null;
+		
+		DateType dateTime = new DateType();
+		DateType.DateString dts = new DateType.DateString(); // DateString ist inner class in DateType
+		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
+		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
+		dateTime.setDateString(dts);
+		return dateTime;
 	}
 
 	@Override
@@ -560,6 +561,7 @@ DueDateDateTime Fälligkeitsdatum
 		return this.getExchangedDocument().getIncludedNote();
 	}
 
+	@Override
 	public List<String> getNotes() {
 		return getNotes(this);
 	}
@@ -574,14 +576,6 @@ DueDateDateTime Fälligkeitsdatum
 	/* PROCESS CONTROL                             BG-2                        1 (mandatory) 
 	 * Eine Gruppe von Informationselementen, 
 	 * die Informationen über den Geschäftsprozess und für die Rechnung geltende Regeln liefern.
-
-    <rsm:ExchangedDocumentContext>
-        <ram:GuidelineSpecifiedDocumentContextParameter>
-            <ram:ID>urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2</ram:ID>
-        </ram:GuidelineSpecifiedDocumentContextParameter>
-    </rsm:ExchangedDocumentContext>
-
-
 	 */
 	/**
 	 * mandatory group PROCESS CONTROL BG-2
@@ -602,21 +596,25 @@ DueDateDateTime Fälligkeitsdatum
 		iDTyp.setSchemeID("XRECHNUNG");
 		documentContextParameter.setID(iDTyp);
 		documentContextParameterList.add(documentContextParameter);
-		this.setExchangedDocumentContext(exchangedDocumentContext);
 		if(profile==null) {
-			// profileIDType ist optional, nicht in cii
-		} else { // BusinessProcessSpecifiedDocumentContextParameter
-//			ProfileIDType profileIDType = new ProfileIDType();
-//			profileIDType.setValue(profile);
-//			this.setProfileID(profileIDType);
+			// profileIDType ist optional
+		} else { 
+			List<DocumentContextParameterType> dcpList = exchangedDocumentContext.getBusinessProcessSpecifiedDocumentContextParameter();
+			DocumentContextParameterType dcp = new DocumentContextParameterType();
+			IDType iDProf = new IDType();
+			iDProf.setValue(profile);
+			dcpList.add(dcp);
 		}
+		this.setExchangedDocumentContext(exchangedDocumentContext);
 	}
 
+	@Override
 	public String getCustomization() {
 		return getCustomization(this);
 	}
 	static String getCustomization(CrossIndustryInvoiceType doc) {
 		List<DocumentContextParameterType> documentContextParameterList = doc.getExchangedDocumentContext().getGuidelineSpecifiedDocumentContextParameter();
+		LOG.info("documentContextParameterList.size()="+documentContextParameterList.size());
 		List<String> res = new ArrayList<String>(documentContextParameterList.size());
 		documentContextParameterList.forEach(documentContextParameter -> {
 			res.add(documentContextParameter.getID().getValue());
@@ -635,18 +633,67 @@ DueDateDateTime Fälligkeitsdatum
 		return res.isEmpty() ? null : res.get(0);
 	}
 
+	/* PRECEDING INVOICE REFERENCE                 BG-3                        0..* (optional)
+	 * Eine Gruppe von Informationselementen, die Informationen über eine vorausgegangene Rechnung liefern, 
+	 * die berichtigt oder gutgeschrieben werden soll.
+	 * 
+	 * Anmerkung: Das Informationselement ist zu verwenden, wenn eine vorangegangene Rechnung korrigiert wird, 
+	 * eine Abschlussrechnung auf vorangegangene Teilrechnungen Bezug nimmt 
+	 * oder eine Abschlussrechnung auf vorangegangene Vorauszahlungsrechnungen Bezug nimmt.
 
-// --------------------------------
-	// nicht in XRechnung-v1-2-0.pdf beschrieben
-	public void setOrderReference(String id) {
-		LOG.warning("für cii nicht implementiert");
-//		OrderReferenceType orderReference = new OrderReferenceType();
-//		IDType mID = new IDType();
-//		mID.setValue(id);
-//		orderReference.setID(mID);
-//		this.setOrderReference(orderReference);
+1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
+0 .. 1 InvoiceReferencedDocument Referenz auf die vorausgegangene Rechnungen BG-3 xs:sequence      <============
+1 .. 1 IssuerAssignedID Nummer der vorausgegangenen Rechnung BT-25 
+0 .. 1 FormattedIssueDateTime Rechnungsdatum xs:sequence 
+1 .. 1 DateTimeString Rechnungsdatum der vorausgegangenen Rechnung BT-26 
+       required format Datum, Format BT-26-0
+ */
+	@Override
+	public void setPrecedingInvoiceReference(String docRefId, String ymd) {
+		setPrecedingInvoiceReference(docRefId, DateTimeFormats.ymdToTs(ymd));
+	}
+	@Override
+	public void setPrecedingInvoiceReference(String docRefId) {
+		setPrecedingInvoiceReference(docRefId, (Timestamp)null);
+	}
+	@Override
+	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts) {
+		IDType mID = new IDType();
+		mID.setValue(docRefId);
+		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
+		referencedDocument.setIssuerAssignedID(mID);
+		FormattedDateTimeType dateTime = newFormattedDateTimeType(ts);
+		if(dateTime!=null) referencedDocument.setFormattedIssueDateTime(dateTime);
+
+		HeaderTradeSettlementType headerTradeSettlement = getApplicableHeaderTradeSettlement();
+		headerTradeSettlement.setInvoiceReferencedDocument(referencedDocument);
+		
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(headerTradeSettlement);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
 	}
 
+	@Override
+	public String getPrecedingInvoiceReference() {
+		return getPrecedingInvoiceReference(this);
+	}
+	static String getPrecedingInvoiceReference(CrossIndustryInvoiceType doc) {
+		ReferencedDocumentType referencedDocument =  doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getInvoiceReferencedDocument();
+		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
+	}
+
+	FormattedDateTimeType newFormattedDateTimeType(Timestamp ts) {
+		if(ts==null) return null;
+		
+		FormattedDateTimeType dateTime = new FormattedDateTimeType();
+		FormattedDateTimeType.DateTimeString dts = new FormattedDateTimeType.DateTimeString(); // DateTimeString ist inner class in FormattedDateTimeType
+		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
+		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
+		dateTime.setDateTimeString(dts);
+		return dateTime;
+	}
+
+// --------------------------------
 	/**
 	 * Adds a mandatory PAYMENT INSTRUCTIONS Group with ibanlAccount as CREDIT TRANSFER
 	 * 

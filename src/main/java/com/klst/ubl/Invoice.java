@@ -687,10 +687,29 @@ Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grun
 	/* PRECEDING INVOICE REFERENCE                 BG-3                        0..*
 	 * Eine Gruppe von Informationselementen, die Informationen über eine vorausgegangene Rechnung liefern, 
 	 * die berichtigt oder gutgeschrieben werden soll. 
+	 * 
+	 * Preceding Invoice reference  BT-25 Document Reference
+	 * Preceding Invoice issue date BT-26 Date
 	 */
-	void setPrecedingInvoiceReference(String customization, String profile) {
+	@Override
+	public void setPrecedingInvoiceReference(String docRefId, String ymd) {
+		setPrecedingInvoiceReference(docRefId, DateTimeFormats.ymdToTs(ymd));
+	}
+	@Override
+	public void setPrecedingInvoiceReference(String docRefId) {
+		setPrecedingInvoiceReference(docRefId, (Timestamp)null); // Date is optional
+	}
+	@Override
+	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts) {
 		LOG.warning(NOT_IMPEMENTED);
 	}
+	
+	@Override
+	public String getPrecedingInvoiceReference() {
+		LOG.warning(NOT_IMPEMENTED);
+		return null;
+	}
+
 	
 	/* SELLER                                      BG-4                        1 (mandatory) 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Verkäufer liefern.

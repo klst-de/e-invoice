@@ -48,6 +48,8 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 
 	private static final Logger LOG = Logger.getLogger(CreditNote.class.getName());
 	
+	private static final String NOT_IMPEMENTED = "NOT IMPEMENTED";
+	
 	CreditNote() {
 		super();
 	}
@@ -197,7 +199,6 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		addPaymentTerms(description); // BT-20 optional
 		setDueDate(ts); // BT-9 optional
 	}
-	
 
 	// wie BT-10  Text
 	public void setBuyerReference(String reference) {
@@ -342,6 +343,26 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	static String getProfileID(CreditNoteType doc) {
 		ProfileIDType profileID = doc.getProfileID();
 		return profileID==null ? null : profileID.getValue();
+	}
+
+	// wie BG-3  PRECEDING INVOICE REFERENCE
+	@Override
+	public void setPrecedingInvoiceReference(String docRefId, String ymd) {
+		setPrecedingInvoiceReference(docRefId, DateTimeFormats.ymdToTs(ymd));
+	}
+	@Override
+	public void setPrecedingInvoiceReference(String docRefId) {
+		setPrecedingInvoiceReference(docRefId, (Timestamp)null); // Date is optional
+	}
+	@Override
+	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts) {
+		LOG.warning(NOT_IMPEMENTED);
+	}
+	
+	@Override
+	public String getPrecedingInvoiceReference() {
+		LOG.warning(NOT_IMPEMENTED);
+		return null;
 	}
 
 	// wie BG-4  SELLER

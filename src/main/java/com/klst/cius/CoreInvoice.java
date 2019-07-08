@@ -354,8 +354,8 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * ProfileID identifies what business process a given message is part of, 
 	 * and CustomizationID identifies the kind of message and the rules applied.
 	 * <p>
-	 * Cardinality: 1..1 (mandatory)
-	 * <br>ID: BG-2 , BT-23 , BT-24
+	 * Cardinality: 	1..1 (mandatory)
+	 * <br>EN16931-ID: 	BG-2 , BT-23 , BT-24
 	 * <br>Req.ID: R44
 	 * <p>
 	 * ProfileID/Business process type - Identifies the business process context in which the transaction appears, 
@@ -373,6 +373,28 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 //	public void setProcessControl(String customization, String profile);
 	public String getCustomization();
 	public String getProfile();
+
+	/**
+	 * PRECEDING INVOICE REFERENCE
+	 * <p>
+	 * A group of business terms providing information on one or more preceding Invoices.
+	 * To be used in case:
+	 * <br>- a preceding invoice is corrected
+	 * <br>- preceding partial invoices are referred to from a final invoice
+	 * <br>- preceding pre-payment invoices are referred to from a final invoice
+	 * <p>
+	 * Cardinality: 	0..n (optional)
+	 * <br>EN16931-ID: 	BG-3 , BT-25,BT-26,BT-26-0
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R11, R12
+	 * 
+	 * @param docRefId - Preceding Invoice reference, BT-25 / 1..1
+	 * @param date ymd - Preceding Invoice issue date, BT-26 / 0..1
+	 */
+	public void setPrecedingInvoiceReference(String docRefId, String ymd);
+	public void setPrecedingInvoiceReference(String docRefId);
+	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts);
+	public String getPrecedingInvoiceReference();
 
 // CopyIndicator . Datentyp: udt:IndicatorType . Kardinalität: 0 .. 1 , nur EXTENDED
 // LanguageID Sprachkennzeichen . Datentyp: udt:IDType . Kardinalität: 0 .. 1 , nur EXTENDED
