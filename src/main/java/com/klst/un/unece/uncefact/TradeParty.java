@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import com.klst.cius.IContact;
 
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LegalOrganizationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeContactType;
@@ -34,21 +35,61 @@ public class TradeParty extends TradePartyType{
 		} else {
 			setContact(tc);
 		}
+		
+		LegalOrganizationType legalOrganization = party.getSpecifiedLegalOrganization();
+		if(legalOrganization!=null) {
+			super.setSpecifiedLegalOrganization(legalOrganization);
+		}
+		List<TextType> textList = party.getDescription();
+		textList.forEach(companyLegalForm -> {
+			this.getDescription().add(companyLegalForm);
+		});
+
 		addTaxSchemes(getTaxSchemes(party));
-//		addLegalEntities(getPartyLegalEntities(party)); // TODO
 	}
 	
 	/**
 	 * 
-	 * @param name    - BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
-	 * @param address - BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
-	 * @param contact - BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
+	 * @param name             BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
+	 * @param address          BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
+	 * @param contact          BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
+	 * @param companyId        BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
+	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
+//	 * @param shipToTradeName  BT-70 0..1 ShipToTradeParty.Name Name des Waren- oder Dienstleistungsempfängers
 	 */
-	public TradeParty(String name, TradeAddress address, TradeContact contact) {
+	public TradeParty(String name, TradeAddress address, TradeContact contact, String companyId, String companyLegalForm) {
 		this();
-		super.setName(newTextType(name));
-		setAddress(address);
+		if(name!=null) super.setName(newTextType(name));
+		if(address!=null) setAddress(address);
 		if(contact!=null) setContact(contact);
+/*
+1 .. 1 SellerTradeParty Verkäufer                                       BG-4  xs:sequence 
+0 .. 1 Description Sonstige rechtliche Informationen des Verkäufers     BT-33 
+0 .. 1 SpecifiedLegalOrganization Details zur Organisation xs:sequence 
+0 .. 1 ID Kennung der rechtlichen Registrierung des Verkäufers          BT-30 
+       required schemeID Kennung des Schemas                            BT-30-1
+       EN16931-ID: BT-30-1 Anwendung: Insbesondere können folgende Codes genutzt werden: 
+       0021 : SWIFT 
+       0088 : EAN 
+       0060 : DUNS 
+       0177 : ODETTE
+ */
+		if(companyId!=null) {
+			LegalOrganizationType legalOrganization = new LegalOrganizationType();
+			String schemeID = null;
+			legalOrganization.setID((newIDType(companyId,schemeID)));
+			super.setSpecifiedLegalOrganization(legalOrganization);
+		}
+		
+		if(companyLegalForm!=null) {
+//			List<TextType> textList = super.getDescription();
+			super.getDescription().add(newTextType(companyLegalForm));
+		}
+	}
+
+	// BT-70 PartyName/shipToTradeName
+	public void addName(String shipToTradeName) { // !wie Name
+		super.setName(newTextType(shipToTradeName));
 	}
 
 	// PostalAddress

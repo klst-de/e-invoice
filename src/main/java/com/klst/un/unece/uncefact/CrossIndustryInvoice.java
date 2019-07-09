@@ -709,9 +709,8 @@ DueDateDateTime Fälligkeitsdatum
 	 */
 	public void setSeller(String registrationName, TradeAddress address, TradeContact contact, 
 			String companyId, String companyLegalForm) {
-		                                  // BT-27, BG-5, BG-6
-		TradeParty party = new TradeParty(null, address, contact);
-//		party.addLegalEntities(registrationName, companyId, companyLegalForm);
+		                                  // BT-27        , BG-5   , BG-6   , BT-30    , BT-33
+		TradeParty party = new TradeParty(registrationName, address, contact, companyId, companyLegalForm);
 		setSellerParty(party);
 	}
 	
@@ -737,8 +736,7 @@ DueDateDateTime Fälligkeitsdatum
 	 * Eine Gruppe von Informationselementen, die Informationen über den Erwerber liefern.
 	 */
 	public void setBuyer(String registrationName, TradeAddress address, TradeContact contact) {
-		TradeParty party = new TradeParty(null, address, contact);
-//		party.addLegalEntities(byuerRegistrationName, null, null); // BT-44, BT-45 optional, BT-46 optional
+		TradeParty party = new TradeParty(registrationName, address, contact, null, null); // BT-44, BG-8, BG-9, BT-45 optional, BT-46 optional
 		setSellerParty(party);
 	}
 	public void setBuyerParty(TradeParty party) {
@@ -810,42 +808,7 @@ DueDateDateTime Fälligkeitsdatum
        headerTradeAgreement.setSellerTradeParty(tradeParty);
                            .setBuyerTradeParty(tradeParty);
 
-	 * Seller (AccountingSupplierParty)
-	 * Seller is mandatory information and provided in element cac:AccountingSupplierParty
-	 * 
-	 * @param sellerName mandatory          / BT-27
-	 * @param postalAddress mandatory group / BG-5
-	 * @param contact mandatory group       / BG-6
- 	 * @param sellerVATid optional          / BT-31 
 	 */
-//	public void setSeller(String sellerName, PostalAddress postalAddress, IContact contact, String sellerVATid) {
-//		
-//		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-//		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement(supplyChainTradeTransaction);
-//		
-//		TradePartyType tradeParty = new TradePartyType();
-//		TextType text = new TextType();
-//		text.setValue(sellerName);
-//		tradeParty.setName(text);
-//		
-//		if(sellerVATid!=null) {
-//			TaxRegistrationType taxRegistration = new TaxRegistrationType();
-//			IDType id = new IDType();
-//			id.setValue(sellerVATid);
-//			id.setSchemeID("VAT");
-//			taxRegistration.setID(id);
-//			tradeParty.getSpecifiedTaxRegistration().add(taxRegistration);
-//		}
-//		
-//		tradeParty.setPostalTradeAddress((TradeAddressType)postalAddress); // cast!
-//		tradeParty.getDefinedTradeContact().add(new TradeContact(contact));
-//		
-//		headerTradeAgreement.setSellerTradeParty(tradeParty);
-//		
-//		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-//		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction); 
-//	}
-
 
 // --------------------------------
 	/**
