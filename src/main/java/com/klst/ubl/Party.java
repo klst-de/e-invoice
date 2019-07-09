@@ -17,7 +17,6 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Part
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyLegalFormType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.RegistrationNameType;
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.IdentifierType;
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
@@ -40,7 +39,12 @@ public class Party extends PartyType { // TODO implements ???
 	// copy ctor
 	public Party(PartyType party) {
 		this();
-		addName(getNames(party));
+
+		List<PartyNameType> partyNameList = party.getPartyName();
+		partyNameList.forEach(partyName -> {
+			this.getPartyName().add(partyName);
+		});
+		
 		setContact(getContact(party));
 		setAddress(getPostalAddress(party));
 		addTaxSchemes(getTaxSchemes(party));
@@ -49,48 +53,49 @@ public class Party extends PartyType { // TODO implements ???
 	
 	/**
 	 * 
-//	 * @param name TODO ====> 
-//	 *                           @param registrationName mandatory, BT-44, R57
-	 * @param name    - BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
-	 * @param address - BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
-	 * @param contact - BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
+	 * @param name             BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
+	 * @param address          BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
+	 * @param contact          BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
+	 * @param companyId        BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
+	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
 	 */
-	public Party(String name, Address address, Contact contact) {
+	public Party(String name, Address address, Contact contact, String companyId, String companyLegalForm) {
 		this();
-		addName(name);
+//		addName(name);
 		setAddress(address);
 		setContact(contact);
+		addLegalEntities(name, companyId, companyLegalForm);
 	}
 
-	// PartyName
-	public void addName(String name) {
-		LOG.info("nmae:"+name);
-		if(name==null) return;
-		NameType n = new NameType();
-		n.setValue(name);
-		PartyNameType partyName = new PartyNameType();
-		partyName.setName(n);
-		super.getPartyName().add(partyName);
-	}
-	
-	void addName(List<String> names) {
-		names.forEach(name -> {
-			addName(name);
-		});
-	}
-
-	public List<String> getNames() {
-		return getNames(this);
-	}
-	
-	static List<String> getNames(PartyType party) {
-		List<PartyNameType> partyNames = party.getPartyName();
-		List<String> result = new ArrayList<String>(partyNames.size());
-		partyNames.forEach(partyName -> {
-			result.add(partyName.getName().getValue());
-		});
-		return result;
-	}
+//	// PartyName
+//	public void addName(String name) {
+//		LOG.info("nmae:"+name);
+//		if(name==null) return;
+//		NameType n = new NameType();
+//		n.setValue(name);
+//		PartyNameType partyName = new PartyNameType();
+//		partyName.setName(n);
+//		super.getPartyName().add(partyName);
+//	}
+//	
+//	void addName(List<String> names) {
+//		names.forEach(name -> {
+//			addName(name);
+//		});
+//	}
+//
+//	public List<String> getNames() {
+//		return getNames(this);
+//	}
+//	
+//	static List<String> getNames(PartyType party) {
+//		List<PartyNameType> partyNames = party.getPartyName();
+//		List<String> result = new ArrayList<String>(partyNames.size());
+//		partyNames.forEach(partyName -> {
+//			result.add(partyName.getName().getValue());
+//		});
+//		return result;
+//	}
 	
 	// PostalAddress
 	public void setAddress(Address address) {
@@ -178,7 +183,6 @@ public class Party extends PartyType { // TODO implements ???
 		return resultList;
 	}
 
-	// PartyLegalEntity
 	/**
 	 * add LegalEntities for seller or buyer party
 	 * 
@@ -214,8 +218,24 @@ public class Party extends PartyType { // TODO implements ???
 		});
 	}
 
-	public List<Map<Object,String>> getPartyLegalEntities() { 
-		return getPartyLegalEntities(this);
+	public String getName() {
+		return getObject(RegistrationNameType.class);
+	}
+	public String getCompanyID() {
+		return getObject(CompanyIDType.class);
+	}
+	public String getCompanyLegalForm() {
+		return getObject(CompanyLegalFormType.class);
+	}
+	String getObject(Object clazz) {
+		List<Map<Object,String>> mapList = getPartyLegalEntities(this);
+		if(mapList.isEmpty()) {
+			LOG.warning("mapList is empty");
+			return null;
+		} else {
+			Map<Object,String> map = mapList.get(0); // first
+			return map.get(clazz);
+		}
 	}
 	static List<Map<Object,String>> getPartyLegalEntities(PartyType party) { 
 		List<PartyLegalEntityType> partyLegalEntities = party.getPartyLegalEntity();

@@ -15,6 +15,7 @@ import com.klst.ubl.Contact;
 import com.klst.ubl.CreditTransfer;
 import com.klst.ubl.Invoice;
 import com.klst.ubl.InvoiceLine;
+import com.klst.ubl.Party;
 import com.klst.ubl.PaymentInstruction;
 import com.klst.ubl.PaymentTerms;
 import com.klst.ubl.VatCategory;
@@ -194,32 +195,39 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			if(documentNameCode==DocumentNameCode.CommercialInvoice) {
 				cmInvoice = new CommercialInvoice(invoice);
 				
-				List<Map<Object, String>> sellerLegalEntities = cmInvoice.getSellerLegalEntities();
-				Map<Object, String> sellerLegalEntity = null;
-				String sellerRegistrationName = null;
-				String sellerCompanyID = null;
-				String sellerCompanyLegalForm = null;
-				if(sellerLegalEntities.isEmpty()) {
-					LOG.warning("sellerLegalEntities is empty");
-				} else {
-					sellerLegalEntity = sellerLegalEntities.get(0); // first
-					sellerRegistrationName = sellerLegalEntity.get(RegistrationNameType.class);
-					sellerCompanyID = sellerLegalEntity.get(CompanyIDType.class);
-					sellerCompanyLegalForm = sellerLegalEntity.get(CompanyLegalFormType.class);
-				}
-				List<Map<Object, String>> buyerLegalEntities = cmInvoice.getBuyerLegalEntities();
-				Map<Object, String> buyerLegalEntity = null;
-				String buyerRegistrationName = null;
-				String buyerCompanyID = null;
-				String buyerCompanyLegalForm = null;
-				if(buyerLegalEntities.isEmpty()) {
-					LOG.warning("buyerLegalEntities is empty");
-				} else {
-					buyerLegalEntity = buyerLegalEntities.get(0); // first
-					buyerRegistrationName = buyerLegalEntity.get(RegistrationNameType.class);
-					buyerCompanyID = buyerLegalEntity.get(CompanyIDType.class);
-					buyerCompanyLegalForm = buyerLegalEntity.get(CompanyLegalFormType.class);
-				}
+//				List<Map<Object, String>> sellerLegalEntities = cmInvoice.getSellerLegalEntities();
+//				Map<Object, String> sellerLegalEntity = null;
+//				String sellerRegistrationName = null;
+//				String sellerCompanyID = null;
+//				String sellerCompanyLegalForm = null;
+//				if(sellerLegalEntities.isEmpty()) {
+//					LOG.warning("sellerLegalEntities is empty");
+//				} else {
+//					sellerLegalEntity = sellerLegalEntities.get(0); // first
+//					sellerRegistrationName = sellerLegalEntity.get(RegistrationNameType.class);
+//					sellerCompanyID = sellerLegalEntity.get(CompanyIDType.class);
+//					sellerCompanyLegalForm = sellerLegalEntity.get(CompanyLegalFormType.class);
+//				}
+				String sellerRegistrationName = cmInvoice.getSellerParty().getName();
+				String sellerCompanyID = cmInvoice.getSellerParty().getCompanyID();
+				String sellerCompanyLegalForm = cmInvoice.getSellerParty().getCompanyLegalForm();
+				
+//				List<Map<Object, String>> buyerLegalEntities = cmInvoice.getBuyerLegalEntities();
+//				Map<Object, String> buyerLegalEntity = null;
+//				String buyerRegistrationName = null;
+//				String buyerCompanyID = null;
+//				String buyerCompanyLegalForm = null;
+//				if(buyerLegalEntities.isEmpty()) {
+//					LOG.warning("buyerLegalEntities is empty");
+//				} else {
+//					buyerLegalEntity = buyerLegalEntities.get(0); // first
+//					buyerRegistrationName = buyerLegalEntity.get(RegistrationNameType.class);
+//					buyerCompanyID = buyerLegalEntity.get(CompanyIDType.class);
+//					buyerCompanyLegalForm = buyerLegalEntity.get(CompanyLegalFormType.class);
+//				}
+				String buyerRegistrationName = cmInvoice.getBuyerParty().getName();
+				String buyerCompanyID = cmInvoice.getBuyerParty().getCompanyID();
+				String buyerCompanyLegalForm = cmInvoice.getBuyerParty().getCompanyLegalForm();
 				
 				List<Map<Object,String>> sellerTaxSchemes = cmInvoice.getSellerTaxSchemes();
 				Map<Object, String> sellerTaxScheme = null;
@@ -283,11 +291,11 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 						" \ninvoice DocumentCurrency="+		cmInvoice.getDocumentCurrency() + 
 						" \ninvoice BuyerReferenceValue="+	cmInvoice.getBuyerReferenceValue() + 
 						" \ninvoice OrderReferenceID="+		cmInvoice.getOrderReferenceID() + 
-						" \ninvoice sellerLegalEntities#:"+	cmInvoice.getSellerLegalEntities().size() +
+//						" \ninvoice sellerLegalEntities#:"+	cmInvoice.getSellerLegalEntities().size() +
 						" \ninvoice SellerRegistrationName="+	sellerRegistrationName +					
 						" \ninvoice SellerCompanyID="+			sellerCompanyID +					
 						" \ninvoice SellerCompanyLegalForm="+	sellerCompanyLegalForm +					
-						" \ninvoice buyerLegalEntities#:"+	cmInvoice.getBuyerLegalEntities().size() +
+//						" \ninvoice buyerLegalEntities#:"+	cmInvoice.getBuyerLegalEntities().size() +
 						" \ninvoice BuyerRegistrationName="+	buyerRegistrationName +					
 						" \ninvoice BuyerCompanyID="+			buyerCompanyID +					
 						" \ninvoice BuyerCompanyLegalForm="+	buyerCompanyLegalForm +					
@@ -307,7 +315,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 						" \ninvoice BuyerContactPoint="+		buyerContact.getContactPoint() +					
 						" \ninvoice BuyerContactTelephone="+	buyerContact.getContactTelephone() +					
 						" \ninvoice BuyerContactEmail="+		buyerContact.getContactEmail() +					
-						" \ninvoice buyerLegalEntities#:"+	cmInvoice.getBuyerLegalEntities().size() +
+//						" \ninvoice buyerLegalEntities#:"+	cmInvoice.getBuyerLegalEntities().size() +
 						" \ninvoice buyerTaxSchemes#:"+		cmInvoice.getBuyerTaxSchemes().size() +
 						" \ninvoice BuyerTaxScheme="+		buyerTaxScheme.get(TaxSchemeType.class) +					
 						" \ninvoice BuyerCompanyID="+		buyerTaxScheme.get(CompanyIDType.class) +					

@@ -774,10 +774,8 @@ SELLER CONTACT                              BG-6                        1
 	 * @param companyId optional / Seller legal registration identifier, BT-30/R52
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
 	 */
-	public void setSeller(String registrationName, Address address, Contact contact, 
-			String companyId, String companyLegalForm) {
-		Party party = new Party(null, address, contact);
-		party.addLegalEntities(registrationName, companyId, companyLegalForm); // BT-27, BT-30 optional, BT-33 optional
+	public void setSeller(String registrationName, Address address, Contact contact, String companyId, String companyLegalForm) {
+		Party party = new Party(registrationName, address, contact, companyId, companyLegalForm);
 		setSellerParty(party);
 	}
 	
@@ -886,8 +884,7 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * @param BUYER CONTACT optional, BG-9, R57
 	 */
 	public void setBuyer(String registrationName, Address address, Contact contact) {
-		Party party = new Party(null, address, contact);
-		party.addLegalEntities(registrationName, null, null); // BT-44, BT-45 optional, BT-46 optional
+		Party party = new Party(registrationName, address, contact, null, null); 
 		setBuyerParty(party);
 	}
 
@@ -1568,15 +1565,4 @@ Connecting Europe Facility gepflegt und herausgegeben
 		return party.getIContact();
 	}
 	
-	// LegalEntities
-	public List<Map<Object,String>> getSellerLegalEntities() { 
-		Party party = getSellerParty();
-		return party.getPartyLegalEntities();
-	}
-	
-	public List<Map<Object,String>> getBuyerLegalEntities() { 
-		Party party = getBuyerParty();
-		return party.getPartyLegalEntities();
-	}
-
 }

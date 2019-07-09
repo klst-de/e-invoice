@@ -40,9 +40,9 @@ public class TradeParty extends TradePartyType{
 	
 	/**
 	 * 
-	 * @param name    - BT-27, 1 .. 1 Name des Verkäufers
-	 * @param address - BG-5 1..1 SELLER POSTAL ADDRESS/ BG-8 1..1 BUYER POSTAL ADDRESS
-	 * @param contact - BG-6 0..1 SELLER CONTACT / BG-9 0..1 BUYER CONTACT
+	 * @param name    - BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
+	 * @param address - BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
+	 * @param contact - BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
 	 */
 	public TradeParty(String name, TradeAddress address, TradeContact contact) {
 		this();
@@ -165,19 +165,6 @@ public class TradeParty extends TradePartyType{
 		return resultList;
 	}
 	
-	// PartyLegalEntity
-	/**
-	 * add LegalEntities for seller or buyer party
-	 * 
-	 * @param registrationName mandatory, BT-27/BT-44
-	 * @param companyId optional / legal registration identifier, BT-30/BT-45
-	 * @param companyLegalForm optional / additional legal information, BT-33/BT-46
-	 */
-	public void addLegalEntities(String registrationName, String companyId, String companyLegalForm)  {
-//		super.getSpecifiedLegalOrganization()       // TODO oder doch BT-47
-	}
-
-
 	IDType newIDType(String value, String schemeID) {
 		IDType ID = new IDType();
 		ID.setValue(value);

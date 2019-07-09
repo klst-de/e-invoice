@@ -24,6 +24,7 @@ import com.klst.ubl.Invoice;
 import com.klst.ubl.Party;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyNameType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.SupplierPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
@@ -78,13 +79,13 @@ public class PartyTest {
 		supplierParty = invoice.getAccountingSupplierParty();
 		if(supplierParty!=null) {
 			supplierparty = new Party(supplierParty.getParty());
-			LOG.info("supplierparty.neme(0):"+ (supplierparty.getNames().isEmpty() ? "nix" : supplierparty.getNames().get(0)) );
+			LOG.info("supplierparty.name:"+ (supplierparty.getName()) );
 		}
 		customerparty = null;
 		customerParty = invoice.getAccountingCustomerParty();
 		if(customerParty!=null) {
 			customerparty = new Party(customerParty.getParty());
-			LOG.info("customerparty.neme(0):"+ (customerparty.getNames().isEmpty() ? "nix" : customerparty.getNames().get(0)) );
+			LOG.info("customerparty.name:"+ (customerparty.getName()) );
 		}
     }
 
@@ -101,20 +102,20 @@ public class PartyTest {
     	String name = "party name";
     	Address address = null;
     	Contact contact = null;
-    	Party party = new Party(name, address, contact);
-		assertEquals(name, party.getNames().get(0));
+    	Party party = new Party(name, address, contact, null, null);
+		assertEquals(name, party.getName());
 		assertEquals(address, party.getAddress());
 		assertEquals(contact, party.getContact());
    }
 
-    @Test
-    public void ublAddName() {
-    	String name = "party name";
-		assertTrue(supplierparty.getNames().isEmpty());
-		supplierparty.addName(name);
-		assertTrue(supplierparty.getNames().size()==1);
-		assertEquals(name, supplierparty.getNames().get(0));
-   }
+//    @Test
+//    public void ublAddName() {
+//    	String name = "party name";
+//		assertTrue(supplierparty.getNames().isEmpty());
+//		supplierparty.addName(name);
+//		assertTrue(supplierparty.getNames().size()==1);
+//		assertEquals(name, supplierparty.getNames().get(0));
+//   }
 
     @Test
     public void ublGetAddress() {
@@ -137,9 +138,9 @@ public class PartyTest {
 		assertTrue(deliveries.size()==1);
 		Party deliveryParty = deliveries.get(0).getParty();
 		assertNotNull(deliveryParty);
-		List<String> names = deliveryParty.getNames();
+		List<PartyNameType> names = deliveryParty.getPartyName();
 		assertTrue(names.size()==1);
-    	assertEquals("Schulungsanbieter", names.get(0));
+    	assertEquals("Schulungsanbieter", names.get(0).getName().getValue());
     	
     	Address address = deliveries.get(0).getLocationAddress();
 		LOG.info("Delivery LocationAddress:" + addressAsString(address));
@@ -148,10 +149,7 @@ public class PartyTest {
     
     @Test
     public void ublParty0Create() {
-    	Party party = new Party("customer", null, null);
-    	List<Map<Object,String>> partyLegalEntities = party.getPartyLegalEntities();
-    	LOG.info("PartyLegalEntities #:"+ partyLegalEntities.size());
-    	assertTrue(partyLegalEntities.isEmpty());
+    	Party party = new Party("customer", null, null, null, null);
     	
     	List<Map<Object,String>> taxSchemes = party.getTaxSchemes();
     	LOG.info("TaxSchemes #:"+ taxSchemes.size());
@@ -213,23 +211,23 @@ public class PartyTest {
     
     @Test
     public void ublPartyLegalEntityCustomer() {
-    	List<Map<Object,String>> partyLegalEntities = customerparty.getPartyLegalEntities();
-    	LOG.info("PartyLegalEntities #:"+ partyLegalEntities.size());
-		assertTrue(partyLegalEntities.size()==1);
-		Map<Object,String> ple = partyLegalEntities.get(0);
-    	assertEquals("[Buyer name]", ple.get(RegistrationNameType.class));
-    	assertNull(ple.get(CompanyIDType.class));
-    	assertNull(ple.get(CompanyLegalFormType.class));
+//    	List<Map<Object,String>> partyLegalEntities = customerparty.getPartyLegalEntities();
+//    	LOG.info("PartyLegalEntities #:"+ partyLegalEntities.size());
+//		assertTrue(partyLegalEntities.size()==1);
+//		Map<Object,String> ple = partyLegalEntities.get(0);
+    	assertEquals("[Buyer name]", customerparty.getName());
+    	assertNull(customerparty.getCompanyID());
+    	assertNull(customerparty.getCompanyLegalForm());
     }
   
     @Test
     public void ublPartyLegalEntitySupplier() {
-    	List<Map<Object,String>> partyLegalEntities = supplierparty.getPartyLegalEntities();
-    	LOG.info("PartyLegalEntities #:"+ partyLegalEntities.size());
-		assertTrue(partyLegalEntities.size()==1);
-		Map<Object,String> ple = partyLegalEntities.get(0);
-    	assertEquals("[Seller name]", ple.get(RegistrationNameType.class));
-    	assertEquals("HRB 123456", ple.get(CompanyIDType.class));
-    	assertEquals("Sitz der Gesellschaft […], Registergericht […], Amtsgericht […]", ple.get(CompanyLegalFormType.class));
+//    	List<Map<Object,String>> partyLegalEntities = supplierparty.getPartyLegalEntities();
+//    	LOG.info("PartyLegalEntities #:"+ partyLegalEntities.size());
+//		assertTrue(partyLegalEntities.size()==1);
+//		Map<Object,String> ple = partyLegalEntities.get(0);
+    	assertEquals("[Seller name]", supplierparty.getName());
+    	assertEquals("HRB 123456", supplierparty.getCompanyID());
+    	assertEquals("Sitz der Gesellschaft […], Registergericht […], Amtsgericht […]", supplierparty.getCompanyLegalForm());
     }
 }

@@ -366,10 +366,8 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	}
 
 	// wie BG-4  SELLER
-	public void setSeller(String sellerRegistrationName, Address address, Contact contact, 
-			String companyId, String companyLegalForm) {
-		Party party = new Party(null, address, contact);
-		party.addLegalEntities(sellerRegistrationName, companyId, companyLegalForm);
+	public void setSeller(String sellerRegistrationName, Address address, Contact contact, String companyId, String companyLegalForm) {
+		Party party = new Party(sellerRegistrationName, address, contact, companyId, companyLegalForm);
 		setSellerParty(party);
 	}
 	
@@ -396,8 +394,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 
 	// wie BG-7  BUYER
 	public void setBuyer(String byuerRegistrationName, Address address, Contact contact) {
-		Party party = new Party(null, address, contact);
-		party.addLegalEntities(byuerRegistrationName, null, null); // BT-44, BT-45 optional, BT-46 optional
+		Party party = new Party(byuerRegistrationName, address, contact, null, null); 
 		setBuyerParty(party);
 	}
 
