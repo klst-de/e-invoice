@@ -28,8 +28,6 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Part
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.SupplierPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyLegalFormType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.RegistrationNameType;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PartyTest {

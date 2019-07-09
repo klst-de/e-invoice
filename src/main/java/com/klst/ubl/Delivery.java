@@ -21,6 +21,13 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ActualDe
  * Actual delivery date                        BT-72                  Date 0..1
  * INVOICING PERIOD                            BG-14                       0..1
  * DELIVER TO ADDRESS                          BG-15                       0..1
+
+1 .. 1 SupplyChainTradeTransaction Gruppierung der Informationen zum Geschäftsvorfall
+0 .. 1 ShipToTradeParty Lieferinfomationen                        BG-13 xs:sequence 
+0 .. 1 ID Kennung des Lieferorts                                  BT-71 
+0 .. n GlobalID Globaler Identifier der Kennung für den Lieferort BT-71-0 
+       required schemeID Kennung des Schemas                      BT-71-1 
+0 .. 1 Name Name des Waren- oder Dienstleistungsempfängers        BT-70
  */
 public class Delivery extends DeliveryType { // TODO implements IDelivery
 

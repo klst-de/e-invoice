@@ -17,6 +17,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Part
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyLegalFormType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.RegistrationNameType;
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.IdentifierType;
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
@@ -58,6 +59,7 @@ public class Party extends PartyType { // TODO implements ???
 	 * @param contact          BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
 	 * @param companyId        BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
 	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
+//	 * @param shipToTradeName  BT-70 0..1 ShipToTradeParty.Name Name des Waren- oder Dienstleistungsempfängers
 	 */
 	public Party(String name, Address address, Contact contact, String companyId, String companyLegalForm) {
 		this();
@@ -67,16 +69,16 @@ public class Party extends PartyType { // TODO implements ???
 		addLegalEntities(name, companyId, companyLegalForm);
 	}
 
-//	// PartyName
-//	public void addName(String name) {
-//		LOG.info("nmae:"+name);
-//		if(name==null) return;
-//		NameType n = new NameType();
-//		n.setValue(name);
-//		PartyNameType partyName = new PartyNameType();
-//		partyName.setName(n);
-//		super.getPartyName().add(partyName);
-//	}
+	// BT-70 PartyName/shipToTradeName
+	public void addName(String shipToTradeName) {
+		if(shipToTradeName==null) return;
+		LOG.info("name/shipToTradeName:"+shipToTradeName);
+		NameType name = new NameType();
+		name.setValue(shipToTradeName);
+		PartyNameType partyName = new PartyNameType();
+		partyName.setName(name);
+		super.getPartyName().add(partyName);
+	}
 //	
 //	void addName(List<String> names) {
 //		names.forEach(name -> {
@@ -184,18 +186,25 @@ public class Party extends PartyType { // TODO implements ???
 	}
 
 	/**
-	 * add LegalEntities for seller or buyer party
+	 * add LegalEntities for seller or buyer party or delivery party
 	 * 
 	 * @param registrationName mandatory, BT-27/BT-44
 	 * @param companyId optional / legal registration identifier, BT-30/BT-45
 	 * @param companyLegalForm optional / additional legal information, BT-33/BT-46
 	 */
-	public void addLegalEntities(String name, String companyId, String companyLegalForm)  {
-		List<PartyLegalEntityType> partyLegalEntities = super.getPartyLegalEntity();
+	void addLegalEntities(String name, String companyId, String companyLegalForm)  {
 		PartyLegalEntityType partyLegalEntity = new PartyLegalEntityType();
-		RegistrationNameType registrationName = new RegistrationNameType();
-		registrationName.setValue(name);
-		partyLegalEntity.setRegistrationName(registrationName);
+		if(name!=null) {
+			RegistrationNameType registrationName = new RegistrationNameType();
+			registrationName.setValue(name);
+			partyLegalEntity.setRegistrationName(registrationName);
+		} else {
+			if(companyId==null && companyLegalForm==null) {
+				// for DeliveryParty all params can be null , do not create DeliveryParty PartyLegalEntity
+				// to avoid warning [UBL-CR-397]-A UBL invoice should not include the DeliveryParty PartyLegalEntity
+				return;
+			}
+		}
 		if(companyId!=null) {
 			CompanyIDType companyID = new CompanyIDType();
 			companyID.setValue(companyId);
@@ -206,7 +215,7 @@ public class Party extends PartyType { // TODO implements ???
 			clf.setValue(companyLegalForm);
 			partyLegalEntity.setCompanyLegalForm(clf);
 		}
-		partyLegalEntities.add(partyLegalEntity);
+		super.getPartyLegalEntity().add(partyLegalEntity);
 	}
 	
 	void addLegalEntities(List<Map<Object,String>> legalEntityList)  {
