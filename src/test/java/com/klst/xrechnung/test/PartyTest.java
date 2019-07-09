@@ -156,7 +156,7 @@ public class PartyTest {
     	List<Map<Object,String>> taxSchemes = party.getTaxSchemes();
     	LOG.info("TaxSchemes #:"+ taxSchemes.size());
     	assertTrue(taxSchemes.isEmpty());
-    	party.addPartyTaxScheme("DE123456789");
+    	party.addPartyTaxID("DE123456789");
     	LOG.info("TaxSchemes #:"+ taxSchemes.size());
     }
     
@@ -174,7 +174,7 @@ public class PartyTest {
     	List<Map<Object,String>> taxSchemes = supplierparty.getTaxSchemes();
     	assertEquals("DE123456789", taxSchemes.get(0).get(CompanyIDType.class));
     	LOG.info("supplierparty taxScheme:" + taxSchemes.get(0).get(CompanyIDType.class) + "/" + taxSchemes.get(0).get(TaxSchemeType.class));
-    	supplierparty.addPartyTaxScheme("Umsatzsteuer-Identifikationsnummer des Verkäufers");
+    	supplierparty.addPartyTaxID("Umsatzsteuer-Identifikationsnummer des Verkäufers");
     	LOG.info("TaxSchemes #:"+supplierparty.getTaxSchemes().size());
     	LOG.info("supplierparty taxScheme:" + supplierparty.getTaxSchemes().get(1).get(CompanyIDType.class) + "/" + supplierparty.getTaxSchemes().get(1).get(TaxSchemeType.class));
   	

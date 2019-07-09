@@ -13,6 +13,22 @@ public class TradeContact extends TradeContactType implements IContact {
 		super();
 	}
 
+	// copy ctor
+	public TradeContact(TradeContactType contact) {
+		this();
+//		this.setContactPoint(((TradeContact)contact).getContactPoint());
+//		this.setContactTelephone(((TradeContact)contact).getContactTelephone());
+//		this.setContactEmail(((TradeContact)contact).getContactEmail());
+		this.setContactPoint(contact.getPersonName().getValue());
+		UniversalCommunicationType universalCommunicationType = contact.getTelephoneUniversalCommunication();
+		if(universalCommunicationType==null) {
+			// darf nicht sein
+		} else {
+			this.setContactTelephone(universalCommunicationType.getCompleteNumber().getValue());
+		}
+		this.setContactEmail(contact.getEmailURIUniversalCommunication().getURIID().getValue());
+	}
+
 	/**
 	 * ctor for Seller Contact which is mandatory group / BG-6
 	 * 

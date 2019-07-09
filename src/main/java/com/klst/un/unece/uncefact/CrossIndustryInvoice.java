@@ -36,7 +36,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeContactType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
@@ -137,8 +136,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setOrderReferenceID(getOrderReferenceID(doc)); // optional
 //		addPaymentTerms(doc);
 		addNotes(doc);	
-//		setSellerParty(getSellerParty(doc));
-//		setBuyerParty(getBuyerParty(doc));
+		setSellerParty(getSellerParty(doc));
+		setBuyerParty(getBuyerParty(doc));
 //		addDeliveries(doc);
 //		addPaymentInstructions(doc);		
 //		setDocumentTotals(doc);
@@ -693,6 +692,161 @@ DueDateDateTime Fälligkeitsdatum
 		return dateTime;
 	}
 
+	/* SELLER                                      BG-4                        1 (mandatory) 
+	 * Eine Gruppe von Informationselementen, die Informationen über den Verkäufer liefern.
+	 */
+	/**
+	 * Seller (AccountingSupplierParty)
+	 * Seller is mandatory information and provided in cii element SellerTradeParty
+	 * 
+	 * @param registrationName mandatory BT-27 : The full formal name by which the Seller is registered 
+	 *        in the national registry of legal entities or as a Taxable person or otherwise trades as a person or persons.
+	 * @param postalAddress mandatory group BG-5/R53 : A group of business terms providing information about the address of the Seller.
+              Sufficient components of the address are to be filled to comply with legal requirements.
+	 * @param contact mandatory group BG-6/R57 : A group of business terms providing contact information about the Seller.
+	 * @param companyId optional / Seller legal registration identifier, BT-30/R52
+	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
+	 */
+	public void setSeller(String registrationName, TradeAddress address, TradeContact contact, 
+			String companyId, String companyLegalForm) {
+		                                  // BT-27, BG-5, BG-6
+		TradeParty party = new TradeParty(null, address, contact);
+//		party.addLegalEntities(registrationName, companyId, companyLegalForm);
+		setSellerParty(party);
+	}
+	
+	public void setSellerParty(TradeParty party) {
+		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
+		headerTradeAgreement.setSellerTradeParty(party);
+		
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+	}
+
+	public TradeParty getSellerParty() {
+		return getSellerParty(this);
+	}
+	static TradeParty getSellerParty(CrossIndustryInvoiceType doc) {
+		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		TradePartyType sellerParty = headerTradeAgreement.getSellerTradeParty();
+		return sellerParty==null ? null : new TradeParty(sellerParty);
+	}
+
+	/* BUYER                                       BG-7                        1 (mandatory) 
+	 * Eine Gruppe von Informationselementen, die Informationen über den Erwerber liefern.
+	 */
+	public void setBuyer(String registrationName, TradeAddress address, TradeContact contact) {
+		TradeParty party = new TradeParty(null, address, contact);
+//		party.addLegalEntities(byuerRegistrationName, null, null); // BT-44, BT-45 optional, BT-46 optional
+		setSellerParty(party);
+	}
+	public void setBuyerParty(TradeParty party) {
+		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
+		headerTradeAgreement.setBuyerTradeParty(party);
+		
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+	}
+
+	public TradeParty getBuyerParty() {
+		return getBuyerParty(this);
+	}
+	static TradeParty getBuyerParty(CrossIndustryInvoiceType doc) {
+		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		TradePartyType buyerParty = headerTradeAgreement.getBuyerTradeParty();
+		return buyerParty==null ? null : new TradeParty(buyerParty);
+	}
+
+	/**
+1 .. 1 ApplicableHeaderTradeAgreement Gruppierung der Vertragsangaben xs:sequence 
+0 .. 1 BuyerReference Referenz des Käufers                              BT-10 
+1 .. 1 SellerTradeParty Verkäufer                                       BG-4  xs:sequence 
+0 .. 1 ID Kennung des Verkäufers                                        BT-29 
+0 .. n GlobalID Globaler Identifier des Verkäufers                      BT-29-0 
+      required schemeID Kennung des Schemas                             BT-29-1 
+1 .. 1 Name Name des Verkäufers                                         BT-27 
+0 .. 1 Description Sonstige rechtliche Informationen des Verkäufers     BT-33 
+0 .. 1 SpecifiedLegalOrganization Details zur Organisation xs:sequence 
+0 .. 1 ID Kennung der rechtlichen Registrierung des Verkäufers          BT-30 
+       required schemeID Kennung des Schemas                            BT-30-1
+1 .. 1 TradingBusinessName Handelsname des Verkäufers                   BT-28 
+0 .. 1 PostalTradeAddress Detailinformationen zur Geschäftsanschrift des Verkäufers xs:sequence 
+0 .. 1 PostcodeCode Postleitzahl 
+0 .. 1 LineOne Adresszeile 1 
+0 .. 1 LineTwo Adresszeile 2 
+0 .. 1 LineThree Adresszeile 3 
+0 .. 1 CityName Ort 
+1 .. 1 CountryID Land (Code) 
+0 .. 1 DefinedTradeContact Kontaktdaten des Verkäufers                  BG-6 xs:sequence SELLER CONTACT 
+0 .. 1 PersonName Kontaktstelle des Verkäufers                          BT-41 
+0 .. 1 DepartmentName Kontaktstelle des Verkäufers                      BT-41-0 
+0 .. 1 TelephoneUniversalCommunication Detailinformationen zur Telefonnummer des Verkäufers xs:sequence 
+1 .. 1 CompleteNumber Telefonnummer des Verkäufers                      BT-42       
+0 .. 1 FaxUniversalCommunication Detailinformationen zur Faxnummer des Verkäufers xs:sequence 
+1 .. 1 CompleteNumber Faxnummer des Verkäufers 
+0 .. 1 EmailURIUniversalCommunication Detailinformationen zur Emailadresse des Verkäufers xs:sequence 
+1 .. 1 URIID E-Mailadresse des Verkäufers                               BT-43 
+1 .. 1 PostalTradeAddress Postanschrift des Verkäufers                  BG-5 xs:sequence SELLER POSTAL ADDRESS 
+0 .. 1 PostcodeCode Postleitzahl der Verkäuferanschrift                 BT-38 
+0 .. 1 LineOne Zeile 1 der Verkäuferanschrift                           BT-35 
+0 .. 1 LineTwo Zeile 2 der Verkäuferanschrift                           BT-36 
+0 .. 1 LineThree Zeile 3 der Verkäuferanschrift                         BT-162 
+0 .. 1 CityName Stadt der Verkäuferanschrift                            BT-37 
+1 .. 1 CountryID Ländercode der Verkäuferanschrift                      BT-40 
+0 .. 1 CountrySubDivisionName Bundesland                                BT-39 
+0 .. 1 URIUniversalCommunication Details zur elektronischen Adresse xs:sequence 
+1 .. 1 URIID Elektronischen Adresse des Verkäufers                      BT-34 
+       required schemeID Kennung des Schemas                            BT-34-1
+0 .. n SpecifiedTaxRegistration Detailinformationen zu Steuerangaben des Verkäufers
+1 .. 1 ID Steuernummer des Verkäufers                                   BT-31,
+       Umsatzsteueridentnummer des Verkäufers                           BT-32 
+       required schemeID Art der Steuernummer des Verkäufers          BT-31-0, BT-32-0
+       
+1 .. 1 BuyerTradeParty Käufer                                           BG-7 xs:sequence 
+0 .. 1 ID Kennung des Käufers                                           BT-46
+...       
+       headerTradeAgreement.setSellerTradeParty(tradeParty);
+                           .setBuyerTradeParty(tradeParty);
+
+	 * Seller (AccountingSupplierParty)
+	 * Seller is mandatory information and provided in element cac:AccountingSupplierParty
+	 * 
+	 * @param sellerName mandatory          / BT-27
+	 * @param postalAddress mandatory group / BG-5
+	 * @param contact mandatory group       / BG-6
+ 	 * @param sellerVATid optional          / BT-31 
+	 */
+//	public void setSeller(String sellerName, PostalAddress postalAddress, IContact contact, String sellerVATid) {
+//		
+//		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
+//		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement(supplyChainTradeTransaction);
+//		
+//		TradePartyType tradeParty = new TradePartyType();
+//		TextType text = new TextType();
+//		text.setValue(sellerName);
+//		tradeParty.setName(text);
+//		
+//		if(sellerVATid!=null) {
+//			TaxRegistrationType taxRegistration = new TaxRegistrationType();
+//			IDType id = new IDType();
+//			id.setValue(sellerVATid);
+//			id.setSchemeID("VAT");
+//			taxRegistration.setID(id);
+//			tradeParty.getSpecifiedTaxRegistration().add(taxRegistration);
+//		}
+//		
+//		tradeParty.setPostalTradeAddress((TradeAddressType)postalAddress); // cast!
+//		tradeParty.getDefinedTradeContact().add(new TradeContact(contact));
+//		
+//		headerTradeAgreement.setSellerTradeParty(tradeParty);
+//		
+//		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
+//		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction); 
+//	}
+
+
 // --------------------------------
 	/**
 	 * Adds a mandatory PAYMENT INSTRUCTIONS Group with ibanlAccount as CREDIT TRANSFER
@@ -865,43 +1019,6 @@ either the Payment due date (BT-9) or the Payment terms (BT-20) shall be present
          <element name="LogoAssociatedSpecifiedBinaryFile" type="{urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100}SpecifiedBinaryFileType" maxOccurs="unbounded" minOccurs="0"/>
  */
 		headerTradeAgreement.setBuyerTradeParty(tradePartyType);
-		
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction); 
-	}
-
-	/**
-	 * Seller (AccountingSupplierParty)
-	 * Seller is mandatory information and provided in element cac:AccountingSupplierParty
-	 * 
-	 * @param sellerName mandatory
-	 * @param postalAddress mandatory group
-	 * @param contact mandatory group
- 	 * @param sellerVATid optional
-	 */
-	public void setSeller(String sellerName, PostalAddress postalAddress, IContact contact, String sellerVATid) {
-		
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement(supplyChainTradeTransaction);
-		
-		TradePartyType tradeParty = new TradePartyType();
-		TextType text = new TextType();
-		text.setValue(sellerName);
-		tradeParty.setName(text);
-		
-		if(sellerVATid!=null) {
-			TaxRegistrationType taxRegistration = new TaxRegistrationType();
-			IDType id = new IDType();
-			id.setValue(sellerVATid);
-			id.setSchemeID("VAT");
-			taxRegistration.setID(id);
-			tradeParty.getSpecifiedTaxRegistration().add(taxRegistration);
-		}
-		
-		tradeParty.setPostalTradeAddress((TradeAddressType)postalAddress); // cast!
-		tradeParty.getDefinedTradeContact().add(new TradeContact(contact));
-		
-		headerTradeAgreement.setSellerTradeParty(tradeParty);
 		
 		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction); 

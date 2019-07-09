@@ -14,6 +14,33 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 		super();
 	}
 
+	// copy ctor
+	public TradeAddress(TradeAddressType address) {
+		this();
+		// TODO testen
+//		this.setCountryCode(((TradeAddress)address).getCountryCode());
+		// ==
+		this.setCountryCode(address.getCountryID().getValue());
+		
+		IDType region = address.getCountrySubDivisionID();
+		if(region!=null) this.setCountrySubdivision(region.getValue());
+//		this.setCountrySubdivision(((TradeAddress)address).getCountrySubdivision());
+		
+//		this.setPostCode(((TradeAddress)address).getPostCode());
+		this.setPostCode(address.getPostcodeCode().getValue());
+		
+//		this.setCity(((TradeAddress)address).getCity());
+		this.setCity(address.getCityName().getValue());
+		
+		super.setStreetName(address.getStreetName());
+		super.setBuildingName(address.getBuildingName());
+		super.setBuildingNumber(address.getBuildingNumber());
+		
+		this.setAddressLine1( address.getLineOne()==null ? null : address.getLineOne().getValue() );
+		this.setAddressLine2( address.getLineTwo()==null ? null : address.getLineTwo().getValue() );
+		this.setAddressLine3( address.getLineThree()==null ? null : address.getLineThree().getValue() );
+	}
+	
 	public TradeAddress(String countryCode, String postalCode, String city, String street) {
 		this(countryCode, null, postalCode, city, street, null);
 	}
@@ -139,10 +166,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	@Override
 	public String getCountrySubdivision() {
 		IDType region = super.getCountrySubDivisionID();
-		if(region==null) {
-			return null;
-		}
-		return region.getValue();
+		return region==null ? null : region.getValue();
 	}
 
 	@Override

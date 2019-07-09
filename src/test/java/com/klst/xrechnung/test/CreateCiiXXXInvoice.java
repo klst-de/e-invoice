@@ -45,6 +45,9 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setBuyerReference(testDoc.getBuyerReferenceValue());
 		
 		makeOptionals(cii);
+		
+		cii.setSellerParty(testDoc.getSellerParty()); // statt makeSellerGroup(cii);
+		cii.setBuyerParty(testDoc.getBuyerParty());
 		// ... TODO
 		return cii;
 	}

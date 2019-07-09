@@ -47,6 +47,14 @@ public class Party extends PartyType { // TODO implements ???
 		addLegalEntities(getPartyLegalEntities(party));
 	}
 	
+	/**
+	 * 
+//	 * @param name TODO ====> 
+//	 *                           @param registrationName mandatory, BT-44, R57
+	 * @param name    - BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
+	 * @param address - BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
+	 * @param contact - BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
+	 */
 	public Party(String name, Address address, Contact contact) {
 		this();
 		addName(name);
@@ -121,7 +129,7 @@ public class Party extends PartyType { // TODO implements ???
 	//                "Seller tax registration identifier" (BT-32) 
 	//                oder "SELLER TAX REPRESENTATIVE PARTY" (BG-11) übermittelt werden. 
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.
-	public void addPartyTaxScheme(String companyId)  {
+	public void addPartyTaxID(String companyId)  {
 		if(companyId==null) return;
 		List<PartyTaxSchemeType> partyTaxSchemeList = super.getPartyTaxScheme();
 		PartyTaxSchemeType partyTaxScheme = new PartyTaxSchemeType();
@@ -142,7 +150,7 @@ public class Party extends PartyType { // TODO implements ???
 		partyTaxSchemes.forEach(partyTaxScheme -> {
 //			String taxScheme = partyTaxScheme==null ? null : partyTaxScheme.get(TaxSchemeType.class); // wird immer weggeworfen???????
 			String companyId = partyTaxScheme==null ? null : partyTaxScheme.get(CompanyIDType.class);
-			addPartyTaxScheme(companyId);
+			addPartyTaxID(companyId);
 		});
 	}
 	public List<Map<Object,String>> getTaxSchemes() { 
@@ -174,9 +182,9 @@ public class Party extends PartyType { // TODO implements ???
 	/**
 	 * add LegalEntities for seller or buyer party
 	 * 
-	 * @param registrationName mandatory
-	 * @param companyId optional / legal registration identifier, BT-30
-	 * @param companyLegalForm optional / additional legal information, BT-33
+	 * @param registrationName mandatory, BT-27/BT-44
+	 * @param companyId optional / legal registration identifier, BT-30/BT-45
+	 * @param companyLegalForm optional / additional legal information, BT-33/BT-46
 	 */
 	public void addLegalEntities(String name, String companyId, String companyLegalForm)  {
 		List<PartyLegalEntityType> partyLegalEntities = super.getPartyLegalEntity();

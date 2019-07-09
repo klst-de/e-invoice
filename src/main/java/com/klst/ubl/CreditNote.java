@@ -375,7 +375,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	
 	public void setSellerTaxCompanyId(String taxCompanyId) {
 		Party party = getSellerParty();
-		party.addPartyTaxScheme(taxCompanyId);
+		party.addPartyTaxID(taxCompanyId);
 	}
 	
 	public void setSellerParty(Party party) {
@@ -403,7 +403,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 
 	public void setBuyerTaxCompanyId(String taxCompanyId) {
 		Party party = getBuyerParty();
-		party.addPartyTaxScheme(taxCompanyId);
+		party.addPartyTaxID(taxCompanyId);
 	}
 	public void setBuyerParty(Party party) {
 		CustomerPartyType customerparty = new CustomerPartyType();

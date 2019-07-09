@@ -766,7 +766,7 @@ SELLER CONTACT                              BG-6                        1
 	 * Seller (AccountingSupplierParty)
 	 * Seller is mandatory information and provided in ubl element cac:AccountingSupplierParty
 	 * 
-	 * @param sellerRegistrationName mandatory BT-27 : The full formal name by which the Seller is registered 
+	 * @param registrationName mandatory BT-27 : The full formal name by which the Seller is registered 
 	 *        in the national registry of legal entities or as a Taxable person or otherwise trades as a person or persons.
 	 * @param postalAddress mandatory group BG-5/R53 : A group of business terms providing information about the address of the Seller.
               Sufficient components of the address are to be filled to comply with legal requirements.
@@ -774,10 +774,10 @@ SELLER CONTACT                              BG-6                        1
 	 * @param companyId optional / Seller legal registration identifier, BT-30/R52
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
 	 */
-	public void setSeller(String sellerRegistrationName, Address address, Contact contact, 
+	public void setSeller(String registrationName, Address address, Contact contact, 
 			String companyId, String companyLegalForm) {
 		Party party = new Party(null, address, contact);
-		party.addLegalEntities(sellerRegistrationName, companyId, companyLegalForm);
+		party.addLegalEntities(registrationName, companyId, companyLegalForm); // BT-27, BT-30 optional, BT-33 optional
 		setSellerParty(party);
 	}
 	
@@ -791,7 +791,7 @@ SELLER CONTACT                              BG-6                        1
 	 */
 	public void setSellerTaxCompanyId(String taxCompanyId) {
 		Party party = getSellerParty();
-		party.addPartyTaxScheme(taxCompanyId);
+		party.addPartyTaxID(taxCompanyId);
 	}
 	
 	/**
@@ -881,13 +881,13 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 *  Buyer (AccountingCustomerParty)
 	 *  Buyer is mandatory information and provided in element cac:AccountingCustomerParty
 	 * 
-	 * @param byuerRegistrationName mandatory, BT-44, R57
+	 * @param registrationName mandatory, BT-44, R57
 	 * @param BUYER POSTAL ADDRESS mandatory, BG-8, R53
 	 * @param BUYER CONTACT optional, BG-9, R57
 	 */
-	public void setBuyer(String byuerRegistrationName, Address address, Contact contact) {
+	public void setBuyer(String registrationName, Address address, Contact contact) {
 		Party party = new Party(null, address, contact);
-		party.addLegalEntities(byuerRegistrationName, null, null); // BT-44, BT-45 optional, BT-46 optional
+		party.addLegalEntities(registrationName, null, null); // BT-44, BT-45 optional, BT-46 optional
 		setBuyerParty(party);
 	}
 
@@ -904,7 +904,7 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 */
 	public void setBuyerTaxCompanyId(String taxCompanyId) {
 		Party party = getBuyerParty();
-		party.addPartyTaxScheme(taxCompanyId);
+		party.addPartyTaxID(taxCompanyId);
 	}
 	
 	/**
