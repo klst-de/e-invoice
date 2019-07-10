@@ -8,8 +8,7 @@ import java.util.logging.Logger;
 
 import com.klst.cius.CoreInvoice;
 import com.klst.cius.DocumentTotals;
-import com.klst.cius.IContact;
-import com.klst.cius.PostalAddress;
+import com.klst.ubl.Party;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansCode;
@@ -36,8 +35,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeContactType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePriceType;
@@ -169,9 +166,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	@Override
 	public void setId(String id) {
 		ExchangedDocumentType ed = this.getExchangedDocument();
-		IDType mID = new IDType();
-		mID.setValue(id);
-		ed.setID(mID);
+		ed.setID(newIDType(id, null)); // null : No identification scheme is to be used.
 	}
 	
 	@Override
@@ -402,9 +397,7 @@ DueDateDateTime Fälligkeitsdatum
 		if(description==null) {
 			LOG.warning("text==null");
 		} else {
-			TextType text = new TextType();
-			text.setValue(description);
-			tradePaymentTerms.getDescription().add(text); // returns List<TextType>
+			tradePaymentTerms.getDescription().add(newTextType(description)); // returns List<TextType>
 		}
 		if(ts==null) {
 			LOG.warning("Timestamp ts==null");
@@ -445,21 +438,14 @@ DueDateDateTime Fälligkeitsdatum
 		return textList.isEmpty() ? null : textList.get(0).getValue();
 	}
 
-/*
-
-1 .. 1 SupplyChainTradeTransaction Gruppierung der Informationen zum Geschäftsvorfall
-1 .. 1 ApplicableHeaderTradeAgreement Gruppierung der Vertragsangaben
-0 .. 1 BuyerReference Referenz des Käufers BT-10
- 
- */
+	/* EN16931-ID: 	BT-10
+	 * (non-Javadoc)
+	 * @see com.klst.cius.CoreInvoice#setBuyerReference(java.lang.String)
+	 */
 	@Override
 	public void setBuyerReference(String reference) {
-		TextType text = new TextType();
-		text.setValue(reference);
-		
-		// headerTradeAgreement cachen wg SellerTradeParty , ...
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setBuyerReference(text);
+		headerTradeAgreement.setBuyerReference(newTextType(reference));
 		
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
 		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
@@ -486,10 +472,8 @@ DueDateDateTime Fälligkeitsdatum
 	@Override
 	public void setOrderReferenceID(String docRefId) {
 		if(docRefId==null) return; // optional
-		IDType iDTyp = new IDType();
-		iDTyp.setValue(docRefId);
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(iDTyp);
+		referencedDocument.setIssuerAssignedID(newIDType(docRefId, null)); // null : No identification scheme
 		
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
 		headerTradeAgreement.setSellerOrderReferencedDocument(referencedDocument);
@@ -546,9 +530,7 @@ DueDateDateTime Fälligkeitsdatum
 			note.setSubjectCode(code); //  z.B ADU
 		}
 		List<TextType> textList = note.getContent();
-		TextType text = new TextType();
-		text.setValue(noteContent);
-		textList.add(text);
+		textList.add(newTextType(noteContent));
 		noteList.add(note);
 		return noteList;
 	}
@@ -590,18 +572,15 @@ DueDateDateTime Fälligkeitsdatum
 		ExchangedDocumentContextType exchangedDocumentContext = new ExchangedDocumentContextType();
 		List<DocumentContextParameterType> documentContextParameterList = exchangedDocumentContext.getGuidelineSpecifiedDocumentContextParameter();
 		DocumentContextParameterType documentContextParameter = new DocumentContextParameterType();
-		IDType iDTyp = new IDType();
-		iDTyp.setValue(customization);
-		iDTyp.setSchemeID("XRECHNUNG");
-		documentContextParameter.setID(iDTyp);
+		documentContextParameter.setID(newIDType(customization, "XRECHNUNG"));
+
 		documentContextParameterList.add(documentContextParameter);
 		if(profile==null) {
 			// profileIDType ist optional
 		} else { 
 			List<DocumentContextParameterType> dcpList = exchangedDocumentContext.getBusinessProcessSpecifiedDocumentContextParameter();
 			DocumentContextParameterType dcp = new DocumentContextParameterType();
-			IDType iDProf = new IDType();
-			iDProf.setValue(profile);
+			dcp.setID(newIDType(profile, null)); // null : No identification scheme
 			dcpList.add(dcp);
 		}
 		this.setExchangedDocumentContext(exchangedDocumentContext);
@@ -657,10 +636,8 @@ DueDateDateTime Fälligkeitsdatum
 	}
 	@Override
 	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts) {
-		IDType mID = new IDType();
-		mID.setValue(docRefId);
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(mID);
+		referencedDocument.setIssuerAssignedID(newIDType(docRefId, null)); // null : No identification scheme
 		FormattedDateTimeType dateTime = newFormattedDateTimeType(ts);
 		if(dateTime!=null) referencedDocument.setFormattedIssueDateTime(dateTime);
 
@@ -810,16 +787,67 @@ DueDateDateTime Fälligkeitsdatum
 
 	 */
 
-// --------------------------------
+	/* PAYEE                                       BG-10                       0..1
+	 * Eine Gruppe von Informationselementen, die Informationen über den Zahlungsempfänger liefern. 
+	 * Die Gruppe wird genutzt, wenn der Zahlungsempfänger nicht mit dem Verkäufer identisch ist.
+	 */
+	public void setPayeeParty(Party party) {
+// TODO		LOG.warning(NOT_IMPEMENTED); 
+	}
+	
+	/* SELLER TAX REPRESENTATIVE PARTY             BG-11                       0..1
+	 * Eine Gruppe von Informationselementen, die Informationen über den Steuervertreter des Verkäufers liefern.
+	 */
+	public void setSellerTaxRepresentativeParty(Party party) {
+// TODO		LOG.warning(NOT_IMPEMENTED);
+	}
+
+	/* DELIVERY INFORMATION                        BG-13                       0..1
+	 * Eine Gruppe von Informationselementen, die Informationen darüber liefern, 
+	 * wo und wann die in Rechnung gestellten Waren und Dienstleistungen geliefert bzw. erbracht werden.
+	 */
 	/**
-	 * Adds a mandatory PAYMENT INSTRUCTIONS Group with ibanlAccount as CREDIT TRANSFER
+	 * DELIVERY INFORMATION
+	 * <p>
+	 * A group of business terms providing information about where and when the goods and services invoiced are delivered.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>ID: BG-13
+	 * <br>Req.ID: R31, R32, R57
+	 */
+// TODO
+	
+// --------------------------------
+	/** 
+	 * mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER
 	 * 
-	 * @param enum paymentMeansCode, use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
+	 * @param enum paymentMeansCode, BT-81 use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
 	 * @param String iban to create ibanlAccount element
-	 * @param String remittanceInformation optional
-	 * @return paymentMeansList with minimum 1 element
+	 * TODO BT-82 ++ 0..1 Payment means text
+	 * @param String remittanceInformation BT-83 optional
+//	 * @return paymentMeansList with minimum 1 element
 	 */
 /*
+0 .. n SpecifiedTradeSettlementPaymentMeans Zahlungsanweisungen               BG-16 xs:sequence 
+1 .. 1 TypeCode Code für die Zahlungsart                                      BT-81 
+0 .. 1 Information Text zur Zahlungsart                                       BT-82 
+0 .. 1 ApplicableTradeSettlementFinancialCard Informationen zur Zahlungskarte BG-18 xs:sequence 
+1 .. 1 ID Zahlungskartennummer                                                BT-87 
+0 .. 1 CardholderName Name des Zahlungskarteninhabers                         BT-88 
+0 .. 1 PayerPartyDebtorFinancialAccount Bankinstitut des Käufers xs:sequence 
+1 .. 1 IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos         BG-19/ BT-91 
+0 .. 1 PayeePartyCreditorFinancialAccount Überweisung                         BG-17 xs:sequence 
+0 .. 1 IBANID Kennung des Zahlungskontos                                      BT-84 
+0 .. 1 AccountName Name des Zahlungskontos                                    BT-85 
+0 .. 1 ProprietaryID Nationale Kontonummer (nicht für SEPA)                   BT-84-0 
+0 .. 1 PayeeSpecifiedCreditorFinancialInstitution Bankinstitut des Verkäufers xs:sequence 
+1 .. 1 BICID Kennung des Zahlungsdienstleisters                               BT-86
+
+0 .. 1 SupplyChainTradeTransaction Gruppierung der Informationen zum Geschäftsvorfall
+1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich xs:sequence 
+0 .. 1 CreditorReferenceID Kennung des Gläubigers                             BG-19/ BT-90 
+0 .. 1 PaymentReference Verwendungszweck                                      BT-83
+
     <ram:ApplicableHeaderTradeSettlement>
         <ram:TaxCurrencyCode>EUR</ram:TaxCurrencyCode>
         <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>  <<======== setPaymentCurrencyCode
@@ -852,48 +880,59 @@ DueDateDateTime Fälligkeitsdatum
 	CreditorFinancialAccountType makeCreditTransfer(IBANId iban) {
 //	FinancialAccountType makeCreditTransfer(IbanId iban) {
 		CreditorFinancialAccountType financialAccount = new CreditorFinancialAccountType();
-		
-		IDType ibanID = new IDType();
-		ibanID.setValue(iban.getValue());
-		ibanID.setSchemeID(iban.getSchemeID()); // so nicht in XRechnung-v1-2-0.pdf dokumentiert
-		financialAccount.setIBANID(ibanID);
-		
+		financialAccount.setIBANID(newIDType(iban.getValue(), iban.getSchemeID()));
 		return financialAccount;
 	}
 	public CreditorFinancialAccountType makeCreditTransfer(String account, String accountName, BICId bic) {
 			CreditorFinancialAccountType financialAccount = new CreditorFinancialAccountType();
-			
-			IDType ibanID = new IDType();
-			ibanID.setValue(account);
-			financialAccount.setIBANID(ibanID);
-			
-			TextType name = new TextType();
-			name.setValue(accountName);
-			financialAccount.setAccountName(name);
-			
-			IDType bicID = new IDType();
-			bicID.setValue(bic.getValue());
-			bicID.setSchemeID(bic.getSchemeID());
-			financialAccount.setProprietaryID(bicID);
+			financialAccount.setIBANID(newIDType(account, null)); // null : No identification scheme
+			financialAccount.setAccountName(newTextType(accountName));
+			financialAccount.setProprietaryID(newIDType(bic.getValue(), bic.getSchemeID()));
 			return financialAccount;
 		}
 	
 	/**
-	 * Adds a mandatory PAYMENT INSTRUCTIONS Group with ibanlAccount as CREDIT TRANSFER
+	 * Adds a mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER
 	 * 
-	 * @param enum paymentMeansCode, use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
+	 * @param enum paymentMeansCode, BT-81 use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
 	 * @param IBANId iban to create ibanlAccount element
 	 * @param String remittanceInformation optional
-	 * @return List with minimum 1 element
+//	 * @return List with minimum 1 element
 	 */
+	public void setPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {
+//		ubl FinancialAccountType ibanlAccount = new CreditTransfer(iban); // ubl CreditTransfer extends FinancialAccountType OASIS
+//		ubl PaymentMeansType paymentMeans = new PaymentInstruction(paymentMeansCode, financialAccount, remittanceInformation);
+		//in cii
+		TradeSettlementPaymentMeansType tradeSettlementPaymentMeans;
+		//= new TradeSettlementPaymentMeans(); extends TradeSettlementPaymentMeansType -- symetrisch zu PaymentInstruction extends PaymentMeansType
+		return; // TODO addPaymentInstructions(paymentMeansCode, ibanlAccount, remittanceInformation);
+	}
+	public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType {
+		
+		TradeSettlementPaymentMeans() {
+			super();
+		}
+		// paymentMeansCode                            BT-81
+		// FinancialAccountType financialAccount     ???
+		// Payment means text                          BT-82 Text                  0..1 TODO
+		// Remittance information                      BT-83 Text                  0..1 optional
+		TradeSettlementPaymentMeans(PaymentMeansCode paymentMeansCode, String text, String remittanceInformation) {
+			this();
+			PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
+			pmc.setValue(paymentMeansCode.getValueAsString());
+			super.setTypeCode(pmc);
+			
+			super.getInformation().add(newTextType(text)); // BT-82
+			// remittanceInformation ist nicht in TradeSettlementPaymentMeans, sondern in HeaderTradeSettlementType
+		}
+	}
 	public List<TradeSettlementPaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {
-//	public List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, IbanId iban, String remittanceInformation) {
 		CreditorFinancialAccountType creditorFinancialAccount = makeCreditTransfer(iban);
 		return addPaymentInstructions(paymentMeansCode, creditorFinancialAccount, remittanceInformation);
 	}
 
 	/**
-	 * Adds a mandatory PAYMENT INSTRUCTIONS Group
+	 * Adds a mandatory Group BG-16 PAYMENT INSTRUCTIONS
 	 * 
 	 * @param enum paymentMeansCode
 	 * @param financialAccount
@@ -905,14 +944,15 @@ DueDateDateTime Fälligkeitsdatum
 		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
 		
 		TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = new TradeSettlementPaymentMeansType();
-		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); 
+		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
 		pmc.setValue(paymentMeansCode.getValueAsString());
 		tradeSettlementPaymentMeans.setTypeCode(pmc);
+
+		// falsch - das ist BT-82
+//		List<TextType> informationList = tradeSettlementPaymentMeans.getInformation();
+//		informationList.add(newTextType(remittanceInformation));
+		applicableHeaderTradeSettlement.getPaymentReference().add(newTextType(remittanceInformation)); // BT-82
 		
-		List<TextType> informationList = tradeSettlementPaymentMeans.getInformation();
-		TextType text = new TextType();
-		text.setValue(remittanceInformation);
-		informationList.add(text);
 
 		tradeSettlementPaymentMeans.setPayeePartyCreditorFinancialAccount(financialAccount);
 		List<TradeSettlementPaymentMeansType> tradeSettlementPaymentMeansList = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans();
@@ -934,57 +974,6 @@ either the Payment due date (BT-9) or the Payment terms (BT-20) shall be present
 		text.setValue(paymentTerms);
 		tradePaymentTerm.getDescription().add(text);
 		applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().add(tradePaymentTerm);
-	}
-
-	/**
-	 *  Buyer (AccountingCustomerParty)
-	 *  Buyer is mandatory information and provided in element cac:AccountingCustomerParty
-	 *  
-	 * @param buyerName mandatory
-	 * @param postalAddress mandatory
-	 * @param contact optinal
-	 */
-	public void setBuyer(String buyerName, PostalAddress postalAddress, IContact contact) {
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement(supplyChainTradeTransaction);
-		
-		TradePartyType tradePartyType = new TradePartyType();
-		TextType text = new TextType();
-		text.setValue(buyerName);
-		tradePartyType.setName(text);
- 
-		tradePartyType.setPostalTradeAddress((TradeAddressType)postalAddress);
-		
-		if(contact!=null) { // optional
-			List<TradeContactType> contacts = tradePartyType.getDefinedTradeContact();
-			contacts.add(new TradeContact(contact));
-		}
-		
-//		List<PartyIdentificationType> partyIdentifications = party.getPartyIdentification();
-//		PartyIdentificationType partyIdentification = new PartyIdentificationType();
-//		IDType buyerID = new IDType();
-//		buyerID.setValue("BuyerID");                                                 // TODO 
-//		partyIdentification.setID(buyerID);
-//		partyIdentifications.add(partyIdentification);
-		
-/*
-         <element name="ID" type="{urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100}IDType" maxOccurs="unbounded" minOccurs="0"/>
-         <element name="GlobalID" type="{urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100}IDType" maxOccurs="unbounded" minOccurs="0"/>
-         <element name="Name" type="{urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100}TextType" minOccurs="0"/>
-         <element name="RoleCode" type="{urn:un:unece:uncefact:data:standard:QualifiedDataType:100}PartyRoleCodeType" maxOccurs="unbounded" minOccurs="0"/>
-         <element name="Description" type="{urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100}TextType" maxOccurs="unbounded" minOccurs="0"/>
-         <element name="SpecifiedLegalOrganization" type="{urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100}LegalOrganizationType" minOccurs="0"/>
-         <element name="DefinedTradeContact" type="{urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100}TradeContactType" maxOccurs="unbounded" minOccurs="0"/>
-         <element name="PostalTradeAddress" type="{urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100}TradeAddressType" minOccurs="0"/>
-         <element name="URIUniversalCommunication" type="{urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100}UniversalCommunicationType" maxOccurs="unbounded" minOccurs="0"/>
-         <element name="SpecifiedTaxRegistration" type="{urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100}TaxRegistrationType" maxOccurs="unbounded" minOccurs="0"/>
-         <element name="EndPointURIUniversalCommunication" type="{urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100}UniversalCommunicationType" minOccurs="0"/>
-         <element name="LogoAssociatedSpecifiedBinaryFile" type="{urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100}SpecifiedBinaryFileType" maxOccurs="unbounded" minOccurs="0"/>
- */
-		headerTradeAgreement.setBuyerTradeParty(tradePartyType);
-		
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction); 
 	}
 
 	// TODO Bauselle
@@ -1209,9 +1198,7 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 //		invoiceLine.setSpecifiedLineTradeSettlement(value);
 		
 		DocumentLineDocumentType documentLineDocument = new DocumentLineDocumentType();
-		IDType lineID = new IDType();
-		lineID.setValue(identifier);
-		documentLineDocument.setLineID(lineID);
+		documentLineDocument.setLineID(newIDType(identifier, null)); // null : No identification scheme
 		
 		// TODO optional noteText
 		NoteType note = new NoteType();
@@ -1244,9 +1231,7 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 		amounts.add(amount);
 		lineTradeAgreement.setNetPriceProductTradePrice(tradePrice);
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		IDType orderlineID = new IDType();
-		orderlineID.setValue("TODO orderlineID"); // TODO
-		referencedDocument.setLineID(orderlineID);
+		referencedDocument.setLineID(newIDType("TODO orderlineID", null)); // null : No identification scheme   -- TODO
 		lineTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument); 
 		invoiceLine.setSpecifiedLineTradeAgreement(lineTradeAgreement); 
 		
@@ -1336,5 +1321,19 @@ Pfad: /rsm:CrossIndustryInvoice/rsm:SupplyChainTradeTransaction[1]/ram:IncludedS
 		}
 		return headerTradeAgreement;
 	}	
+
+	// ----------------- gemeinsam mit TradeParty
+	static IDType newIDType(String value, String schemeID) {
+		IDType ID = new IDType();
+		ID.setValue(value);
+		ID.setSchemeID(schemeID);
+		return ID;
+	}
+
+	static TextType newTextType(String value) {
+		TextType text = new TextType();
+		text.setValue(value);
+		return text;
+	}
 
 }

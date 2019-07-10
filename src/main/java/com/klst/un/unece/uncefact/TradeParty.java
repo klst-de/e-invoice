@@ -59,7 +59,7 @@ public class TradeParty extends TradePartyType{
 	 */
 	public TradeParty(String name, TradeAddress address, TradeContact contact, String companyId, String companyLegalForm) {
 		this();
-		if(name!=null) super.setName(newTextType(name));
+		if(name!=null) super.setName(CrossIndustryInvoice.newTextType(name));
 		if(address!=null) setAddress(address);
 		if(contact!=null) setContact(contact);
 /*
@@ -77,19 +77,18 @@ public class TradeParty extends TradePartyType{
 		if(companyId!=null) {
 			LegalOrganizationType legalOrganization = new LegalOrganizationType();
 			String schemeID = null;
-			legalOrganization.setID((newIDType(companyId,schemeID)));
+			legalOrganization.setID(CrossIndustryInvoice.newIDType(companyId,schemeID));
 			super.setSpecifiedLegalOrganization(legalOrganization);
 		}
 		
 		if(companyLegalForm!=null) {
-//			List<TextType> textList = super.getDescription();
-			super.getDescription().add(newTextType(companyLegalForm));
+			super.getDescription().add(CrossIndustryInvoice.newTextType(companyLegalForm));
 		}
 	}
 
 	// BT-70 PartyName/shipToTradeName
 	public void addName(String shipToTradeName) { // !wie Name
-		super.setName(newTextType(shipToTradeName));
+		super.setName(CrossIndustryInvoice.newTextType(shipToTradeName));
 	}
 
 	// PostalAddress
@@ -173,7 +172,7 @@ public class TradeParty extends TradePartyType{
 		if(companyId==null) return;
 		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
 		TaxRegistrationType taxRegistration = new TaxRegistrationType();
-		taxRegistration.setID(newIDType(companyId,schemeID));
+		taxRegistration.setID(CrossIndustryInvoice.newIDType(companyId,schemeID));
 		taxRegistrationList.add(taxRegistration);
 	}
 	public void addPartyTaxID(String companyId)  {
@@ -206,16 +205,4 @@ public class TradeParty extends TradePartyType{
 		return resultList;
 	}
 	
-	IDType newIDType(String value, String schemeID) {
-		IDType ID = new IDType();
-		ID.setValue(value);
-		ID.setSchemeID(schemeID);
-		return ID;
-	}
-
-	TextType newTextType(String value) {
-		TextType text = new TextType();
-		text.setValue(value);
-		return text;
-	}
 }
