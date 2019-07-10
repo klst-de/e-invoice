@@ -39,23 +39,23 @@ Die Gruppe ist alternativ zu „CREDIT TRANSFER“ (BG-17) oder zu „PAYMENT CA
 anzugeben, wenn ein Mandat erteilt wurde und der Rechnungsbetrag per Lastschrift beglichen werden soll.
 
  */
-public class PaymentInstruction extends PaymentMeansType {
+public class PaymentMeans extends PaymentMeansType {
 
-	PaymentInstruction() {
+	PaymentMeans() {
 		super();
 	}
 	
 	// copy ctor
-	public PaymentInstruction(PaymentMeansType paymentMeans) {
+	public PaymentMeans(PaymentMeansType paymentMeans) {
 		this(PaymentMeansCode.valueOf(paymentMeans.getPaymentMeansCode()), paymentMeans.getPayeeFinancialAccount());
 		setPaymentIDs(paymentMeans.getPaymentID());
 	}
 	
-	public PaymentInstruction(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount) {
+	public PaymentMeans(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount) {
 		this(paymentMeansCode, financialAccount, null);
 	}
 	
-	PaymentInstruction(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation) {
+	PaymentMeans(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation) {
 		this();
 		
 		PaymentMeansCodeType paymentMeansCodeValue = new PaymentMeansCodeType();

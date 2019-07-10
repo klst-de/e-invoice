@@ -1056,19 +1056,19 @@ anzugeben, wenn ein Mandat erteilt wurde und der Rechnungsbetrag per Lastschrift
 	public List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation) {
 		List<PaymentMeansType> paymentMeansList = this.getPaymentMeans();
 		LOG.info("paymentMeansCode:"+paymentMeansCode.toString() + ", paymentMeansList size="+paymentMeansList.size()); // == 0 beim ersten mal	
-		PaymentMeansType paymentMeans = new PaymentInstruction(paymentMeansCode, financialAccount, remittanceInformation);
+		PaymentMeansType paymentMeans = new PaymentMeans(paymentMeansCode, financialAccount, remittanceInformation);
 		paymentMeansList.add(paymentMeans);
 		return paymentMeansList;
 	}
 
-	public List<PaymentInstruction> getPaymentInstructions() {
+	public List<PaymentMeans> getPaymentInstructions() {
 		return getPaymentInstructions(this);
 	}
-	static List<PaymentInstruction> getPaymentInstructions(InvoiceType doc) {
+	static List<PaymentMeans> getPaymentInstructions(InvoiceType doc) {
 		List<PaymentMeansType> paymentMeansList = doc.getPaymentMeans();
-		List<PaymentInstruction> result = new ArrayList<PaymentInstruction>(paymentMeansList.size());
+		List<PaymentMeans> result = new ArrayList<PaymentMeans>(paymentMeansList.size());
 		paymentMeansList.forEach(paymentMeans -> {
-			result.add(new PaymentInstruction(paymentMeans));
+			result.add(new PaymentMeans(paymentMeans));
 		});
 		return result;
 	}

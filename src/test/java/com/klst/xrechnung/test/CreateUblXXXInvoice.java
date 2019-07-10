@@ -16,7 +16,7 @@ import com.klst.ubl.FinancialAccount;
 import com.klst.ubl.Invoice;
 import com.klst.ubl.InvoiceLine;
 import com.klst.ubl.Party;
-import com.klst.ubl.PaymentInstruction;
+import com.klst.ubl.PaymentMeans;
 import com.klst.ubl.PaymentTerms;
 import com.klst.ubl.VatCategory;
 import com.klst.un.unece.uncefact.Amount;
@@ -101,7 +101,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makePaymentGroup(Invoice ublInvoice) {
-		PaymentInstruction paymentInstruction = testDoc.getPaymentInstructions().get(0);
+		PaymentMeans paymentInstruction = testDoc.getPaymentInstructions().get(0);
 		PaymentMeansCode paymentMeansCode = paymentInstruction.getPaymentMeans();
 		if(paymentMeansCode==PaymentMeansCode.CreditTransfer) {
 			IBANId iban = new IBANId(paymentInstruction.getFinancialAccount().getID().getValue());
@@ -252,11 +252,11 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					buyerContact = new Contact("nix", "0", "nix@nix.nix");
 				}
 				
-				List<PaymentInstruction> paymentInstructions = cmInvoice.getPaymentInstructions();
-				PaymentInstruction paymentInstruction = null;
+				List<PaymentMeans> paymentInstructions = cmInvoice.getPaymentInstructions();
+				PaymentMeans paymentInstruction = null;
 				if(paymentInstructions.isEmpty()) {
 					LOG.warning("paymentInstructions is empty");
-					paymentInstruction = new PaymentInstruction(PaymentMeansCode.InCash, new FinancialAccount(new IBANId("nix")));
+					paymentInstruction = new PaymentMeans(PaymentMeansCode.InCash, new FinancialAccount(new IBANId("nix")));
 				} else {
 					paymentInstruction = paymentInstructions.get(0); // first
 				}
