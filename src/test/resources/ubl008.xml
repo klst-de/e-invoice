@@ -11,6 +11,9 @@
     <cbc:IssueDate>2015-01-09</cbc:IssueDate>
     <cbc:CreditNoteTypeCode>326</cbc:CreditNoteTypeCode>
     <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
+	
+	<!-- BuyerReference wg. val-sch.2.1 	BR-DE-15 	error 	[BR-DE-15] Das Element "Buyer reference" (BT-10) muss übermittelt werden. -->
+    <cbc:BuyerReference>A test buyer reference</cbc:BuyerReference>
 
     <cac:AccountingSupplierParty>
         <cac:Party>
