@@ -89,9 +89,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	
 	// wie BT-1  Identifier
 	public void setId(String id) {
-		IDType mID = new IDType();
-		mID.setValue(id);
-		this.setID(mID);
+		this.setID(Invoice.newIDType(id, null)); // null : No identification scheme is to be used.
 	}
 	public String getId() {
 		return getId(this);
@@ -218,9 +216,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	public void setOrderReferenceID(String docRefId) {
 		if(docRefId==null) return; // optional
 		OrderReferenceType orderReference = new OrderReferenceType();
-		IDType mID = new IDType();
-		mID.setValue(docRefId);
-		orderReference.setID(mID);
+		orderReference.setID(Invoice.newIDType(docRefId, null)); // null : No identification scheme
 		this.setOrderReference(orderReference);
 	}
 	public String getOrderReferenceID() {

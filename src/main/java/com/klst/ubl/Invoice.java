@@ -174,9 +174,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	 */
 	@Override
 	public void setId(String id) {
-		IDType mID = new IDType();
-		mID.setValue(id);
-		this.setID(mID);
+		this.setID(newIDType(id, null)); // null : No identification scheme is to be used.
 	}
 	
 	@Override
@@ -475,9 +473,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	public void setOrderReferenceID(String docRefId) {
 		if(docRefId==null) return; // optional
 		OrderReferenceType orderReference = new OrderReferenceType();
-		IDType mID = new IDType();
-		mID.setValue(docRefId);
-		orderReference.setID(mID);
+		orderReference.setID(newIDType(docRefId, null)); // null : No identification scheme
 		this.setOrderReference(orderReference);
 	}
 	@Override
@@ -1565,4 +1561,11 @@ Connecting Europe Facility gepflegt und herausgegeben
 		return party.getIContact();
 	}
 	
+	static IDType newIDType(String value, String schemeID) {
+		IDType ID = new IDType();
+		ID.setValue(value);
+		ID.setSchemeID(schemeID);
+		return ID;
+	}
+
 }

@@ -6,10 +6,9 @@ import com.klst.un.unece.uncefact.IBANId;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.BranchType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialInstitutionType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 
-// Gruppe CREDIT TRANSFER
+// Gruppe CREDIT TRANSFER                   BG-17
 /*
 
 Name                                        ID    Semantischer Datentyp Anz. 
@@ -32,7 +31,7 @@ zwingend erforderlich
 • für alle Zahlungen an Bankverbindungen außerhalb des SEPA-Raumes (Code 42 des „Payment means type
 code“ (BT-81)) sind, abhängig vom empfangenden Institut, IBAN bzw. Kontonummer und BIC nötig
 */
-public class CreditTransfer extends FinancialAccountType {
+public class CreditTransfer extends FinancialAccountType { // TODO Umbenennen in FinancialAccount
 
 	CreditTransfer() {
 		super();
@@ -40,18 +39,13 @@ public class CreditTransfer extends FinancialAccountType {
 	
 	public CreditTransfer(IBANId iban) {
 		this();
-		IDType ibanID = new IDType();
-		ibanID.setValue(iban.getValue());
-		ibanID.setSchemeID(iban.getSchemeID()); // so nicht in XRechnung-v1-2-0.pdf dokumentiert
-		super.setID(ibanID);
+		super.setID(Invoice.newIDType(iban.getValue(), iban.getSchemeID()));
 	}
 
 	//TODO besser Klasse Iban als Subklasse von IDType, dto Bic
 	public CreditTransfer(String account, String accountName, BICId bic) {
 		this();
-		IDType accountID = new IDType();
-		accountID.setValue(account);	
-		super.setID(accountID);
+		super.setID(Invoice.newIDType(account, null)); // null : No identification scheme
 		
 		if(accountName!=null) {
 			NameType name = new NameType();
@@ -61,10 +55,7 @@ public class CreditTransfer extends FinancialAccountType {
 		
 		BranchType branch = new BranchType();
 		FinancialInstitutionType financialInstitution = new FinancialInstitutionType();
-		IDType bicID = new IDType();
-		bicID.setValue(bic.getValue());
-		bicID.setSchemeID(bic.getSchemeID());
-		financialInstitution.setID(bicID);
+		financialInstitution.setID(Invoice.newIDType(bic.getValue(), bic.getSchemeID()));
 		branch.setFinancialInstitution(financialInstitution);
 		super.setFinancialInstitutionBranch(branch);		
 	}
