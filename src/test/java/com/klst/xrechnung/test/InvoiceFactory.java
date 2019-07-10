@@ -21,12 +21,12 @@ public abstract class InvoiceFactory {
 
 	public byte[] toUbl() {
 		invoice = makeInvoice();
-		return transformer.fromModel((Invoice)invoice);
+		return transformer.fromModel(invoice);
 	}
 	
 	public byte[] toCii() {
 		invoice = makeInvoice();
-		return transformer.fromModel((CrossIndustryInvoice)invoice);
+		return transformer.fromModel(invoice);
 	}
 	
 	abstract Object makeInvoice();

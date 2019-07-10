@@ -34,7 +34,7 @@ public class CreateUblTest {
 //			"ubl002.xml" , // error tr=val-sch.1.1BR-06error[BR-06]-An Invoice shall contain the Seller name (BT-27).
 			"ubl004.xml" ,
 			"ubl007.xml" ,
-//			"ubl008.xml" , TODO CreditNote
+//			"ubl008.xml" , //TODO CreditNote ist nicht valide: 12 Fehler zu Schematron rules for EN16931 (UBL) (val-sch.1)
 			"01.01a-INVOICE_ubl.xml" ,
 			"01.02a-INVOICE_ubl.xml" ,
 			"01.03a-INVOICE_ubl.xml" ,
@@ -187,9 +187,18 @@ Die für die maschinelle Auswertung des Prüfberichts wesentlichsten Angaben sin
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
     	assertTrue(check(bytes));
+   } // "ubl008.xml"
+    
+	@Test
+    public void ublCreditNote() {
+    	InvoiceFactory factory = new CreateUblXXXInvoice("ubl008.xml");
+    	byte[] bytes = factory.toUbl(); // the xml
+    	String xml = new String(bytes);
+    	LOG.info("xml=\n"+xml);
+    	assertTrue(check(bytes));
    }
     
-    @Test
+//    @Test
     public void ublAll() {
     	for(int i=0; i<UBL_XML.length; i++) {
     		String fileName = UBL_XML[i];

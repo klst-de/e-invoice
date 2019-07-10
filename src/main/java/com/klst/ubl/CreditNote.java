@@ -69,11 +69,13 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));
 		setDocumentCurrency(getDocumentCurrency(doc));
+		LOG.info("alle mandatories - jetzt die optionalen:");
 		setTaxCurrency(getTaxCurrency(doc)); // optional
 		setTaxPointDate(getTaxPointDateAsTimestamp(doc)); // optional
 		setPaymentTermsAndDate(getPaymentTerm(doc), (Timestamp)null); // optional, DueDateAsTimestamp==null
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional
 		setOrderReferenceID(getOrderReferenceID(doc)); // optional
+		LOG.info("alle optionalen.");
 //		addPaymentTerms(doc);
 		addNotes(doc);
 		setSellerParty(getSellerParty(doc));
@@ -84,6 +86,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		setInvoiceTax(getInvoiceTax(doc));
 		addVATBreakDown(doc);
 		addLines(doc);
+		LOG.info("ctor ENDE.");
 	}
 	
 	// wie BT-1  Identifier

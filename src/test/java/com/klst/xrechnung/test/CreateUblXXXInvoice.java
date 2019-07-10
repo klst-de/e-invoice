@@ -9,9 +9,12 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.klst.cius.IContact;
+import com.klst.marshaller.UblCreditNoteTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
 import com.klst.ubl.CommercialInvoice;
 import com.klst.ubl.Contact;
+import com.klst.ubl.CreditNote;
+import com.klst.ubl.CreditNoteLine;
 import com.klst.ubl.FinancialAccount;
 import com.klst.ubl.Invoice;
 import com.klst.ubl.InvoiceLine;
@@ -33,6 +36,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmoun
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
+import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
 public class CreateUblXXXInvoice extends InvoiceFactory {
@@ -43,6 +47,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	
 	private File testFile;
 	private Invoice testDoc;
+	private CreditNote testCreditNote;
 	
 	// ctor
 	public CreateUblXXXInvoice() {
@@ -53,6 +58,13 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		testFile = getTestFile(TESTDIR+ublXml);
 		if(transformer.isValid(testFile)) {
 			testDoc = toModel(testFile);
+		} else {
+			LOG.warning(ublXml + "ist nicht UblInvoice!!!!!!!!!!!!!!!");
+			this.transformer = UblCreditNoteTransformer.getInstance();
+			if(transformer.isValid(testFile)) {
+				testDoc = null;
+				testCreditNote = toModelCreditNote(testFile);
+			}
 		}
 	}
 
@@ -60,8 +72,109 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		return testDoc;
 	}
 		
+	Object makeCreditNote() {
+		CreditNote ublInvoice = new  CreditNote(testCreditNote.getCustomization(), testCreditNote.getProfile(), testCreditNote.getTypeCode());
+		ublInvoice.setId(testCreditNote.getId());
+		ublInvoice.setIssueDate(testCreditNote.getIssueDateAsTimestamp());
+		ublInvoice.setDocumentCurrency(testCreditNote.getDocumentCurrency());
+		ublInvoice.setTaxCurrency(testCreditNote.getTaxCurrency());
+		ublInvoice.setBuyerReference(testCreditNote.getBuyerReferenceValue());
+		
+		LOG.info("makeOptionals...");	
+			ublInvoice.setOrderReferenceID(testCreditNote.getOrderReferenceID());
+			List<String> notes = testCreditNote.getNotes();
+			notes.forEach(note -> {
+				ublInvoice.setNote(note);
+			});
+		LOG.info("finished makeOptionals.");
+		
+		ublInvoice.setSellerParty(testCreditNote.getSellerParty());
+		ublInvoice.setBuyerParty(testCreditNote.getBuyerParty());
+
+//		void makePaymentGroup(Invoice ublInvoice) {
+			PaymentMeans paymentInstruction = testCreditNote.getPaymentInstructions().get(0);
+			PaymentMeansCode paymentMeansCode = paymentInstruction.getPaymentMeans();
+			if(paymentMeansCode==PaymentMeansCode.CreditTransfer) {
+				IBANId iban = new IBANId(paymentInstruction.getFinancialAccount().getID().getValue());
+				List<String> remittanceInformations = paymentInstruction.getRemittanceInformation();
+				ublInvoice.addPaymentInstructions(paymentMeansCode, iban, remittanceInformations.isEmpty() ? null : remittanceInformations.get(0));
+			} else {
+				LOG.warning("TODO:"+paymentMeansCode);
+			}
+			ublInvoice.setPaymentTermsAndDate(testCreditNote.getPaymentTerm(), testCreditNote.getDueDateAsTimestamp());
+		LOG.info("finished PaymentGroup.");
+
+//		void makesDocumentTotalsGroup(Invoice ublInvoice) {
+			ublInvoice.setDocumentTotals(testCreditNote.getInvoiceLineNetTotal(), 
+					testCreditNote.getInvoiceTotalTaxExclusive(), 
+					testCreditNote.getInvoiceTotalTaxInclusive(), testCreditNote.getDuePayable());
+			ublInvoice.setInvoiceTax(testCreditNote.getInvoiceTax());
+		LOG.info("finished DocumentTotalsGroup.");
+		
+		makeVatBreakDownGroup2(ublInvoice);
+		
+//		 LineGroup 
+		List<CreditNoteLine> invoiceLines = testCreditNote.getLines();
+		LOG.info("LineGroup starts for "+invoiceLines.size() + " lines.");
+		invoiceLines.forEach(testLine -> {
+			List<String> itemDescriptions = testLine.getItemDescriptions();
+			CreditNoteLine invoiceLine = new CreditNoteLine(testLine.getId(), testLine.getQuantity(),
+					testLine.getLineNetAmount(), testLine.getItemNetPrice(), 
+					testLine.getItemName(), testLine.getVatCategory());
+			itemDescriptions.forEach(description -> {
+				invoiceLine.addItemDescription(description);
+			});
+			ublInvoice.addLine(invoiceLine);
+		});
+		LOG.info("LineGroup finished. ");
+
+		return ublInvoice;
+	}
+	void makeVatBreakDownGroup2(CreditNote ublInvoice) {
+		List<Map<Object, Object>> vatBreakDowns = testCreditNote.getVATBreakDown();
+		vatBreakDowns.forEach(vatBreakDown -> {
+			VatCategory vc = (VatCategory) vatBreakDown.get(VatCategory.class);
+//			LOG.info("vc =============================" +vc + " ID.value:"+vc.getID().getValue() +
+//					"TaxCategoryCode:"+vc.getTaxCategoryCode()
+//					);
+			VatCategory vatCategory = null;
+			if(vc.getTaxCategoryCode().equals(TaxCategoryCode.StandardRate.getValue())) {
+				vatCategory = new VatCategory(TaxCategoryCode.StandardRate, vc.getPercent().getValue());
+			} else if(vc.getTaxCategoryCode().equals(TaxCategoryCode.ServicesOutsideScope.getValue())) {
+				vatCategory = new VatCategory(TaxCategoryCode.ServicesOutsideScope, vc.getPercent().getValue());
+			} else {
+				vatCategory = new VatCategory(TaxCategoryCode.ExemptFromTax, vc.getPercent().getValue());
+				LOG.warning("vatCategory =============================" +vatCategory);
+			}
+			
+			// die optionalen "VAT exemption reason text" und "VAT exemption reason code"
+			List<String> taxExemptionReasonList = (List<String>) vatBreakDown.get(TaxExemptionReasonType.class);
+			if(taxExemptionReasonList==null) {
+				LOG.info("taxExemptionReasonList =============================" +taxExemptionReasonList);
+			} else for(int l=0; l<taxExemptionReasonList.size(); l++){
+				
+				LOG.warning("TaxExemptionReason TODO ============================= #" +l);
+				vatCategory.addTaxExemptionReason(taxExemptionReasonList.get(l));
+			}
+			String reasonCode = (String) vatBreakDown.get(TaxExemptionReasonCodeType.class);
+			if(reasonCode!=null) {
+				vatCategory.setTaxExemptionReasonCode(reasonCode);
+			}
+			
+			LOG.info("vatCategory =============================" +vatCategory);
+			ublInvoice.addVATBreakDown( (Amount) vatBreakDown.get(TaxableAmountType.class), 
+					(Amount) vatBreakDown.get(TaxAmountType.class), 
+					vatCategory);
+			
+		});
+		LOG.info("finished. "+vatBreakDowns.size() + " vatBreakDowns.");
+	}
+
 	@Override
-	Invoice makeInvoice() {
+	Object makeInvoice() {
+		if(testDoc==null) {
+			return makeCreditNote();
+		}
 		Invoice ublInvoice = new CommercialInvoice(testDoc.getCustomization(), testDoc.getProfile());
 		ublInvoice.setId(testDoc.getId());
 		ublInvoice.setIssueDate(testDoc.getIssueDateAsTimestamp());
@@ -184,6 +297,19 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		return file;
 	}
 	
+	private CreditNote toModelCreditNote(File xmlfile) {
+		CreditNoteType invoice;
+		CreditNote creditNote = null;
+		try {
+			InputStream is = new FileInputStream(xmlfile);
+			invoice = transformer.toModel(is);
+			creditNote = new CreditNote(invoice);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			LOG.severe(ex.getMessage());			
+		}
+		return creditNote;
+	}
 	private Invoice toModel(File xmlfile) {
 		InvoiceType invoice;
 		CommercialInvoice cmInvoice = null;
@@ -195,36 +321,10 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			if(documentNameCode==DocumentNameCode.CommercialInvoice) {
 				cmInvoice = new CommercialInvoice(invoice);
 				
-//				List<Map<Object, String>> sellerLegalEntities = cmInvoice.getSellerLegalEntities();
-//				Map<Object, String> sellerLegalEntity = null;
-//				String sellerRegistrationName = null;
-//				String sellerCompanyID = null;
-//				String sellerCompanyLegalForm = null;
-//				if(sellerLegalEntities.isEmpty()) {
-//					LOG.warning("sellerLegalEntities is empty");
-//				} else {
-//					sellerLegalEntity = sellerLegalEntities.get(0); // first
-//					sellerRegistrationName = sellerLegalEntity.get(RegistrationNameType.class);
-//					sellerCompanyID = sellerLegalEntity.get(CompanyIDType.class);
-//					sellerCompanyLegalForm = sellerLegalEntity.get(CompanyLegalFormType.class);
-//				}
 				String sellerRegistrationName = cmInvoice.getSellerParty().getName();
 				String sellerCompanyID = cmInvoice.getSellerParty().getCompanyID();
 				String sellerCompanyLegalForm = cmInvoice.getSellerParty().getCompanyLegalForm();
 				
-//				List<Map<Object, String>> buyerLegalEntities = cmInvoice.getBuyerLegalEntities();
-//				Map<Object, String> buyerLegalEntity = null;
-//				String buyerRegistrationName = null;
-//				String buyerCompanyID = null;
-//				String buyerCompanyLegalForm = null;
-//				if(buyerLegalEntities.isEmpty()) {
-//					LOG.warning("buyerLegalEntities is empty");
-//				} else {
-//					buyerLegalEntity = buyerLegalEntities.get(0); // first
-//					buyerRegistrationName = buyerLegalEntity.get(RegistrationNameType.class);
-//					buyerCompanyID = buyerLegalEntity.get(CompanyIDType.class);
-//					buyerCompanyLegalForm = buyerLegalEntity.get(CompanyLegalFormType.class);
-//				}
 				String buyerRegistrationName = cmInvoice.getBuyerParty().getName();
 				String buyerCompanyID = cmInvoice.getBuyerParty().getCompanyID();
 				String buyerCompanyLegalForm = cmInvoice.getBuyerParty().getCompanyLegalForm();
@@ -261,14 +361,6 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					paymentInstruction = paymentInstructions.get(0); // first
 				}
 				
-//				List<PaymentTerms> paymentTermsList = cmInvoice.getPaymentTermList();
-//				PaymentTerms paymentTerms = null;
-//				if(paymentTermsList.isEmpty()) {
-//					LOG.severe("paymentTermsList is empty");
-//					paymentTerms = new PaymentTerms("nix");
-//				} else {
-//					paymentTerms = paymentTermsList.get(0); // first
-//				}
 				String paymentTerm = cmInvoice.getPaymentTerm();
 				
 				List<Map<Object,Object>> vatBreakDownList = cmInvoice.getVATBreakDown();
@@ -291,11 +383,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 						" \ninvoice DocumentCurrency="+		cmInvoice.getDocumentCurrency() + 
 						" \ninvoice BuyerReferenceValue="+	cmInvoice.getBuyerReferenceValue() + 
 						" \ninvoice OrderReferenceID="+		cmInvoice.getOrderReferenceID() + 
-//						" \ninvoice sellerLegalEntities#:"+	cmInvoice.getSellerLegalEntities().size() +
 						" \ninvoice SellerRegistrationName="+	sellerRegistrationName +					
 						" \ninvoice SellerCompanyID="+			sellerCompanyID +					
 						" \ninvoice SellerCompanyLegalForm="+	sellerCompanyLegalForm +					
-//						" \ninvoice buyerLegalEntities#:"+	cmInvoice.getBuyerLegalEntities().size() +
 						" \ninvoice BuyerRegistrationName="+	buyerRegistrationName +					
 						" \ninvoice BuyerCompanyID="+			buyerCompanyID +					
 						" \ninvoice BuyerCompanyLegalForm="+	buyerCompanyLegalForm +					
@@ -315,7 +405,6 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 						" \ninvoice BuyerContactPoint="+		buyerContact.getContactPoint() +					
 						" \ninvoice BuyerContactTelephone="+	buyerContact.getContactTelephone() +					
 						" \ninvoice BuyerContactEmail="+		buyerContact.getContactEmail() +					
-//						" \ninvoice buyerLegalEntities#:"+	cmInvoice.getBuyerLegalEntities().size() +
 						" \ninvoice buyerTaxSchemes#:"+		cmInvoice.getBuyerTaxSchemes().size() +
 						" \ninvoice BuyerTaxScheme="+		buyerTaxScheme.get(TaxSchemeType.class) +					
 						" \ninvoice BuyerCompanyID="+		buyerTaxScheme.get(CompanyIDType.class) +					

@@ -68,11 +68,13 @@ public class CreditNoteLine extends CreditNoteLineType {
 		
 		setItemNetPrice(priceAmt);
 		
-		ItemType item = getItemInformation(); // ITEM INFORMATION, creates new if necessary
-		setItemName(itemName);
+		if(itemName!=null) {
+			ItemType item = getItemInformation(); // ITEM INFORMATION, creates new if necessary
+			setItemName(itemName);
+			List<TaxCategoryType> taxCategories = item.getClassifiedTaxCategory();
+			taxCategories.add(vatCategory);
+		}
 		
-		List<TaxCategoryType> taxCategories = item.getClassifiedTaxCategory();
-		taxCategories.add(vatCategory);
 	}
 	
 	public String getId() {
@@ -82,9 +84,10 @@ public class CreditNoteLine extends CreditNoteLineType {
 	
 	public Quantity getQuantity() {
 		QuantityType quantity = super.getCreditedQuantity();
-		return new Quantity(quantity.getUnitCode(), quantity.getValue());
+		return quantity==null ? null : new Quantity(quantity.getUnitCode(), quantity.getValue());
 	}
 	private void setQuantity(Quantity quantity) {
+		if(quantity==null) return;
 		CreditedQuantityType creditedQuantity = new CreditedQuantityType();
 		creditedQuantity.setUnitCode(quantity.getUnitCode());
 		creditedQuantity.setValue(quantity.getValue());
@@ -93,19 +96,22 @@ public class CreditNoteLine extends CreditNoteLineType {
 
 	public Amount getLineNetAmount() {
 		LineExtensionAmountType amount = super.getLineExtensionAmount();
-		return new Amount(amount.getCurrencyID(), amount.getValue());
+		return amount==null ? null : new Amount(amount.getCurrencyID(), amount.getValue());
 	}
 	private void setLineNetAmount(Amount amount) {
+		if(amount==null) return;
 		LineExtensionAmountType lineExtensionAmount = new LineExtensionAmountType();
 		amount.copyTo(lineExtensionAmount);
 		super.setLineExtensionAmount(lineExtensionAmount);
 	}
 
 	public UnitPriceAmount getItemNetPrice() {
+		if(super.getPrice()==null) return null;
 		PriceAmountType priceAmount = super.getPrice().getPriceAmount();
-		return new UnitPriceAmount(priceAmount.getCurrencyID(), priceAmount.getValue());
+		return priceAmount==null ? null : new UnitPriceAmount(priceAmount.getCurrencyID(), priceAmount.getValue());
 	}
 	private void setItemNetPrice(UnitPriceAmount priceAmt) {
+		if(priceAmt==null) return;
 		PriceAmountType priceAmount = new PriceAmountType();
 		priceAmt.copyTo(priceAmount);
 		PriceType price = new PriceType();
@@ -114,7 +120,8 @@ public class CreditNoteLine extends CreditNoteLineType {
 	}
 
 	public String getItemName() {
-		return getItemInformation().getName().getValue();
+		NameType name = getItemInformation().getName();
+		return name==null ? null : name.getValue();
 	}
 	private void setItemName(String itemName) {
 		NameType name = new NameType();
@@ -154,6 +161,7 @@ public class CreditNoteLine extends CreditNoteLineType {
 		List<VatCategory> taxCategories = getVatCategories();
 		if(taxCategories.size()!=1) {
 			LOG.warning("inkonsistent: taxCategories.size="+taxCategories.size() + " muss 1 sein" );
+			return null;
 		}
 		return taxCategories.get(0);
 	}
