@@ -31,19 +31,19 @@ zwingend erforderlich
 • für alle Zahlungen an Bankverbindungen außerhalb des SEPA-Raumes (Code 42 des „Payment means type
 code“ (BT-81)) sind, abhängig vom empfangenden Institut, IBAN bzw. Kontonummer und BIC nötig
 */
-public class CreditTransfer extends FinancialAccountType { // TODO Umbenennen in FinancialAccount
+public class FinancialAccount extends FinancialAccountType {
 
-	CreditTransfer() {
+	FinancialAccount() {
 		super();
 	}
 	
-	public CreditTransfer(IBANId iban) {
+	public FinancialAccount(IBANId iban) {
 		this();
 		super.setID(Invoice.newIDType(iban.getValue(), iban.getSchemeID()));
 	}
 
 	//TODO besser Klasse Iban als Subklasse von IDType, dto Bic
-	public CreditTransfer(String account, String accountName, BICId bic) {
+	public FinancialAccount(String account, String accountName, BICId bic) {
 		this();
 		super.setID(Invoice.newIDType(account, null)); // null : No identification scheme
 		

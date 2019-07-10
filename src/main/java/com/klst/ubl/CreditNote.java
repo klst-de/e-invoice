@@ -29,7 +29,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BuyerRef
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditNoteTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CustomizationIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentCurrencyCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
@@ -443,7 +442,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	}
 
 	public List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {
-		FinancialAccountType ibanlAccount = new CreditTransfer(iban);
+		FinancialAccountType ibanlAccount = new FinancialAccount(iban);
 		return addPaymentInstructions(paymentMeansCode, ibanlAccount, remittanceInformation);
 	}
 	

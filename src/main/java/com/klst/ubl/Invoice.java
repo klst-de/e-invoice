@@ -1041,7 +1041,7 @@ anzugeben, wenn ein Mandat erteilt wurde und der Rechnungsbetrag per Lastschrift
 	 * @return paymentMeansList with minimum 1 element
 	 */
 	public List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {
-		FinancialAccountType ibanlAccount = new CreditTransfer(iban); // CreditTransfer extends FinancialAccountType
+		FinancialAccountType ibanlAccount = new FinancialAccount(iban); // CreditTransfer extends FinancialAccountType
 		return addPaymentInstructions(paymentMeansCode, ibanlAccount, remittanceInformation);
 	}
 	

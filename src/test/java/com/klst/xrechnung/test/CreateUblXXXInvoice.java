@@ -12,7 +12,7 @@ import com.klst.cius.IContact;
 import com.klst.marshaller.UblInvoiceTransformer;
 import com.klst.ubl.CommercialInvoice;
 import com.klst.ubl.Contact;
-import com.klst.ubl.CreditTransfer;
+import com.klst.ubl.FinancialAccount;
 import com.klst.ubl.Invoice;
 import com.klst.ubl.InvoiceLine;
 import com.klst.ubl.Party;
@@ -256,7 +256,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				PaymentInstruction paymentInstruction = null;
 				if(paymentInstructions.isEmpty()) {
 					LOG.warning("paymentInstructions is empty");
-					paymentInstruction = new PaymentInstruction(PaymentMeansCode.InCash, new CreditTransfer(new IBANId("nix")));
+					paymentInstruction = new PaymentInstruction(PaymentMeansCode.InCash, new FinancialAccount(new IBANId("nix")));
 				} else {
 					paymentInstruction = paymentInstructions.get(0); // first
 				}
