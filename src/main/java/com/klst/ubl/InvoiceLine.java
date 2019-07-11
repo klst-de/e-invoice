@@ -9,6 +9,7 @@ import com.klst.un.unece.uncefact.Quantity;
 import com.klst.un.unece.uncefact.UnitPriceAmount;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemIdentificationType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderLineReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PriceType;
@@ -59,12 +60,26 @@ public class InvoiceLine extends InvoiceLineType {
 		super.setLineExtensionAmount(line.getLineExtensionAmount());
 		super.setPrice(line.getPrice());
 		super.setItem(line.getItem());
-		
+//		LOG.info("Zeile 63");
 		List<OrderLineReferenceType> olReferences = super.getOrderLineReference();
 		List<OrderLineReferenceType> orderLineReferences = line.getOrderLineReference();
 		orderLineReferences.forEach(orderLineReference -> {
 			olReferences.add(orderLineReference);
 		});
+		ItemType item = line.getItem();
+		if(item!=null) {
+//			LOG.info("item:"+item);
+			List<DescriptionType> descriptions = item.getDescription();
+			descriptions.forEach(description -> {
+				addItemDescription(description.getValue());
+			});
+			ItemIdentificationType itemIdentification = item.getSellersItemIdentification();
+			if(itemIdentification==null) {
+				//
+			} else {
+				this.setSellerAssignedID(itemIdentification.getID()==null ? null : itemIdentification.getID().getValue()) ;
+			}
+		}
 	}
 	
 	/**
@@ -196,7 +211,7 @@ public class InvoiceLine extends InvoiceLineType {
 1 .. 1 SpecifiedTradeProduct Artikelinformationen                 BG-31 xs:sequence
 0 .. 1 GlobalID Kennung eines Artikels nach registriertem Schema  BT-157      TODO 
        required schemeID Kennung des Schemas                      BT-157-1 
-0 .. 1 SellerAssignedID Artikelnummer des Verkäufers              BT-155      TODO 
+0 .. 1 SellerAssignedID Artikelnummer des Verkäufers              BT-155
 0 .. 1 BuyerAssignedID Artikelnummer des Käufers                  BT-156      TODO 
 1 .. 1 Name Artikelname                                           BT-153 
 0 .. 1 Description Artikelbeschreibung                            BT-154
@@ -215,7 +230,6 @@ public class InvoiceLine extends InvoiceLineType {
 1 .. 1 ID Artikelherkunftsland                                    BT-159      TODO
 
 nicht implementiert optionale ITEM INFORMATION Teile TODO:
-BT-155 +++ 0..1 Item Seller's identifier
 BT-156 +++ 0..1 Item Buyer's identifier
 BT-157 +++ 0..1 Item standard identifier + identification scheme identifier of the Item standard identifier
 BT-158 +++ 0..n Item classification identifier
@@ -279,6 +293,31 @@ BG-32  +++ 0..n ITEM ATTRIBUTES
 		description.setValue(descriptionText);
 		descriptions.add(description);
 	}
+	
+	/**
+	 * SellerAssignedID (optional part in ITEM INFORMATION)
+	 * <p>
+	 * An identifier, assigned by the Seller, for the item. 
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BT-155 
+	 * <br>Rule ID:
+	 * <br>Request ID: 	R21, R56
+	 * 
+	 */
+	public String getSellerAssignedID() {
+		ItemType it = getItemInformation();
+		ItemIdentificationType itemIdentification = it.getSellersItemIdentification();
+		if(itemIdentification==null) return null;
+		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
+	}
+	public void setSellerAssignedID(String id) {
+		ItemIdentificationType itemIdentification = new ItemIdentificationType();
+		itemIdentification.setID(Invoice.newIDType(id, null));
+		ItemType it = getItemInformation();
+		it.setSellersItemIdentification(itemIdentification);
+	}
+	
 	
 	public VatCategory getVatCategory() {
 		List<VatCategory> taxCategories = getVatCategories();
