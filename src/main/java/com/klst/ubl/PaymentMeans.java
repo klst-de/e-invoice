@@ -2,11 +2,13 @@ package com.klst.ubl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.klst.untdid.codelist.PaymentMeansCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentChannelCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentMeansCodeType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.CodeType;
@@ -38,9 +40,44 @@ Eine Gruppe von Informationselementen, die spezifische Informationen über die v
 Die Gruppe ist alternativ zu „CREDIT TRANSFER“ (BG-17) oder zu „PAYMENT CARD INFORMATION“ (BG-18)
 anzugeben, wenn ein Mandat erteilt wurde und der Rechnungsbetrag per Lastschrift beglichen werden soll.
 
+Bsp: ubl001.xml :
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>		<!-- CreditTransfer 	(30), -->
+        <cbc:PaymentID>Deb. 10202 / Fact. 12115118</cbc:PaymentID>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID>NL57 RABO 0107307510</cbc:ID>
+        </cac:PayeeFinancialAccount>
+    </cac:PaymentMeans>
+
+Bsp: example-peppol-ubl-creditnote.xml :
+  <cac:PaymentMeans>
+    <!-- Kontoverbindung -->
+    <cbc:PaymentMeansCode>31</cbc:PaymentMeansCode>         <!-- DebitTransfer 		(31), -->
+    <cbc:PaymentChannelCode>IBAN</cbc:PaymentChannelCode>
+    <cac:PayeeFinancialAccount>
+      <cbc:ID schemeID="IBAN">AT611904300234573201</cbc:ID>
+      <cac:FinancialInstitutionBranch>
+        <cac:FinancialInstitution>
+          <cbc:ID schemeID="BIC">TUVTAT21</cbc:ID>
+        </cac:FinancialInstitution>
+      </cac:FinancialInstitutionBranch>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
+
+Bsp: miad :
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+        <cbc:PaymentID>TODO Verwendungszweck</cbc:PaymentID>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID schemeID="IBAN">DE-----------100</cbc:ID>
+        </cac:PayeeFinancialAccount>
+    </cac:PaymentMeans>
+
  */
 public class PaymentMeans extends PaymentMeansType {
 
+	private static final Logger LOG = Logger.getLogger(PaymentMeans.class.getName());
+	
 	PaymentMeans() {
 		super();
 	}
@@ -48,6 +85,7 @@ public class PaymentMeans extends PaymentMeansType {
 	// copy ctor
 	public PaymentMeans(PaymentMeansType paymentMeans) {
 		this(PaymentMeansCode.valueOf(paymentMeans.getPaymentMeansCode()), paymentMeans.getPayeeFinancialAccount());
+		LOG.info("ctor vor setPaymentIDs:"+this.toString());
 		setPaymentIDs(paymentMeans.getPaymentID());
 	}
 	
@@ -64,7 +102,14 @@ public class PaymentMeans extends PaymentMeansType {
 		paymentMeansCodeValue.setValue(paymentMeansCode.getValueAsString());
 		super.setPaymentMeansCode(paymentMeansCodeValue);
 		
-		super.setPayeeFinancialAccount(financialAccount);
+		LOG.info("!!!!!!!!!!!! FinancialAccountType.ID:"+ (financialAccount.getID()==null ? null : financialAccount.getID().getValue()));
+		LOG.info("!!!!!!!!!!!! FinancialAccountType.FinancialInstitutionBranch:"+ (financialAccount.getFinancialInstitutionBranch()==null ? null 
+				: financialAccount.getFinancialInstitutionBranch().getFinancialInstitution()));
+		FinancialAccountType fa = new FinancialAccount(financialAccount);
+//		if(financialAccount.getID()!=null) {
+//			fa.setID(Invoice.newIDType(financialAccount.getID().getValue(), financialAccount.getID().getSchemeID()));	
+//		}
+		super.setPayeeFinancialAccount(fa);
 
 		// Remittance information                      BT-83 Text                  0..1 optional
 		// Ein Textwert, der zur Verknüpfung der Zahlung mit der vom Verkäufer ausgestellten Rechnung verwendet wird.
@@ -101,4 +146,14 @@ public class PaymentMeans extends PaymentMeansType {
 		return result;
 	}
 
+	public String toString() {
+		List<PaymentIDType> paymentIDList = super.getPaymentID();
+		String paymentIDs = paymentIDList.isEmpty() ? null : ("#="+paymentIDList.size() + ","+paymentIDList.get(0).getValue()+",...");
+		PaymentChannelCodeType paymentChannelCode = super.getPaymentChannelCode();
+		String channelCode = paymentChannelCode==null ? null : paymentChannelCode.getValue();
+		FinancialAccountType fa = super.getPayerFinancialAccount();
+		String financialAccount = fa==null ? null : (fa.getID()==null ? null : fa.getID().getValue());
+		return "Code:"+getPaymentMeans().getValueAsString() + ", paymentIDs:"+paymentIDs + 
+				", paymentChannelCode:"+channelCode + ", financialAccount:"+financialAccount;
+	}
 }

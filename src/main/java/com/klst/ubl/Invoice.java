@@ -41,6 +41,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PayableAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentCurrencyCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentIDType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentMeansCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ProfileIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExclusiveAmountType;
@@ -1031,31 +1032,72 @@ Eine Gruppe von Informationselementen, die spezifische Informationen über die v
 Die Gruppe ist alternativ zu „CREDIT TRANSFER“ (BG-17) oder zu „PAYMENT CARD INFORMATION“ (BG-18)
 anzugeben, wenn ein Mandat erteilt wurde und der Rechnungsbetrag per Lastschrift beglichen werden soll.
 
+Bsp: 01.01a-INVOICE_ubl.xml :
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID>DE12345678912345678912</cbc:ID>
+        </cac:PayeeFinancialAccount>
+    </cac:PaymentMeans>
+
+Bsp: ubl004.xml :
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>		<!-- CreditTransfer 	(30), -->
+        <cbc:PaymentID>Deb. 10202 + Fact. 12115118</cbc:PaymentID>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID>NL57 RABO 0107307510</cbc:ID>
+        </cac:PayeeFinancialAccount>
+    </cac:PaymentMeans>
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+        <cbc:PaymentID>Deb. 10202 / Fact. 12115118</cbc:PaymentID>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID>NL03 INGB 0004489902</cbc:ID>
+        </cac:PayeeFinancialAccount>
+    </cac:PaymentMeans>
+
+Bsp: example-peppol-ubl-creditnote.xml :
+  <cac:PaymentMeans>
+    <!-- Kontoverbindung -->
+    <cbc:PaymentMeansCode>31</cbc:PaymentMeansCode>         <!-- DebitTransfer 		(31), -->
+    <cbc:PaymentChannelCode>IBAN</cbc:PaymentChannelCode>
+    <cac:PayeeFinancialAccount>
+      <cbc:ID schemeID="IBAN">AT611904300234573201</cbc:ID>
+      <cac:FinancialInstitutionBranch>
+        <cac:FinancialInstitution>
+          <cbc:ID schemeID="BIC">TUVTAT21</cbc:ID>
+        </cac:FinancialInstitution>
+      </cac:FinancialInstitutionBranch>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
+
 	 */
 	/**
-	 * Adds a mandatory PAYMENT INSTRUCTIONS Group with ibanlAccount as CREDIT TRANSFER
+	 * mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER
 	 * 
-	 * @param enum paymentMeansCode, use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
+	 * @param enum paymentMeansCode, BT-81 : use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
 	 * @param String iban to create ibanlAccount element
-	 * @param String remittanceInformation optional
-	 * @return paymentMeansList with minimum 1 element
+	 * @param String remittanceInformation                   BT-83 optional
+	 * TODO @param String accountName                        BT-85 optional
+//	 * @return paymentMeansList with minimum 1 element
 	 */
-	public List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {
-		FinancialAccountType ibanlAccount = new FinancialAccount(iban); // CreditTransfer extends FinancialAccountType
-		return addPaymentInstructions(paymentMeansCode, ibanlAccount, remittanceInformation);
+	public void setPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation, String accountName) {
+		FinancialAccountType ibanAccount = new FinancialAccount(iban); 
+		setPaymentInstructions(paymentMeansCode, ibanAccount, remittanceInformation, accountName);
 	}
+	public void setPaymentInstructions(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation, String accountName) {
+		addPaymentInstructions(paymentMeansCode, financialAccount, remittanceInformation, accountName);
+	}
+//	public List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {
+//		FinancialAccountType ibanAccount = new FinancialAccount(iban); // CreditTransfer extends FinancialAccountType
+//		return addPaymentInstructions(paymentMeansCode, ibanAccount, remittanceInformation);
+//	}
 	
-	/**
-	 * Adds a mandatory PAYMENT INSTRUCTIONS Group
-	 * 
-	 * @param enum paymentMeansCode
-	 * @param financialAccount
-	 * @param remittanceInformation optional
-	 * @return paymentMeansList with minimum 1 element
-	 */
-	public List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation) {
-		List<PaymentMeansType> paymentMeansList = this.getPaymentMeans();
-		LOG.info("paymentMeansCode:"+paymentMeansCode.toString() + ", paymentMeansList size="+paymentMeansList.size()); // == 0 beim ersten mal	
+	List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, 
+			String remittanceInformation, String accountName) {
+		List<PaymentMeansType> paymentMeansList = super.getPaymentMeans();
+		LOG.info("paymentMeansCode:"+paymentMeansCode.toString() + ", (TODO)accountName:"+accountName + // TODO
+				", paymentMeansList size="+paymentMeansList.size()); // == 0 beim ersten mal	
 		PaymentMeansType paymentMeans = new PaymentMeans(paymentMeansCode, financialAccount, remittanceInformation);
 		paymentMeansList.add(paymentMeans);
 		return paymentMeansList;
@@ -1074,29 +1116,57 @@ anzugeben, wenn ein Mandat erteilt wurde und der Rechnungsbetrag per Lastschrift
 	}
 	
 	public List<PaymentMeansType> addPaymentInstructions(InvoiceType doc) {
-		List<PaymentMeansType> myPaymentMeansList = this.getPaymentMeans();
+		List<PaymentMeansType> result = this.getPaymentMeans();
 		List<PaymentMeansType> paymentMeansList = doc.getPaymentMeans();
-		LOG.info("invoice.PaymentMeansList#:"+paymentMeansList.size());
+		LOG.info(" VOR doc.PaymentMeansList#:"+paymentMeansList.size() + " result.List#:"+result.size());
 		paymentMeansList.forEach(paymentMeans -> {
-			addPaymentInstructions(myPaymentMeansList, paymentMeans); // nicht direkt, da noch eine iteration:
+			PaymentMeansCodeType pmc = paymentMeans.getPaymentMeansCode();
+			if(pmc==null) {
+				LOG.info("pmc==null");
+			} else {
+				LOG.info("pmc:"+pmc.getValue());
+			}
+			addPaymentInstructions(result, paymentMeans); // nicht direkt, da noch eine iteration:
 		});
-		return myPaymentMeansList;
+		LOG.info("NACH doc.PaymentMeansList#:"+paymentMeansList.size() + " result.List#:"+result.size());
+		result.forEach(pmt -> {
+			PaymentMeans pm = (PaymentMeans)pmt;
+			LOG.info("pm:"+pm.toString());
+		});
+		
+		return result;
 	}
-	private List<PaymentMeansType> addPaymentInstructions(List<PaymentMeansType> myPaymentMeansList, PaymentMeansType paymentMeans) {
-		PaymentMeansType myPaymentMeans = new PaymentMeansType();
-		myPaymentMeans.setPaymentMeansCode(paymentMeans.getPaymentMeansCode());  // PaymentMeansCode
-		myPaymentMeans.setPayeeFinancialAccount(paymentMeans.getPayeeFinancialAccount());  // financialAccount, zB ibanlAccount
-		List<PaymentIDType> myPaymentIDs = myPaymentMeans.getPaymentID();
-		List<PaymentIDType> paymentIDs = paymentMeans.getPaymentID();
-		LOG.info("PaymentMeansCode="+paymentMeans.getPaymentMeansCode() + 
-				", PayeeFinancialAccount="+paymentMeans.getPayeeFinancialAccount() + 
-				", paymentIDs#:"+paymentIDs.size());
-		paymentIDs.forEach(paymentID -> {
-			myPaymentIDs.add(paymentID);  // darin remittanceInformation
-			LOG.info("remittanceInformation:"+paymentID.getValue());
-		});
-		myPaymentMeansList.add(myPaymentMeans);
-		return myPaymentMeansList;
+	private List<PaymentMeansType> addPaymentInstructions(List<PaymentMeansType> result, PaymentMeansType paymentMeans) {
+/*
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+        <cbc:PaymentID>Deb. 10202 + Fact. 12115118</cbc:PaymentID>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID>NL57 RABO 0107307510</cbc:ID>
+        </cac:PayeeFinancialAccount>
+    </cac:PaymentMeans>
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+        <cbc:PaymentID>Deb. 10202 / Fact. 12115118</cbc:PaymentID>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID>NL03 INGB 0004489902</cbc:ID>
+        </cac:PayeeFinancialAccount>
+    </cac:PaymentMeans>
+
+ */
+		PaymentMeansType resPaymentMeans = new PaymentMeans(paymentMeans);
+//		resPaymentMeans.setPaymentMeansCode(paymentMeans.getPaymentMeansCode());  // PaymentMeansCode
+//		resPaymentMeans.setPayeeFinancialAccount(paymentMeans.getPayeeFinancialAccount());  // financialAccount, zB ibanlAccount
+//		List<PaymentIDType> resPaymentIDs = resPaymentMeans.getPaymentID();
+//		List<PaymentIDType> inpPaymentIDs = paymentMeans.getPaymentID();
+//		LOG.info("PayeeFinancialAccount="+paymentMeans.getPayeeFinancialAccount() + 
+//				", inpPaymentIDs#:"+inpPaymentIDs.size());
+//		inpPaymentIDs.forEach(paymentID -> {
+//			resPaymentIDs.add(paymentID);  // darin remittanceInformation
+//			LOG.info("remittanceInformation:"+paymentID.getValue());
+//		});
+		result.add(resPaymentMeans);
+		return result;
 	}
 
 	/* DOCUMENT LEVEL ALLOWANCES                   BG-20                       0..*

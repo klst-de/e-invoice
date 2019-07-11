@@ -18,20 +18,18 @@ import com.klst.ubl.CreditNoteLine;
 import com.klst.ubl.FinancialAccount;
 import com.klst.ubl.Invoice;
 import com.klst.ubl.InvoiceLine;
-import com.klst.ubl.Party;
 import com.klst.ubl.PaymentMeans;
-import com.klst.ubl.PaymentTerms;
 import com.klst.ubl.VatCategory;
 import com.klst.un.unece.uncefact.Amount;
+import com.klst.un.unece.uncefact.BICId;
 import com.klst.un.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansCode;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyLegalFormType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.RegistrationNameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
@@ -92,16 +90,32 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setBuyerParty(testCreditNote.getBuyerParty());
 
 //		void makePaymentGroup(Invoice ublInvoice) {
-			PaymentMeans paymentInstruction = testCreditNote.getPaymentInstructions().get(0);
+		List<PaymentMeans> paymentMeansList = testCreditNote.getPaymentInstructions();
+		LOG.info("START PaymentGroup: paymentMeansList#:"+paymentMeansList.size());
+		paymentMeansList.forEach(paymentInstruction -> {
+			LOG.info("paymentInstruction PaymentMeans:" + paymentInstruction.toString());
 			PaymentMeansCode paymentMeansCode = paymentInstruction.getPaymentMeans();
-			if(paymentMeansCode==PaymentMeansCode.CreditTransfer) {
-				IBANId iban = new IBANId(paymentInstruction.getFinancialAccount().getID().getValue());
+			if(paymentMeansCode==PaymentMeansCode.CreditTransfer
+					|| paymentMeansCode==PaymentMeansCode.DebitTransfer
+					) {
 				List<String> remittanceInformations = paymentInstruction.getRemittanceInformation();
-				ublInvoice.addPaymentInstructions(paymentMeansCode, iban, remittanceInformations.isEmpty() ? null : remittanceInformations.get(0));
+				String accountName = null;
+				LOG.warning("????? paymentInstruction.FinancialAccount.ID():"+
+						paymentInstruction.getFinancialAccount().getID().getValue() + " " + paymentInstruction.getFinancialAccount().getID().getSchemeID());
+				if(paymentInstruction.getFinancialAccount().getID().getSchemeID()==null) {
+					FinancialAccountType fa = new FinancialAccount(paymentInstruction.getFinancialAccount().getID().getValue(), null, null);
+					ublInvoice.setPaymentInstructions(paymentMeansCode, fa, remittanceInformations.isEmpty() ? null : remittanceInformations.get(0), accountName);
+				} else if(paymentInstruction.getFinancialAccount().getID().getSchemeID().equals("IBAN")) {
+					IBANId iban = new IBANId(paymentInstruction.getFinancialAccount().getID().getValue());
+					ublInvoice.setPaymentInstructions(paymentMeansCode, iban, remittanceInformations.isEmpty() ? null : remittanceInformations.get(0), accountName);
+				} else {
+					LOG.warning("TODO:"+paymentInstruction.getFinancialAccount().getID().getSchemeID());
+				}
 			} else {
 				LOG.warning("TODO:"+paymentMeansCode);
 			}
-			ublInvoice.setPaymentTermsAndDate(testCreditNote.getPaymentTerm(), testCreditNote.getDueDateAsTimestamp());
+		});
+		ublInvoice.setPaymentTermsAndDate(testCreditNote.getPaymentTerm(), testCreditNote.getDueDateAsTimestamp());
 		LOG.info("finished PaymentGroup.");
 
 //		void makesDocumentTotalsGroup(Invoice ublInvoice) {
@@ -134,9 +148,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		List<Map<Object, Object>> vatBreakDowns = testCreditNote.getVATBreakDown();
 		vatBreakDowns.forEach(vatBreakDown -> {
 			VatCategory vc = (VatCategory) vatBreakDown.get(VatCategory.class);
-//			LOG.info("vc =============================" +vc + " ID.value:"+vc.getID().getValue() +
-//					"TaxCategoryCode:"+vc.getTaxCategoryCode()
-//					);
+			LOG.info("vc =============================" +vc + " ID.value:"+vc.getID().getValue() +
+					"TaxCategoryCode:"+vc.getTaxCategoryCode()
+					);
 			VatCategory vatCategory = null;
 			if(vc.getTaxCategoryCode().equals(TaxCategoryCode.StandardRate.getValue())) {
 				vatCategory = new VatCategory(TaxCategoryCode.StandardRate, vc.getPercent().getValue());
@@ -214,15 +228,29 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makePaymentGroup(Invoice ublInvoice) {
-		PaymentMeans paymentInstruction = testDoc.getPaymentInstructions().get(0);
-		PaymentMeansCode paymentMeansCode = paymentInstruction.getPaymentMeans();
-		if(paymentMeansCode==PaymentMeansCode.CreditTransfer) {
-			IBANId iban = new IBANId(paymentInstruction.getFinancialAccount().getID().getValue());
-			List<String> remittanceInformations = paymentInstruction.getRemittanceInformation();
-			ublInvoice.addPaymentInstructions(paymentMeansCode, iban, remittanceInformations.isEmpty() ? null : remittanceInformations.get(0));
-		} else {
-			LOG.warning("TODO:"+paymentMeansCode);
-		}
+		List<PaymentMeans> paymentMeansList = testDoc.getPaymentInstructions();
+		paymentMeansList.forEach(paymentInstruction -> {
+			PaymentMeansCode paymentMeansCode = paymentInstruction.getPaymentMeans();
+			if(paymentMeansCode==PaymentMeansCode.CreditTransfer) {
+				List<String> remittanceInformations = paymentInstruction.getRemittanceInformation();
+				String accountName = null;
+				// das ist nicht richtig:
+//				IBANId iban = new IBANId(paymentInstruction.getFinancialAccount().getID().getValue());
+				LOG.warning("????? paymentInstruction.FinancialAccount.ID():"+
+						paymentInstruction.getFinancialAccount().getID().getValue() + " " + paymentInstruction.getFinancialAccount().getID().getSchemeID());
+				if(paymentInstruction.getFinancialAccount().getID().getSchemeID()==null) {
+					FinancialAccountType fa = new FinancialAccount(paymentInstruction.getFinancialAccount().getID().getValue(), null, null);
+					ublInvoice.setPaymentInstructions(paymentMeansCode, fa, remittanceInformations.isEmpty() ? null : remittanceInformations.get(0), accountName);
+				} else if(paymentInstruction.getFinancialAccount().getID().getSchemeID().equals("IBAN")) {
+					IBANId iban = new IBANId(paymentInstruction.getFinancialAccount().getID().getValue());
+					ublInvoice.setPaymentInstructions(paymentMeansCode, iban, remittanceInformations.isEmpty() ? null : remittanceInformations.get(0), accountName);
+				} else {
+					LOG.warning("TODO:"+paymentInstruction.getFinancialAccount().getID().getSchemeID());
+				}
+			} else {
+				LOG.warning("TODO:"+paymentMeansCode);
+			}
+		});
 
 		ublInvoice.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp());
 		LOG.info("finished.");
@@ -240,9 +268,6 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		List<Map<Object, Object>> vatBreakDowns = testDoc.getVATBreakDown();
 		vatBreakDowns.forEach(vatBreakDown -> {
 			VatCategory vc = (VatCategory) vatBreakDown.get(VatCategory.class);
-//			LOG.info("vc =============================" +vc + " ID.value:"+vc.getID().getValue() +
-//					"TaxCategoryCode:"+vc.getTaxCategoryCode()
-//					);
 			VatCategory vatCategory = null;
 			if(vc.getTaxCategoryCode().equals(TaxCategoryCode.StandardRate.getValue())) {
 				vatCategory = new VatCategory(TaxCategoryCode.StandardRate, vc.getPercent().getValue());
@@ -250,16 +275,15 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				vatCategory = new VatCategory(TaxCategoryCode.ServicesOutsideScope, vc.getPercent().getValue());
 			} else {
 				vatCategory = new VatCategory(TaxCategoryCode.ExemptFromTax, vc.getPercent().getValue());
-				LOG.warning("vatCategory =============================" +vatCategory);
 			}
 			
 			// die optionalen "VAT exemption reason text" und "VAT exemption reason code"
 			List<String> taxExemptionReasonList = (List<String>) vatBreakDown.get(TaxExemptionReasonType.class);
 			if(taxExemptionReasonList==null) {
-				LOG.info("taxExemptionReasonList =============================" +taxExemptionReasonList);
+				LOG.info("taxExemptionReasonList:" +taxExemptionReasonList);
 			} else for(int l=0; l<taxExemptionReasonList.size(); l++){
 				
-				LOG.warning("TaxExemptionReason TODO ============================= #" +l);
+				LOG.warning("TaxExemptionReason TODO #" +l);
 				vatCategory.addTaxExemptionReason(taxExemptionReasonList.get(l));
 			}
 			String reasonCode = (String) vatBreakDown.get(TaxExemptionReasonCodeType.class);
@@ -267,7 +291,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				vatCategory.setTaxExemptionReasonCode(reasonCode);
 			}
 			
-			LOG.info("vatCategory =============================" +vatCategory);
+			LOG.info("vatCategory:" +vatCategory);
 			ublInvoice.addVATBreakDown( (Amount) vatBreakDown.get(TaxableAmountType.class), 
 					(Amount) vatBreakDown.get(TaxAmountType.class), 
 					vatCategory);
@@ -277,18 +301,26 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makeLineGroup(Invoice ublInvoice) {
-		List<InvoiceLine> invoiceLines = testDoc.getLines();
-		invoiceLines.forEach(testLine -> {
+		List<InvoiceLine> testLines = testDoc.getLines();
+		testLines.forEach(testLine -> {
 			List<String> itemDescriptions = testLine.getItemDescriptions();
+			LOG.info("-----------------itemDescriptions.size():"+itemDescriptions.size());
 			InvoiceLine invoiceLine = new InvoiceLine(testLine.getId(), testLine.getQuantity(),
 					testLine.getLineNetAmount(), testLine.getItemNetPrice(), 
 					testLine.getItemName(), testLine.getVatCategory());
 			itemDescriptions.forEach(description -> {
 				invoiceLine.addItemDescription(description);
 			});
+			invoiceLine.setSellerAssignedID(testLine.getSellerAssignedID());
+			testLine.getNotes().forEach(note -> {
+				invoiceLine.setNote(note);
+			});
+			testLine.getOrderLineID().forEach(lineRef -> {
+				invoiceLine.setOrderLineID(lineRef);
+			});
 			ublInvoice.addLine(invoiceLine);
 		});
-		LOG.info("finished. "+invoiceLines.size() + " lines.");
+		LOG.info("finished. "+testLines.size() + " lines.");
 	}
 
 	private File getTestFile(String uri) {

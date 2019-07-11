@@ -892,7 +892,7 @@ DueDateDateTime Fälligkeitsdatum
 		}
 	
 	/**
-	 * Adds a mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER
+	 * mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER
 	 * 
 	 * @param enum paymentMeansCode, BT-81 use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
 	 * @param IBANId iban to create ibanlAccount element

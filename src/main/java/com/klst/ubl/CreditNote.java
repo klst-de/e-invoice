@@ -34,7 +34,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExte
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PayableAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentCurrencyCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentIDType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentMeansCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ProfileIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExclusiveAmountType;
@@ -444,15 +444,19 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		return deliveryList;
 	}
 
-	public List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {
-		FinancialAccountType ibanlAccount = new FinancialAccount(iban);
-		return addPaymentInstructions(paymentMeansCode, ibanlAccount, remittanceInformation);
-	}
-	
 	// wie BG-16  PAYMENT INSTRUCTIONS
-	public List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation) {
-		List<PaymentMeansType> paymentMeansList = this.getPaymentMeans();
-//		LOG.info("paymentMeansCode:"+paymentMeansCode.toString() + ", paymentMeansList size="+paymentMeansList.size()); // == 0 beim ersten mal	
+	public void setPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation, String accountName) {
+		FinancialAccountType ibanAccount = new FinancialAccount(iban); 
+		setPaymentInstructions(paymentMeansCode, ibanAccount, remittanceInformation, accountName);
+	}
+	public void setPaymentInstructions(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation, String accountName) {
+		addPaymentInstructions(paymentMeansCode, financialAccount, remittanceInformation, accountName);
+	}
+	List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, 
+			String remittanceInformation, String accountName) {
+		List<PaymentMeansType> paymentMeansList = super.getPaymentMeans();
+		LOG.info("paymentMeansCode:"+paymentMeansCode.toString() + ", (TODO)accountName:"+accountName + // TODO
+				", paymentMeansList size="+paymentMeansList.size()); // == 0 beim ersten mal	
 		PaymentMeansType paymentMeans = new PaymentMeans(paymentMeansCode, financialAccount, remittanceInformation);
 		paymentMeansList.add(paymentMeans);
 		return paymentMeansList;
@@ -469,32 +473,78 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		});
 		return result;
 	}
-	
-	public List<PaymentMeansType> addPaymentInstructions(CreditNoteType doc) {
-		List<PaymentMeansType> myPaymentMeansList = this.getPaymentMeans();
+
+	List<PaymentMeansType> addPaymentInstructions(CreditNoteType doc) {
+		List<PaymentMeansType> result = this.getPaymentMeans();
 		List<PaymentMeansType> paymentMeansList = doc.getPaymentMeans();
-//		LOG.info("invoice.PaymentMeansList#:"+paymentMeansList.size());
+		LOG.info(" VOR doc.PaymentMeansList#:"+paymentMeansList.size() + " result.List#:"+result.size());
 		paymentMeansList.forEach(paymentMeans -> {
-			addPaymentInstructions(myPaymentMeansList, paymentMeans); // nicht direkt, da noch eine iteration:
+			PaymentMeansCodeType pmc = paymentMeans.getPaymentMeansCode();
+			if(pmc==null) {
+				LOG.info("pmc==null");
+			} else {
+				LOG.info("pmc:"+pmc.getValue());
+			}
+			addPaymentInstructions(result, paymentMeans); // nicht direkt, da noch eine iteration:
 		});
-		return myPaymentMeansList;
+		LOG.info("NACH doc.PaymentMeansList#:"+paymentMeansList.size() + " result.List#:"+result.size());
+		result.forEach(pmt -> {
+			PaymentMeans pm = (PaymentMeans)pmt;
+			LOG.info("result pm:"+pm.toString());
+		});
+		return result;
 	}
-	private List<PaymentMeansType> addPaymentInstructions(List<PaymentMeansType> myPaymentMeansList, PaymentMeansType paymentMeans) {
-		PaymentMeansType myPaymentMeans = new PaymentMeansType();
-		myPaymentMeans.setPaymentMeansCode(paymentMeans.getPaymentMeansCode());  // PaymentMeansCode
-		myPaymentMeans.setPayeeFinancialAccount(paymentMeans.getPayeeFinancialAccount());  // financialAccount, zB ibanlAccount
-		List<PaymentIDType> myPaymentIDs = myPaymentMeans.getPaymentID();
-		List<PaymentIDType> paymentIDs = paymentMeans.getPaymentID();
+	private List<PaymentMeansType> addPaymentInstructions(List<PaymentMeansType> result, PaymentMeansType paymentMeans) {
+		PaymentMeansType resPaymentMeans = new PaymentMeans(paymentMeans);
+		result.add(resPaymentMeans);
+		return result;
+	}
+
+//	public List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation) {
+//		List<PaymentMeansType> paymentMeansList = this.getPaymentMeans();
+////		LOG.info("paymentMeansCode:"+paymentMeansCode.toString() + ", paymentMeansList size="+paymentMeansList.size()); // == 0 beim ersten mal	
+//		PaymentMeansType paymentMeans = new PaymentMeans(paymentMeansCode, financialAccount, remittanceInformation);
+//		paymentMeansList.add(paymentMeans);
+//		return paymentMeansList;
+//	}
+//
+//	public List<PaymentMeans> getPaymentInstructions() {
+//		return getPaymentInstructions(this);
+//	}
+//	static List<PaymentMeans> getPaymentInstructions(CreditNoteType doc) {
+//		List<PaymentMeansType> paymentMeansList = doc.getPaymentMeans();
+//		List<PaymentMeans> result = new ArrayList<PaymentMeans>(paymentMeansList.size());
+//		paymentMeansList.forEach(paymentMeans -> {
+//			result.add(new PaymentMeans(paymentMeans));
+//		});
+//		return result;
+//	}
+//	
+//	public List<PaymentMeansType> addPaymentInstructions(CreditNoteType doc) {
+//		List<PaymentMeansType> myPaymentMeansList = this.getPaymentMeans();
+//		List<PaymentMeansType> paymentMeansList = doc.getPaymentMeans();
+//		LOG.info("invoice.PaymentMeansList#:"+paymentMeansList.size());
+//		paymentMeansList.forEach(paymentMeans -> {
+//			addPaymentInstructions(myPaymentMeansList, paymentMeans); // nicht direkt, da noch eine iteration:
+//		});
+//		return myPaymentMeansList;
+//	}
+//	private List<PaymentMeansType> addPaymentInstructions(List<PaymentMeansType> myPaymentMeansList, PaymentMeansType paymentMeans) {
+//		PaymentMeansType myPaymentMeans = new PaymentMeansType();
+//		myPaymentMeans.setPaymentMeansCode(paymentMeans.getPaymentMeansCode());  // PaymentMeansCode
+//		myPaymentMeans.setPayeeFinancialAccount(paymentMeans.getPayeeFinancialAccount());  // financialAccount, zB ibanlAccount
+//		List<PaymentIDType> myPaymentIDs = myPaymentMeans.getPaymentID();
+//		List<PaymentIDType> paymentIDs = paymentMeans.getPaymentID();
 //		LOG.info("PaymentMeansCode="+paymentMeans.getPaymentMeansCode() + 
 //				", PayeeFinancialAccount="+paymentMeans.getPayeeFinancialAccount() + 
 //				", paymentIDs#:"+paymentIDs.size());
-		paymentIDs.forEach(paymentID -> {
-			myPaymentIDs.add(paymentID);  // darin remittanceInformation
+//		paymentIDs.forEach(paymentID -> {
+//			myPaymentIDs.add(paymentID);  // darin remittanceInformation
 //			LOG.info("remittanceInformation:"+paymentID.getValue());
-		});
-		myPaymentMeansList.add(myPaymentMeans);
-		return myPaymentMeansList;
-	}
+//		});
+//		myPaymentMeansList.add(myPaymentMeans);
+//		return myPaymentMeansList;
+//	}
 
 	// wie BG-22  DOCUMENT TOTALS
 	@Override

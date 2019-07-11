@@ -1,11 +1,14 @@
 package com.klst.ubl;
 
+import javax.xml.bind.annotation.XmlType;
+
 import com.klst.un.unece.uncefact.BICId;
 import com.klst.un.unece.uncefact.IBANId;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.BranchType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialInstitutionType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 
 // Gruppe CREDIT TRANSFER                   BG-17
@@ -30,11 +33,53 @@ Stelle = Ländercode nach ISO, 3. und 4. Stelle = Prüfziffer; Angabe des BIC is
 zwingend erforderlich
 • für alle Zahlungen an Bankverbindungen außerhalb des SEPA-Raumes (Code 42 des „Payment means type
 code“ (BT-81)) sind, abhängig vom empfangenden Institut, IBAN bzw. Kontonummer und BIC nötig
+
+@XmlType(name = "FinancialAccountType", propOrder = {
+    "id",                                   -- IDType
+    "name",                                 -- NameType accountName
+    "aliasName",
+    "accountTypeCode",
+    "accountFormatCode",
+    "currencyCode",
+    "paymentNote",
+    "financialInstitutionBranch",
+    "country"
+
+  <cac:PaymentMeans>
+    <!-- Kontoverbindung -->
+    <cbc:PaymentMeansCode>31</cbc:PaymentMeansCode>
+    <cbc:PaymentChannelCode>IBAN</cbc:PaymentChannelCode>
+    
+    <cac:PayeeFinancialAccount>
+      <cbc:ID schemeID="IBAN">AT611904300234573201</cbc:ID>
+      <cac:FinancialInstitutionBranch>
+        <cac:FinancialInstitution>
+          <cbc:ID schemeID="BIC">TUVTAT21</cbc:ID>
+        </cac:FinancialInstitution>
+      </cac:FinancialInstitutionBranch>
+    </cac:PayeeFinancialAccount>
+    
+    
+  </cac:PaymentMeans>
+
 */
 public class FinancialAccount extends FinancialAccountType {
 
 	FinancialAccount() {
 		super();
+	}
+	
+	// copy ctor
+	public FinancialAccount(FinancialAccountType doc) {
+//		IDType ID = doc.getID();
+//		FinancialInstitutionType financialInstitution = doc.getFinancialInstitutionBranch().getFinancialInstitution();
+		this(doc.getID(), 
+//				doc.getFinancialInstitutionBranch().getFinancialInstitution().getName().getValue(),
+				null,
+				doc.getFinancialInstitutionBranch()==null ? null : 
+					(doc.getFinancialInstitutionBranch().getFinancialInstitution()==null ? null : 
+						(doc.getFinancialInstitutionBranch().getFinancialInstitution().getID()==null ? null : new BICId(doc.getFinancialInstitutionBranch().getFinancialInstitution().getID().getValue())))
+				);
 	}
 	
 	public FinancialAccount(IBANId iban) {
@@ -44,8 +89,12 @@ public class FinancialAccount extends FinancialAccountType {
 
 	//TODO besser Klasse Iban als Subklasse von IDType, dto Bic
 	public FinancialAccount(String account, String accountName, BICId bic) {
+		this(Invoice.newIDType(account, null), // null : No identification scheme
+				accountName, bic);
+	}
+	public FinancialAccount(IDType ID, String accountName, BICId bic) {
 		this();
-		super.setID(Invoice.newIDType(account, null)); // null : No identification scheme
+		super.setID(Invoice.newIDType(ID.getValue(), ID.getSchemeID()));
 		
 		if(accountName!=null) {
 			NameType name = new NameType();
@@ -55,7 +104,7 @@ public class FinancialAccount extends FinancialAccountType {
 		
 		BranchType branch = new BranchType();
 		FinancialInstitutionType financialInstitution = new FinancialInstitutionType();
-		financialInstitution.setID(Invoice.newIDType(bic.getValue(), bic.getSchemeID()));
+		if(bic!=null) financialInstitution.setID(Invoice.newIDType(bic.getValue(), bic.getSchemeID()));
 		branch.setFinancialInstitution(financialInstitution);
 		super.setFinancialInstitutionBranch(branch);		
 	}
