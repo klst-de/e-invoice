@@ -17,7 +17,9 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxC
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DescriptionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InvoicedQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PriceAmountType;
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType;
 
@@ -42,7 +44,25 @@ ITEM INFORMATION        BG-31             1
  * 
 ID    | Level | Cardinality | Business Term         | Description | Usage Note | Req.ID   | Semantic data type
 BG-25 | +     | 1..n        | INVOICE LINE          | A group of business terms providing information on individual Invoice lines.
-                                                                               | R17, R23, R27                                                                               | R40
+                                                                               | R17, R23, R27  
+                                                                               
+ TODO
+ 01.01a-INVOICE_ubl.xml :                                                                                                                                                            
+        <cac:InvoicePeriod>
+            <cbc:StartDate>2016-01-01+01:00</cbc:StartDate>
+            <cbc:EndDate>2016-12-31+01:00</cbc:EndDate>
+        </cac:InvoicePeriod>
+ ...
+         <cac:OrderLineReference>
+            <cbc:LineID>6171175.1</cbc:LineID>
+        </cac:OrderLineReference>
+...
+        <cac:Item>
+...
+            <cac:CommodityClassification>
+                <cbc:ItemClassificationCode listID="IB">0721-880X</cbc:ItemClassificationCode>
+            </cac:CommodityClassification>
+                                                                                                                                                          | R40
  */
 public class InvoiceLine extends InvoiceLineType {
 
@@ -60,26 +80,38 @@ public class InvoiceLine extends InvoiceLineType {
 		super.setLineExtensionAmount(line.getLineExtensionAmount());
 		super.setPrice(line.getPrice());
 		super.setItem(line.getItem());
-//		LOG.info("Zeile 63");
-		List<OrderLineReferenceType> olReferences = super.getOrderLineReference();
+		
+		List<NoteType> noteList = line.getNote(); // optional BT-127
+		noteList.forEach(note -> {
+			LOG.info("line.noteList.size:"+noteList.size() + " note:"+note.getValue());
+			setNote(note.getValue());
+		});
+		
 		List<OrderLineReferenceType> orderLineReferences = line.getOrderLineReference();
 		orderLineReferences.forEach(orderLineReference -> {
-			olReferences.add(orderLineReference);
+			LOG.info("line.OrderLineReference.size:"+orderLineReferences.size() + " LineID:"+orderLineReference.getLineID().getValue());
+			setOrderLineID(orderLineReference.getLineID().getValue());
 		});
-		ItemType item = line.getItem();
-		if(item!=null) {
-//			LOG.info("item:"+item);
-			List<DescriptionType> descriptions = item.getDescription();
-			descriptions.forEach(description -> {
-				addItemDescription(description.getValue());
-			});
-			ItemIdentificationType itemIdentification = item.getSellersItemIdentification();
-			if(itemIdentification==null) {
-				//
-			} else {
-				this.setSellerAssignedID(itemIdentification.getID()==null ? null : itemIdentification.getID().getValue()) ;
-			}
-		}
+		
+//		item = new ItemType();
+//		super.setItem(item);
+//		ItemType item = line.getItem();
+//		if(item!=null) {
+//			ItemIdentificationType itemIdentification = item.getSellersItemIdentification();
+//			if(itemIdentification==null) {
+//				//
+//			} else {
+//				this.setSellerAssignedID(itemIdentification.getID()==null ? null : itemIdentification.getID().getValue()) ;
+//			}
+//			List<String> descriptionList = getItemDescriptions(line);
+//			LOG.info("Zeile 105 descriptionList.size:"+descriptionList.size());
+//			descriptionList.forEach(description -> {
+//				LOG.info("Zeile 107 description:"+description);
+//				addItemDescription(description);
+//			});
+//		} else {
+//			LOG.warning("line.item!=null !!!!!!!!!!!!!!!!!!!!!!!!!!");
+//		}
 	}
 	
 	/**
@@ -112,7 +144,10 @@ public class InvoiceLine extends InvoiceLineType {
 //		invoiceLine.getOrderLineReference()
 */
 		
-		ItemType item = getItemInformation(); // ITEM INFORMATION, creates new if necessary
+//		ItemType item = getItemInformation(); // ITEM INFORMATION, creates new if necessary
+		item = new ItemType();
+		super.setItem(item);
+
 		setItemName(itemName);
 //		ItemType item = new ItemType();
 //		NameType name = new NameType();
@@ -205,6 +240,47 @@ public class InvoiceLine extends InvoiceLineType {
 		super.setPrice(price);
 	}
 
+	/*
+BT-127 ++ 0..1 Invoice line note
+A textual note that gives unstructured information that is relevant to the Invoice line.
+R28 Text
+	 */
+	public List<String> getNotes() {
+		List<NoteType> noteList = super.getNote();
+		List<String> result = new ArrayList<String>(noteList.size());
+		noteList.forEach(note -> {
+			result.add(note.getValue());
+		});
+		return result;
+	}
+	public void setNote(String text) {
+		NoteType note = new NoteType();
+		note.setValue(text);
+		super.getNote().add(note);
+	}
+	
+	/* TODO test
+BT-132 ++ 0..1 Referenced purchase order line reference
+An identifier for a referenced line within a purchase order, issued by the Buyer.
+The purchase order identifier is referenced on document level. 
+R6 Document reference	 
+*/
+	public List<String> getOrderLineID() {
+		List<OrderLineReferenceType> orderLineRefList = super.getOrderLineReference();
+		List<String> result = new ArrayList<String>(orderLineRefList.size());
+		orderLineRefList.forEach(orderLineRef -> {
+			result.add(orderLineRef.getLineID().getValue());
+		});
+		return result;
+	}
+	public void setOrderLineID(String id) {
+		LineIDType lineID = new LineIDType();
+		lineID.setValue(id);
+		OrderLineReferenceType orderLineReference = new OrderLineReferenceType();
+		orderLineReference.setLineID(lineID);
+		super.getOrderLineReference().add(orderLineReference);
+	}
+	
 	/* BG-31 ITEM INFORMATION
 	 * A group of business terms providing information about the goods and services invoiced
 
@@ -228,6 +304,11 @@ public class InvoiceLine extends InvoiceLineType {
 0 .. 1 ClassName Klassifikationsname 
 0 .. 1 OriginTradeCountry Detailinformationen zur Produktherkunft xs:sequence 
 1 .. 1 ID Artikelherkunftsland                                    BT-159      TODO
+...
+1 .. 1 SpecifiedLineTradeAgreement Detailinformationen zum Preis  BG-29 xs:sequence 
+0 .. 1 BuyerOrderReferencedDocument Detailangaben zur zugehörigen Bestellung xs:sequence 
+0 .. 1 IssuerAssignedID Bestellnummer 
+0 .. 1 LineID Referenz zur Bestellposition                        BT-132      TODO
 
 nicht implementiert optionale ITEM INFORMATION Teile TODO:
 BT-156 +++ 0..1 Item Buyer's identifier
@@ -235,6 +316,7 @@ BT-157 +++ 0..1 Item standard identifier + identification scheme identifier of t
 BT-158 +++ 0..n Item classification identifier
 BT-159 +++ 0..1 Item country of origin
 BG-32  +++ 0..n ITEM ATTRIBUTES
+BT-132 ++  0..1 Referenced purchase order line reference
 
 	 */
 	/**
@@ -247,24 +329,25 @@ BG-32  +++ 0..n ITEM ATTRIBUTES
 	 * 
 	 */
 	public String getItemName() {
-		return getItemInformation().getName().getValue();
+		ItemType item = super.getItem();
+		return item.getName()==null ? null : item.getName().getValue();
 	}
 	private void setItemName(String itemName) {
 		NameType name = new NameType();
 		name.setValue(itemName);
-		ItemType item = getItemInformation();
+		ItemType item = super.getItem();
 		item.setName(name);
 	}
-	private ItemType getItemInformation() {
-		ItemType item = super.getItem();
-		if(item!=null) {
-			return item;
-		}
-		// add empty item to this:
-		item = new ItemType();
-		super.setItem(item);
-		return item;
-	}
+//	private ItemType getItemInformation() {
+//		ItemType item = super.getItem();
+//		if(item!=null) {
+//			return item;
+//		}
+//		// add empty item to this: causes getItemInformation in lambda!!!
+//		item = new ItemType();
+//		super.setItem(item);
+//		return item;
+//	}
 
 	/**
 	 * Item description (optional part in ITEM INFORMATION)
@@ -279,19 +362,26 @@ BG-32  +++ 0..n ITEM ATTRIBUTES
 	 * 
 	 */
 	public List<String> getItemDescriptions() {
-		List<DescriptionType> descriptions = getItemInformation().getDescription();
-		List<String> result = new ArrayList<String>(descriptions.size());
-		descriptions.forEach(description -> {
-			// DescriptionType extends TextType extends un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType
+		return getItemDescriptions(this);
+	}
+	static List<String> getItemDescriptions(InvoiceLineType line) {
+		ItemType item = line.getItem();
+		if(item==null) {
+			return new ArrayList<String>();
+		}
+		List<DescriptionType> descriptionList = item.getDescription();
+		List<String> result = new ArrayList<String>(descriptionList.size());
+		descriptionList.forEach(description -> {
 			result.add(description.getValue());
 		});
 		return result;
 	}
 	public void addItemDescription(String descriptionText) {
-		List<DescriptionType> descriptions = getItemInformation().getDescription();
+		LOG.info("descriptionText:"+descriptionText);
+		ItemType item = super.getItem();
 		DescriptionType description = new DescriptionType();
 		description.setValue(descriptionText);
-		descriptions.add(description);
+		item.getDescription().add(description);
 	}
 	
 	/**
@@ -306,16 +396,16 @@ BG-32  +++ 0..n ITEM ATTRIBUTES
 	 * 
 	 */
 	public String getSellerAssignedID() {
-		ItemType it = getItemInformation();
-		ItemIdentificationType itemIdentification = it.getSellersItemIdentification();
+		ItemType item = super.getItem();
+		ItemIdentificationType itemIdentification = item.getSellersItemIdentification();
 		if(itemIdentification==null) return null;
 		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
 	}
 	public void setSellerAssignedID(String id) {
 		ItemIdentificationType itemIdentification = new ItemIdentificationType();
 		itemIdentification.setID(Invoice.newIDType(id, null));
-		ItemType it = getItemInformation();
-		it.setSellersItemIdentification(itemIdentification);
+		ItemType item = super.getItem();
+		item.setSellersItemIdentification(itemIdentification);
 	}
 	
 	
@@ -333,7 +423,8 @@ BG-32  +++ 0..n ITEM ATTRIBUTES
 	 * BG-30 ++ 1..1 LINE VAT INFORMATION ------------ hiernach gibt es nur ein Eintrag in der Liste
 	 */
 	private List<VatCategory> getVatCategories() {
-		List<TaxCategoryType> taxCategories = getItemInformation().getClassifiedTaxCategory();
+		ItemType item = super.getItem();
+		List<TaxCategoryType> taxCategories = item.getClassifiedTaxCategory();
 		List<VatCategory> result = new ArrayList<VatCategory>(taxCategories.size());
 		taxCategories.forEach(taxCategory -> {
 			result.add(new VatCategory(taxCategory));
