@@ -14,7 +14,6 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Orde
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PriceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DescriptionType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InvoicedQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
@@ -81,9 +80,7 @@ public class InvoiceLine extends InvoiceLineType {
 	public InvoiceLine(String identifier, Quantity quantity, Amount lineNetAmount, UnitPriceAmount priceAmt
 			, String itemName, VatCategory vatCategory) {
 		this();
-		IDType lineID = new IDType();
-		lineID.setValue(identifier);
-		super.setID(lineID);
+		super.setID(Invoice.newIDType(identifier, null)); // null : No identification scheme 
 		
 		setQuantity(quantity);
 		
@@ -117,25 +114,25 @@ public class InvoiceLine extends InvoiceLineType {
 	/**
 	 * Invoice line identifier - a unique identifier for the individual line within the Invoice.
 	 * <p>
-	 * Cardinality: 1..1 (mandatory)
-	 * <br>ID: BT-126
-	 * <br>Req.ID: R44
+	 * Cardinality: 	1..1 (mandatory)
+	 * <br>EN16931-ID: 	BT-126
+	 * <br>Rule ID: 	BR-21
+	 * <br>Request ID: 	R44
 	 *  
-	 * @return Identifier
 	 */
+	//public void setId(String identifier); // use ctor
 	public String getId() {
 		return super.getID().getValue();
 	}
-	//public void setId(String identifier); // use ctor
 	
 	/**
 	 * UoM and quantity of items (goods or services) that is charged in the Invoice line.
 	 * <p>
-	 * Cardinality: 1..1 (mandatory)
-	 * <br>ID: BT-129, BT-130
-	 * <br>Req.ID: R39, R56, R14
+	 * Cardinality: 	1..1 (mandatory)
+	 * <br>EN16931-ID: 	BT-130, BT.129
+	 * <br>Rule ID: 	BR-23, BR-22
+	 * <br>Request ID: 	R39, R56, R14
 	 *  
-	 * @return Quantity
 	 */
 	public Quantity getQuantity() {
 		QuantityType quantity = super.getInvoicedQuantity();
@@ -154,13 +151,13 @@ public class InvoiceLine extends InvoiceLineType {
 	 * The total amount of the Invoice line. The amount is “net” without VAT, i.e.
 	 * inclusive of line level allowances and charges as well as other relevant taxes.
 	 * <p>
-	 * Cardinality: 1..1 (mandatory)
-	 * <br>ID: BT-131 
-	 * <br>Req.ID: R39, R40, R56
+	 * Cardinality: 	1..1 (mandatory)
+	 * <br>EN16931-ID: 	BT-131
+	 * <br>Rule ID: 	BR-24
+	 * <br>Request ID: 	R39, R56, R14
 	 * 
-	 * @return Amount
 	 */
-	public Amount getLineNetAmount() {
+	public Amount getLineNetAmount() { // Umbenennen in LineTotalAmount
 		LineExtensionAmountType amount = super.getLineExtensionAmount();
 		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
@@ -175,11 +172,11 @@ public class InvoiceLine extends InvoiceLineType {
 	 * <p>
 	 * The Item net price has to be equal with the Item gross price less the Item price discount.
 	 * <p>
-	 * Cardinality: 1..1 (mandatory)
-	 * <br>ID: BG-29, BT-146 
-	 * <br>Req.ID: R14
+	 * Cardinality: 	1..1 (mandatory)
+	 * <br>EN16931-ID: 	BG-29, BT-146 
+	 * <br>Rule ID: 	BR-27
+	 * <br>Request ID: 	R14
 	 * 
-	 * @return Unit price amount
 	 */
 	public UnitPriceAmount getItemNetPrice() {
 		PriceAmountType priceAmount = super.getPrice().getPriceAmount();
@@ -193,14 +190,47 @@ public class InvoiceLine extends InvoiceLineType {
 		super.setPrice(price);
 	}
 
+	/* BG-31 ITEM INFORMATION
+	 * A group of business terms providing information about the goods and services invoiced
+
+1 .. 1 SpecifiedTradeProduct Artikelinformationen                 BG-31 xs:sequence
+0 .. 1 GlobalID Kennung eines Artikels nach registriertem Schema  BT-157      TODO 
+       required schemeID Kennung des Schemas                      BT-157-1 
+0 .. 1 SellerAssignedID Artikelnummer des Verkäufers              BT-155      TODO 
+0 .. 1 BuyerAssignedID Artikelnummer des Käufers                  BT-156      TODO 
+1 .. 1 Name Artikelname                                           BT-153 
+0 .. 1 Description Artikelbeschreibung                            BT-154
+0 .. n ApplicableProductCharacteristic Artikelattribute           BG-32 xs:sequence 
+0 .. 1 TypeCode Art der Produkteigenschaft (Code) 
+1 .. 1 Description Artikelattributname                            BT-160 
+0 .. 1 ValueMeasure Wert der Produkteigenschaft (numerische Messgröße) 
+       required unitCode Maßeinheit 
+1 .. 1 Value Artikelattributwert                                  BT-161 
+0 .. n DesignatedProductClassification Detailinformationen zur Produktklassifikation xs:sequence 
+1 .. 1 ClassCode Kennung der Artikelklassifizierung               BT-158      TODO 
+       required listID Kennung des Schemas                        BT-158-1 
+       optional listVersionID Version des Schemas                 BT-158-2 
+0 .. 1 ClassName Klassifikationsname 
+0 .. 1 OriginTradeCountry Detailinformationen zur Produktherkunft xs:sequence 
+1 .. 1 ID Artikelherkunftsland                                    BT-159      TODO
+
+nicht implementiert optionale ITEM INFORMATION Teile TODO:
+BT-155 +++ 0..1 Item Seller's identifier
+BT-156 +++ 0..1 Item Buyer's identifier
+BT-157 +++ 0..1 Item standard identifier + identification scheme identifier of the Item standard identifier
+BT-158 +++ 0..n Item classification identifier
+BT-159 +++ 0..1 Item country of origin
+BG-32  +++ 0..n ITEM ATTRIBUTES
+
+	 */
 	/**
-	 * Item name (mandatory part in ITEM INFORMATION)
+	 * Item name (mandatory part in BG-31 ITEM INFORMATION)
 	 * <p>
-	 * Cardinality: 1..1 (mandatory)
-	 * <br>ID: BG-31, BT-153 
-	 * <br>Req.ID: R20, R56, R25, R26
+	 * Cardinality: 	1..1 (mandatory)
+	 * <br>EN16931-ID: 	BT-153 
+	 * <br>Rule ID: 	BR-25
+	 * <br>Request ID: 	R20, R56
 	 * 
-	 * @return Text
 	 */
 	public String getItemName() {
 		return getItemInformation().getName().getValue();
@@ -211,12 +241,6 @@ public class InvoiceLine extends InvoiceLineType {
 		ItemType item = getItemInformation();
 		item.setName(name);
 	}
-	
-	/* ITEM INFORMATION
-	 * A group of business terms providing information about the goods and services invoiced.
-	 * Cardinality: 1..1 (mandatory)
-	 * Req.ID: R20, R56, R25, R26
-	 */
 	private ItemType getItemInformation() {
 		ItemType item = super.getItem();
 		if(item!=null) {
@@ -228,25 +252,17 @@ public class InvoiceLine extends InvoiceLineType {
 		return item;
 	}
 
-	/* nicht implementiert optionale ITEM INFORMATION Teile TODO:
-BT-155 +++ 0..1 Item Seller's identifier
-BT-156 +++ 0..1 Item Buyer's identifier
-BT-157 +++ 0..1 Item standard identifier + identification scheme identifier of the Item standard identifier
-BT-158 +++ 0..n Item classification identifier
-BT-159 +++ 0..1 Item country of origin
-BG-32  +++ 0..n ITEM ATTRIBUTES
-	 */
-	
 	/**
 	 * Item description (optional part in ITEM INFORMATION)
 	 * <p>
 	 * A description for an item. The Item description allows for describing the item 
 	 * and its features in more detail than the Item name.
 	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>ID: BG-31, BT-154 
-	 * <br>Req.ID: R20, R56
-	 * @return Text
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BT-154 
+	 * <br>Rule ID:
+	 * <br>Request ID: 	R20, R56
+	 * 
 	 */
 	public List<String> getItemDescriptions() {
 		List<DescriptionType> descriptions = getItemInformation().getDescription();

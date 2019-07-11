@@ -15,7 +15,6 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Pric
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditedQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DescriptionType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PriceAmountType;
@@ -58,9 +57,7 @@ public class CreditNoteLine extends CreditNoteLineType {
 	public CreditNoteLine(String identifier, Quantity quantity, Amount lineNetAmount, UnitPriceAmount priceAmt
 			, String itemName, VatCategory vatCategory) {
 		this();
-		IDType lineID = new IDType();
-		lineID.setValue(identifier);
-		super.setID(lineID);
+		super.setID(Invoice.newIDType(identifier, null)); // null : No identification scheme 
 		
 		setQuantity(quantity);
 		
@@ -77,11 +74,13 @@ public class CreditNoteLine extends CreditNoteLineType {
 		
 	}
 	
+//	 * <br>Request ID: 	R44
+	//public void setId(String identifier); // use ctor
 	public String getId() {
 		return super.getID().getValue();
 	}
-	//public void setId(String identifier); // use ctor
 	
+//	 * <br>EN16931-ID: 	BT-130, BT.129
 	public Quantity getQuantity() {
 		QuantityType quantity = super.getCreditedQuantity();
 		return quantity==null ? null : new Quantity(quantity.getUnitCode(), quantity.getValue());
@@ -94,6 +93,7 @@ public class CreditNoteLine extends CreditNoteLineType {
 		super.setCreditedQuantity(creditedQuantity);
 	}
 
+//	 * <br>EN16931-ID: 	BT-131
 	public Amount getLineNetAmount() {
 		LineExtensionAmountType amount = super.getLineExtensionAmount();
 		return amount==null ? null : new Amount(amount.getCurrencyID(), amount.getValue());
@@ -105,6 +105,7 @@ public class CreditNoteLine extends CreditNoteLineType {
 		super.setLineExtensionAmount(lineExtensionAmount);
 	}
 
+//	 * <br>EN16931-ID: 	BG-29, BT-146 
 	public UnitPriceAmount getItemNetPrice() {
 		if(super.getPrice()==null) return null;
 		PriceAmountType priceAmount = super.getPrice().getPriceAmount();
@@ -119,6 +120,7 @@ public class CreditNoteLine extends CreditNoteLineType {
 		super.setPrice(price);
 	}
 
+//	 * <br>EN16931-ID: 	BG-31, BT-153 
 	public String getItemName() {
 		NameType name = getItemInformation().getName();
 		return name==null ? null : name.getValue();
@@ -129,7 +131,6 @@ public class CreditNoteLine extends CreditNoteLineType {
 		ItemType item = getItemInformation();
 		item.setName(name);
 	}
-
 	private ItemType getItemInformation() {
 		ItemType item = super.getItem();
 		if(item!=null) {
@@ -141,6 +142,7 @@ public class CreditNoteLine extends CreditNoteLineType {
 		return item;
 	}
 
+//	 * <br>EN16931-ID: 	BT-154 
 	public List<String> getItemDescriptions() {
 		List<DescriptionType> descriptions = getItemInformation().getDescription();
 		List<String> result = new ArrayList<String>(descriptions.size());
