@@ -44,3 +44,7 @@ this snippet creates a valid ubl invoice [see (xrechnung-testsuite)](https://git
   transformer.toXML(ublInvoice);
 ```
 - in [AD-e-invoice](https://github.com/klst-de/AD-e-invoice) I use the jar to create "€-invoices" within an ERP-System.
+
+## Core Invoice Overview
+
+![](src/main/resources/image/CoreInvoice.PNG)
