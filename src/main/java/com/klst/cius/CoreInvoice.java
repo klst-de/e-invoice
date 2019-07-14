@@ -7,7 +7,11 @@ import com.klst.untdid.codelist.DocumentNameCode;
 
 /*
 
-Ich wähle den Begriff CoreInvoice für das Interface, das die gemeinsamen Methoden des sematischen Datenmodells beschreibz.
+core invoice model ::=
+semantic data model of the core elements of an electronic invoice
+siehe: EN_16931_1_2017_en , Kap.3 Terms and definitions
+
+Ich wähle den Begriff CoreInvoice für das Interface, das die gemeinsamen Methoden des sematischen Datenmodells beschreibt.
 Das Datenmodell hat zwei Syntaxen. UBL und CII
 Implemetiert wird CoreInvoice in
  - ubl.Invoice
@@ -15,11 +19,11 @@ Implemetiert wird CoreInvoice in
  - uncefact.CrossIndustryInvoice
  
 Eine andere mögliche Namensgebung wären die Profilnamen mit Hierarhie
- - CoreInvoiceMinimum
- - CoreInvoiceBasicwl extends CoreInvoiceMinimum
- - CoreInvoiceBasic extends CoreInvoiceBasicwl
- - CoreInvoiceEN16931 extends CoreInvoiceBasic                 -- das entspricht CoreInvoice
- - CoreInvoiceExtended extends CoreInvoiceEN16931
+ - CoreInvoiceMinimum                                          -- nur fr
+ - CoreInvoiceBasicwl extends CoreInvoiceMinimum               -- nur fr
+ - CoreInvoiceBasic extends CoreInvoiceBasicwl                 -- Untermenge von EN 16931-1
+ - CoreInvoiceEN16931 extends CoreInvoiceBasic                 -- EN 16931-1 vollständig, entspricht CoreInvoice
+ - CoreInvoiceExtended extends CoreInvoiceEN16931              -- Erweiterung der EN 16931-1
 
  */
 public interface CoreInvoice {

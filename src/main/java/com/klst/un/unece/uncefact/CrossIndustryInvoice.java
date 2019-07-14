@@ -1131,7 +1131,38 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 
 	/* INVOICE LINE                                BG-25                       1..* (mandatory)
 	 * Eine Gruppe von Informationselementen, die Informationen über einzelne Rechnungspositionen liefern.
+	 * 
+
+1 .. 1 SupplyChainTradeTransaction Gruppierung der Informationen zum Geschäftsvorfall xs:sequence 
+0 .. n IncludedSupplyChainTradeLineItem Rechnungsposition BG-25 xs:sequence 
+
 	 */
+	
+	public void addLine(SupplyChainTradeLineItemType line) {
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem().add(line);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
+	}
+
+	public void addLines(CrossIndustryInvoiceType doc) {
+		List<TradeLineItem> lines = getLines(doc);
+		lines.forEach(line -> {
+			addLine(new TradeLineItem(line));
+		});
+	}
+
+	public List<TradeLineItem> getLines() {
+		return getLines(this);
+	}
+	static List<TradeLineItem> getLines(CrossIndustryInvoiceType doc) {
+		List<SupplyChainTradeLineItemType> lines = doc.getSupplyChainTradeTransaction().getIncludedSupplyChainTradeLineItem();
+		List<TradeLineItem> resultLines = new ArrayList<TradeLineItem>(lines.size());
+		lines.forEach(line -> {
+			resultLines.add(new TradeLineItem(line));
+		});
+		return resultLines;
+	}
+
 	/**
 	 * Adds a mandatory invoice line element
 	 * 
