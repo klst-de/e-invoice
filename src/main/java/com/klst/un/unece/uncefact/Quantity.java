@@ -3,6 +3,8 @@ package com.klst.un.unece.uncefact;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import com.klst.cius.Rounding;
+
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType;
 
 /* Mit diesem Datentyp wird die Mengenangabe zu einem Einzelposten abgebildet. 
@@ -22,7 +24,7 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Qua
  * The quantity of items (goods or services) that is charged in the Invoice line.
  * 
  */
-public class Quantity extends QuantityType {
+public class Quantity extends QuantityType implements Rounding {
 
 	public static final int SCALE = 4;
 	
@@ -40,15 +42,20 @@ public class Quantity extends QuantityType {
 		this.setValue(quantity);
 	}
 
-	public BigDecimal getValue(RoundingMode roundingMode) {
-		return getValue().setScale(SCALE, roundingMode);
-	}
-	
 	void copyTo(un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType quantity) {
 		quantity.setUnitCode(this.getUnitCode());
 		quantity.setValue(this.getValue(RoundingMode.HALF_UP));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.klst.cius.Rounding#getValue(java.math.RoundingMode)
+	 */
+	@Override
+	public BigDecimal getValue(RoundingMode roundingMode) {
+		return getValue().setScale(SCALE, roundingMode);
+	}
+	
 	@Override
 	public String toString() {
 		return getValue(RoundingMode.HALF_UP) + (getUnitCode()==null ? "" : " " + getUnitCode());

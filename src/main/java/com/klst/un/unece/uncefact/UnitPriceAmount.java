@@ -42,14 +42,19 @@ public class UnitPriceAmount extends Amount {
 		super(currencyID, amount);
 	}
 
-	public BigDecimal getValue(RoundingMode roundingMode) {
-		return getValue().setScale(SCALE, roundingMode);
-	}
-	
 	void copyTo(un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType amount) {
 		amount.setValue(this.getValue(RoundingMode.HALF_UP));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.klst.un.unece.uncefact.Amount#getValue(java.math.RoundingMode)
+	 */
+	@Override
+	public BigDecimal getValue(RoundingMode roundingMode) {
+		return getValue().setScale(SCALE, roundingMode);
+	}
+	
 	@Override
 	public String toString() {
 		return getCurrencyID()==null ? ""+getValue(RoundingMode.HALF_UP) : getCurrencyID() + getValue(RoundingMode.HALF_UP);

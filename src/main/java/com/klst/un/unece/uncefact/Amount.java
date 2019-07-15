@@ -3,6 +3,8 @@ package com.klst.un.unece.uncefact;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import com.klst.cius.Rounding;
+
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.AmountType;
 
 /* Mit diesem Datentyp wird ein Betrag in numerischer Form abgebildet. 
@@ -27,7 +29,7 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Amo
  * Type is floating up to two fraction digits.
  *
  */
-public class Amount extends AmountType {
+public class Amount extends AmountType implements Rounding {
 
 	// Der Betrag wird mit zwei Nachkommastellen angegeben. ==> setScale(2, RoundingMode.HALF_UP)
 	public static final int SCALE = 2;
@@ -64,6 +66,11 @@ public class Amount extends AmountType {
 		amount.setValue(this.getValue(RoundingMode.HALF_UP));
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see com.klst.cius.Rounding#getValue(java.math.RoundingMode)
+	 */
+	@Override
 	public BigDecimal getValue(RoundingMode roundingMode) {
 		return getValue().setScale(SCALE, roundingMode);
 	}
