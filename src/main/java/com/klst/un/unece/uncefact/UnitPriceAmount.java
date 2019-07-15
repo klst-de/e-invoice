@@ -1,6 +1,7 @@
 package com.klst.un.unece.uncefact;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /* Mit diesem Datentyp wird der dem Preis eines Einzelpostens entsprechende Betrag abgebildet.
  * 
@@ -13,6 +14,9 @@ import java.math.BigDecimal;
 /**
  * Unit Price Amount
  * 
+ * This is a "decimal" type with 4 digits maximum after the decimal point, without a thousand separator, and with the ". " as a decimal separator. 
+ * It can be supplemented by a "Currency" attribute, if different from the currency in the header. Example 1000.3454
+ * 
  * @see European standard EN 16931-1:2017 : 6.5.3 Unit Price Amount
  * 
  * A unit price amount states a numerical monetary amount value for data elements 
@@ -24,15 +28,31 @@ import java.math.BigDecimal;
  */
 public class UnitPriceAmount extends Amount {
 
+	public static final int SCALE = 4;
+	
 	UnitPriceAmount() {
 		super();
+	}
+
+	public UnitPriceAmount(BigDecimal amount) {
+		super(amount);
 	}
 
 	public UnitPriceAmount(String currencyID, BigDecimal amount) {
 		super(currencyID, amount);
 	}
 
-	public BigDecimal getValue() {
-		return super.getValue();
+	public BigDecimal getValue(RoundingMode roundingMode) {
+		return getValue().setScale(SCALE, roundingMode);
 	}
+	
+	void copyTo(un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType amount) {
+		amount.setValue(this.getValue(RoundingMode.HALF_UP));
+	}
+
+	@Override
+	public String toString() {
+		return getCurrencyID()==null ? ""+getValue(RoundingMode.HALF_UP) : getCurrencyID() + getValue(RoundingMode.HALF_UP);
+	}
+
 }

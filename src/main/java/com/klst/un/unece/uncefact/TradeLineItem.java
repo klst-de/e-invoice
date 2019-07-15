@@ -155,21 +155,12 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override // 1 .. 1 ChargeAmount BT-146
 	public void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
 		setUnitPriceAmount(unitPriceAmount, null);
-//		TradePriceType tradePrice = new TradePriceType();
-////		tradePrice.setBasisQuantity(value); BT-149-0 + BT-150-0 optional
-//		AmountType chargeAmount = new AmountType();
-//		// amount.copyTo(chargeAmount); === amount.setValue(this.getValue(RoundingMode.HALF_UP));
-//		chargeAmount.setValue(unitPriceAmount.getValue());
-////		tradePrice.getChargeAmount(); // List<AmountType> mit nur einem Element
-//		tradePrice.getChargeAmount().add(chargeAmount);
-//		specifiedLineTradeAgreement.setNetPriceProductTradePrice(tradePrice);
-//		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
 	}
 
 	// 1 .. 1 ChargeAmount BT-146 , BaseQuantity BT-149-0 + BT-150-0 optional
 	public void setUnitPriceAmount(UnitPriceAmount unitPriceAmount, Quantity quantity) {
 		AmountType chargeAmount = new AmountType();
-		chargeAmount.setValue(unitPriceAmount.getValue()); // TODO RoundingMode.HALF_UP
+		unitPriceAmount.copyTo(chargeAmount);
 		TradePriceType tradePrice = new TradePriceType();
 		tradePrice.getChargeAmount().add(chargeAmount);
 		
