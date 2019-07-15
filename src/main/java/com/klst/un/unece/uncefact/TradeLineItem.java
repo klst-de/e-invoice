@@ -1,8 +1,10 @@
 package com.klst.un.unece.uncefact;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.klst.cius.CoreInvoiceLine;
+import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
@@ -151,11 +153,11 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 	@Override // 1 .. 1 ChargeAmount BT-146
 	public void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
-		setUnitPriceAmount(unitPriceAmount, null);
+		setUnitPriceAmountAndQuantity(unitPriceAmount, null);
 	}
 
 	// 1 .. 1 ChargeAmount BT-146 , BaseQuantity BT-149-0 + BT-150-0 optional
-	public void setUnitPriceAmount(UnitPriceAmount unitPriceAmount, Quantity quantity) {
+	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
 		AmountType chargeAmount = new AmountType();
 		unitPriceAmount.copyTo(chargeAmount);
 		TradePriceType tradePrice = new TradePriceType();
@@ -176,30 +178,75 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return new UnitPriceAmount(specifiedLineTradeAgreement.getNetPriceProductTradePrice().getChargeAmount().get(0).getValue());
 	}
 
-//	@Override // optional BaseQuantity : BT-149-0 QuantityType 0..1 + BT-150-0 required
+	@Override // optional BaseQuantity : BT-149-0 QuantityType 0..1 + BT-150-0 required
 	public Quantity getBaseQuantity() {
 		QuantityType qt = specifiedLineTradeAgreement.getNetPriceProductTradePrice().getBasisQuantity();
 		return qt==null ? null : new Quantity(qt.getValue());
 	}
 
-// TODO Baustelle
-	private void taxxxx() {
-		TradeTaxType tradeTax = new TradeTaxType();
-		tradeTax.getTypeCode();
-		
+/*
+
+1 .. n ApplicableTradeTax Umsatzsteuerinformationen auf der Ebene der Rechnungsposition BG-30 xs:sequence 
+0 .. 1 CalculatedAmount Steuerbetrag 
+1 .. 1 TypeCode Steuerart (Code)                                                        BT-151-0 
+0 .. 1 ExemptionReason Grund der Steuerbefreiung (Freitext) 
+1 .. 1 CategoryCode Code der Umsatzsteuerkategorie des in Rechnung gestellten Artikels  BT-151
+
+ */
+	/*
+	 * TypeCode Steuerart (Code) Datentyp: qdt:TaxTypeCodeType 
+	 * Hinweis: Fester Wert = "VAT" Kardinalität: 1 .. 1 EN16931-ID: BT-151-0
+	 */
+	static final TaxTypeCodeType VAT() {
 		TaxTypeCodeType taxTypeCode = new TaxTypeCodeType();
 		taxTypeCode.setValue("VAT");
-		/*
-		 * TypeCode Steuerart (Code) Datentyp: qdt:TaxTypeCodeType 
-		 * Hinweis: Fester Wert = "VAT" Kardinalität: 1 .. 1 EN16931-ID: BT-151-0
-		 */
-		TaxCategoryCodeType taxCategoryCode = new TaxCategoryCodeType(); // Kardinalität: 1 .. 1 EN16931-ID: BT-151
-		tradeTax.setCategoryCode(taxCategoryCode);
-		
-		PercentType percent = tradeTax.getRateApplicablePercent(); // Kardinalität: 0 .. 1 EN16931-ID: BT-152
-		
-		specifiedLineTradeSettlement.getApplicableTradeTax(); // List<TradeTaxType>  Kardinalität: 1 .. unbounded . EN16931-ID: BG-30
+		return taxTypeCode;
 	}
+	
+	/*
+	 * 
+	 * @param codeEnum 1..1 EN16931-ID: BT-151
+	 * @param percent 0..1 EN16931-ID: BT-152
+	 */
+	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, Percent percent) {
+		TaxCategoryCodeType taxCategoryCode = new TaxCategoryCodeType();
+		taxCategoryCode.setValue(taxCategoryCode.getValue());
+
+		TradeTaxType tradeTax = new TradeTaxType();
+		tradeTax.setCategoryCode(taxCategoryCode);
+		tradeTax.setTypeCode(VAT());
+		
+		if(percent!=null) {
+			tradeTax.setRateApplicablePercent(percent);
+		}
+		
+		specifiedLineTradeSettlement.getApplicableTradeTax().add(tradeTax);
+		super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);		
+	}
+	
+	@Override
+	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
+		setTaxCategoryAndRate(codeEnum, new Percent(percent));
+	}
+
+	@Override
+	public void setTaxCategory(TaxCategoryCode codeEnum) {
+		setTaxCategoryAndRate(codeEnum, (Percent)null);
+	}
+
+	@Override
+	public TaxCategoryCode getTaxCategory() {
+		TradeTaxType tradeTax = specifiedLineTradeSettlement.getApplicableTradeTax().get(0); // Kardinalität: 1..n
+		tradeTax.getCategoryCode().getValue();
+		return TaxCategoryCode.valueOf(tradeTax.getCategoryCode().getValue());
+	}
+
+	public BigDecimal getTaxRate() {
+		TradeTaxType tradeTax = specifiedLineTradeSettlement.getApplicableTradeTax().get(0); // Kardinalität: 1..n
+		PercentType percent = tradeTax.getRateApplicablePercent();
+		return percent==null ? null : percent.getValue();
+	}
+
 /**
 
 CII:
