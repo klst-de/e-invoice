@@ -1,6 +1,7 @@
 package com.klst.un.unece.uncefact;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType;
 
@@ -14,15 +15,23 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Qua
 /**
  * Quantity contains unit of measure and quantity of items (goods or services)
  * <p>
+ * This is a "decimal" type with 4 digits maximum after the decimal point, without a thousand separator, and with the ". " as a decimal separator. 
+ * Example 10000.3454
+ * 
  * <br>The unit of measure that applies to the invoiced quantity.
  * The quantity of items (goods or services) that is charged in the Invoice line.
  * 
- * <br>Req.ID: R39, R56, R14
  */
 public class Quantity extends QuantityType {
 
+	public static final int SCALE = 4;
+	
 	Quantity() {
 		super();
+	}
+
+	public Quantity(BigDecimal quantity) {
+		this(null, quantity);
 	}
 
 	public Quantity(String unitCode, BigDecimal quantity) {
@@ -31,8 +40,17 @@ public class Quantity extends QuantityType {
 		this.setValue(quantity);
 	}
 
+	public BigDecimal getValue(RoundingMode roundingMode) {
+		return getValue().setScale(SCALE, roundingMode);
+	}
+	
+	void copyTo(un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType quantity) {
+		quantity.setUnitCode(this.getUnitCode());
+		quantity.setValue(this.getValue(RoundingMode.HALF_UP));
+	}
+
 	@Override
 	public String toString() {
-		return this.getValue() + " " + this.getUnitCode();
+		return getValue(RoundingMode.HALF_UP) + (getUnitCode()==null ? "" : " " + getUnitCode());
 	}
 }

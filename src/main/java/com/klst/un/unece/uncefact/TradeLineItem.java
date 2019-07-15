@@ -1,6 +1,5 @@
 package com.klst.un.unece.uncefact;
 
-import java.math.RoundingMode;
 import java.util.List;
 
 import com.klst.cius.CoreInvoiceLine;
@@ -123,10 +122,8 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 	@Override // BT-129+BT-130
 	public void setQuantity(Quantity quantity) { 
-		                     // Quantity extends un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType
-		QuantityType qt = new QuantityType(); // un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType
-		qt.setUnitCode(quantity.getUnitCode());
-		qt.setValue(quantity.getValue());
+		QuantityType qt = new QuantityType();
+		quantity.copyTo(qt);
 		specifiedLineTradeDelivery.setBilledQuantity(qt);
 		super.setSpecifiedLineTradeDelivery(specifiedLineTradeDelivery);
 	}
@@ -166,8 +163,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		
 		if(quantity!=null) {
 			QuantityType qt = new QuantityType();
-			qt.setUnitCode(quantity.getUnitCode());
-			qt.setValue(quantity.getValue());
+			quantity.copyTo(qt);
 			tradePrice.setBasisQuantity(qt); 
 		}
 
@@ -177,13 +173,13 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 	@Override
 	public UnitPriceAmount getItemNetPrice() {
-		return new UnitPriceAmount(null, specifiedLineTradeAgreement.getNetPriceProductTradePrice().getChargeAmount().get(0).getValue());
+		return new UnitPriceAmount(specifiedLineTradeAgreement.getNetPriceProductTradePrice().getChargeAmount().get(0).getValue());
 	}
 
-//	@Override // BaseQuantity BT-149-0 + BT-150-0 optional
+//	@Override // optional BaseQuantity : BT-149-0 QuantityType 0..1 + BT-150-0 required
 	public Quantity getBaseQuantity() {
 		QuantityType qt = specifiedLineTradeAgreement.getNetPriceProductTradePrice().getBasisQuantity();
-		return qt==null ? null : new Quantity(null, qt.getValue());
+		return qt==null ? null : new Quantity(qt.getValue());
 	}
 
 // TODO Baustelle
