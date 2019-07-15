@@ -15,6 +15,9 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Amo
 /**
  * Amount
  * 
+ * This is a "decimal" type with 2 digits maximum after the decimal point, without a thousand separator, and with the ". " as a decimal separator. 
+ * It can be supplemented by a "Currency" attribute, if different from the currency in the header. Example 10000.34
+ * 
  * @see European standard EN 16931-1:2017 : 6.5.2 Amount. Type
  * 
  * An amount states a numerical monetary value. 
@@ -26,10 +29,17 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Amo
  */
 public class Amount extends AmountType {
 
+	// Der Betrag wird mit zwei Nachkommastellen angegeben. ==> setScale(2, RoundingMode.HALF_UP)
+	public static final int SCALE = 2;
+
 	Amount() {
 		super();
 	}
 
+	public Amount(BigDecimal amount) {
+		this(null, amount);
+	}
+	
 	public Amount(String currencyID, BigDecimal amount) {
 		this();
 		this.setCurrencyID(currencyID);
@@ -54,14 +64,12 @@ public class Amount extends AmountType {
 		amount.setValue(this.getValue(RoundingMode.HALF_UP));
 	}
 	
-	// Der Betrag wird mit zwei Nachkommastellen angegeben. ==> setScale(2, RoundingMode.HALF_UP)
-	private static final int SCALE = 2;
 	public BigDecimal getValue(RoundingMode roundingMode) {
 		return getValue().setScale(SCALE, roundingMode);
 	}
 	
 	@Override
 	public String toString() {
-		return this.getCurrencyID() + this.getValue(RoundingMode.HALF_UP);
+		return getCurrencyID()==null ? ""+getValue(RoundingMode.HALF_UP) : getCurrencyID() + getValue(RoundingMode.HALF_UP);
 	}
 }

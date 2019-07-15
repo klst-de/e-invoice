@@ -149,8 +149,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 	@Override
 	public Amount getLineTotalAmount() {
-		// Amount(String currencyID, BigDecimal amount) TODO ohne currencyID!
-		return new Amount(null, specifiedLineTradeSettlement.getSpecifiedTradeSettlementLineMonetarySummation().getLineTotalAmount().get(0).getValue());
+		return new Amount(specifiedLineTradeSettlement.getSpecifiedTradeSettlementLineMonetarySummation().getLineTotalAmount().get(0).getValue());
 	}
 
 	@Override // 1 .. 1 ChargeAmount BT-146
