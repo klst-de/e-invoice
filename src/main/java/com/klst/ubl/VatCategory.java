@@ -77,7 +77,7 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 		super.setTaxScheme(taxCategory.getTaxScheme());
 	}
 	
-	public VatCategory(TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
+	public VatCategory(TaxCategoryCode taxCategoryCode, Percent taxRate) {
 		this();
 		
 		IDType taxID = new IDType();
@@ -90,11 +90,9 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 		taxCategory.setTaxScheme(taxScheme);
 		taxCategory.setID(taxID);
 		if(taxRate!=null) {
-			PercentType percentType = new PercentType();
-			percentType.setValue(taxRate);
-			taxCategory.setPercent(percentType);
+			taxCategory.setPercent(taxRate);
+			super.setPercent(taxRate);
 		}
-		super.setPercent(taxCategory.getPercent());
 		super.setID(taxCategory.getID());
 		super.setTaxScheme(taxCategory.getTaxScheme());
 	}

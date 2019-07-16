@@ -19,6 +19,7 @@ import com.klst.ubl.FinancialAccount;
 import com.klst.ubl.Invoice;
 import com.klst.ubl.InvoiceLine;
 import com.klst.ubl.PaymentMeans;
+import com.klst.ubl.Percent;
 import com.klst.ubl.VatCategory;
 import com.klst.un.unece.uncefact.Amount;
 import com.klst.un.unece.uncefact.BICId;
@@ -152,15 +153,15 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					"TaxCategoryCode:"+vc.getTaxCategoryCode()
 					);
 			VatCategory vatCategory = null;
-			if(vc.getTaxCategoryCodeDeprecated().equals(TaxCategoryCode.StandardRate.getValue())) {
-				vatCategory = new VatCategory(TaxCategoryCode.StandardRate, vc.getPercent().getValue());
-			} else if(vc.getTaxCategoryCodeDeprecated().equals(TaxCategoryCode.ServicesOutsideScope.getValue())) {
-				vatCategory = new VatCategory(TaxCategoryCode.ServicesOutsideScope, vc.getPercent().getValue());
+			if(vc.getTaxCategoryCode().equals(TaxCategoryCode.StandardRate)) {
+				vatCategory = new VatCategory(TaxCategoryCode.StandardRate, new Percent(vc.getPercent().getValue()));
+			} else if(vc.getTaxCategoryCode().equals(TaxCategoryCode.ServicesOutsideScope)) {
+				vatCategory = new VatCategory(TaxCategoryCode.ServicesOutsideScope, new Percent(vc.getPercent().getValue()));
 			} else {
-				vatCategory = new VatCategory(TaxCategoryCode.ExemptFromTax, vc.getPercent().getValue());
+				vatCategory = new VatCategory(TaxCategoryCode.ExemptFromTax, new Percent(vc.getPercent().getValue()));
 				LOG.warning("vatCategory =============================" +vatCategory);
 			}
-			LOG.info("vc.TaxCategoryCode:"+vc.getTaxCategoryCodeDeprecated() + " new vatCategory:" +vatCategory);
+			LOG.info("vc.TaxCategoryCode:"+vc.getTaxCategoryCode() + " new vatCategory:" +vatCategory);
 			
 			// die optionalen "VAT exemption reason text" und "VAT exemption reason code"
 			List<String> taxExemptionReasonList = (List<String>) vatBreakDown.get(TaxExemptionReasonType.class);
@@ -270,14 +271,14 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		vatBreakDowns.forEach(vatBreakDown -> {
 			VatCategory vc = (VatCategory) vatBreakDown.get(VatCategory.class);
 			VatCategory vatCategory = null;
-			if(vc.getTaxCategoryCodeDeprecated().equals(TaxCategoryCode.StandardRate.getValue())) {
-				vatCategory = new VatCategory(TaxCategoryCode.StandardRate, vc.getPercent().getValue());
-			} else if(vc.getTaxCategoryCodeDeprecated().equals(TaxCategoryCode.ServicesOutsideScope.getValue())) {
-				vatCategory = new VatCategory(TaxCategoryCode.ServicesOutsideScope, vc.getPercent().getValue());
+			if(vc.getTaxCategoryCode().equals(TaxCategoryCode.StandardRate)) {
+				vatCategory = new VatCategory(TaxCategoryCode.StandardRate, new Percent(vc.getPercent().getValue()));
+			} else if(vc.getTaxCategoryCode().equals(TaxCategoryCode.ServicesOutsideScope)) {
+				vatCategory = new VatCategory(TaxCategoryCode.ServicesOutsideScope, new Percent(vc.getPercent().getValue()));
 			} else {
-				vatCategory = new VatCategory(TaxCategoryCode.ExemptFromTax, vc.getPercent().getValue());
+				vatCategory = new VatCategory(TaxCategoryCode.ExemptFromTax, new Percent(vc.getPercent().getValue()));
 			}
-			LOG.info("vc.TaxCategoryCode:"+vc.getTaxCategoryCodeDeprecated() + " new vatCategory:" +vatCategory);
+			LOG.info("vc.TaxCategoryCode:"+vc.getTaxCategoryCode() + " new vatCategory:" +vatCategory);
 			
 			// die optionalen "VAT exemption reason text" und "VAT exemption reason code"
 			List<String> taxExemptionReasonList = (List<String>) vatBreakDown.get(TaxExemptionReasonType.class);
@@ -312,6 +313,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					testLine.getItemName() );
 			
 			VatCategory vatCategory = testLine.getVatCategory(); // mandatory, rate optional
+			LOG.info("testLine.vatCategory : "+vatCategory + " vatCategory.getTaxRate():"+vatCategory.getTaxRate());
 			invoiceLine.setTaxCategoryAndRate(vatCategory.getTaxCategoryCode(), vatCategory.getTaxRate());
 			
 			itemDescriptions.forEach(description -> {

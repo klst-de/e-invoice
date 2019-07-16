@@ -138,12 +138,13 @@ public class InvoiceLine extends InvoiceLineType {
 	 * @param codeEnum 1..1 EN16931-ID: BT-151
 	 * @param percent 0..1 EN16931-ID: BT-152
 	 */
-//	@Override TODO
-	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
-		// TODO class Percent extends OASIS , dann setTaxCategoryAndRate(codeEnum, new Percent(percent));
-		// vorerst so:
+	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, Percent percent) {
 		VatCategory taxCategory = new VatCategory(codeEnum, percent);
 		item.getClassifiedTaxCategory().add(taxCategory);
+	}
+//	@Override TODO
+	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
+		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
 	}
 	
 	/**
