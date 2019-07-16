@@ -3,6 +3,7 @@ package com.klst.untdid.codelist;
 import java.util.HashMap;
 import java.util.Map;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
 
 /* urn:xoev-de:kosit:codeliste:untdid.5305
@@ -61,7 +62,7 @@ Anmerkung: nicht alle Codes aus der Codeliste UNTDID 5305 werden verwendet
  */
 public enum TaxCategoryCode {
 
-	StandardRate 		("S"), //S("S"),
+	StandardRate 		("S"),
 	ZeroRatedGoods 		("Z"),
 	ExemptFromTax 		("E"),
 	VATreverseCharge 	("AE"),
@@ -101,6 +102,10 @@ public enum TaxCategoryCode {
         }
     }
     
+    public static TaxCategoryCode valueOf(TaxCategoryType ublCode) {
+    	return ublCode.getID()==null ? null : map.get(ublCode.getID().getValue());
+    } 
+
     public static TaxCategoryCode valueOf(TaxCategoryCodeType uneceCode) {
     	return map.get(uneceCode.getValue());
     } 

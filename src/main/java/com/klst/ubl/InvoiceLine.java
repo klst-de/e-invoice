@@ -1,5 +1,6 @@
 package com.klst.ubl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -7,6 +8,7 @@ import java.util.logging.Logger;
 import com.klst.un.unece.uncefact.Amount;
 import com.klst.un.unece.uncefact.Quantity;
 import com.klst.un.unece.uncefact.UnitPriceAmount;
+import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemIdentificationType;
@@ -93,25 +95,6 @@ public class InvoiceLine extends InvoiceLineType {
 			setOrderLineID(orderLineReference.getLineID().getValue());
 		});
 		
-//		item = new ItemType();
-//		super.setItem(item);
-//		ItemType item = line.getItem();
-//		if(item!=null) {
-//			ItemIdentificationType itemIdentification = item.getSellersItemIdentification();
-//			if(itemIdentification==null) {
-//				//
-//			} else {
-//				this.setSellerAssignedID(itemIdentification.getID()==null ? null : itemIdentification.getID().getValue()) ;
-//			}
-//			List<String> descriptionList = getItemDescriptions(line);
-//			LOG.info("Zeile 105 descriptionList.size:"+descriptionList.size());
-//			descriptionList.forEach(description -> {
-//				LOG.info("Zeile 107 description:"+description);
-//				addItemDescription(description);
-//			});
-//		} else {
-//			LOG.warning("line.item!=null !!!!!!!!!!!!!!!!!!!!!!!!!!");
-//		}
 	}
 	
 	/**
@@ -124,8 +107,7 @@ public class InvoiceLine extends InvoiceLineType {
 	 * @param itemName : a name for an item (mandatory part in ITEM INFORMATION)
 	 * @param vatCategory : VAT category code and rate for the invoiced item. (mandatory part in LINE VAT INFORMATION)
 	 */
-	public InvoiceLine(String identifier, Quantity quantity, Amount lineNetAmount, UnitPriceAmount priceAmt
-			, String itemName, VatCategory vatCategory) {
+	public InvoiceLine(String identifier, Quantity quantity, Amount lineNetAmount, UnitPriceAmount priceAmt, String itemName) {
 		this();
 		super.setID(Invoice.newIDType(identifier, null)); // null : No identification scheme 
 		
@@ -144,23 +126,26 @@ public class InvoiceLine extends InvoiceLineType {
 //		invoiceLine.getOrderLineReference()
 */
 		
-//		ItemType item = getItemInformation(); // ITEM INFORMATION, creates new if necessary
 		item = new ItemType();
 		super.setItem(item);
 
 		setItemName(itemName);
-//		ItemType item = new ItemType();
-//		NameType name = new NameType();
-//		name.setValue(itemName);
-//		item.setName(name);
 		
-		List<TaxCategoryType> taxCategories = item.getClassifiedTaxCategory();
-//		taxCategories.add(new TaxCategory(taxCategoryCode, taxRate));
-		taxCategories.add(vatCategory);
-		
-//		super.setItem(item);
 	}
 
+	/*
+	 * 
+	 * @param codeEnum 1..1 EN16931-ID: BT-151
+	 * @param percent 0..1 EN16931-ID: BT-152
+	 */
+//	@Override TODO
+	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
+		// TODO class Percent extends OASIS , dann setTaxCategoryAndRate(codeEnum, new Percent(percent));
+		// vorerst so:
+		VatCategory taxCategory = new VatCategory(codeEnum, percent);
+		item.getClassifiedTaxCategory().add(taxCategory);
+	}
+	
 	/**
 	 * Invoice line identifier - a unique identifier for the individual line within the Invoice.
 	 * <p>

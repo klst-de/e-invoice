@@ -83,15 +83,17 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 		IDType taxID = new IDType();
 		taxID.setValue(taxCategoryCode.getValue());
 		
-		PercentType percentType = new PercentType();
-		percentType.setValue(taxRate);
 			
 		TaxSchemeType taxScheme = getVatScheme();
 		
 		TaxCategoryType taxCategory = new TaxCategoryType();
 		taxCategory.setTaxScheme(taxScheme);
 		taxCategory.setID(taxID);
-		taxCategory.setPercent(percentType);
+		if(taxRate!=null) {
+			PercentType percentType = new PercentType();
+			percentType.setValue(taxRate);
+			taxCategory.setPercent(percentType);
+		}
 		super.setPercent(taxCategory.getPercent());
 		super.setID(taxCategory.getID());
 		super.setTaxScheme(taxCategory.getTaxScheme());
@@ -106,8 +108,12 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 	 * 
 	 * @return Code
 	 */
-	public String getTaxCategoryCode() {
+	@Deprecated
+	public String getTaxCategoryCodeDeprecated() {
 		return getID().getValue();
+	}
+	public TaxCategoryCode getTaxCategoryCode() {
+		return TaxCategoryCode.valueOf(this);
 	}
 	
 	/**
