@@ -140,7 +140,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 //		setDocumentTotals(doc);
 //		setInvoiceTax(getInvoiceTax(doc));
 //		addVATBreakDown(doc);
-//		addLines(doc);
+		addLines(doc);
 	}
 
 

@@ -1,5 +1,10 @@
 package com.klst.untdid.codelist;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
+
 /* urn:xoev-de:kosit:codeliste:untdid.5305
  * United Nations Trade Data Interchange Directory (UNTDID), http://www.unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tredi2.htm
  * UN/EDIFACT 5305  Duty or tax or fee category code
@@ -56,7 +61,7 @@ Anmerkung: nicht alle Codes aus der Codeliste UNTDID 5305 werden verwendet
  */
 public enum TaxCategoryCode {
 
-	StandardRate 		("S"),
+	StandardRate 		("S"), //S("S"),
 	ZeroRatedGoods 		("Z"),
 	ExemptFromTax 		("E"),
 	VATreverseCharge 	("AE"),
@@ -88,5 +93,16 @@ public enum TaxCategoryCode {
 	public String getValue() {
 		return value;
 	}
+
+    private static Map<String, TaxCategoryCode> map = new HashMap<String, TaxCategoryCode>();
+    static {
+        for (TaxCategoryCode documentNameCode : TaxCategoryCode.values()) {
+            map.put(documentNameCode.value, documentNameCode);
+        }
+    }
+    
+    public static TaxCategoryCode valueOf(TaxCategoryCodeType uneceCode) {
+    	return map.get(uneceCode.getValue());
+    } 
 
 }

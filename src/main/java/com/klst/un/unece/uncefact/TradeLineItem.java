@@ -2,6 +2,7 @@ package com.klst.un.unece.uncefact;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.klst.cius.CoreInvoiceLine;
 import com.klst.untdid.codelist.TaxCategoryCode;
@@ -38,15 +39,11 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  */
 public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreInvoiceLine {
 
+	private static final Logger LOG = Logger.getLogger(TradeLineItem.class.getName());
+
 	public TradeLineItem() {
 		super();
 	}
-	
-//	DocumentLineDocumentType documentLineDocument;
-//	TradeProductType tradeProduct;
-//	LineTradeAgreementType lineTradeAgreement;
-//	LineTradeDeliveryType lineTradeDelivery;
-//	LineTradeSettlementType lineTradeSettlement;
 	
 	// copy ctor
 	public TradeLineItem(SupplyChainTradeLineItemType line) {
@@ -113,13 +110,13 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 	@Override // 1 .. 1 SpecifiedTradeProduct.Name BT-153
 	public void setItemName(String text) {
-		specifiedTradeProduct.setTradeName(CrossIndustryInvoice.newTextType(text));
+		specifiedTradeProduct.getName().add(CrossIndustryInvoice.newTextType(text));
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
 
 	@Override
 	public String getItemName() {
-		return specifiedTradeProduct.getTradeName().getValue();
+		return specifiedTradeProduct.getName().get(0).getValue();
 	}
 
 	@Override // BT-129+BT-130
@@ -135,6 +132,11 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return new Quantity(specifiedLineTradeDelivery.getBilledQuantity().getUnitCode(), specifiedLineTradeDelivery.getBilledQuantity().getValue());
 	}
 
+	// TODO BT-128
+	// TODO <ram:Description>Zeitschrift Inland</ram:Description>
+	// TODO <ram:DesignatedProductClassification>
+	// TODO <ram:BuyerOrderReferencedDocument>
+	
 	@Override // BT-131
 	public void setLineTotalAmount(Amount amount) { // Amount extends un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.AmountType
 		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
@@ -237,8 +239,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override
 	public TaxCategoryCode getTaxCategory() {
 		TradeTaxType tradeTax = specifiedLineTradeSettlement.getApplicableTradeTax().get(0); // Kardinalität: 1..n
-		tradeTax.getCategoryCode().getValue();
-		return TaxCategoryCode.valueOf(tradeTax.getCategoryCode().getValue());
+		return TaxCategoryCode.valueOf(tradeTax.getCategoryCode());
 	}
 
 	public BigDecimal getTaxRate() {
@@ -248,6 +249,11 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 /**
+1 .. 1 SpecifiedLineTradeSettlement Gruppierung von Angaben zur Abrechnung auf Positionsebene
+0 .. n AdditionalReferencedDocument Objektkennung auf Ebene der Rechnungsposition xs:sequence 
+0 .. 1 IssuerAssignedID Objektkennung auf Ebene der Rechnungsposition, Wert                      BT-128 
+1 .. 1 TypeCode Typ der Kennung für einen Gegenstand, auf dem die Rechnungsposition basiert      BT-128-0 
+0 .. 1 ReferenceTypeCode Kennung des Schemas                                                     BT-128-1
 
 CII:
 0 .. n IncludedSupplyChainTradeLineItem Rechnungsposition                                        BG-25

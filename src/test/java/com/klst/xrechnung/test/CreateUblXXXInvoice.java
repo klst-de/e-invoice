@@ -131,7 +131,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		List<CreditNoteLine> invoiceLines = testCreditNote.getLines();
 		LOG.info("LineGroup starts for "+invoiceLines.size() + " lines.");
 		invoiceLines.forEach(testLine -> {
-			List<String> itemDescriptions = testLine.getItemDescriptions();
+			List<String> itemDescriptions = testLine.getItemDescriptions(); // <> Notes
 			CreditNoteLine invoiceLine = new CreditNoteLine(testLine.getId(), testLine.getQuantity(),
 					testLine.getLineNetAmount(), testLine.getItemNetPrice(), 
 					testLine.getItemName(), testLine.getVatCategory());

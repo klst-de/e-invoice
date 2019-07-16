@@ -9,7 +9,11 @@ import java.util.logging.Logger;
 import com.klst.marshaller.CiiTransformer;
 import com.klst.ubl.CommercialInvoice;
 import com.klst.ubl.Invoice;
+import com.klst.un.unece.uncefact.Amount;
 import com.klst.un.unece.uncefact.CrossIndustryInvoice;
+import com.klst.un.unece.uncefact.Quantity;
+import com.klst.un.unece.uncefact.TradeLineItem;
+import com.klst.un.unece.uncefact.UnitPriceAmount;
 import com.klst.untdid.codelist.DocumentNameCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
@@ -49,6 +53,22 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setSellerParty(testDoc.getSellerParty()); // statt makeSellerGroup(cii);
 		cii.setBuyerParty(testDoc.getBuyerParty());
 		// ... TODO
+        List<TradeLineItem> lines = testDoc.getLines();
+        LOG.info("LineGroup starts for "+lines.size() + " lines.");
+        lines.forEach(testLine -> {
+        	TradeLineItem line = new TradeLineItem
+        			( testLine.getId()
+        			, testLine.getQuantity()
+        			, testLine.getLineTotalAmount()
+        			, testLine.getItemNetPrice()
+        			, testLine.getItemName()
+        			);
+        	line.setNote(testLine.getNote()); // opt
+        	// invoiceLine.setSellerAssignedID(testLine.getSellerAssignedID()); ------------------ 0..1 BT-128 ram:SellerAssignedID
+        	line.setTaxCategoryAndRate(testLine.getTaxCategory(), testLine.getTaxRate());
+        	cii.addLine(line);
+        });
+        LOG.info("LineGroup finished.");
 		return cii;
 	}
 	void makeOptionals(CrossIndustryInvoice cii) {	
