@@ -17,6 +17,8 @@ import com.klst.un.unece.uncefact.UnitPriceAmount;
 import com.klst.untdid.codelist.DocumentNameCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductClassificationType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 
 public class CreateCiiXXXInvoice extends InvoiceFactory {
 
@@ -63,9 +65,27 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         			, testLine.getItemNetPrice()
         			, testLine.getItemName()
         			);
-        	line.setNote(testLine.getNote()); // opt
-        	// invoiceLine.setSellerAssignedID(testLine.getSellerAssignedID()); ------------------ 0..1 BT-128 ram:SellerAssignedID
         	line.setTaxCategoryAndRate(testLine.getTaxCategory(), testLine.getTaxRate());
+        	
+        	line.setNote(testLine.getNote()); // opt
+        	line.setDescription(testLine.getDescription());
+        	line.setSellerAssignedID(testLine.getSellerAssignedID()); // 0..1 BT-128 ram:SellerAssignedID
+        	List<Object> cl = testLine.getClassificationList();
+        	cl.forEach(c -> {
+        		if(c.getClass() == ProductClassificationType.class) {
+        			CodeType cc = ((ProductClassificationType)c).getClassCode();
+        			line.addClassificationID(cc.getValue(), cc.getListID(), cc.getListVersionID());
+ /*
+ 		CodeType code = new CodeType();
+		code.setListID(schemeID);
+		code.setListVersionID(schemeVersion);
+		ProductClassificationType productClassification = new ProductClassificationType();
+		productClassification.setClassCode(code);
+       			
+  */
+        		}
+        	});
+        	line.setOrderLineReference(testLine.getOrderLineReference());
         	cii.addLine(line);
         });
         LOG.info("LineGroup finished.");

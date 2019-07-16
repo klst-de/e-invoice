@@ -1,6 +1,7 @@
 package com.klst.cius;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.klst.un.unece.uncefact.Amount;
 import com.klst.un.unece.uncefact.Quantity;
@@ -49,12 +50,28 @@ public interface CoreInvoiceLine {
 	public void setNote(String text);
 	public String getNote();
 
-	// 1 .. 1 SpecifiedTradeProduct Artikelinformationen                                                BG-31
-	// 0 .. 1 GlobalID Kennung eines Artikels nach registriertem Schema                                 BT-157 
-    //        required schemeID Kennung des Schemas                                                     BT-157-1 
-	// 0 .. 1 SellerAssignedID Artikelnummer des Verkäufers                                             BT-155 
-	// 0 .. 1 BuyerAssignedID Artikelnummer des Käufers                                                 BT-156 
-	// 1 .. 1 Name Artikelname                                                                          BT-153 
+	/*
+	 * Eine vom Verkäufer angegebene Kennung für einen Gegenstand, auf dem die Rechnungsposition basiert
+	 * EN16931-ID: BT-128-0 1..1 TypeCode = "130" Rechnungsdatenblatt, UNTDID 1001 Untermenge
+	 * EN16931-ID: BT-128-1 0..1 UNTDID 1153
+	 */
+	/*    TODO
+	 * Invoice line object identifier
+	 * <p>
+	 * An identifier for an object on which the invoice line is based, given by the Seller.
+	 * It may be a subscription number, telephone number, meter point etc., as applicable.  
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-128
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R33
+	 * 
+	 * @param Identifier
+	 * @param schemeID, (optional) ff it may be not clear for the receiver what scheme is used for the identifier, 
+	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.
+	 */
+//	public void setIssuerAssignedID(String id, String schemeID);
+//	public String getIssuerAssignedID();
 
 	/**
 	 * Item name (mandatory part in 1..1 BG-31 ITEM INFORMATION)
@@ -68,6 +85,21 @@ public interface CoreInvoiceLine {
 	 */
 	public void setItemName(String text);
 	public String getItemName();
+
+	/**
+	 * Item description (optional part in 1..1 BG-31 ITEM INFORMATION)
+ 	 * <p>
+	 * The Item description allows for describing the item and its features in more detail than the Item name.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BT-154
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R20, R56
+	 * 
+	 * @param Text
+	 */
+	public void setDescription(String text);
+	public String getDescription();
 
 	/**
 	 * Billed quantity and UoM of items (goods or services) that is charged in the Invoice line.
@@ -97,6 +129,33 @@ public interface CoreInvoiceLine {
 	 */
 	public void setLineTotalAmount(Amount amount);
 	public Amount getLineTotalAmount();
+
+	/*
+Bsp. CII 01.01a-INVOICE_uncefact.xml :
+                <ram:BuyerOrderReferencedDocument>
+                    <ram:LineID>6171175.1</ram:LineID>
+                </ram:BuyerOrderReferencedDocument>
+     UBL
+        <cac:OrderLineReference>
+            <cbc:LineID>6171175.1</cbc:LineID>
+        </cac:OrderLineReference>
+
+	 */
+	/**
+	 * Referenced purchase order line reference
+	 * <p>
+	 * An identifier for a referenced line within a purchase order, issued by the Buyer.
+	 * The purchase order identifier is referenced on document level. 
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BT-132
+	 * <br>Rule ID: 	 
+	 * <br>Request ID: 	R6
+	 * 
+	 * @param reference
+	 */
+	public void setOrderLineReference(String lineReference);
+	public String getOrderLineReference();
 
 	/**
 	 * Item net price (mandatory part in PRICE DETAILS), exclusive of VAT, after subtracting item price discount.
@@ -134,9 +193,85 @@ public interface CoreInvoiceLine {
 	public void setTaxCategory(TaxCategoryCode codeEnum); 
 	public TaxCategoryCode getTaxCategory(); 
 	// + 0..1 EN16931-ID: BT-152 Invoiced item VAT rate
-//	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, Percent percent); // Percent nur UN
+//	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, Percent percent); // Percent UN und UBL anders!
 //	public Percent getTaxRate(); 
 	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent);
 	public BigDecimal getTaxRate(); 
+
+	/**
+	 * Item Seller's identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
+ 	 * <p>
+	 * An identifier, assigned by the Seller, for the item.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BT-155
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R21, R56
+	 * 
+	 * @param Identifier
+	 */
+	public void setSellerAssignedID(String id);
+	public String getSellerAssignedID();
+
+	/**
+	 * Item Buyer's identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
+ 	 * <p>
+	 * An identifier, assigned by the Buyer, for the item.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BT-156
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R21, R56, R22
+	 * 
+	 * @param Identifier
+	 */
+	public void setBuyerAssignedID(String id);
+	public String getBuyerAssignedID();
+	
+	/*
+	 * GlobalID Kennung eines Artikels nach registriertem Schema
+	 * CII:
+	 * BG-31    1 .. 1   SpecifiedTradeProduct
+	 * BT-157   0 .. 1   GlobalID
+	 * BT-157-1          required schemeID
+	 * Codeliste: ISO 6523 :
+	 * 0021 : SWIFT 
+	 * 0088 : EAN 
+	 * 0060 : DUNS 
+	 * 0177 : ODETTE 
+	 */
+	/**
+	 * Item standard identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
+ 	 * <p>
+	 * An item identifier based on a registered scheme.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BT-157 BT-157-1
+	 * <br>Rule ID: 	BR-64
+	 * <br>Request ID: 	R23, R56
+	 * 
+	 * @param Identifier
+	 * @param schemeID, The identification scheme shall be identified from the entries of the list published by the ISO/IEC 6523 maintenance agency.
+	 */
+	public void setStandardID(String id, String schemeID);
+	public String getStandardID();
+
+	/**
+	 * Item classification identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
+ 	 * <p>
+	 * A code for classifying the item by its type or nature.
+	 * Classification codes are used to allow grouping of similar items for a various purposes e.g. public procurement (CPV), e-Commerce (UNSPSC) etc.
+	 * <p>
+	 * Cardinality: 	0..n (optional)
+	 * <br>EN16931-ID: 	BT-158
+	 * <br>Rule ID: 	BR-64
+	 * <br>Request ID: 	R24
+	 * 
+	 * @param Identifier
+	 * @param schemeID,      BT-158-1 1..1 The identification scheme shall be chosen from the entries in UNTDID 7143
+	 * @param schemeVersion, BT-158-1 0..1 Scheme version identifier - The version of the identification scheme.
+	 */
+	public void addClassificationID(String id, String schemeID, String schemeVersion);
+	public List<Object> getClassificationList();
 
 }

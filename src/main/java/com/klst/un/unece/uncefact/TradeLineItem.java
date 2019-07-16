@@ -1,6 +1,7 @@
 package com.klst.un.unece.uncefact;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -14,12 +15,15 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductClassificationType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeProductType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementLineMonetarySummationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
@@ -65,9 +69,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	 * @param BT-153 itemName : a name for an item (mandatory part in ITEM INFORMATION)
 	 * @param BT-151 vatCategory : VAT category code and rate for the invoiced item. (mandatory part in LINE VAT INFORMATION) !!! ubl
 	 */
-	public TradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount
-			, String itemName //, VatCategory vatCategory
-			) {
+	public TradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName) {
 		this();
 		associatedDocumentLineDocument = new DocumentLineDocumentType();
 		specifiedTradeProduct = new TradeProductType();
@@ -119,6 +121,113 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return specifiedTradeProduct.getName().get(0).getValue();
 	}
 
+	@Override // 0 .. 1 SpecifiedTradeProduct.Description BT-154 Bsp: <ram:Description>Zeitschrift Inland</ram:Description>
+	public void setDescription(String text) {
+		if(text==null) return;
+		specifiedTradeProduct.setDescription(CrossIndustryInvoice.newTextType(text));
+		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+	}
+
+	@Override
+	public String getDescription() {
+		return specifiedTradeProduct.getDescription()==null ? null : specifiedTradeProduct.getDescription().getValue();
+	}
+
+	// TODO BT-128  IssuerAssignedID
+/*
+       TODO
+                <ram:BillingSpecifiedPeriod>
+                    <ram:StartDateTime>
+                        <udt:DateTimeString format="102">20160101</udt:DateTimeString>
+                    </ram:StartDateTime>
+                    <ram:EndDateTime>
+                        <udt:DateTimeString format="102">20161231</udt:DateTimeString>
+                    </ram:EndDateTime>
+                </ram:BillingSpecifiedPeriod>
+
+ */
+	@Override // 0 .. 1 BT-155 Bsp: <ram:SellerAssignedID>246</ram:SellerAssignedID>
+	public void setSellerAssignedID(String id) {
+		if(id==null) return;
+		specifiedTradeProduct.setSellerAssignedID(CrossIndustryInvoice.newIDType(id, null)); // null : No identification scheme is to be used.
+		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+	}
+
+	@Override
+	public String getSellerAssignedID() {
+		return specifiedTradeProduct.getSellerAssignedID()==null ? null : specifiedTradeProduct.getSellerAssignedID().getValue();
+	}
+
+	@Override // 0 .. 1 BT-156
+	public void setBuyerAssignedID(String id) {
+		if(id==null) return;
+		specifiedTradeProduct.setBuyerAssignedID(CrossIndustryInvoice.newIDType(id, null)); // null : No identification scheme is to be used.
+		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+	}
+
+	@Override
+	public String getBuyerAssignedID() {
+		return specifiedTradeProduct.getBuyerAssignedID()==null ? null : specifiedTradeProduct.getBuyerAssignedID().getValue();
+	}
+
+	/*
+	 * GlobalID Kennung eines Artikels nach registriertem Schema
+	 * CII:
+	 * BG-31    1 .. 1   SpecifiedTradeProduct
+	 * BT-157   0 .. 1   GlobalID
+	 * BT-157-1          required schemeID
+	 * Codeliste: ISO 6523 :
+	 * 0021 : SWIFT 
+	 * 0088 : EAN 
+	 * 0060 : DUNS 
+	 * 0177 : ODETTE 
+	 */
+	@Override // 0 .. 1 BT-157
+	public void setStandardID(String id, String schemeID) {
+		if(id==null) return;
+		specifiedTradeProduct.setGlobalID(CrossIndustryInvoice.newIDType(id, schemeID));
+		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+	}
+
+	@Override
+	public String getStandardID() { // ohne schemeID! TODO
+		return specifiedTradeProduct.getGlobalID()==null ? null : specifiedTradeProduct.getGlobalID().getValue();
+	}
+
+/*
+	0 .. n DesignatedProductClassification Detailinformationen zur Produktklassifikation xs:sequence 
+	1 .. 1 ClassCode Kennung der Artikelklassifizierung                                              BT-158 
+	       required listID Kennung des Schemas                                                       BT-158-1 
+	       optional listVersionID Version des Schemas                                                BT-158-2 
+Bsp.
+                <ram:DesignatedProductClassification>
+                    <ram:ClassCode listID="IB">0721-880X</ram:ClassCode>
+                </ram:DesignatedProductClassification>
+
+ */
+	@Override // 0 .. n BT-158
+	public void addClassificationID(String id, String schemeID, String schemeVersion) {
+		if(id==null) return;
+		CodeType code = new CodeType();
+		code.setValue(id);
+		code.setListID(schemeID);
+		code.setListVersionID(schemeVersion);
+		ProductClassificationType productClassification = new ProductClassificationType();
+		productClassification.setClassCode(code);
+		specifiedTradeProduct.getDesignatedProductClassification().add(productClassification);
+		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+	}
+
+	@Override
+	public List<Object> getClassificationList() {
+		List<ProductClassificationType> productClassificatioList = specifiedTradeProduct.getDesignatedProductClassification();
+		List<Object> resList = new ArrayList<Object>(productClassificatioList.size());
+		productClassificatioList.forEach(productClassification -> {
+			resList.add(productClassification);
+		});
+		return resList;
+	}
+
 	@Override // BT-129+BT-130
 	public void setQuantity(Quantity quantity) { 
 		QuantityType qt = new QuantityType();
@@ -132,17 +241,11 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return new Quantity(specifiedLineTradeDelivery.getBilledQuantity().getUnitCode(), specifiedLineTradeDelivery.getBilledQuantity().getValue());
 	}
 
-	// TODO BT-128
-	// TODO <ram:Description>Zeitschrift Inland</ram:Description>
-	// TODO <ram:DesignatedProductClassification>
-	// TODO <ram:BuyerOrderReferencedDocument>
-	
 	@Override // BT-131
-	public void setLineTotalAmount(Amount amount) { // Amount extends un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.AmountType
+	public void setLineTotalAmount(Amount amount) {
 		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
 		AmountType lineTotalAmt = new AmountType();
 		amount.copyTo(lineTotalAmt);
-		// un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType
 		tradeSettlementLineMonetarySummation.getLineTotalAmount().add(lineTotalAmt);
 		specifiedLineTradeSettlement.setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
 		super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);
@@ -151,6 +254,33 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override
 	public Amount getLineTotalAmount() {
 		return new Amount(specifiedLineTradeSettlement.getSpecifiedTradeSettlementLineMonetarySummation().getLineTotalAmount().get(0).getValue());
+	}
+
+	/*
+Bsp. CII 01.01a-INVOICE_uncefact.xml :
+            <ram:SpecifiedLineTradeAgreement>
+                <ram:BuyerOrderReferencedDocument>
+                    <ram:LineID>6171175.1</ram:LineID>
+                </ram:BuyerOrderReferencedDocument>
+     UBL
+        <cac:OrderLineReference>
+            <cbc:LineID>6171175.1</cbc:LineID>
+        </cac:OrderLineReference>
+
+	 */
+	@Override // BT-132 0..1
+	public void setOrderLineReference(String lineReference) {
+		if(lineReference==null) return;
+		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
+		referencedDocument.setLineID(CrossIndustryInvoice.newIDType(lineReference, null)); // null : No identification scheme is to be used.
+		specifiedLineTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument);
+		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
+	}
+
+	@Override
+	public String getOrderLineReference() {
+		ReferencedDocumentType referencedDocument = specifiedLineTradeAgreement.getBuyerOrderReferencedDocument();
+		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
 	}
 
 	@Override // 1 .. 1 ChargeAmount BT-146
