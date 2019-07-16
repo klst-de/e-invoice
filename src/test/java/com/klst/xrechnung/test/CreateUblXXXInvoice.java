@@ -135,7 +135,12 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			List<String> itemDescriptions = testLine.getItemDescriptions(); // <> Notes
 			CreditNoteLine invoiceLine = new CreditNoteLine(testLine.getId(), testLine.getQuantity(),
 					testLine.getLineNetAmount(), testLine.getItemNetPrice(), 
-					testLine.getItemName(), testLine.getVatCategory());
+					testLine.getItemName());
+			
+			VatCategory vatCategory = testLine.getVatCategory(); // mandatory, rate optional
+			LOG.info("testLine.vatCategory : "+vatCategory + " vatCategory.getTaxRate():"+vatCategory.getTaxRate());
+			invoiceLine.setTaxCategoryAndRate(vatCategory.getTaxCategoryCode(), vatCategory.getTaxRate());
+
 			itemDescriptions.forEach(description -> {
 				invoiceLine.addItemDescription(description);
 			});

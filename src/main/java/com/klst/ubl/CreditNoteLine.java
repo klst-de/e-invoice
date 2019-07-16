@@ -1,5 +1,6 @@
 package com.klst.ubl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -7,6 +8,7 @@ import java.util.logging.Logger;
 import com.klst.un.unece.uncefact.Amount;
 import com.klst.un.unece.uncefact.Quantity;
 import com.klst.un.unece.uncefact.UnitPriceAmount;
+import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemType;
@@ -54,8 +56,7 @@ public class CreditNoteLine extends CreditNoteLineType {
 	 * @param itemName : a name for an item (mandatory part in ITEM INFORMATION)
 	 * @param vatCategory : VAT category code and rate for the invoiced item. (mandatory part in LINE VAT INFORMATION)
 	 */
-	public CreditNoteLine(String identifier, Quantity quantity, Amount lineNetAmount, UnitPriceAmount priceAmt
-			, String itemName, VatCategory vatCategory) {
+	public CreditNoteLine(String identifier, Quantity quantity, Amount lineNetAmount, UnitPriceAmount priceAmt, String itemName) {
 		this();
 		super.setID(Invoice.newIDType(identifier, null)); // null : No identification scheme 
 		
@@ -65,13 +66,25 @@ public class CreditNoteLine extends CreditNoteLineType {
 		
 		setItemNetPrice(priceAmt);
 		
-		if(itemName!=null) {
-			ItemType item = getItemInformation(); // ITEM INFORMATION, creates new if necessary
-			setItemName(itemName);
-			List<TaxCategoryType> taxCategories = item.getClassifiedTaxCategory();
-			taxCategories.add(vatCategory);
-		}
-		
+		item = new ItemType();
+		super.setItem(item);
+
+		setItemName(itemName);
+
+	}
+
+	/*
+	 * 
+	 * @param codeEnum 1..1 EN16931-ID: BT-151
+	 * @param percent 0..1 EN16931-ID: BT-152
+	 */
+	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, Percent percent) {
+		VatCategory taxCategory = new VatCategory(codeEnum, percent);
+		item.getClassifiedTaxCategory().add(taxCategory);
+	}
+//	@Override TODO
+	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
+		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
 	}
 	
 //	 * <br>Request ID: 	R44
@@ -122,53 +135,57 @@ public class CreditNoteLine extends CreditNoteLineType {
 
 //	 * <br>EN16931-ID: 	BG-31, BT-153 
 	public String getItemName() {
-		NameType name = getItemInformation().getName();
-		return name==null ? null : name.getValue();
+		ItemType item = super.getItem();
+		return item.getName()==null ? null : item.getName().getValue();
 	}
 	private void setItemName(String itemName) {
 		NameType name = new NameType();
 		name.setValue(itemName);
-		ItemType item = getItemInformation();
+		ItemType item = super.getItem();
 		item.setName(name);
 	}
-	private ItemType getItemInformation() {
-		ItemType item = super.getItem();
-		if(item!=null) {
-			return item;
-		}
-		// add empty item to this:
-		item = new ItemType();
-		super.setItem(item);
-		return item;
-	}
 
-//	 * <br>EN16931-ID: 	BT-154 
+//	 * <br>EN16931-ID: 	BT-154
 	public List<String> getItemDescriptions() {
-		List<DescriptionType> descriptions = getItemInformation().getDescription();
-		List<String> result = new ArrayList<String>(descriptions.size());
-		descriptions.forEach(description -> {
-			// DescriptionType extends TextType extends un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType
+		return getItemDescriptions(this);
+	}
+	static List<String> getItemDescriptions(CreditNoteLineType line) {
+		ItemType item = line.getItem();
+		if(item==null) {
+			return new ArrayList<String>();
+		}
+		List<DescriptionType> descriptionList = item.getDescription();
+		List<String> result = new ArrayList<String>(descriptionList.size());
+		descriptionList.forEach(description -> {
 			result.add(description.getValue());
 		});
 		return result;
 	}
 	public void addItemDescription(String descriptionText) {
-		List<DescriptionType> descriptions = getItemInformation().getDescription();
+		LOG.info("descriptionText:"+descriptionText);
+		ItemType item = super.getItem();
 		DescriptionType description = new DescriptionType();
 		description.setValue(descriptionText);
-		descriptions.add(description);
+		item.getDescription().add(description);
 	}
+
 
 	public VatCategory getVatCategory() {
 		List<VatCategory> taxCategories = getVatCategories();
 		if(taxCategories.size()!=1) {
 			LOG.warning("inkonsistent: taxCategories.size="+taxCategories.size() + " muss 1 sein" );
-			return null;
 		}
 		return taxCategories.get(0);
 	}
+	/*
+	 * mandatory elements in LINE VAT INFORMATION
+	 * @return List of LINE VAT INFORMATION
+	 * 
+	 * BG-30 ++ 1..1 LINE VAT INFORMATION ------------ hiernach gibt es nur ein Eintrag in der Liste
+	 */
 	private List<VatCategory> getVatCategories() {
-		List<TaxCategoryType> taxCategories = getItemInformation().getClassifiedTaxCategory();
+		ItemType item = super.getItem();
+		List<TaxCategoryType> taxCategories = item.getClassifiedTaxCategory();
 		List<VatCategory> result = new ArrayList<VatCategory>(taxCategories.size());
 		taxCategories.forEach(taxCategory -> {
 			result.add(new VatCategory(taxCategory));
