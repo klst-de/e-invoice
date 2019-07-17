@@ -266,13 +266,28 @@ R28 Text
 		super.getNote().add(note);
 	}
 	
-	/* TODO test
+	@Override
+	public void setOrderLineID(String lineReference) {
+		LineIDType lineID = new LineIDType();
+		lineID.setValue(lineReference);
+		OrderLineReferenceType orderLineReference = new OrderLineReferenceType();
+		orderLineReference.setLineID(lineID);
+		super.getOrderLineReference().add(orderLineReference);
+	}
+
+	@Override
+	public String getOrderLineID() {
+		List<String> list = getOrderLineIDs();
+		return list.isEmpty() ? null : list.get(0); // wg. 0..1
+	}
+	
+	/* test
 BT-132 ++ 0..1 Referenced purchase order line reference
 An identifier for a referenced line within a purchase order, issued by the Buyer.
 The purchase order identifier is referenced on document level. 
 R6 Document reference	 
 */
-	public List<String> getOrderLineID() {
+	public List<String> getOrderLineIDs() { // public wg.Test
 		List<OrderLineReferenceType> orderLineRefList = super.getOrderLineReference();
 		List<String> result = new ArrayList<String>(orderLineRefList.size());
 		orderLineRefList.forEach(orderLineRef -> {
@@ -280,13 +295,7 @@ R6 Document reference
 		});
 		return result;
 	}
-	public void setOrderLineID(String id) {
-		LineIDType lineID = new LineIDType();
-		lineID.setValue(id);
-		OrderLineReferenceType orderLineReference = new OrderLineReferenceType();
-		orderLineReference.setLineID(lineID);
-		super.getOrderLineReference().add(orderLineReference);
-	}
+
 	
 	/* BG-31 ITEM INFORMATION
 	 * A group of business terms providing information about the goods and services invoiced
@@ -440,18 +449,6 @@ BT-132 ++  0..1 Referenced purchase order line reference
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setBuyerOrderLine(String lineReference) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getBuyerOrderLine() {
 		// TODO Auto-generated method stub
 		return null;
 	}

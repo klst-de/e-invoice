@@ -77,7 +77,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         			line.addClassificationID(cc.getValue(), cc.getListID(), cc.getListVersionID());
         		}
         	});
-        	line.setBuyerOrderLine(testLine.getBuyerOrderLine());
+        	line.setOrderLineID(testLine.getOrderLineID());
         	cii.addLine(line);
         });
         LOG.info("LineGroup finished.");

@@ -152,10 +152,10 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * <br>Rule ID: 	 
 	 * <br>Request ID: 	R6
 	 * 
-	 * @param reference
+	 * @param reference id
 	 */
-	public void setBuyerOrderLine(String lineReference);
-	public String getBuyerOrderLine();
+	public void setOrderLineID(String id);
+	public String getOrderLineID();
 
 	/**
 	 * Item net price (mandatory part in PRICE DETAILS), exclusive of VAT, after subtracting item price discount.

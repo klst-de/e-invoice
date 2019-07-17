@@ -289,16 +289,16 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 
 	 */
 	@Override // BT-132 0..1
-	public void setBuyerOrderLine(String lineReference) {
-		if(lineReference==null) return;
+	public void setOrderLineID(String id) {
+		if(id==null) return;
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setLineID(CrossIndustryInvoice.newIDType(lineReference, null)); // null : No identification scheme is to be used.
+		referencedDocument.setLineID(CrossIndustryInvoice.newIDType(id, null)); // null : No identification scheme is to be used.
 		specifiedLineTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument);
 		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
 	}
 
 	@Override
-	public String getBuyerOrderLine() {
+	public String getOrderLineID() {
 		ReferencedDocumentType referencedDocument = specifiedLineTradeAgreement.getBuyerOrderReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
 	}
