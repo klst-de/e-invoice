@@ -64,6 +64,8 @@ public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 
 	private static final Logger LOG = Logger.getLogger(InvoiceLine.class.getName());
 	
+	private static final String NOT_IMPEMENTED = "NOT IMPEMENTED";
+
 	public InvoiceLine() {
 		super();
 	}
@@ -438,22 +440,25 @@ R6 Document reference
 	@Override
 	public void setBuyerAssignedID(String id) {
 		// TODO Auto-generated method stub
-		
+		LOG.warning(NOT_IMPEMENTED);
 	}
 
 	@Override
 	public String getBuyerAssignedID() {
 		// TODO Auto-generated method stub
+		LOG.warning(NOT_IMPEMENTED);
 		return null;
 	}
 
 	@Override // 0..1 BT-157 BT-157-1
 	public void setStandardID(String id, String schemeID) {
+		LOG.warning(NOT_IMPEMENTED);
 		// TODO
 	}
 
 	@Override
 	public String getStandardID() { // ohne schemeID! TODO
+		LOG.warning(NOT_IMPEMENTED);
 		return null;
 	}
 
