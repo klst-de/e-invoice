@@ -15,8 +15,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import com.klst.cius.IContact;
-import com.klst.cius.PostalAddress;
+import com.klst.einvoice.IContact;
+import com.klst.einvoice.PostalAddress;
 import com.klst.ubl.Address;
 import com.klst.ubl.Contact;
 import com.klst.ubl.Delivery;

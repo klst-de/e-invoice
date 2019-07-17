@@ -1,4 +1,4 @@
-package com.klst.cius;
+package com.klst.einvoice;
 
 import java.sql.Timestamp;
 import java.util.List;

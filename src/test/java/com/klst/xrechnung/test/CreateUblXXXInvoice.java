@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.klst.cius.IContact;
+import com.klst.einvoice.IContact;
 import com.klst.marshaller.UblCreditNoteTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
 import com.klst.ubl.CommercialInvoice;

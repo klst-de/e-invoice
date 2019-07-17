@@ -1,6 +1,6 @@
 package com.klst.ubl;
 
-import com.klst.cius.IContact;
+import com.klst.einvoice.IContact;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ContactType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ElectronicMailType;

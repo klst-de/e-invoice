@@ -1,4 +1,4 @@
-package com.klst.cius;
+package com.klst.einvoice;
 
 import java.math.BigDecimal;
 import java.util.List;

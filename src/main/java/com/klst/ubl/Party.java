@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.klst.cius.IContact;
+import com.klst.einvoice.IContact;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ContactType;

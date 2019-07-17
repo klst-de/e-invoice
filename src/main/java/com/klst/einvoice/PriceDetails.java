@@ -1,4 +1,4 @@
-package com.klst.cius;
+package com.klst.einvoice;
 
 import com.klst.un.unece.uncefact.Quantity;
 import com.klst.un.unece.uncefact.UnitPriceAmount;

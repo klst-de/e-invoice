@@ -1,6 +1,6 @@
 package com.klst.un.unece.uncefact;
 
-import com.klst.cius.IContact;
+import com.klst.einvoice.IContact;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeContactType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.UniversalCommunicationType;

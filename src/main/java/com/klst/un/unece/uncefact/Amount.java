@@ -3,7 +3,7 @@ package com.klst.un.unece.uncefact;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import com.klst.cius.Rounding;
+import com.klst.einvoice.Rounding;
 
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.AmountType;
 

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.klst.cius.CoreInvoiceLine;
+import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;

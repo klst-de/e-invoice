@@ -3,7 +3,7 @@ package com.klst.ubl;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.klst.cius.PostalAddress;
+import com.klst.einvoice.PostalAddress;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;

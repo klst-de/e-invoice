@@ -1,6 +1,6 @@
 package com.klst.un.unece.uncefact;
 
-import com.klst.cius.PostalAddress;
+import com.klst.einvoice.PostalAddress;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CountryIDType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;

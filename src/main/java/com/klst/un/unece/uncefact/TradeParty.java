@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.klst.cius.IContact;
+import com.klst.einvoice.IContact;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LegalOrganizationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;

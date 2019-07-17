@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.klst.cius.CoreInvoice;
-import com.klst.cius.DocumentTotals;
+import com.klst.einvoice.CoreInvoice;
+import com.klst.einvoice.DocumentTotals;
 import com.klst.un.unece.uncefact.Amount;
 import com.klst.un.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.DateTimeFormats;
