@@ -57,8 +57,31 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		specifiedLineTradeAgreement = line.getSpecifiedLineTradeAgreement();
 		specifiedLineTradeDelivery = line.getSpecifiedLineTradeDelivery(); // 0..1
 		specifiedLineTradeSettlement = line.getSpecifiedLineTradeSettlement();
+
+		TradeTaxType tradeTax = specifiedLineTradeSettlement.getApplicableTradeTax().get(0);
+		PercentType percent = tradeTax.getRateApplicablePercent();
+		init( associatedDocumentLineDocument.getLineID().getValue()
+			, new Quantity(specifiedLineTradeDelivery.getBilledQuantity().getUnitCode(), specifiedLineTradeDelivery.getBilledQuantity().getValue())
+			, new Amount(specifiedLineTradeSettlement.getSpecifiedTradeSettlementLineMonetarySummation().getLineTotalAmount().get(0).getValue())
+			, new UnitPriceAmount(specifiedLineTradeAgreement.getNetPriceProductTradePrice().getChargeAmount().get(0).getValue())
+			, specifiedTradeProduct.getName().get(0).getValue()
+			, TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
+			, percent==null ? null : percent.getValue()
+			);
 	}
 
+	public TradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
+			, TaxCategoryCode codeEnum, BigDecimal percent) {
+		this();
+		associatedDocumentLineDocument = new DocumentLineDocumentType();
+		specifiedTradeProduct = new TradeProductType();
+		specifiedLineTradeAgreement = new LineTradeAgreementType();
+		specifiedLineTradeDelivery = new LineTradeDeliveryType(); // 0..1, aber BT-129 ist mandatory 
+		specifiedLineTradeSettlement = new LineTradeSettlementType();
+		
+		init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+	}
+	
 	/**
 	 * mandatory elements of INVOICE LINE
 	 * 
@@ -67,22 +90,24 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	 * @param BT-131 lineTotalAmount : the total amount of the Invoice line.
 	 * @param BT-146 priceAmt : item net price (mandatory part in PRICE DETAILS)
 	 * @param BT-153 itemName : a name for an item (mandatory part in ITEM INFORMATION)
-	 * @param BT-151 vatCategory : VAT category code and rate for the invoiced item. (mandatory part in LINE VAT INFORMATION) !!! ubl
+//	 * @param BT-151 vatCategory : VAT category code and rate for the invoiced item. (mandatory part in LINE VAT INFORMATION) !!! ubl
+	 * @param BG-30.BT-151 codeEnum 1..1 VAT category code
+	 * @param BG-30.BT-152 percent  0..1 VAT rate
 	 */
-	public TradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName) {
-		this();
-		associatedDocumentLineDocument = new DocumentLineDocumentType();
-		specifiedTradeProduct = new TradeProductType();
-		specifiedLineTradeAgreement = new LineTradeAgreementType();
-		specifiedLineTradeDelivery = new LineTradeDeliveryType(); // 0..1, aber BT-129 ist mandatory 
-		specifiedLineTradeSettlement = new LineTradeSettlementType();
+	public void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
+			, TaxCategoryCode codeEnum, BigDecimal percent) {
 		setId(id);
 		setQuantity(quantity);
 		setLineTotalAmount(lineTotalAmount);
 		setUnitPriceAmount(priceAmount);
 		setItemName(itemName);
+		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see com.klst.cius.CoreInvoiceLine#setId(java.lang.String)
+	 */
 	@Override // 1 .. 1 LineID BT-126
 	public void setId(String id) {
 		associatedDocumentLineDocument.setLineID(CrossIndustryInvoice.newIDType(id, null)); // null : No identification scheme is to be used.
@@ -358,7 +383,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	
 	@Override
 	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
-		setTaxCategoryAndRate(codeEnum, new Percent(percent));
+		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
 	}
 
 	@Override
