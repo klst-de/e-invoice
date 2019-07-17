@@ -20,7 +20,6 @@ import com.klst.einvoice.ubl.PaymentMeans;
 import com.klst.einvoice.ubl.Percent;
 import com.klst.einvoice.ubl.VatCategory;
 import com.klst.einvoice.unece.uncefact.Amount;
-import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.marshaller.UblCreditNoteTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
@@ -28,9 +27,11 @@ import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansCode;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CommodityClassificationType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ItemClassificationCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
@@ -311,22 +312,23 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	void makeLineGroup(Invoice ublInvoice) {
 		List<InvoiceLine> testLines = testDoc.getLines();
 		testLines.forEach(testLine -> {
-			List<String> itemDescriptions = testLine.getItemDescriptions();
-			LOG.info("-----------------itemDescriptions.size():"+itemDescriptions.size());
-			VatCategory vatCategory = testLine.getVatCategory(); // mandatory, rate optional
-			LOG.info("testLine.vatCategory : "+vatCategory + " vatCategory.getTaxRate():"+vatCategory.getTaxRate());
 			InvoiceLine invoiceLine = new InvoiceLine(testLine.getId(), testLine.getQuantity(),
-					testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), 
+					testLine.getLineTotalAmount(), testLine.getItemNetPrice(), 
 					testLine.getItemName(),
-					vatCategory.getTaxCategoryCode(), vatCategory.getTaxRate()
+					testLine.getTaxCategory(), testLine.getTaxRate()
 					);
 			
-//			invoiceLine.setTaxCategoryAndRate(vatCategory.getTaxCategoryCode(), vatCategory.getTaxRate());
-			
-			itemDescriptions.forEach(description -> {
-				invoiceLine.addItemDescription(description);
-			});
+			// opt:
 			invoiceLine.setSellerAssignedID(testLine.getSellerAssignedID());
+//			invoiceLine.setStandardID(testLine.getStandardID(), "TODO"  );
+        	List<Object> cl = testLine.getClassificationList();
+        	cl.forEach(c -> {
+        		if(c.getClass() == CommodityClassificationType.class) {
+        			ItemClassificationCodeType cc = ((CommodityClassificationType)c).getItemClassificationCode();
+        			invoiceLine.addClassificationID(cc.getValue(), cc.getListID(), cc.getListVersionID());
+        		}
+        	});
+			
 			testLine.getNotes().forEach(note -> {
 				invoiceLine.setNoteText(note);
 			});
@@ -472,9 +474,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					LOG.info("\n invoiceLine ID="+			        invoiceLine.getId() +
 							" \n invoiceLine ItemName="+			invoiceLine.getItemName() +
 							" \n invoiceLine Quantity="+			invoiceLine.getQuantity() +
-							" \n invoiceLine ItemNetPrice="+		invoiceLine.getUnitPriceAmount() +
+							" \n invoiceLine ItemNetPrice="+		invoiceLine.getItemNetPrice() +
 							" \n invoiceLine LineNetAmount="+		invoiceLine.getLineTotalAmount() +
-							" \n invoiceLine TaxCategory="+			invoiceLine.getVatCategory()
+							" \n invoiceLine TaxCategory/Rate="+	invoiceLine.getTaxCategory()+invoiceLine.getTaxRate()
 							);
 				});
 

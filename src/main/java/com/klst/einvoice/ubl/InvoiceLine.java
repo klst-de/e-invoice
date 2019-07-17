@@ -11,18 +11,22 @@ import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CommodityClassificationType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemIdentificationType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderLineReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PriceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BaseQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DescriptionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InvoicedQuantityType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ItemClassificationCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PercentType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PriceAmountType;
 
 /* @see XRechnung-v1-2-0.pdf : 11.16. Gruppe INVOICE LINE
@@ -54,17 +58,7 @@ BG-25 | +     | 1..n        | INVOICE LINE          | A group of business terms 
             <cbc:StartDate>2016-01-01+01:00</cbc:StartDate>
             <cbc:EndDate>2016-12-31+01:00</cbc:EndDate>
         </cac:InvoicePeriod>
- ...
-         <cac:OrderLineReference>
-            <cbc:LineID>6171175.1</cbc:LineID>
-        </cac:OrderLineReference>
 ...
-        <cac:Item>
-...
-            <cac:CommodityClassification>
-                <cbc:ItemClassificationCode listID="IB">0721-880X</cbc:ItemClassificationCode>
-            </cac:CommodityClassification>
-                                                                                                                                                          | R40
  */
 public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 
@@ -85,9 +79,9 @@ public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 		if(taxCategories.size()==1) {
 			classifiedTaxCategory = taxCategories.get(0);
 		} else if(taxCategories.size()==0) {
-			LOG.warning("inkonsistent: taxCategories.size="+taxCategories.size() + " muss 1 sein" );
+			LOG.warning("----------inkonsistent: taxCategories.size="+taxCategories.size() + " muss 1 sein" );
 		} else {
-			LOG.info("taxCategories.size="+taxCategories.size() + " muss 1 sein!" );
+			LOG.info("---------taxCategories.size="+taxCategories.size() + " muss 1 sein!" );
 			classifiedTaxCategory = taxCategories.get(0);
 		}
 		VatCategory vatCategory = new VatCategory(classifiedTaxCategory);
@@ -100,13 +94,26 @@ public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 			, vatCategory.getTaxCategoryCode() // TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
 			, vatCategory.getTaxRate()         // percent==null ? null : percent.getValue()
 			);
-
 		
+		List<NoteType> noteList = line.getNote();
+		noteList.forEach(note -> {
+			setNoteText(note.getValue()); // opt 
+		});
+		
+		List<DescriptionType> descriptionList = item.getDescription();
+		if(descriptionList.isEmpty()) {
+			// optional
+		} else {
+			LOG.info("descriptionList.size="+descriptionList.size() + " !!!!!!!!!!!!!!!!!!!!!!!" );
+			setDescription(descriptionList.get(0).getValue()); 
+		}
+
 		if(line.getOrderLineReference().isEmpty()) { // opt BT-132 0..1
 			// nix, da optional
 		} else {
 			super.getOrderLineReference().add(line.getOrderLineReference().get(0));
 		}
+		
 //		line.getInvoicePeriod() // List TODO
 		
 	}
@@ -172,28 +179,19 @@ public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
 		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
 	}
-	
-	/**
-	 * UoM and quantity of items (goods or services) that is charged in the Invoice line.
-	 * <p>
-	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BT-130, BT.129
-	 * <br>Rule ID: 	BR-23, BR-22
-	 * <br>Request ID: 	R39, R56, R14
-	 *  
-	 */
- 	@Override
-	public Quantity getQuantity() {
-		InvoicedQuantityType quantity = super.getInvoicedQuantity();
-		return new Quantity(quantity.getUnitCode(), quantity.getValue());
-	}
-	void setQuantity(Quantity quantity) {
-		InvoicedQuantityType invoicedQuantity = new InvoicedQuantityType();
-		invoicedQuantity.setUnitCode(quantity.getUnitCode());
-		invoicedQuantity.setValue(quantity.getValue());
-		super.setInvoicedQuantity(invoicedQuantity);
+	@Override
+	public TaxCategoryCode getTaxCategory() {
+		TaxCategoryType taxCategory = item.getClassifiedTaxCategory().get(0); // wg. 1..1
+		return TaxCategoryCode.valueOf(taxCategory); // S
 	}
 
+	@Override
+	public BigDecimal getTaxRate() {
+		TaxCategoryType taxCategory = item.getClassifiedTaxCategory().get(0); // wg. 1..1
+		PercentType percent = taxCategory.getPercent();
+		return percent==null ? null : percent.getValue();
+	}
+	
 	/**
 	 * Invoice line net amount 
 	 * <p>
@@ -228,16 +226,63 @@ public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 	 * <br>Request ID: 	R14
 	 * 
 	 */
-	public UnitPriceAmount getUnitPriceAmount() {
-		PriceAmountType priceAmount = super.getPrice().getPriceAmount();
+	@Override
+	public UnitPriceAmount getItemNetPrice() {
+		PriceAmountType priceAmount = price.getPriceAmount();
 		return new UnitPriceAmount(priceAmount.getCurrencyID(), priceAmount.getValue());
 	}
-	public void setUnitPriceAmount(UnitPriceAmount priceAmt) {
+
+	// 1 .. 1 ChargeAmount BT-146
+	void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
+		setUnitPriceAmountAndQuantity(unitPriceAmount, null);
+	}
+
+	@Override
+	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
 		PriceAmountType priceAmount = new PriceAmountType();
-		priceAmt.copyTo(priceAmount);
+		unitPriceAmount.copyTo(priceAmount);
 		PriceType price = new PriceType();
 		price.setPriceAmount(priceAmount);
+		
+		if(quantity!=null) {
+			BaseQuantityType baseQuantity = new BaseQuantityType();
+			baseQuantity.setUnitCode(quantity.getUnitCode());
+			baseQuantity.setValue(quantity.getValue());
+			price.setBaseQuantity(baseQuantity);
+		}
+		
 		super.setPrice(price);
+	}
+
+	@Override // optional BaseQuantity : BT-149-0 QuantityType 0..1 + BT-150-0 required
+	public Quantity getBaseQuantity() {
+		BaseQuantityType baseQuantity = price.getBaseQuantity();
+		String unit = baseQuantity.getUnitCode();
+		return baseQuantity==null ? null : (unit==null ? new Quantity(baseQuantity.getValue()) : new Quantity(unit, baseQuantity.getValue()));
+	}
+
+
+	/**
+	 * UoM and quantity of items (goods or services) that is charged in the Invoice line.
+	 * <p>
+	 * Cardinality: 	1..1 (mandatory)
+	 * <br>EN16931-ID: 	BT-130, BT.129
+	 * <br>Rule ID: 	BR-23, BR-22
+	 * <br>Request ID: 	R39, R56, R14
+	 *  
+	 */
+ 	@Override
+	public Quantity getQuantity() {
+		InvoicedQuantityType quantity = super.getInvoicedQuantity();
+		return new Quantity(quantity.getUnitCode(), quantity.getValue());
+	}
+
+ 	// use ctor
+	void setQuantity(Quantity quantity) {
+		InvoicedQuantityType invoicedQuantity = new InvoicedQuantityType();
+		invoicedQuantity.setUnitCode(quantity.getUnitCode());
+		invoicedQuantity.setValue(quantity.getValue());
+		super.setInvoicedQuantity(invoicedQuantity);
 	}
 
 	@Override
@@ -296,45 +341,6 @@ R6 Document reference
 		return result;
 	}
 
-	
-	/* BG-31 ITEM INFORMATION
-	 * A group of business terms providing information about the goods and services invoiced
-
-1 .. 1 SpecifiedTradeProduct Artikelinformationen                 BG-31 xs:sequence
-0 .. 1 GlobalID Kennung eines Artikels nach registriertem Schema  BT-157      TODO 
-       required schemeID Kennung des Schemas                      BT-157-1 
-0 .. 1 SellerAssignedID Artikelnummer des Verkäufers              BT-155
-0 .. 1 BuyerAssignedID Artikelnummer des Käufers                  BT-156      TODO 
-1 .. 1 Name Artikelname                                           BT-153 
-0 .. 1 Description Artikelbeschreibung                            BT-154
-0 .. n ApplicableProductCharacteristic Artikelattribute           BG-32 xs:sequence 
-0 .. 1 TypeCode Art der Produkteigenschaft (Code) 
-1 .. 1 Description Artikelattributname                            BT-160 
-0 .. 1 ValueMeasure Wert der Produkteigenschaft (numerische Messgröße) 
-       required unitCode Maßeinheit 
-1 .. 1 Value Artikelattributwert                                  BT-161 
-0 .. n DesignatedProductClassification Detailinformationen zur Produktklassifikation xs:sequence 
-1 .. 1 ClassCode Kennung der Artikelklassifizierung               BT-158      TODO 
-       required listID Kennung des Schemas                        BT-158-1 
-       optional listVersionID Version des Schemas                 BT-158-2 
-0 .. 1 ClassName Klassifikationsname 
-0 .. 1 OriginTradeCountry Detailinformationen zur Produktherkunft xs:sequence 
-1 .. 1 ID Artikelherkunftsland                                    BT-159      TODO
-...
-1 .. 1 SpecifiedLineTradeAgreement Detailinformationen zum Preis  BG-29 xs:sequence 
-0 .. 1 BuyerOrderReferencedDocument Detailangaben zur zugehörigen Bestellung xs:sequence 
-0 .. 1 IssuerAssignedID Bestellnummer 
-0 .. 1 LineID Referenz zur Bestellposition                        BT-132      TODO
-
-nicht implementiert optionale ITEM INFORMATION Teile TODO:
-BT-156 +++ 0..1 Item Buyer's identifier
-BT-157 +++ 0..1 Item standard identifier + identification scheme identifier of the Item standard identifier
-BT-158 +++ 0..n Item classification identifier
-BT-159 +++ 0..1 Item country of origin
-BG-32  +++ 0..n ITEM ATTRIBUTES
-BT-132 ++  0..1 Referenced purchase order line reference
-
-	 */
 	/**
 	 * Item name (mandatory part in BG-31 ITEM INFORMATION)
 	 * <p>
@@ -368,7 +374,25 @@ BT-132 ++  0..1 Referenced purchase order line reference
 	 * <br>Request ID: 	R20, R56
 	 * 
 	 */
-	public List<String> getItemDescriptions() {
+	@Override
+	public void setDescription(String text) {
+		addItemDescription(text);	
+	}
+	void addItemDescription(String text) {
+		if(text==null) return;
+		DescriptionType description = new DescriptionType();
+		description.setValue(text);
+		item.getDescription().add(description);
+		super.setItem(item);
+	}
+
+	@Override
+	public String getDescription() {
+		if(item.getDescription().isEmpty()) return null;
+		return item.getDescription().get(0).getValue(); // get(0) wg ..1
+	}
+
+	public List<String> getItemDescriptions() { // public wg. test
 		return getItemDescriptions(this);
 	}
 	static List<String> getItemDescriptions(InvoiceLineType line) {
@@ -382,13 +406,6 @@ BT-132 ++  0..1 Referenced purchase order line reference
 			result.add(description.getValue());
 		});
 		return result;
-	}
-	public void addItemDescription(String descriptionText) {
-		LOG.info("descriptionText:"+descriptionText);
-		ItemType item = super.getItem();
-		DescriptionType description = new DescriptionType();
-		description.setValue(descriptionText);
-		item.getDescription().add(description);
 	}
 	
 	/**
@@ -404,85 +421,20 @@ BT-132 ++  0..1 Referenced purchase order line reference
 	 */
  	@Override
 	public String getSellerAssignedID() {
-		ItemType item = super.getItem();
 		ItemIdentificationType itemIdentification = item.getSellersItemIdentification();
 		if(itemIdentification==null) return null;
 		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
 	}
  	@Override
 	public void setSellerAssignedID(String id) {
+ 		if(id==null) return;
 		ItemIdentificationType itemIdentification = new ItemIdentificationType();
 		itemIdentification.setID(Invoice.newIDType(id, null));
-		ItemType item = super.getItem();
 		item.setSellersItemIdentification(itemIdentification);
+		super.setItem(item);
 	}
 	
 	
-	public VatCategory getVatCategory() { // TODO public nur wg test
-		List<VatCategory> taxCategories = getVatCategories();
-		if(taxCategories.size()!=1) {
-			LOG.warning("inkonsistent: taxCategories.size="+taxCategories.size() + " muss 1 sein" );
-		}
-		return taxCategories.get(0);
-	}
-	/*
-	 * mandatory elements in LINE VAT INFORMATION
-	 * @return List of LINE VAT INFORMATION
-	 * 
-	 * BG-30 ++ 1..1 LINE VAT INFORMATION ------------ hiernach gibt es nur ein Eintrag in der Liste
-	 */
-	private List<VatCategory> getVatCategories() {
-		ItemType item = super.getItem();
-		List<TaxCategoryType> taxCategories = item.getClassifiedTaxCategory();
-		List<VatCategory> result = new ArrayList<VatCategory>(taxCategories.size());
-		taxCategories.forEach(taxCategory -> {
-			result.add(new VatCategory(taxCategory));
-		});
-		return result;
-	}
-
-	@Override
-	public void setDescription(String text) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public UnitPriceAmount getItemNetPrice() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Quantity getBaseQuantity() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public TaxCategoryCode getTaxCategory() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public BigDecimal getTaxRate() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	@Override
 	public void setBuyerAssignedID(String id) {
 		// TODO Auto-generated method stub
@@ -495,28 +447,37 @@ BT-132 ++  0..1 Referenced purchase order line reference
 		return null;
 	}
 
-	@Override
+	@Override // 0..1 BT-157 BT-157-1
 	public void setStandardID(String id, String schemeID) {
-		// TODO Auto-generated method stub
-		
+		// TODO
 	}
 
 	@Override
-	public String getStandardID() {
-		// TODO Auto-generated method stub
+	public String getStandardID() { // ohne schemeID! TODO
 		return null;
 	}
 
 	@Override
 	public void addClassificationID(String id, String schemeID, String schemeVersion) {
-		// TODO Auto-generated method stub
-		
+		if(id==null) return;
+		ItemClassificationCodeType itemClassificationCode = new ItemClassificationCodeType();
+		itemClassificationCode.setValue(id);
+		itemClassificationCode.setListID(schemeID);
+		itemClassificationCode.setListVersionID(schemeVersion);
+		CommodityClassificationType commodityClassification = new CommodityClassificationType();
+		commodityClassification.setItemClassificationCode(itemClassificationCode);
+		item.getCommodityClassification().add(commodityClassification);
+		super.setItem(item);
 	}
 
 	@Override
 	public List<Object> getClassificationList() {
-		// TODO Auto-generated method stub
-		return null;
+		List<CommodityClassificationType> commodityClassificationList = item.getCommodityClassification();
+		List<Object> resList = new ArrayList<Object>(commodityClassificationList.size());
+		commodityClassificationList.forEach(productClassification -> {
+			resList.add(productClassification);
+		});
+		return resList;
 	}
 
 }

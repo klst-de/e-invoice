@@ -173,7 +173,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	public UnitPriceAmount getItemNetPrice();
 
 	// 1 .. 1 ChargeAmount BT-146 , BaseQuantity BT-149-0 + BT-150-0 optional
-	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity);
+	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity baseQuantity);
 
 	// optional BaseQuantity : BT-149-0 QuantityType 0..1 + BT-150-0 required
 	public Quantity getBaseQuantity();
