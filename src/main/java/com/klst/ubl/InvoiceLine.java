@@ -23,7 +23,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineIDTy
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PriceAmountType;
-import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType;
 
 /* @see XRechnung-v1-2-0.pdf : 11.16. Gruppe INVOICE LINE
 
@@ -77,23 +76,37 @@ public class InvoiceLine extends InvoiceLineType {
 	// copy ctor
 	public InvoiceLine(InvoiceLineType line) {
 		this();
-		super.setID(line.getID());
-		super.setInvoicedQuantity(line.getInvoicedQuantity());
-		super.setLineExtensionAmount(line.getLineExtensionAmount());
-		super.setPrice(line.getPrice());
-		super.setItem(line.getItem());
+		item = line.getItem();
+		price = line.getPrice();
 		
-		List<NoteType> noteList = line.getNote(); // optional BT-127
-		noteList.forEach(note -> {
-			LOG.info("line.noteList.size:"+noteList.size() + " note:"+note.getValue());
-			setNote(note.getValue());
-		});
+		TaxCategoryType classifiedTaxCategory = null;
+		List<TaxCategoryType> taxCategories = item.getClassifiedTaxCategory();
+		if(taxCategories.size()==1) {
+			classifiedTaxCategory = taxCategories.get(0);
+		} else if(taxCategories.size()==0) {
+			LOG.warning("inkonsistent: taxCategories.size="+taxCategories.size() + " muss 1 sein" );
+		} else {
+			LOG.info("taxCategories.size="+taxCategories.size() + " muss 1 sein!" );
+			classifiedTaxCategory = taxCategories.get(0);
+		}
+		VatCategory vatCategory = new VatCategory(classifiedTaxCategory);
+
+		init( line.getID().getValue()
+			, new Quantity(line.getInvoicedQuantity().getUnitCode(), line.getInvoicedQuantity().getValue())
+			, new Amount(line.getLineExtensionAmount().getCurrencyID(), line.getLineExtensionAmount().getValue())
+			, new UnitPriceAmount(price.getPriceAmount().getCurrencyID(), price.getPriceAmount().getValue())
+			, item.getName().getValue()
+			, vatCategory.getTaxCategoryCode() // TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
+			, vatCategory.getTaxRate()         // percent==null ? null : percent.getValue()
+			);
+
 		
-		List<OrderLineReferenceType> orderLineReferences = line.getOrderLineReference();
-		orderLineReferences.forEach(orderLineReference -> {
-			LOG.info("line.OrderLineReference.size:"+orderLineReferences.size() + " LineID:"+orderLineReference.getLineID().getValue());
-			setOrderLineID(orderLineReference.getLineID().getValue());
-		});
+		if(line.getOrderLineReference().isEmpty()) { // opt BT-132 0..1
+			// nix, da optional
+		} else {
+			super.getOrderLineReference().add(line.getOrderLineReference().get(0));
+		}
+//		line.getInvoicePeriod() // List TODO
 		
 	}
 	
@@ -105,34 +118,51 @@ public class InvoiceLine extends InvoiceLineType {
 	 * @param lineNetAmount : the total amount of the Invoice line.
 	 * @param priceAmt : item net price (mandatory part in PRICE DETAILS)
 	 * @param itemName : a name for an item (mandatory part in ITEM INFORMATION)
-	 * @param vatCategory : VAT category code and rate for the invoiced item. (mandatory part in LINE VAT INFORMATION)
+//	 * @param vatCategory : VAT category code and rate for the invoiced item. (mandatory part in LINE VAT INFORMATION)
+	 * @param BG-30.BT-151 codeEnum 1..1 VAT category code
+	 * @param BG-30.BT-152 percent  0..1 VAT rate
 	 */
-	public InvoiceLine(String identifier, Quantity quantity, Amount lineNetAmount, UnitPriceAmount priceAmt, String itemName) {
+	public InvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
+			, TaxCategoryCode codeEnum, BigDecimal percent) {
 		this();
-		super.setID(Invoice.newIDType(identifier, null)); // null : No identification scheme 
-		
-		setQuantity(quantity);
-		
-		setLineNetAmount(lineNetAmount);
-		
-		setItemNetPrice(priceAmt);
-		
-		/*
-	    <cac:OrderLineReference>                                             TODO optional
-	      <!-- Bestellpositionsnummer für dies Rechnungszeile: -->
-	      <!-- Order position number for this invoice line: -->
-	      <cbc:LineID>10</cbc:LineID>
-	    </cac:OrderLineReference>
-//		invoiceLine.getOrderLineReference()
-*/
-		
 		item = new ItemType();
-		super.setItem(item);
-
-		setItemName(itemName);
-		
+		price = new PriceType();
+		init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 	}
 
+	private void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
+			, TaxCategoryCode codeEnum, BigDecimal percent) {
+		setId(id);
+		setQuantity(quantity);
+		setLineTotalAmount(lineTotalAmount);
+		setUnitPriceAmount(priceAmount);
+		setItemName(itemName);
+		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.klst.cius.CoreInvoiceLine#setId(java.lang.String)
+	 */
+//	@Override // 1 .. 1 LineID BT-126  ------------ use ctor
+	public void setId(String id) {
+		super.setID(Invoice.newIDType(id, null)); // null : No identification scheme 
+	}
+	
+	/**
+	 * Invoice line identifier - a unique identifier for the individual line within the Invoice.
+	 * <p>
+	 * Cardinality: 	1..1 (mandatory)
+	 * <br>EN16931-ID: 	BT-126
+	 * <br>Rule ID: 	BR-21
+	 * <br>Request ID: 	R44
+	 *  
+	 */
+// TODO	@Override
+	public String getId() {
+		return super.getID().getValue();
+	}
+	
 	/*
 	 * 
 	 * @param codeEnum 1..1 EN16931-ID: BT-151
@@ -148,20 +178,6 @@ public class InvoiceLine extends InvoiceLineType {
 	}
 	
 	/**
-	 * Invoice line identifier - a unique identifier for the individual line within the Invoice.
-	 * <p>
-	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BT-126
-	 * <br>Rule ID: 	BR-21
-	 * <br>Request ID: 	R44
-	 *  
-	 */
-	//public void setId(String identifier); // use ctor
-	public String getId() {
-		return super.getID().getValue();
-	}
-	
-	/**
 	 * UoM and quantity of items (goods or services) that is charged in the Invoice line.
 	 * <p>
 	 * Cardinality: 	1..1 (mandatory)
@@ -171,7 +187,7 @@ public class InvoiceLine extends InvoiceLineType {
 	 *  
 	 */
 	public Quantity getQuantity() {
-		QuantityType quantity = super.getInvoicedQuantity();
+		InvoicedQuantityType quantity = super.getInvoicedQuantity();
 		return new Quantity(quantity.getUnitCode(), quantity.getValue());
 	}
 	private void setQuantity(Quantity quantity) {
@@ -193,11 +209,11 @@ public class InvoiceLine extends InvoiceLineType {
 	 * <br>Request ID: 	R39, R56, R14
 	 * 
 	 */
-	public Amount getLineNetAmount() { // Umbenennen in LineTotalAmount
+	public Amount getLineTotalAmount() {
 		LineExtensionAmountType amount = super.getLineExtensionAmount();
 		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
-	private void setLineNetAmount(Amount amount) {
+	private void setLineTotalAmount(Amount amount) {
 		LineExtensionAmountType lineExtensionAmount = new LineExtensionAmountType();
 		amount.copyTo(lineExtensionAmount);
 		super.setLineExtensionAmount(lineExtensionAmount);
@@ -214,11 +230,11 @@ public class InvoiceLine extends InvoiceLineType {
 	 * <br>Request ID: 	R14
 	 * 
 	 */
-	public UnitPriceAmount getItemNetPrice() {
+	public UnitPriceAmount getUnitPriceAmount() {
 		PriceAmountType priceAmount = super.getPrice().getPriceAmount();
 		return new UnitPriceAmount(priceAmount.getCurrencyID(), priceAmount.getValue());
 	}
-	private void setItemNetPrice(UnitPriceAmount priceAmt) {
+	public void setUnitPriceAmount(UnitPriceAmount priceAmt) {
 		PriceAmountType priceAmount = new PriceAmountType();
 		priceAmt.copyTo(priceAmount);
 		PriceType price = new PriceType();
@@ -324,16 +340,6 @@ BT-132 ++  0..1 Referenced purchase order line reference
 		ItemType item = super.getItem();
 		item.setName(name);
 	}
-//	private ItemType getItemInformation() {
-//		ItemType item = super.getItem();
-//		if(item!=null) {
-//			return item;
-//		}
-//		// add empty item to this: causes getItemInformation in lambda!!!
-//		item = new ItemType();
-//		super.setItem(item);
-//		return item;
-//	}
 
 	/**
 	 * Item description (optional part in ITEM INFORMATION)

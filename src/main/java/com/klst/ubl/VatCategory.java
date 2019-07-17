@@ -72,7 +72,11 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 	
 	public VatCategory(TaxCategoryType taxCategory) {
 		this();
-		super.setPercent(taxCategory.getPercent());
+		if(taxCategory.getPercent()==null) {
+			// nix, da optional
+		} else {
+			super.setPercent(taxCategory.getPercent());
+		}
 		super.setID(taxCategory.getID());
 		super.setTaxScheme(taxCategory.getTaxScheme());
 	}

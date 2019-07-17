@@ -313,13 +313,15 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		testLines.forEach(testLine -> {
 			List<String> itemDescriptions = testLine.getItemDescriptions();
 			LOG.info("-----------------itemDescriptions.size():"+itemDescriptions.size());
-			InvoiceLine invoiceLine = new InvoiceLine(testLine.getId(), testLine.getQuantity(),
-					testLine.getLineNetAmount(), testLine.getItemNetPrice(), 
-					testLine.getItemName() );
-			
 			VatCategory vatCategory = testLine.getVatCategory(); // mandatory, rate optional
 			LOG.info("testLine.vatCategory : "+vatCategory + " vatCategory.getTaxRate():"+vatCategory.getTaxRate());
-			invoiceLine.setTaxCategoryAndRate(vatCategory.getTaxCategoryCode(), vatCategory.getTaxRate());
+			InvoiceLine invoiceLine = new InvoiceLine(testLine.getId(), testLine.getQuantity(),
+					testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), 
+					testLine.getItemName(),
+					vatCategory.getTaxCategoryCode(), vatCategory.getTaxRate()
+					);
+			
+//			invoiceLine.setTaxCategoryAndRate(vatCategory.getTaxCategoryCode(), vatCategory.getTaxRate());
 			
 			itemDescriptions.forEach(description -> {
 				invoiceLine.addItemDescription(description);
@@ -470,8 +472,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					LOG.info("\n invoiceLine ID="+			        invoiceLine.getId() +
 							" \n invoiceLine ItemName="+			invoiceLine.getItemName() +
 							" \n invoiceLine Quantity="+			invoiceLine.getQuantity() +
-							" \n invoiceLine ItemNetPrice="+		invoiceLine.getItemNetPrice() +
-							" \n invoiceLine LineNetAmount="+		invoiceLine.getLineNetAmount() +
+							" \n invoiceLine ItemNetPrice="+		invoiceLine.getUnitPriceAmount() +
+							" \n invoiceLine LineNetAmount="+		invoiceLine.getLineTotalAmount() +
 							" \n invoiceLine TaxCategory="+			invoiceLine.getVatCategory()
 							);
 				});
