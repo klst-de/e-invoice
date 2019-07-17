@@ -328,7 +328,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			});
 			invoiceLine.setSellerAssignedID(testLine.getSellerAssignedID());
 			testLine.getNotes().forEach(note -> {
-				invoiceLine.setNote(note);
+				invoiceLine.setNoteText(note);
 			});
 			testLine.getOrderLineID().forEach(lineRef -> {
 				invoiceLine.setOrderLineID(lineRef);

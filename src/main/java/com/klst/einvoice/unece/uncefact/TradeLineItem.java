@@ -90,11 +90,10 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	 * @param BT-131 lineTotalAmount : the total amount of the Invoice line.
 	 * @param BT-146 priceAmt : item net price (mandatory part in PRICE DETAILS)
 	 * @param BT-153 itemName : a name for an item (mandatory part in ITEM INFORMATION)
-//	 * @param BT-151 vatCategory : VAT category code and rate for the invoiced item. (mandatory part in LINE VAT INFORMATION) !!! ubl
 	 * @param BG-30.BT-151 codeEnum 1..1 VAT category code
 	 * @param BG-30.BT-152 percent  0..1 VAT rate
 	 */
-	public void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
+	void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
 			, TaxCategoryCode codeEnum, BigDecimal percent) {
 		setId(id);
 		setQuantity(quantity);
@@ -104,12 +103,8 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see com.klst.cius.CoreInvoiceLine#setId(java.lang.String)
-	 */
-	@Override // 1 .. 1 LineID BT-126
-	public void setId(String id) {
+	// 1 .. 1 LineID BT-126
+	void setId(String id) {
 		associatedDocumentLineDocument.setLineID(CrossIndustryInvoice.newIDType(id, null)); // null : No identification scheme is to be used.
 		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
 	}
@@ -120,7 +115,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	@Override // 0 .. n IncludedNote.Content BT-127
-	public void setNote(String text) {
+	public void setNoteText(String text) {
 		if(text==null) return;
 		NoteType note = new NoteType();
 		note.getContent().add(CrossIndustryInvoice.newTextType(text)); // Kardinalität: 1 .. 1 TODO test
@@ -129,14 +124,14 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	@Override 
-	public String getNote() {
+	public String getNoteText() {
 		if(associatedDocumentLineDocument.getIncludedNote().isEmpty()) return null;
 		List<TextType> textList = associatedDocumentLineDocument.getIncludedNote().get(0).getContent();
 		return textList.isEmpty() ? null : textList.get(0).getValue();
 	}
 
-	@Override // 1 .. 1 SpecifiedTradeProduct.Name BT-153
-	public void setItemName(String text) {
+	// 1 .. 1 SpecifiedTradeProduct.Name BT-153
+	void setItemName(String text) {
 		specifiedTradeProduct.getName().add(CrossIndustryInvoice.newTextType(text));
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
@@ -253,8 +248,8 @@ Bsp.
 		return resList;
 	}
 
-	@Override // BT-129+BT-130
-	public void setQuantity(Quantity quantity) { 
+	// BT-129+BT-130
+	void setQuantity(Quantity quantity) { 
 		QuantityType qt = new QuantityType();
 		quantity.copyTo(qt);
 		specifiedLineTradeDelivery.setBilledQuantity(qt);
@@ -266,8 +261,8 @@ Bsp.
 		return new Quantity(specifiedLineTradeDelivery.getBilledQuantity().getUnitCode(), specifiedLineTradeDelivery.getBilledQuantity().getValue());
 	}
 
-	@Override // BT-131
-	public void setLineTotalAmount(Amount amount) {
+	// BT-131
+	void setLineTotalAmount(Amount amount) {
 		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
 		AmountType lineTotalAmt = new AmountType();
 		amount.copyTo(lineTotalAmt);
@@ -294,7 +289,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 
 	 */
 	@Override // BT-132 0..1
-	public void setOrderLineReference(String lineReference) {
+	public void setBuyerOrderLine(String lineReference) {
 		if(lineReference==null) return;
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
 		referencedDocument.setLineID(CrossIndustryInvoice.newIDType(lineReference, null)); // null : No identification scheme is to be used.
@@ -303,13 +298,13 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	}
 
 	@Override
-	public String getOrderLineReference() {
+	public String getBuyerOrderLine() {
 		ReferencedDocumentType referencedDocument = specifiedLineTradeAgreement.getBuyerOrderReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
 	}
 
-	@Override // 1 .. 1 ChargeAmount BT-146
-	public void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
+	// 1 .. 1 ChargeAmount BT-146
+	void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
 		setUnitPriceAmountAndQuantity(unitPriceAmount, null);
 	}
 
@@ -381,13 +376,11 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);		
 	}
 	
-	@Override
-	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
+	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
 		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
 	}
 
-	@Override
-	public void setTaxCategory(TaxCategoryCode codeEnum) {
+	void setTaxCategory(TaxCategoryCode codeEnum) {
 		setTaxCategoryAndRate(codeEnum, (Percent)null);
 	}
 

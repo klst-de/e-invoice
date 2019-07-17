@@ -67,7 +67,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         			, testLine.getTaxCategory(), testLine.getTaxRate() // mandatory, rate can be null
         			);
         	
-        	line.setNote(testLine.getNote()); // opt
+        	line.setNoteText(testLine.getNoteText()); // opt
         	line.setDescription(testLine.getDescription());
         	line.setSellerAssignedID(testLine.getSellerAssignedID()); // 0..1 BT-128 ram:SellerAssignedID
         	List<Object> cl = testLine.getClassificationList();
@@ -77,7 +77,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         			line.addClassificationID(cc.getValue(), cc.getListID(), cc.getListVersionID());
         		}
         	});
-        	line.setOrderLineReference(testLine.getOrderLineReference());
+        	line.setBuyerOrderLine(testLine.getBuyerOrderLine());
         	cii.addLine(line);
         });
         LOG.info("LineGroup finished.");

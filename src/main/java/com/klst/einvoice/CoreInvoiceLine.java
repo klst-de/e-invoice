@@ -32,7 +32,7 @@ public interface CoreInvoiceLine {
 	 * 
 	 * @param id Identifier
 	 */
-	public void setId(String id);
+//	public void setId(String id); // use ctor
 	public String getId();
 
 	/**
@@ -47,8 +47,8 @@ public interface CoreInvoiceLine {
 	 * 
 	 * @param text Text
 	 */
-	public void setNote(String text);
-	public String getNote();
+	public void setNoteText(String text);
+	public String getNoteText();
 
 	/*
 	 * Eine vom Verkäufer angegebene Kennung für einen Gegenstand, auf dem die Rechnungsposition basiert
@@ -83,7 +83,7 @@ public interface CoreInvoiceLine {
 	 * 
 	 * @param text Text
 	 */
-	public void setItemName(String text);
+//	public void setItemName(String text); // use ctor
 	public String getItemName();
 
 	/**
@@ -111,7 +111,7 @@ public interface CoreInvoiceLine {
 	 * 
 	 * @param Quantity
 	 */
-	public void setQuantity(Quantity quantity);
+//	public void setQuantity(Quantity quantity); // use ctor
 	public Quantity getQuantity();
 
 	/**
@@ -127,7 +127,7 @@ public interface CoreInvoiceLine {
 	 * 
 	 * @param Amount
 	 */
-	public void setLineTotalAmount(Amount amount);
+//	public void setLineTotalAmount(Amount amount); // use ctor
 	public Amount getLineTotalAmount();
 
 	/*
@@ -154,8 +154,8 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * 
 	 * @param reference
 	 */
-	public void setOrderLineReference(String lineReference);
-	public String getOrderLineReference();
+	public void setBuyerOrderLine(String lineReference);
+	public String getBuyerOrderLine();
 
 	/**
 	 * Item net price (mandatory part in PRICE DETAILS), exclusive of VAT, after subtracting item price discount.
@@ -169,7 +169,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * 
 	 * @param UnitPriceAmount
 	 */
-	public void setUnitPriceAmount(UnitPriceAmount unitPriceAmount);
+//	public void setUnitPriceAmount(UnitPriceAmount unitPriceAmount); // use ctor
 	public UnitPriceAmount getItemNetPrice();
 
 	// 1 .. 1 ChargeAmount BT-146 , BaseQuantity BT-149-0 + BT-150-0 optional
@@ -190,12 +190,10 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * 
 	 * @param Code
 	 */
-	public void setTaxCategory(TaxCategoryCode codeEnum); 
+//	public void setTaxCategory(TaxCategoryCode codeEnum); // use ctor 
 	public TaxCategoryCode getTaxCategory(); 
 	// + 0..1 EN16931-ID: BT-152 Invoiced item VAT rate
-//	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, Percent percent); // Percent UN und UBL anders!
-//	public Percent getTaxRate(); 
-	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent);
+//	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent); // use ctor
 	public BigDecimal getTaxRate(); 
 
 	/**

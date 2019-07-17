@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
@@ -65,7 +66,7 @@ BG-25 | +     | 1..n        | INVOICE LINE          | A group of business terms 
             </cac:CommodityClassification>
                                                                                                                                                           | R40
  */
-public class InvoiceLine extends InvoiceLineType {
+public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 
 	private static final Logger LOG = Logger.getLogger(InvoiceLine.class.getName());
 	
@@ -130,7 +131,7 @@ public class InvoiceLine extends InvoiceLineType {
 		init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 	}
 
-	private void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
+	void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
 			, TaxCategoryCode codeEnum, BigDecimal percent) {
 		setId(id);
 		setQuantity(quantity);
@@ -140,11 +141,7 @@ public class InvoiceLine extends InvoiceLineType {
 		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.klst.cius.CoreInvoiceLine#setId(java.lang.String)
-	 */
-//	@Override // 1 .. 1 LineID BT-126  ------------ use ctor
+	// 1 .. 1 LineID BT-126  ------------ use ctor
 	public void setId(String id) {
 		super.setID(Invoice.newIDType(id, null)); // null : No identification scheme 
 	}
@@ -158,7 +155,7 @@ public class InvoiceLine extends InvoiceLineType {
 	 * <br>Request ID: 	R44
 	 *  
 	 */
-// TODO	@Override
+ 	@Override
 	public String getId() {
 		return super.getID().getValue();
 	}
@@ -172,8 +169,7 @@ public class InvoiceLine extends InvoiceLineType {
 		VatCategory taxCategory = new VatCategory(codeEnum, percent);
 		item.getClassifiedTaxCategory().add(taxCategory);
 	}
-//	@Override TODO
-	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
+	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
 		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
 	}
 	
@@ -186,11 +182,12 @@ public class InvoiceLine extends InvoiceLineType {
 	 * <br>Request ID: 	R39, R56, R14
 	 *  
 	 */
+ 	@Override
 	public Quantity getQuantity() {
 		InvoicedQuantityType quantity = super.getInvoicedQuantity();
 		return new Quantity(quantity.getUnitCode(), quantity.getValue());
 	}
-	private void setQuantity(Quantity quantity) {
+	void setQuantity(Quantity quantity) {
 		InvoicedQuantityType invoicedQuantity = new InvoicedQuantityType();
 		invoicedQuantity.setUnitCode(quantity.getUnitCode());
 		invoicedQuantity.setValue(quantity.getValue());
@@ -209,11 +206,12 @@ public class InvoiceLine extends InvoiceLineType {
 	 * <br>Request ID: 	R39, R56, R14
 	 * 
 	 */
+ 	@Override
 	public Amount getLineTotalAmount() {
 		LineExtensionAmountType amount = super.getLineExtensionAmount();
 		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
-	private void setLineTotalAmount(Amount amount) {
+	void setLineTotalAmount(Amount amount) {
 		LineExtensionAmountType lineExtensionAmount = new LineExtensionAmountType();
 		amount.copyTo(lineExtensionAmount);
 		super.setLineExtensionAmount(lineExtensionAmount);
@@ -242,6 +240,12 @@ public class InvoiceLine extends InvoiceLineType {
 		super.setPrice(price);
 	}
 
+	@Override
+	public String getNoteText() {
+		List<String> noteList = getNotes();
+		return noteList.isEmpty() ? null : noteList.get(0); // wg. 0..1
+	}
+
 	/*
 BT-127 ++ 0..1 Invoice line note
 A textual note that gives unstructured information that is relevant to the Invoice line.
@@ -255,7 +259,8 @@ R28 Text
 		});
 		return result;
 	}
-	public void setNote(String text) {
+ 	@Override
+	public void setNoteText(String text) {
 		NoteType note = new NoteType();
 		note.setValue(text);
 		super.getNote().add(note);
@@ -330,11 +335,12 @@ BT-132 ++  0..1 Referenced purchase order line reference
 	 * <br>Request ID: 	R20, R56
 	 * 
 	 */
+ 	@Override
 	public String getItemName() {
 		ItemType item = super.getItem();
 		return item.getName()==null ? null : item.getName().getValue();
 	}
-	private void setItemName(String itemName) {
+	void setItemName(String itemName) {
 		NameType name = new NameType();
 		name.setValue(itemName);
 		ItemType item = super.getItem();
@@ -387,12 +393,14 @@ BT-132 ++  0..1 Referenced purchase order line reference
 	 * <br>Request ID: 	R21, R56
 	 * 
 	 */
+ 	@Override
 	public String getSellerAssignedID() {
 		ItemType item = super.getItem();
 		ItemIdentificationType itemIdentification = item.getSellersItemIdentification();
 		if(itemIdentification==null) return null;
 		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
 	}
+ 	@Override
 	public void setSellerAssignedID(String id) {
 		ItemIdentificationType itemIdentification = new ItemIdentificationType();
 		itemIdentification.setID(Invoice.newIDType(id, null));
@@ -401,7 +409,7 @@ BT-132 ++  0..1 Referenced purchase order line reference
 	}
 	
 	
-	public VatCategory getVatCategory() {
+	public VatCategory getVatCategory() { // TODO public nur wg test
 		List<VatCategory> taxCategories = getVatCategories();
 		if(taxCategories.size()!=1) {
 			LOG.warning("inkonsistent: taxCategories.size="+taxCategories.size() + " muss 1 sein" );
@@ -422,6 +430,96 @@ BT-132 ++  0..1 Referenced purchase order line reference
 			result.add(new VatCategory(taxCategory));
 		});
 		return result;
+	}
+
+	@Override
+	public void setDescription(String text) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getDescription() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setBuyerOrderLine(String lineReference) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getBuyerOrderLine() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UnitPriceAmount getItemNetPrice() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Quantity getBaseQuantity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public TaxCategoryCode getTaxCategory() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BigDecimal getTaxRate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setBuyerAssignedID(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getBuyerAssignedID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setStandardID(String id, String schemeID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getStandardID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addClassificationID(String id, String schemeID, String schemeVersion) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<Object> getClassificationList() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
