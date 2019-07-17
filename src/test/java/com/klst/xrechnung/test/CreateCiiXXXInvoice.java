@@ -64,8 +64,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         			, testLine.getLineTotalAmount()
         			, testLine.getItemNetPrice()
         			, testLine.getItemName()
+        			, testLine.getTaxCategory(), testLine.getTaxRate() // mandatory, rate can be null
         			);
-        	line.setTaxCategoryAndRate(testLine.getTaxCategory(), testLine.getTaxRate());
         	
         	line.setNote(testLine.getNote()); // opt
         	line.setDescription(testLine.getDescription());
@@ -75,14 +75,6 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         		if(c.getClass() == ProductClassificationType.class) {
         			CodeType cc = ((ProductClassificationType)c).getClassCode();
         			line.addClassificationID(cc.getValue(), cc.getListID(), cc.getListVersionID());
- /*
- 		CodeType code = new CodeType();
-		code.setListID(schemeID);
-		code.setListVersionID(schemeVersion);
-		ProductClassificationType productClassification = new ProductClassificationType();
-		productClassification.setClassCode(code);
-       			
-  */
         		}
         	});
         	line.setOrderLineReference(testLine.getOrderLineReference());
