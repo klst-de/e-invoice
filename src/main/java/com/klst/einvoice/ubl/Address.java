@@ -1,4 +1,4 @@
-package com.klst.ubl;
+package com.klst.einvoice.ubl;
 
 import java.util.List;
 import java.util.logging.Logger;

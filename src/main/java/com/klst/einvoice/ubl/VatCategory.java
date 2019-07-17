@@ -1,4 +1,4 @@
-package com.klst.ubl;
+package com.klst.einvoice.ubl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

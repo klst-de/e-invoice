@@ -17,11 +17,11 @@ import org.junit.runners.MethodSorters;
 
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
-import com.klst.ubl.Address;
-import com.klst.ubl.Contact;
-import com.klst.ubl.Delivery;
-import com.klst.ubl.Invoice;
-import com.klst.ubl.Party;
+import com.klst.einvoice.ubl.Address;
+import com.klst.einvoice.ubl.Contact;
+import com.klst.einvoice.ubl.Delivery;
+import com.klst.einvoice.ubl.Invoice;
+import com.klst.einvoice.ubl.Party;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyNameType;

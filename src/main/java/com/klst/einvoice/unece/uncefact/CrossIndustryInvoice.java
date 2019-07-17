@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.DocumentTotals;
-import com.klst.ubl.Party;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansCode;
@@ -791,14 +790,14 @@ DueDateDateTime Fälligkeitsdatum
 	 * Eine Gruppe von Informationselementen, die Informationen über den Zahlungsempfänger liefern. 
 	 * Die Gruppe wird genutzt, wenn der Zahlungsempfänger nicht mit dem Verkäufer identisch ist.
 	 */
-	public void setPayeeParty(Party party) {
+	public void setPayeeParty(TradeParty party) {
 // TODO		LOG.warning(NOT_IMPEMENTED); 
 	}
 	
 	/* SELLER TAX REPRESENTATIVE PARTY             BG-11                       0..1
 	 * Eine Gruppe von Informationselementen, die Informationen über den Steuervertreter des Verkäufers liefern.
 	 */
-	public void setSellerTaxRepresentativeParty(Party party) {
+	public void setSellerTaxRepresentativeParty(TradeParty party) {
 // TODO		LOG.warning(NOT_IMPEMENTED);
 	}
 

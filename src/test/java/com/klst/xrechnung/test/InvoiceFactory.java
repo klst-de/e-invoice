@@ -2,9 +2,9 @@ package com.klst.xrechnung.test;
 
 import java.util.logging.Logger;
 
+import com.klst.einvoice.ubl.Invoice;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.marshaller.AbstactTransformer;
-import com.klst.ubl.Invoice;
 
 // mit subclass CreateUbl01_01aInvoice, CreateUbl01_04aInvoice, CreateAD_xxInvoice, ...
 public abstract class InvoiceFactory {
