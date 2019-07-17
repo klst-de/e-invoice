@@ -1,4 +1,4 @@
-package com.klst.un.unece.uncefact;
+package com.klst.einvoice.unece.uncefact;
 
 import com.klst.einvoice.PostalAddress;
 

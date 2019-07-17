@@ -2,8 +2,8 @@ package com.klst.ubl;
 
 import javax.xml.bind.annotation.XmlType;
 
-import com.klst.un.unece.uncefact.BICId;
-import com.klst.un.unece.uncefact.IBANId;
+import com.klst.einvoice.unece.uncefact.BICId;
+import com.klst.einvoice.unece.uncefact.IBANId;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.BranchType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;

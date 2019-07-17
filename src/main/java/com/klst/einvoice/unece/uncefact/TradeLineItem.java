@@ -1,4 +1,4 @@
-package com.klst.un.unece.uncefact;
+package com.klst.einvoice.unece.uncefact;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

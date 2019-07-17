@@ -1,6 +1,6 @@
 package com.klst.einvoice;
 
-import com.klst.un.unece.uncefact.Amount;
+import com.klst.einvoice.unece.uncefact.Amount;
 
 /* @see European standard EN 16931-1:2017
  * 

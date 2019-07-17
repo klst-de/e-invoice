@@ -3,9 +3,9 @@ package com.klst.einvoice;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.klst.un.unece.uncefact.Amount;
-import com.klst.un.unece.uncefact.Quantity;
-import com.klst.un.unece.uncefact.UnitPriceAmount;
+import com.klst.einvoice.unece.uncefact.Amount;
+import com.klst.einvoice.unece.uncefact.Quantity;
+import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 /**

@@ -1,4 +1,4 @@
-package com.klst.un.unece.uncefact;
+package com.klst.einvoice.unece.uncefact;
 
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.IdentifierType;
 
