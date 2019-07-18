@@ -16,8 +16,10 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Invo
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemIdentificationType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderLineReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PeriodType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PriceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.AccountingCostType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BaseQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DescriptionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InvoicedQuantityType;
@@ -125,21 +127,20 @@ public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 	/**
 	 * mandatory elements of INVOICE LINE
 	 * 
-	 * @param identifier : a unique identifier for the individual line within the Invoice.
-	 * @param quantity : UoM and quantity of items (goods or services) that is charged in the Invoice line.
-	 * @param lineNetAmount : the total amount of the Invoice line.
-	 * @param priceAmt : item net price (mandatory part in PRICE DETAILS)
-	 * @param itemName : a name for an item (mandatory part in ITEM INFORMATION)
-//	 * @param vatCategory : VAT category code and rate for the invoiced item. (mandatory part in LINE VAT INFORMATION)
-	 * @param BG-30.BT-151 codeEnum 1..1 VAT category code
-	 * @param BG-30.BT-152 percent  0..1 VAT rate
+	 * @param identifier  BT-126          : a unique identifier for the individual line within the Invoice.
+	 * @param quantity    BT-130+BT.129   : UoM and quantity of goods or services that is charged in the Invoice line.
+	 * @param totalAmount BT-131          : the total amount of the Invoice line.
+	 * @param priceAmount BG-29.BT-146    : item net price (mandatory part in PRICE DETAILS)
+	 * @param itemName    BT-153          : a name for an item (mandatory part in ITEM INFORMATION)
+	 * @param codeEnum    BG-30.BT-151 1..1 VAT category code
+	 * @param percent     BG-30.BT-152 0..1 VAT rate
 	 */
-	public InvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
+	public InvoiceLine(String id, Quantity quantity, Amount totalAmount, UnitPriceAmount priceAmount, String itemName
 			, TaxCategoryCode codeEnum, BigDecimal percent) {
 		this();
 		item = new ItemType();
 		price = new PriceType();
-		init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+		init(id, quantity, totalAmount, priceAmount, itemName, codeEnum, percent);
 	}
 
 	void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
@@ -152,95 +153,215 @@ public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
 	}
 
-	// 1 .. 1 LineID BT-126  ------------ use ctor
-	public void setId(String id) {
-		super.setID(Invoice.newIDType(id, null)); // null : No identification scheme 
-	}
-	
-	/**
-	 * Invoice line identifier - a unique identifier for the individual line within the Invoice.
-	 * <p>
-	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BT-126
-	 * <br>Rule ID: 	BR-21
-	 * <br>Request ID: 	R44
-	 *  
+	/* BT-126 1..1
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getId()
 	 */
  	@Override
 	public String getId() {
 		return super.getID().getValue();
 	}
-	
-	/* non public - use ctor
-	 * 
-	 * @param codeEnum 1..1 EN16931-ID: BT-151
-	 * @param percent 0..1 EN16931-ID: BT-152
-	 */
-	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, Percent percent) {
-		VatCategory taxCategory = new VatCategory(codeEnum, percent);
-		item.getClassifiedTaxCategory().add(taxCategory);
-	}
-	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
-		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
-	}
-	@Override
-	public TaxCategoryCode getTaxCategory() {
-		TaxCategoryType taxCategory = item.getClassifiedTaxCategory().get(0); // wg. 1..1
-		return TaxCategoryCode.valueOf(taxCategory); // S
+ 	/**
+ 	 * non public - use ctor
+ 	 * 
+ 	 * @param id
+ 	 */
+	void setId(String id) {
+		super.setID(Invoice.newIDType(id, null)); // null : No identification scheme 
 	}
 
+	/* BT-127 0..1
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getNoteText()
+	 */
 	@Override
-	public BigDecimal getTaxRate() {
-		TaxCategoryType taxCategory = item.getClassifiedTaxCategory().get(0); // wg. 1..1
-		PercentType percent = taxCategory.getPercent();
-		return percent==null ? null : percent.getValue();
+	public String getNoteText() {
+		List<String> noteList = getNotes();
+		return noteList.isEmpty() ? null : noteList.get(0); // wg. 0..1
+	}
+	// public wg. test
+	public List<String> getNotes() {
+		List<NoteType> noteList = super.getNote();
+		List<String> result = new ArrayList<String>(noteList.size());
+		noteList.forEach(note -> {
+			result.add(note.getValue());
+		});
+		return result;
+	}
+ 	@Override
+	public void setNoteText(String text) {
+		NoteType note = new NoteType();
+		note.setValue(text);
+		super.getNote().add(note);
 	}
 	
-	/**
-	 * Invoice line net amount 
-	 * <p>
-	 * The total amount of the Invoice line. The amount is “net” without VAT, i.e.
-	 * inclusive of line level allowances and charges as well as other relevant taxes.
-	 * <p>
-	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BT-131
-	 * <br>Rule ID: 	BR-24
-	 * <br>Request ID: 	R39, R56, R14
-	 * 
+	/* BT-128 0..1
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getIssuerAssignedID()
+	 */
+	public String getIssuerAssignedID() {
+		LOG.warning(NOT_IMPEMENTED); // TODO
+		return null;
+	}
+	public void setIssuerAssignedID(String id, String schemeID) {
+		LOG.warning(NOT_IMPEMENTED); // TODO
+	}
+
+	/* BT-130, BT.129 1..1
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getQuantity()
+	 */
+ 	@Override
+	public Quantity getQuantity() {
+		InvoicedQuantityType quantity = super.getInvoicedQuantity();
+		return new Quantity(quantity.getUnitCode(), quantity.getValue());
+	}
+ 	/**
+ 	 * non public - use ctor
+ 	 * 
+ 	 * @param quantity
+ 	 */
+	void setQuantity(Quantity quantity) {
+		InvoicedQuantityType invoicedQuantity = new InvoicedQuantityType();
+		invoicedQuantity.setUnitCode(quantity.getUnitCode());
+		invoicedQuantity.setValue(quantity.getValue());
+		super.setInvoicedQuantity(invoicedQuantity);
+	}
+
+	/* BT-131 1..1
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getLineTotalAmount()
 	 */
  	@Override
 	public Amount getLineTotalAmount() {
 		LineExtensionAmountType amount = super.getLineExtensionAmount();
 		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
+ 	/**
+ 	 * non public - use ctor
+ 	 * 
+ 	 * @param amount
+ 	 */
 	void setLineTotalAmount(Amount amount) {
 		LineExtensionAmountType lineExtensionAmount = new LineExtensionAmountType();
 		amount.copyTo(lineExtensionAmount);
 		super.setLineExtensionAmount(lineExtensionAmount);
 	}
 
-	/**
-	 * Item net price (mandatory part in PRICE DETAILS), exclusive of VAT, after subtracting item price discount.
-	 * <p>
-	 * The Item net price has to be equal with the Item gross price less the Item price discount.
-	 * <p>
-	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BG-29, BT-146 
-	 * <br>Rule ID: 	BR-27
-	 * <br>Request ID: 	R14
-	 * 
+	/* BT-132 0..1
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getOrderLineID()
 	 */
 	@Override
-	public UnitPriceAmount getItemNetPrice() {
+	public String getOrderLineID() {
+		List<String> list = getOrderLineIDs();
+		return list.isEmpty() ? null : list.get(0); // wg. 0..1
+	}
+	/* test
+BT-132 ++ 0..1 Referenced purchase order line reference
+An identifier for a referenced line within a purchase order, issued by the Buyer.
+The purchase order identifier is referenced on document level. 
+R6 Document reference	 
+*/
+	public List<String> getOrderLineIDs() { // public wg.Test
+		List<OrderLineReferenceType> orderLineRefList = super.getOrderLineReference();
+		List<String> result = new ArrayList<String>(orderLineRefList.size());
+		orderLineRefList.forEach(orderLineRef -> {
+			result.add(orderLineRef.getLineID().getValue());
+		}); 
+		return result;
+	}
+	@Override
+	public void setOrderLineID(String lineReference) {
+		LineIDType lineID = new LineIDType();
+		lineID.setValue(lineReference);
+		OrderLineReferenceType orderLineReference = new OrderLineReferenceType();
+		orderLineReference.setLineID(lineID);
+		super.getOrderLineReference().add(orderLineReference);
+	}
+
+	/* BT-133 0..1
+	 * Invoice line Buyer accounting reference
+	 * http://docs.peppol.eu/poacc/billing/3.0/syntax/ubl-invoice/tree/
+	 */
+// TODO	@Override
+	public String getBuyerAccounting() {
+		return super.getAccountingCost()==null ? null : super.getAccountingCost().getValue();
+	}
+// TODO	@Override
+	public void setBuyerAccounting(String text) {
+		if(text==null) return;
+		AccountingCostType accountingCost = new AccountingCostType();
+		accountingCost.setValue(text);
+		super.setAccountingCost(accountingCost);
+	}
+
+	/*
+	 * BG-26 0..1 INVOICE LINE PERIOD
+	 * A group of business terms providing information about the period relevant for the Invoice line.
+	 * Is also called Invoice line delivery period. 
+	 * R30
+	 */
+	
+	/*
+	 * BT-134 0..1 Invoice line period start date
+	 * BT-135 0..1 Invoice line period end date
+	 */
+// TODO	@Override
+	public String getInvoiceStartDate() {
+		List<PeriodType> periodList = super.getInvoicePeriod();
+		return periodList.isEmpty() ? null : "TODO"; //periodList.get(0).getStartDate().getValue(); // XMLGregorian...
+	}
+	
+	/*
+	 * BG-27 0..n INVOICE LINE ALLOWANCES
+	 * TODO Komplett
+	 */
+	
+	/* 
+	 * BG-28 ++ 0..n INVOICE LINE CHARGES
+	 * TODO Komplett
+	 */
+	
+	/*
+	 * BG-29 1..1 PRICE DETAILS
+	 */
+	
+	/* BG-29.BT-146 1..1 (mandatory part in PRICE DETAILS) aka Item net price
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getItemNetPrice()
+	 */
+	@Override
+	public UnitPriceAmount getUnitPriceAmount() {
 		PriceAmountType priceAmount = price.getPriceAmount();
 		return new UnitPriceAmount(priceAmount.getCurrencyID(), priceAmount.getValue());
 	}
-
-	// 1 .. 1 ChargeAmount BT-146
+	/**
+	 * non public - use ctor
+	 * 
+	 * @param unitPriceAmount
+	 */
 	void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
 		setUnitPriceAmountAndQuantity(unitPriceAmount, null);
 	}
 
+	// BT-147 +++ 0..1 Item price discount          TODO
+	// BT-148 +++ 0..1 Item gross price             TODO
+	
+	/* BT-149-0 0..1 , BT-150-0 required
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getBaseQuantity()
+	 */
+	@Override
+	public Quantity getBaseQuantity() {
+		BaseQuantityType baseQuantity = price.getBaseQuantity();
+		String unit = baseQuantity.getUnitCode();
+		return baseQuantity==null ? null : (unit==null ? new Quantity(baseQuantity.getValue()) : new Quantity(unit, baseQuantity.getValue()));
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#setUnitPriceAmountAndQuantity(com.klst.einvoice.unece.uncefact.UnitPriceAmount, com.klst.einvoice.unece.uncefact.Quantity)
+	 */
 	@Override
 	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
 		PriceAmountType priceAmount = new PriceAmountType();
@@ -258,107 +379,61 @@ public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 		super.setPrice(price);
 	}
 
-	@Override // optional BaseQuantity : BT-149-0 QuantityType 0..1 + BT-150-0 required
-	public Quantity getBaseQuantity() {
-		BaseQuantityType baseQuantity = price.getBaseQuantity();
-		String unit = baseQuantity.getUnitCode();
-		return baseQuantity==null ? null : (unit==null ? new Quantity(baseQuantity.getValue()) : new Quantity(unit, baseQuantity.getValue()));
-	}
-
-
-	/**
-	 * UoM and quantity of items (goods or services) that is charged in the Invoice line.
-	 * <p>
-	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BT-130, BT.129
-	 * <br>Rule ID: 	BR-23, BR-22
-	 * <br>Request ID: 	R39, R56, R14
-	 *  
-	 */
- 	@Override
-	public Quantity getQuantity() {
-		InvoicedQuantityType quantity = super.getInvoicedQuantity();
-		return new Quantity(quantity.getUnitCode(), quantity.getValue());
-	}
-
- 	// use ctor
-	void setQuantity(Quantity quantity) {
-		InvoicedQuantityType invoicedQuantity = new InvoicedQuantityType();
-		invoicedQuantity.setUnitCode(quantity.getUnitCode());
-		invoicedQuantity.setValue(quantity.getValue());
-		super.setInvoicedQuantity(invoicedQuantity);
-	}
-
-	@Override
-	public String getNoteText() {
-		List<String> noteList = getNotes();
-		return noteList.isEmpty() ? null : noteList.get(0); // wg. 0..1
-	}
-
 	/*
-BT-127 ++ 0..1 Invoice line note
-A textual note that gives unstructured information that is relevant to the Invoice line.
-R28 Text
+	 * BG-30 1..1 LINE VAT INFORMATION
 	 */
-	public List<String> getNotes() {
-		List<NoteType> noteList = super.getNote();
-		List<String> result = new ArrayList<String>(noteList.size());
-		noteList.forEach(note -> {
-			result.add(note.getValue());
-		});
-		return result;
-	}
- 	@Override
-	public void setNoteText(String text) {
-		NoteType note = new NoteType();
-		note.setValue(text);
-		super.getNote().add(note);
-	}
-	
-	@Override
-	public void setOrderLineID(String lineReference) {
-		LineIDType lineID = new LineIDType();
-		lineID.setValue(lineReference);
-		OrderLineReferenceType orderLineReference = new OrderLineReferenceType();
-		orderLineReference.setLineID(lineID);
-		super.getOrderLineReference().add(orderLineReference);
-	}
 
+	/* BG-30.BT-151 1..1
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getTaxCategory()
+	 */
 	@Override
-	public String getOrderLineID() {
-		List<String> list = getOrderLineIDs();
-		return list.isEmpty() ? null : list.get(0); // wg. 0..1
+	public TaxCategoryCode getTaxCategory() {
+		TaxCategoryType taxCategory = item.getClassifiedTaxCategory().get(0); // wg. 1..1
+		return TaxCategoryCode.valueOf(taxCategory); // S
 	}
-	
-	/* test
-BT-132 ++ 0..1 Referenced purchase order line reference
-An identifier for a referenced line within a purchase order, issued by the Buyer.
-The purchase order identifier is referenced on document level. 
-R6 Document reference	 
-*/
-	public List<String> getOrderLineIDs() { // public wg.Test
-		List<OrderLineReferenceType> orderLineRefList = super.getOrderLineReference();
-		List<String> result = new ArrayList<String>(orderLineRefList.size());
-		orderLineRefList.forEach(orderLineRef -> {
-			result.add(orderLineRef.getLineID().getValue());
-		});
-		return result;
+	/* BG-30.BT-152 0..1
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getTaxRate()
+	 */
+	@Override
+	public BigDecimal getTaxRate() {
+		TaxCategoryType taxCategory = item.getClassifiedTaxCategory().get(0); // wg. 1..1
+		PercentType percent = taxCategory.getPercent();
+		return percent==null ? null : percent.getValue();
 	}
-
 	/**
-	 * Item name (mandatory part in BG-31 ITEM INFORMATION)
-	 * <p>
-	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BT-153 
-	 * <br>Rule ID: 	BR-25
-	 * <br>Request ID: 	R20, R56
+	 * non public - use ctor
 	 * 
+	 * @param codeEnum 1..1 EN16931-ID: BT-151
+	 * @param percent 0..1 EN16931-ID: BT-152
+	 */
+	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, Percent percent) {
+		VatCategory taxCategory = new VatCategory(codeEnum, percent);
+		item.getClassifiedTaxCategory().add(taxCategory);
+	}
+	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
+		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
+	}
+	
+	/*
+	 * BG-31 1..1 ITEM INFORMATION
+	 */
+	
+	/* BG-31.BT-153 1..1
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getItemName()
 	 */
  	@Override
 	public String getItemName() {
 		ItemType item = super.getItem();
 		return item.getName()==null ? null : item.getName().getValue();
 	}
+ 	/**
+ 	 * non public - use ctor
+ 	 * 
+ 	 * @param itemName
+ 	 */
 	void setItemName(String itemName) {
 		NameType name = new NameType();
 		name.setValue(itemName);
@@ -366,18 +441,15 @@ R6 Document reference
 		item.setName(name);
 	}
 
-	/**
-	 * Item description (optional part in ITEM INFORMATION)
-	 * <p>
-	 * A description for an item. The Item description allows for describing the item 
-	 * and its features in more detail than the Item name.
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BT-154 
-	 * <br>Rule ID:
-	 * <br>Request ID: 	R20, R56
-	 * 
+	/* BG-31.BT-154 0..1
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getDescription()
 	 */
+	@Override
+	public String getDescription() {
+		if(item.getDescription().isEmpty()) return null;
+		return item.getDescription().get(0).getValue(); // get(0) wg ..1
+	}
 	@Override
 	public void setDescription(String text) {
 		addItemDescription(text);	
@@ -388,12 +460,6 @@ R6 Document reference
 		description.setValue(text);
 		item.getDescription().add(description);
 		super.setItem(item);
-	}
-
-	@Override
-	public String getDescription() {
-		if(item.getDescription().isEmpty()) return null;
-		return item.getDescription().get(0).getValue(); // get(0) wg ..1
 	}
 
 	public List<String> getItemDescriptions() { // public wg. test
@@ -412,10 +478,16 @@ R6 Document reference
 		return result;
 	}
 	
-	/* BT-155 0..1 (optional)
+	/* BG-31.BT-155 0..1
 	 * (non-Javadoc)
-	 * @see com.klst.einvoice.CoreInvoiceLine#setSellerAssignedID(java.lang.String)
+	 * @see com.klst.einvoice.CoreInvoiceLine#getSellerAssignedID()
 	 */
+ 	@Override
+	public String getSellerAssignedID() {
+		ItemIdentificationType itemIdentification = item.getSellersItemIdentification();
+		if(itemIdentification==null) return null;
+		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
+	}
  	@Override
 	public void setSellerAssignedID(String id) {
  		if(id==null) return;
@@ -424,17 +496,17 @@ R6 Document reference
 		item.setSellersItemIdentification(itemIdentification);
 		super.setItem(item);
 	}
- 	@Override
-	public String getSellerAssignedID() {
-		ItemIdentificationType itemIdentification = item.getSellersItemIdentification();
+	
+ 	/* BG-31.BT-156 0..1
+ 	 * (non-Javadoc)
+ 	 * @see com.klst.einvoice.CoreInvoiceLine#getBuyerAssignedID()
+ 	 */
+	@Override
+	public String getBuyerAssignedID() {
+		ItemIdentificationType itemIdentification = item.getBuyersItemIdentification();
 		if(itemIdentification==null) return null;
 		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
 	}
-	
-	/* BT-156 0..1 (optional)
-	 * (non-Javadoc)
-	 * @see com.klst.einvoice.CoreInvoiceLine#setBuyerAssignedID(java.lang.String)
-	 */
 	@Override
 	public void setBuyerAssignedID(String id) {
  		if(id==null) return;
@@ -443,14 +515,8 @@ R6 Document reference
 		item.setBuyersItemIdentification(itemIdentification);
 		super.setItem(item);
 	}
-	@Override
-	public String getBuyerAssignedID() {
-		ItemIdentificationType itemIdentification = item.getBuyersItemIdentification();
-		if(itemIdentification==null) return null;
-		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
-	}
 
-	/* BT-157 0..1 (optional) , BT-157-1 required
+	/* BG-31.BT-157 0..1 (optional) , BT-157-1 required
 	 * (non-Javadoc)
 	 * @see com.klst.einvoice.CoreInvoiceLine#setStandardID(java.lang.String, java.lang.String)
 	 */
@@ -469,7 +535,7 @@ R6 Document reference
 		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
 	}
 
-	/* BT-158 0..n (optional) , BT-158-1 1..1 , BT-158-2 0..1
+	/* BG-31.BT-158 0..n (optional) , BT-158-1 1..1 , BT-158-2 0..1
 	 * (non-Javadoc)
 	 * @see com.klst.einvoice.CoreInvoiceLine#addClassificationID(java.lang.String, java.lang.String, java.lang.String)
 	 */

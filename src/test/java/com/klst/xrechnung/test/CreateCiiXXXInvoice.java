@@ -62,7 +62,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         			( testLine.getId()
         			, testLine.getQuantity()
         			, testLine.getLineTotalAmount()
-        			, testLine.getItemNetPrice()
+        			, testLine.getUnitPriceAmount()
         			, testLine.getItemName()
         			, testLine.getTaxCategory(), testLine.getTaxRate() // mandatory, rate can be null
         			);

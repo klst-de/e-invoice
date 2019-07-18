@@ -313,7 +313,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		List<InvoiceLine> testLines = testDoc.getLines();
 		testLines.forEach(testLine -> {
 			InvoiceLine invoiceLine = new InvoiceLine(testLine.getId(), testLine.getQuantity(),
-					testLine.getLineTotalAmount(), testLine.getItemNetPrice(), 
+					testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), 
 					testLine.getItemName(),
 					testLine.getTaxCategory(), testLine.getTaxRate()
 					);
@@ -475,7 +475,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					LOG.info("\n invoiceLine ID="+			        invoiceLine.getId() +
 							" \n invoiceLine ItemName="+			invoiceLine.getItemName() +
 							" \n invoiceLine Quantity="+			invoiceLine.getQuantity() +
-							" \n invoiceLine ItemNetPrice="+		invoiceLine.getItemNetPrice() +
+							" \n invoiceLine ItemNetPrice="+		invoiceLine.getUnitPriceAmount() +
 							" \n invoiceLine LineNetAmount="+		invoiceLine.getLineTotalAmount() +
 							" \n invoiceLine TaxCategory/Rate="+	invoiceLine.getTaxCategory()+invoiceLine.getTaxRate()
 							);

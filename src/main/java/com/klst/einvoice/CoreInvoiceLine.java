@@ -160,7 +160,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	/**
 	 * Item net price (mandatory part in PRICE DETAILS), exclusive of VAT, after subtracting item price discount.
 	 * <p>
-	 * The Item net price has to be equal with the Item gross price less the Item price discount.
+	 * The unit net price has to be equal with the Item gross price less the Item price discount.
 	 * <p>
 	 * Cardinality: 	1..1 (mandatory)
 	 * <br>EN16931-ID: 	BG-29, BT-146 
@@ -170,7 +170,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * @param UnitPriceAmount
 	 */
 //	public void setUnitPriceAmount(UnitPriceAmount unitPriceAmount); // use ctor
-	public UnitPriceAmount getItemNetPrice();
+	public UnitPriceAmount getUnitPriceAmount();
 
 	// 1 .. 1 ChargeAmount BT-146 , BaseQuantity BT-149-0 + BT-150-0 optional
 	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity baseQuantity);

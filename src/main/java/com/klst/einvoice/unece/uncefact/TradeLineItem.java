@@ -326,7 +326,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	}
 
 	@Override
-	public UnitPriceAmount getItemNetPrice() {
+	public UnitPriceAmount getUnitPriceAmount() {
 		return new UnitPriceAmount(specifiedLineTradeAgreement.getNetPriceProductTradePrice().getChargeAmount().get(0).getValue());
 	}
 
