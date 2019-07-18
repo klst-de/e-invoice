@@ -130,24 +130,35 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		makeVatBreakDownGroup2(ublInvoice);
 		
 //		 LineGroup 
-		List<CreditNoteLine> invoiceLines = testCreditNote.getLines();
-		LOG.info("LineGroup starts for "+invoiceLines.size() + " lines.");
-		invoiceLines.forEach(testLine -> {
-			List<String> itemDescriptions = testLine.getItemDescriptions(); // <> Notes
-			CreditNoteLine invoiceLine = new CreditNoteLine(testLine.getId(), testLine.getQuantity(),
-					testLine.getLineNetAmount(), testLine.getItemNetPrice(), 
-					testLine.getItemName());
+		List<CreditNoteLine> testLines = testCreditNote.getLines();
+		testLines.forEach(testLine -> {
+			CreditNoteLine targetLine = new CreditNoteLine(testLine.getId(), testLine.getQuantity(),
+					testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), 
+					testLine.getItemName(),
+					testLine.getTaxCategory(), testLine.getTaxRate()
+					);
 			
-			VatCategory vatCategory = testLine.getVatCategory(); // mandatory, rate optional
-			LOG.info("testLine.vatCategory : "+vatCategory + " vatCategory.getTaxRate():"+vatCategory.getTaxRate());
-			invoiceLine.setTaxCategoryAndRate(vatCategory.getTaxCategoryCode(), vatCategory.getTaxRate());
-
-			itemDescriptions.forEach(description -> {
-				invoiceLine.addItemDescription(description);
+			// opt:
+			targetLine.setSellerAssignedID(testLine.getSellerAssignedID());   //BT-155 0..1
+			targetLine.setBuyerAssignedID(testLine.getBuyerAssignedID());     //BT-156 0..1
+			targetLine.setStandardID(testLine.getStandardID(), "TODOSchema"); //BT-157 0..1 , BT-157-1 required
+        	List<Object> cl = testLine.getClassificationList();                //BT-158 0..n , BT-158-1 1..1 , BT-158-2 0..1
+        	cl.forEach(c -> {
+        		if(c.getClass() == CommodityClassificationType.class) {
+        			ItemClassificationCodeType cc = ((CommodityClassificationType)c).getItemClassificationCode();
+        			targetLine.addClassificationID(cc.getValue(), cc.getListID(), cc.getListVersionID());
+        		}
+        	});
+			
+			testLine.getNotes().forEach(note -> {
+				targetLine.setNoteText(note);
 			});
-			ublInvoice.addLine(invoiceLine);
+			testLine.getOrderLineIDs().forEach(lineRef -> {
+				targetLine.setOrderLineID(lineRef);
+			});
+			ublInvoice.addLine(targetLine);
 		});
-		LOG.info("LineGroup finished. ");
+		LOG.info("LineGroup finished. "+testLines.size() + " lines.");
 
 		return ublInvoice;
 	}
@@ -309,34 +320,34 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("finished. "+vatBreakDowns.size() + " vatBreakDowns.");
 	}
 	
-	void makeLineGroup(Invoice ublInvoice) {
+	void makeLineGroup(Invoice ublDoc) {
 		List<InvoiceLine> testLines = testDoc.getLines();
 		testLines.forEach(testLine -> {
-			InvoiceLine invoiceLine = new InvoiceLine(testLine.getId(), testLine.getQuantity(),
+			InvoiceLine targetLine = new InvoiceLine(testLine.getId(), testLine.getQuantity(),
 					testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), 
 					testLine.getItemName(),
 					testLine.getTaxCategory(), testLine.getTaxRate()
 					);
 			
 			// opt:
-			invoiceLine.setSellerAssignedID(testLine.getSellerAssignedID());   //BT-155 0..1
-			invoiceLine.setBuyerAssignedID(testLine.getBuyerAssignedID());     //BT-156 0..1
-			invoiceLine.setStandardID(testLine.getStandardID(), "TODOSchema"); //BT-157 0..1 , BT-157-1 required
+			targetLine.setSellerAssignedID(testLine.getSellerAssignedID());   //BT-155 0..1
+			targetLine.setBuyerAssignedID(testLine.getBuyerAssignedID());     //BT-156 0..1
+			targetLine.setStandardID(testLine.getStandardID(), "TODOSchema"); //BT-157 0..1 , BT-157-1 required
         	List<Object> cl = testLine.getClassificationList();                //BT-158 0..n , BT-158-1 1..1 , BT-158-2 0..1
         	cl.forEach(c -> {
         		if(c.getClass() == CommodityClassificationType.class) {
         			ItemClassificationCodeType cc = ((CommodityClassificationType)c).getItemClassificationCode();
-        			invoiceLine.addClassificationID(cc.getValue(), cc.getListID(), cc.getListVersionID());
+        			targetLine.addClassificationID(cc.getValue(), cc.getListID(), cc.getListVersionID());
         		}
         	});
 			
 			testLine.getNotes().forEach(note -> {
-				invoiceLine.setNoteText(note);
+				targetLine.setNoteText(note);
 			});
 			testLine.getOrderLineIDs().forEach(lineRef -> {
-				invoiceLine.setOrderLineID(lineRef);
+				targetLine.setOrderLineID(lineRef);
 			});
-			ublInvoice.addLine(invoiceLine);
+			ublDoc.addLine(targetLine);
 		});
 		LOG.info("finished. "+testLines.size() + " lines.");
 	}

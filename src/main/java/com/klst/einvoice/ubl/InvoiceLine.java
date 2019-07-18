@@ -80,7 +80,6 @@ public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 		
 		TaxCategoryType classifiedTaxCategory = null;
 		List<TaxCategoryType> taxCategories = item.getClassifiedTaxCategory();
-		//BigDecimal taxRatePercent = percent==null ? null : percent.getValue();
 		if(taxCategories.size()==1) {
 			classifiedTaxCategory = taxCategories.get(0);
 		} else if(taxCategories.size()==0) {
@@ -110,7 +109,9 @@ public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 		if(descriptionList.isEmpty()) {
 			// optional
 		} else {
-			LOG.info("descriptionList.size="+descriptionList.size() + " !!!!!!!!!!!!!!!!!!!!!!!" );
+			if(descriptionList.size()>1) {
+				LOG.warning("descriptionList.size="+descriptionList.size() + " !!!!!!!!!!!!!!!!!!!!!!!" );
+			}
 			setDescription(descriptionList.get(0).getValue()); 
 		}
 
