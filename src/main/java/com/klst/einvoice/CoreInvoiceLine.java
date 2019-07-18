@@ -236,7 +236,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * 0021 : SWIFT 
 	 * 0088 : EAN 
 	 * 0060 : DUNS 
-	 * 0177 : ODETTE 
+	 * 0177 : ODETTE automotive industry
 	 */
 	/**
 	 * Item standard identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
@@ -267,7 +267,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * 
 	 * @param Identifier
 	 * @param schemeID,      BT-158-1 1..1 The identification scheme shall be chosen from the entries in UNTDID 7143
-	 * @param schemeVersion, BT-158-1 0..1 Scheme version identifier - The version of the identification scheme.
+	 * @param schemeVersion, BT-158-2 0..1 Scheme version identifier - The version of the identification scheme.
 	 */
 	public void addClassificationID(String id, String schemeID, String schemeVersion);
 	public List<Object> getClassificationList();

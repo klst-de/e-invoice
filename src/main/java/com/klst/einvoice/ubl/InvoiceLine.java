@@ -78,23 +78,25 @@ public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 		
 		TaxCategoryType classifiedTaxCategory = null;
 		List<TaxCategoryType> taxCategories = item.getClassifiedTaxCategory();
+		//BigDecimal taxRatePercent = percent==null ? null : percent.getValue();
 		if(taxCategories.size()==1) {
 			classifiedTaxCategory = taxCategories.get(0);
 		} else if(taxCategories.size()==0) {
-			LOG.warning("----------inkonsistent: taxCategories.size="+taxCategories.size() + " muss 1 sein" );
+			LOG.warning("inkonsistent: taxCategories.size="+taxCategories.size() + " muss 1 sein" );
 		} else {
-			LOG.info("---------taxCategories.size="+taxCategories.size() + " muss 1 sein!" );
+			LOG.info("taxCategories.size="+taxCategories.size() + " muss 1 sein!" );
 			classifiedTaxCategory = taxCategories.get(0);
 		}
-		VatCategory vatCategory = new VatCategory(classifiedTaxCategory);
+		TaxCategoryCode taxCategoryCode = TaxCategoryCode.valueOf(classifiedTaxCategory);
+		PercentType taxRatePercent = classifiedTaxCategory.getPercent();
 
 		init( line.getID().getValue()
 			, new Quantity(line.getInvoicedQuantity().getUnitCode(), line.getInvoicedQuantity().getValue())
 			, new Amount(line.getLineExtensionAmount().getCurrencyID(), line.getLineExtensionAmount().getValue())
 			, new UnitPriceAmount(price.getPriceAmount().getCurrencyID(), price.getPriceAmount().getValue())
 			, item.getName().getValue()
-			, vatCategory.getTaxCategoryCode() // TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
-			, vatCategory.getTaxRate()         // percent==null ? null : percent.getValue()
+			, taxCategoryCode
+			, taxRatePercent==null ? null : taxRatePercent.getValue()
 			);
 		
 		List<NoteType> noteList = line.getNote();
@@ -169,7 +171,7 @@ public class InvoiceLine extends InvoiceLineType implements CoreInvoiceLine {
 		return super.getID().getValue();
 	}
 	
-	/*
+	/* non public - use ctor
 	 * 
 	 * @param codeEnum 1..1 EN16931-ID: BT-151
 	 * @param percent 0..1 EN16931-ID: BT-152
@@ -410,23 +412,10 @@ R6 Document reference
 		return result;
 	}
 	
-	/**
-	 * SellerAssignedID (optional part in ITEM INFORMATION)
-	 * <p>
-	 * An identifier, assigned by the Seller, for the item. 
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BT-155 
-	 * <br>Rule ID:
-	 * <br>Request ID: 	R21, R56
-	 * 
+	/* BT-155 0..1 (optional)
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#setSellerAssignedID(java.lang.String)
 	 */
- 	@Override
-	public String getSellerAssignedID() {
-		ItemIdentificationType itemIdentification = item.getSellersItemIdentification();
-		if(itemIdentification==null) return null;
-		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
-	}
  	@Override
 	public void setSellerAssignedID(String id) {
  		if(id==null) return;
@@ -435,33 +424,55 @@ R6 Document reference
 		item.setSellersItemIdentification(itemIdentification);
 		super.setItem(item);
 	}
+ 	@Override
+	public String getSellerAssignedID() {
+		ItemIdentificationType itemIdentification = item.getSellersItemIdentification();
+		if(itemIdentification==null) return null;
+		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
+	}
 	
-	
+	/* BT-156 0..1 (optional)
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#setBuyerAssignedID(java.lang.String)
+	 */
 	@Override
 	public void setBuyerAssignedID(String id) {
-		// TODO Auto-generated method stub
-		LOG.warning(NOT_IMPEMENTED);
+ 		if(id==null) return;
+		ItemIdentificationType itemIdentification = new ItemIdentificationType();
+		itemIdentification.setID(Invoice.newIDType(id, null));
+		item.setBuyersItemIdentification(itemIdentification);
+		super.setItem(item);
 	}
-
 	@Override
 	public String getBuyerAssignedID() {
-		// TODO Auto-generated method stub
-		LOG.warning(NOT_IMPEMENTED);
-		return null;
+		ItemIdentificationType itemIdentification = item.getBuyersItemIdentification();
+		if(itemIdentification==null) return null;
+		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
 	}
 
-	@Override // 0..1 BT-157 BT-157-1
+	/* BT-157 0..1 (optional) , BT-157-1 required
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#setStandardID(java.lang.String, java.lang.String)
+	 */
+	@Override
 	public void setStandardID(String id, String schemeID) {
-		LOG.warning(NOT_IMPEMENTED);
-		// TODO
+ 		if(id==null) return;
+		ItemIdentificationType itemIdentification = new ItemIdentificationType();
+		itemIdentification.setID(Invoice.newIDType(id, schemeID));
+		item.setBuyersItemIdentification(itemIdentification);
+		super.setItem(item);
 	}
-
 	@Override
 	public String getStandardID() { // ohne schemeID! TODO
-		LOG.warning(NOT_IMPEMENTED);
-		return null;
+		ItemIdentificationType itemIdentification = item.getStandardItemIdentification();
+		if(itemIdentification==null) return null;
+		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
 	}
 
+	/* BT-158 0..n (optional) , BT-158-1 1..1 , BT-158-2 0..1
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceLine#addClassificationID(java.lang.String, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public void addClassificationID(String id, String schemeID, String schemeVersion) {
 		if(id==null) return;
