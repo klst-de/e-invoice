@@ -11,7 +11,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 
-public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdown{
+public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdown {
 
 	VatBreakdown() {
 		super();
@@ -41,41 +41,40 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 	 * @param percent       BT-119 RateApplicablePercent
 	 */
 	void init(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
-		setTaxableAmount(taxableAmount);
-		setTaxAmount(taxAmount);
-		setTaxCategoryAndRate(codeEnum, percent);
+		setTaxBaseAmount(taxableAmount);
+		setCalculatedTaxAmount(taxAmount);
+		setTaxCategoryCodeAndRate(codeEnum, percent);
 	}
 
 	/* BT-116 1..1 BasisAmount Steuerbasisbetrag
 	 * (non-Javadoc)
-	 * @see com.klst.einvoice.CoreInvoiceVatBreakdown#setTaxableAmount(com.klst.einvoice.unece.uncefact.Amount)
+	 * @see com.klst.einvoice.CoreInvoiceVatBreakdown#setTaxBaseAmount(com.klst.einvoice.unece.uncefact.Amount)
 	 */
 	@Override
-	public void setTaxableAmount(Amount taxableAmount) {
+	public void setTaxBaseAmount(Amount taxableAmount) {
 		AmountType basisAmount = new AmountType();
 		taxableAmount.copyTo(basisAmount);
 		super.getBasisAmount().add(basisAmount);
 	}
 
 	@Override
-	public Amount getTaxableAmount() {
-//		super.getBasisAmount().get(0); // wg. 1.1 möglich
+	public Amount getTaxBaseAmount() {
 		return new Amount(super.getBasisAmount().get(0).getValue());
 	}
 
 	/* BT-117 1..1 CalculatedAmount Kategoriespezifischer Steuerbetrag
 	 * (non-Javadoc)
-	 * @see com.klst.einvoice.CoreInvoiceVatBreakdown#setTaxAmount(com.klst.einvoice.unece.uncefact.Amount)
+	 * @see com.klst.einvoice.CoreInvoiceVatBreakdown#setCalculatedTaxAmount(com.klst.einvoice.unece.uncefact.Amount)
 	 */
 	@Override
-	public void setTaxAmount(Amount taxAmount) {
+	public void setCalculatedTaxAmount(Amount taxAmount) {
 		AmountType calculatedAmount = new AmountType();
 		taxAmount.copyTo(calculatedAmount);
 		super.getCalculatedAmount().add(calculatedAmount);		
 	}
 
 	@Override
-	public Amount getTaxAmount() {
+	public Amount getCalculatedTaxAmount() {
 		return new Amount(super.getCalculatedAmount().get(0).getValue());
 	}
 
@@ -86,7 +85,7 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, String typeCode, Percent taxRate) {
 		TaxCategoryCodeType taxCategory = new TaxCategoryCodeType();
 		taxCategory.setValue(codeEnum.getValue());
-		this.setCategoryCode(taxCategory);
+		super.setCategoryCode(taxCategory);
 		
 		TaxTypeCodeType taxTypeCode = new TaxTypeCodeType();
 		taxTypeCode.setValue(typeCode); // USt/VAT
@@ -104,17 +103,17 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 	 * @see com.klst.einvoice.CoreInvoiceVatBreakdown#setTaxCategoryAndRate(com.klst.untdid.codelist.TaxCategoryCode, java.math.BigDecimal)
 	 */
 	@Override
-	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal taxRate) {
+	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal taxRate) {
 		setTaxCategoryAndRate(codeEnum, CoreInvoiceVatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate));
 	}
 
 	@Override
-	public void setTaxCategory(TaxCategoryCode code) {
-		setTaxCategoryAndRate(code, null);	
+	public void setTaxCategoryCode(TaxCategoryCode code) {
+		setTaxCategoryCodeAndRate(code, null);	
 	}
 
 	@Override
-	public TaxCategoryCode getTaxCategory() {
+	public TaxCategoryCode getTaxCategoryCode() {
 		return TaxCategoryCode.valueOf(super.getCategoryCode());
 	}
 

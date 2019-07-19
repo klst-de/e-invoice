@@ -59,8 +59,8 @@ public interface CoreInvoiceVatBreakdown {
 	 * @param Amount
 	 */
 	// BT-116 1..1 BasisAmount Steuerbasisbetrag
-	public void setTaxableAmount(Amount taxableAmount); // use ctor
-	public Amount getTaxableAmount();
+	public void setTaxBaseAmount(Amount taxBaseAmount); // use ctor
+	public Amount getTaxBaseAmount();
 
 	/**
 	 * VAT category tax amount
@@ -78,8 +78,8 @@ public interface CoreInvoiceVatBreakdown {
 	 * @param Amount
 	 */
 	// BT-117 1..1 CalculatedAmount Kategoriespezifischer Steuerbetrag
-	public void setTaxAmount(Amount taxAmount); // use ctor
-	public Amount getTaxAmount();
+	public void setCalculatedTaxAmount(Amount taxAmount); // use ctor
+	public Amount getCalculatedTaxAmount();
 	
 	/**
 	 * Value added tax. 
@@ -99,7 +99,7 @@ public interface CoreInvoiceVatBreakdown {
 	 * @param codeEnum BT-118
 	 * @param percent  BT-119
 	 */
-	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent); // use ctor
+	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal percent); // use ctor
 	
 	/**
 	 * VAT category code 
@@ -115,8 +115,8 @@ public interface CoreInvoiceVatBreakdown {
 	 */
 	// BT-118   CategoryCode Codierte Bezeichnung einer Umsatzsteuerkategorie
 	// BT-118-0 TypeCode Code der Umsatzsteuerkategorie, Hinweis: Fester Wert = "VAT"
-	public void setTaxCategory(TaxCategoryCode code); // use ctor
-	public TaxCategoryCode getTaxCategory();
+	public void setTaxCategoryCode(TaxCategoryCode code); // use ctor
+	public TaxCategoryCode getTaxCategoryCode();
 	
 	/**
 	 * VAT category rate
