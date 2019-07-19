@@ -25,7 +25,7 @@ _A “Core Invoice Usage Specification” (CIUS) is a specification that provide
 ## Example 
 this snippet creates a valid ubl invoice [see (xrechnung-testsuite)](https://github.com/itplr-kosit/xrechnung-testsuite/blob/master/instances/01.01a-INVOICE_ubl.xml)
 ```java
-  Invoice ublInvoice = new CommercialInvoice(XRECHNUNG_12);
+  CoreInvoice ublInvoice = new CommercialInvoice(XRECHNUNG_12);
   ublInvoice.setId("123456XX");
   ublInvoice.setIssueDate("2016-04-04");
   ublInvoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
