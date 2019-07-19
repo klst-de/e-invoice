@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoice;
+import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -1547,12 +1548,10 @@ Connecting Europe Facility gepflegt und herausgegeben
 	 * Adds a mandatory invoice line element
 	 * 
 	 * @param line
-	 * @return
 	 */
-	public List<InvoiceLineType> addLine(InvoiceLineType line) {
+	public void addLine(CoreInvoiceLine line) {
 		List<InvoiceLineType> lines = this.getInvoiceLine();
-		lines.add(line);
-		return lines;
+		lines.add((InvoiceLineType)line);
 	}
 
 	public List<InvoiceLineType> addLines(InvoiceType doc) {

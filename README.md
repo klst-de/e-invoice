@@ -30,20 +30,21 @@ this snippet creates a valid ubl invoice [see (xrechnung-testsuite)](https://git
   ublInvoice.setIssueDate("2016-04-04");
   ublInvoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
   ublInvoice.setDocumentCurrencyCode(EUR);
-  ublInvoice.setOrderReference("1234567890"); // optional
+  ublInvoice.setOrderReference("1234567890");           // optional
   ublInvoice.setBuyerReference("04011000-12345-34");
 ...
-  ublInvoice.addInvoiceLine(ublInvoice.makeInvoiceLine("1" // invoice line number
+  CoreInvoiceLine line = new InvoiceLine("1"            // invoice line number
     , new Quantity("XPP", new BigDecimal(1))
-    , new Amount(EUR, new BigDecimal(288.79))              // lineNetAmount
-    , new UnitPriceAmount(EUR, new BigDecimal(288.79))     // priceAmt
-    , "Zeitschrift [...]"                                  // itemName
-    , TaxCategoryCode.StandardRate, new BigDecimal(7)      // TaxCategoryCode, rate 7%
-    ));
+    , new Amount(EUR, new BigDecimal(288.79))           // line net amount
+    , new UnitPriceAmount(EUR, new BigDecimal(288.79))  // price
+    , "Zeitschrift [...]"                               // itemName
+    , TaxCategoryCode.StandardRate, new BigDecimal(7)); // VAT category code, rate 7%
+    );
+  ublInvoice.addLine(line);
 ...
   transformer.toXML(ublInvoice);
 ```
-- in [AD-e-invoice](https://github.com/klst-de/AD-e-invoice) I use the jar to create "€-invoices" within an ERP-System.
+- in [AD-e-invoice](https://github.com/klst-de/AD-e-invoice) the jar is userd to create "€-invoices" within an ERP-System.
 
 ## Core Invoice Overview
 

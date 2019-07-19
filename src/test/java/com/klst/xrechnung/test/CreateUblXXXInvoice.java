@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.ubl.CommercialInvoice;
 import com.klst.einvoice.ubl.Contact;
@@ -323,7 +324,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	void makeLineGroup(Invoice ublDoc) {
 		List<InvoiceLine> testLines = testDoc.getLines();
 		testLines.forEach(testLine -> {
-			InvoiceLine targetLine = new InvoiceLine(testLine.getId(), testLine.getQuantity(),
+			CoreInvoiceLine targetLine = new InvoiceLine(testLine.getId(), testLine.getQuantity(),
 					testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), 
 					testLine.getItemName(),
 					testLine.getTaxCategory(), testLine.getTaxRate()
