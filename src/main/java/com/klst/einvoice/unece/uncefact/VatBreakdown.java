@@ -5,46 +5,32 @@ import java.math.BigDecimal;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
+import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 
 public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdown{
 
 	VatBreakdown() {
 		super();
 	}
-	
+
 	// copy ctor
 	public VatBreakdown(TradeTaxType tradeTax) {
 		this();
-		// ...
+		init( new Amount(tradeTax.getBasisAmount().get(0).getValue())
+			, new Amount(tradeTax.getCalculatedAmount().get(0).getValue())
+			, TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
+			, tradeTax.getRateApplicablePercent()==null ? null : tradeTax.getRateApplicablePercent().getValue()
+			);
 	}
 
 	public VatBreakdown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
 		this();
 		init(taxableAmount, taxAmount, codeEnum, percent);
 	}
-
-//	private TradeTaxType makeTradeTaxType(TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
-//		TradeTaxType tradeTax = new TradeTaxType();
-//		
-//		// USt/VAT
-//		TaxTypeCodeType vat = new TaxTypeCodeType();
-//		vat.setValue("VAT"); // TODO
-//		tradeTax.setTypeCode(vat);
-//		// taxCategory:
-//		TaxCategoryCodeType taxCategory = new TaxCategoryCodeType();
-//		taxCategory.setValue(taxCategoryCode.getValue());
-//		tradeTax.setCategoryCode(taxCategory);
-//		// taxRate:
-//		PercentType percent = new PercentType();
-//		percent.setValue(taxRate);
-//		tradeTax.setRateApplicablePercent(percent);
-//		
-//		return tradeTax;
-//	}
-
 
 	/**
 	 * mandatory elements of VAT BREAKDOWN BG-23
@@ -73,8 +59,8 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 
 	@Override
 	public Amount getTaxableAmount() {
-		// TODO Auto-generated method stub
-		return null;
+//		super.getBasisAmount().get(0); // wg. 1.1 möglich
+		return new Amount(super.getBasisAmount().get(0).getValue());
 	}
 
 	/* BT-117 1..1 CalculatedAmount Kategoriespezifischer Steuerbetrag
@@ -90,8 +76,7 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 
 	@Override
 	public Amount getTaxAmount() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Amount(super.getCalculatedAmount().get(0).getValue());
 	}
 
 	/* BT-118   CategoryCode
@@ -99,10 +84,14 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 	 * BT-119   RateApplicablePercent, EN16931 0..1 (optional), wg BR-DE-14 1.1
 	 */
 	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, String typeCode, Percent taxRate) {
+		TaxCategoryCodeType taxCategory = new TaxCategoryCodeType();
+		taxCategory.setValue(codeEnum.getValue());
+		this.setCategoryCode(taxCategory);
 		
 		TaxTypeCodeType taxTypeCode = new TaxTypeCodeType();
 		taxTypeCode.setValue(typeCode); // USt/VAT
 		super.setTypeCode(taxTypeCode);
+		
 		if(taxRate!=null) {
 			super.setRateApplicablePercent(taxRate);
 		}
@@ -121,26 +110,24 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 
 	@Override
 	public void setTaxCategory(TaxCategoryCode code) {
-		// TODO Auto-generated method stub
-		
+		setTaxCategoryAndRate(code, null);	
 	}
 
 	@Override
 	public TaxCategoryCode getTaxCategory() {
-		// TODO Auto-generated method stub
-		return null;
+		return TaxCategoryCode.valueOf(super.getCategoryCode());
 	}
 
 	@Override
 	public void setTaxCategoryRate(BigDecimal taxableAmount) {
 		// TODO Auto-generated method stub
-		
+		// use ctor
 	}
 
 	@Override
 	public BigDecimal getTaxCategoryRate() {
-		// TODO Auto-generated method stub
-		return null;
+		PercentType percent = super.getRateApplicablePercent();
+		return percent==null ? null : percent.getValue();
 	}
 
 	@Override

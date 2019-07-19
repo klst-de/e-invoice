@@ -138,7 +138,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 //		addPaymentInstructions(doc);		
 //		setDocumentTotals(doc);
 //		setInvoiceTax(getInvoiceTax(doc));
-//		addVATBreakDown(doc);
+		addVATBreakDown(getVATBreakDowns(doc));
 		addLines(doc);
 	}
 
@@ -1072,7 +1072,7 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 		
 	}
 
-	/**
+	/*
 	 * VAT BREAKDOWN
 
 1 .. 1 SupplyChainTradeTransaction Gruppierung der Informationen zum Geschäftsvorfall
@@ -1081,46 +1081,41 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 
        VatBreakdown extends ApplicableTradeTax
 
-1 .. 1 CalculatedAmount Kategoriespezifischer Steuerbetrag                                            BT-117 
-1 .. 1 TypeCode Code der Umsatzsteuerkategorie                                                        BT-118-0 
-0 .. 1 ExemptionReason Grund der Steuerbefreiung (Freitext)                                           BT-120 
-1 .. 1 BasisAmount Steuerbasisbetrag                                                                  BT-116 
-0 .. 1 LineTotalBasisAmount Warenbetrag des Steuersatzes 
-0 .. 1 AllowanceChargeBasisAmount Gesamtbetrag Zu- und Abschläge des Steuersatzes auf Dokumentenebene 
-1 .. 1 CategoryCode Codierte Bezeichnung einer Umsatzsteuerkategorie                                  BT-118 
-0 .. 1 ExemptionReasonCode Code für den Umsatzsteuerbefreiungsgrund                                   BT-121 
-0 .. 1 TaxPointDate Datum der Steuerfälligkeit xs:choice 
-1 .. 1 DateString Datum der Steuerfälligkeit, Wert                                                    BT-7 
-       required format Datum, Format                                                                  BT-7-0 
-0 .. 1 DueDateTypeCode Code für das Datum der Steuerfälligkeit                                        BT-8 
-0 .. 1 RateApplicablePercent Kategoriespezifischer Umsatzsteuersatz                                   BT-119
-
-	 * 
-	 * @param mandatory taxableAmount : VAT category taxable amount
-	 * @param mandatory tax : VAT category tax amount
-	 * @param mandatory taxCategoryCode : VAT category code
-	 * @param mandatory taxRate : VAT category rate (Percentage)
-// TODO	 * optional : VAT exemption reason text
-// TODO	 * optional : VAT exemption reason code
 	 */
+	public void addVATBreakDown(List<VatBreakdown> VatBreakdowns) {
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
+		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
+		List<TradeTaxType> tradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
+		VatBreakdowns.forEach(vbd -> {
+			tradeTaxes.add(vbd);
+		});	
+	}
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
 		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
 
-		TradeTaxType tradeTax = makeTradeTaxType(taxCategoryCode, taxRate);
-		
-		AmountType basisAmount = new AmountType();
-		taxableAmount.copyTo(basisAmount);
-		tradeTax.getBasisAmount().add(basisAmount);
-		
-		AmountType calculatedAmount = new AmountType();
-		tax.copyTo(calculatedAmount);
-		tradeTax.getCalculatedAmount().add(calculatedAmount);
+		TradeTaxType tradeTax = new VatBreakdown(taxableAmount, tax, taxCategoryCode, taxRate);
 		
 		List<TradeTaxType> tradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
 		tradeTaxes.add(tradeTax);
 	}
-
+	public List<VatBreakdown> getVATBreakDowns() {
+		return getVATBreakDowns(this);
+	}
+	static List<VatBreakdown> getVATBreakDowns(CrossIndustryInvoiceType doc) {
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = doc.getSupplyChainTradeTransaction();
+		if(supplyChainTradeTransaction==null) return null;
+		HeaderTradeSettlementType applicableHeaderTradeSettlement = supplyChainTradeTransaction.getApplicableHeaderTradeSettlement();
+		if(applicableHeaderTradeSettlement==null) return null;
+		List<TradeTaxType> list = applicableHeaderTradeSettlement.getApplicableTradeTax();
+		List<VatBreakdown> resultLines = new ArrayList<VatBreakdown>(list.size()); // VatBreakdown extends TradeTaxType
+		list.forEach(vbd -> {
+			resultLines.add(new VatBreakdown(vbd));
+		});
+		return resultLines;
+	
+	}
+	
 	/* INVOICE LINE                                BG-25                       1..* (mandatory)
 	 * Eine Gruppe von Informationselementen, die Informationen über einzelne Rechnungspositionen liefern.
 	 * 
@@ -1155,162 +1150,7 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 		return resultLines;
 	}
 
-	/**
-	 * Adds a mandatory invoice line element
-	 * 
-	 * @param invoiceLine
-	 * @return
-	 */
-	public List<SupplyChainTradeLineItemType> addInvoiceLine(SupplyChainTradeLineItemType invoiceLine) {
-//	public List<InvoiceLineType> addInvoiceLine(InvoiceLineType invoiceLine) {
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-		List<SupplyChainTradeLineItemType> supplyChainTradeLineItems = supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem();
-		supplyChainTradeLineItems.add(invoiceLine);
-		return supplyChainTradeLineItems;
-	}
-
-	/* @see XRechnung-v1-2-0.pdf : 11.16. Gruppe INVOICE LINE
-
-	Dieses Informationselement (ID: BG-25, Anz. 1..*) ist ein direkter Bestandteil des Wurzelelements „INVOICE“
-	Eine Gruppe von Informationselementen, die Informationen über einzelne Rechnungspositionen liefern.
-	
-	mandatory:
-	Invoice line identifier BT-126 Identifier 1 / Eindeutige Bezeichnung für die betreffende Rechnungsposition
-	Invoiced quantity       BT-129 Quantity   1 / Die Menge zu dem in der betreffenden Zeile in Rechnung gestellten Einzelposten (Waren oder Dienstleistungen)
-	Invoiced quantity unit of measure code BT-130 Code 1 / Die für die in Rechnung gestellte Menge geltende Maßeinheit.
-	Invoice line net amount BT-131 Amount     1 / Der Gesamtbetrag der Rechnungsposition. Dies ist der Betrag ohne Umsatzsteuer, aber einschließlich 
-	                                              aller für die Rechnungsposition geltenden Nachlässe und Abgaben sowie sonstiger anfallender Steuern.
-	PRICE DETAILS           BG-29             1
-	LINE VAT INFORMATION    BG-30             1
-	ITEM INFORMATION        BG-31             1
-
-        <ram:IncludedSupplyChainTradeLineItem>
-            <ram:AssociatedDocumentLineDocument>
-                <ram:LineID>Porto + Versandkosten</ram:LineID>
-            </ram:AssociatedDocumentLineDocument>
-            <ram:SpecifiedTradeProduct>
-                <ram:Name>Porto + Versandkosten</ram:Name>
-            </ram:SpecifiedTradeProduct>
-            <ram:SpecifiedLineTradeAgreement>
-                <ram:NetPriceProductTradePrice>
-                    <ram:ChargeAmount>26.07</ram:ChargeAmount>
-                </ram:NetPriceProductTradePrice>
-            </ram:SpecifiedLineTradeAgreement>
-            <ram:SpecifiedLineTradeDelivery>
-                <ram:BilledQuantity unitCode="XPP">1</ram:BilledQuantity>
-            </ram:SpecifiedLineTradeDelivery>
-            <ram:SpecifiedLineTradeSettlement>
-                <ram:ApplicableTradeTax>
-                    <ram:TypeCode>VAT</ram:TypeCode>
-                    <ram:CategoryCode>S</ram:CategoryCode>
-                    <ram:RateApplicablePercent>7</ram:RateApplicablePercent>
-                </ram:ApplicableTradeTax>
-                <ram:SpecifiedTradeSettlementLineMonetarySummation>
-                    <ram:LineTotalAmount>26.07</ram:LineTotalAmount>
-                </ram:SpecifiedTradeSettlementLineMonetarySummation>
-            </ram:SpecifiedLineTradeSettlement>
-        </ram:IncludedSupplyChainTradeLineItem>
-
-
-	 */
-	public SupplyChainTradeLineItemType makeInvoiceLine(String identifier, Quantity quantity, Amount lineNetAmount, UnitPriceAmount priceAmt
-			, String itemName, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
-		SupplyChainTradeLineItemType invoiceLine = new SupplyChainTradeLineItemType(); 
-		
-//		invoiceLine.getIncludedSubordinateTradeLineItem() // List
-//		invoiceLine.setSpecifiedLineTradeSettlement(value);
-		
-		DocumentLineDocumentType documentLineDocument = new DocumentLineDocumentType();
-		documentLineDocument.setLineID(newIDType(identifier, null)); // null : No identification scheme
-		
-		// TODO optional noteText
-		NoteType note = new NoteType();
-		CodeType code = new CodeType();
-		code.setValue("TODO optional noteText");
-		note.setContentCode(code);
-		documentLineDocument.getIncludedNote().add(note);
-		
-		invoiceLine.setAssociatedDocumentLineDocument(documentLineDocument);
-		
-//		CodeType code = new CodeType();
-//		invoiceLine.setDescriptionCode(code);
-		
-		// quantity:
-		LineTradeDeliveryType lineTradeDelivery = new LineTradeDeliveryType(); // Lieferschein
-		QuantityType billedQty = new QuantityType();
-		billedQty.setUnitCode(quantity.getUnitCode());
-		billedQty.setValue(quantity.getValue());
-		lineTradeDelivery.setBilledQuantity(billedQty);
-		invoiceLine.setSpecifiedLineTradeDelivery(lineTradeDelivery);
-		
-		// priceAmt:
-		LineTradeAgreementType lineTradeAgreement = new LineTradeAgreementType(); // Auftrag
-		TradePriceType tradePrice = new TradePriceType();
-		AmountType amount = new AmountType();
-//		amount.setCurrencyID(priceAmt.getCurrencyID());
-//		amount.setValue(priceAmt.getValue());
-		priceAmt.copyTo(amount);
-		List<AmountType> amounts = tradePrice.getChargeAmount();
-		amounts.add(amount);
-		lineTradeAgreement.setNetPriceProductTradePrice(tradePrice);
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setLineID(newIDType("TODO orderlineID", null)); // null : No identification scheme   -- TODO
-		lineTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument); 
-		invoiceLine.setSpecifiedLineTradeAgreement(lineTradeAgreement); 
-		
-		LineTradeSettlementType lineTradeSettlement = new LineTradeSettlementType();
-/*
-val-sch.1.1 	BR-24 	error 	[BR-24]-Each Invoice line (BG-25) shall have an Invoice line net amount (BT-131).
-Pfad: /rsm:CrossIndustryInvoice/rsm:SupplyChainTradeTransaction[1]/ram:IncludedSupplyChainTradeLineItem[1]
-
-val-sch.1.8 	CII-SR-206 	warning 	[CII-SR-206] - NetLineTotalAmount should not be present
-Pfad: /rsm:CrossIndustryInvoice/rsm:SupplyChainTradeTransaction[1]/ram:IncludedSupplyChainTradeLineItem[1]/ram:SpecifiedLineTradeSettlement[1]
-
- */
-		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
-		AmountType netLineTotalAmount = new AmountType();
-		lineNetAmount.copyTo(netLineTotalAmount);
-//		tradeSettlementLineMonetarySummation.getNetLineTotalAmount().add(netLineTotalAmount);
-		lineTradeSettlement.setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
-		
-//		lineTradeSettlement.setBillingSpecifiedPeriod(value); // optional TODO
-		
-		TradeTaxType tradeTax = makeTradeTaxType(taxCategoryCode, taxRate);
-		lineTradeSettlement.getApplicableTradeTax().add(tradeTax);
-		invoiceLine.setSpecifiedLineTradeSettlement(lineTradeSettlement);
-		
-		TradeProductType tradeProduct = new TradeProductType();
-		TextType item = new TextType();
-		item.setValue(itemName);
-		tradeProduct.getName().add(item);
-		
-//		tradeProduct.setSellerAssignedID(value); // TODO optional Product value
-//		tradeProduct.setDescription(value);
-//		tradeProduct.getDesignatedProductClassification() // List
-		
-		invoiceLine.setSpecifiedTradeProduct(tradeProduct);             //Produkt  - ITEM INFORMATION
-		
-		return invoiceLine;
-	}
-	
-	private TradeTaxType makeTradeTaxType(TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
-		TradeTaxType tradeTax = new TradeTaxType();
-		
-		// USt/VAT
-		TaxTypeCodeType vat = new TaxTypeCodeType();
-		vat.setValue("VAT"); // TODO
-		tradeTax.setTypeCode(vat);
-		// taxCategory:
-		TaxCategoryCodeType taxCategory = new TaxCategoryCodeType();
-		taxCategory.setValue(taxCategoryCode.getValue());
-		tradeTax.setCategoryCode(taxCategory);
-		// taxRate:
-		PercentType percent = new PercentType();
-		percent.setValue(taxRate);
-		tradeTax.setRateApplicablePercent(percent);
-		
-		return tradeTax;
-	}
+// -----------------------------------------------------------
 	
 	private TradeSettlementHeaderMonetarySummationType getTradeSettlementHeaderMonetarySummation(HeaderTradeSettlementType applicableHeaderTradeSettlement) {
 		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation();

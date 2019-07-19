@@ -13,8 +13,10 @@ import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
+import com.klst.einvoice.unece.uncefact.VatBreakdown;
 import com.klst.marshaller.CiiTransformer;
 import com.klst.untdid.codelist.DocumentNameCode;
+import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductClassificationType;
@@ -55,6 +57,16 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setSellerParty(testDoc.getSellerParty()); // statt makeSellerGroup(cii);
 		cii.setBuyerParty(testDoc.getBuyerParty());
 		// ... TODO
+        List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
+        LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
+        vbdList.forEach(tradeTax -> {
+        	cii.addVATBreakDown( new Amount(tradeTax.getBasisAmount().get(0).getValue())
+        						,new Amount(tradeTax.getCalculatedAmount().get(0).getValue())
+        						,TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
+        						,tradeTax.getRateApplicablePercent()==null ? null : tradeTax.getRateApplicablePercent().getValue()
+        						);
+        });
+		
         List<TradeLineItem> lines = testDoc.getLines();
         LOG.info("LineGroup starts for "+lines.size() + " lines.");
         lines.forEach(testLine -> {
