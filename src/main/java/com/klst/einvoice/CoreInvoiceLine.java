@@ -18,7 +18,7 @@ import com.klst.untdid.codelist.TaxCategoryCode;
  * <br>Rule ID: 	BR-16 
  * <br>Request ID: 	R17 R23 R27
  * 
- * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for EN_16931_1_2017 rule und request IDs
+ * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for EN_16931_1_2017 rule and request IDs
  */
 public interface CoreInvoiceLine {
 

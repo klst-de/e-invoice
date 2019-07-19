@@ -16,19 +16,19 @@ import com.klst.untdid.codelist.TaxCategoryCode;
  * <br>Rule ID: 	BR-CO-18 
  * <br>Request ID: 	R38, R45, R47, R48, R49
  * 
- * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for (en)EN_16931_1_2017 rule und request IDs
+ * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for (en)EN_16931_1_2017 rule and request IDs
  */
 /* (de) rules / Geschäftsregel::
+ * 
+ * BR-CO-17 Umsatzsteueraufschlüsselung : 
+ * Kategoriespezifischer Steuerbetrag (BT-117) = kategoriespezifischer Steuerbasisbetrag (BT-116) x (kategoriespezifischer Umsatzsteuersatz (BT-119)/100), 
+ * gerundet auf zwei Dezimalstellen.
  * 
  * BR-CO-18 Umsatzsteueraufschlüsselung :
  * Eine Rechnung muss mindestens eine Umsatzsteueraufschlüsselungsgruppe (BG-23) haben.
  * 
  * BR-45 Umsatzsteueraufschlüsselung  : 
  * Jede Umsatzsteueraufschlüsselung (BG-23) muss einen kategoriespezifischen Steuerbasisbetrag (BT-116) ausweisen.
- * 
- * BR-CO-17 Umsatzsteueraufschlüsselung : 
- * Kategoriespezifischer Steuerbetrag (BT-117) = kategoriespezifischer Steuerbasisbetrag (BT-116) x (kategoriespezifischer Umsatzsteuersatz (BT-119)/100), 
- * gerundet auf zwei Dezimalstellen.
  * 
  * BR-47 Umsatzsteueraufschlüsselung : 
  * Jede Umsatzsteueraufschlüsselung (BG-23) muss durch einen Code für die Umsatzsteuerkategorie (BT-118) bestimmt werden.

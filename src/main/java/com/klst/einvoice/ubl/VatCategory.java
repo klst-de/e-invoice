@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
@@ -31,16 +32,6 @@ public class VatCategory extends TaxCategoryType {
 
 //	private static final Logger LOG = Logger.getLogger(VatCategory.class.getName());
 	
-	/**
-	 * Value added tax. 
-	 * <p>
-	 * Code according to <A HREF="http://www.unece.org/trade/untdid/d13b/tred/tred5153.htm">UN/EDIFACT 5153</A>  
-	 * <p>
-	 * A tax on domestic or imported goods applied to the value added 
-	 * at each stage in the production/distribution cycle.
-	 */
-	public static final String VAT = "VAT";
-
 /* beim Test von 01.04a-INVOICE_ubl.xml bekommt man @see https://github.com/klst-de/e-invoice/issues/1
 Pos 	Code 	Adj. Grad (Grad) 	Text
 val-sch.1.1 	BR-O-02 	error 	[BR-O-02]-An Invoice that contains an Invoice line (BG-25) where the Invoiced item VAT category code 
@@ -63,7 +54,7 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 	}
 
 	static TaxSchemeType getVatScheme() {
-		return getVatScheme(VAT);
+		return getVatScheme(CoreInvoiceVatBreakdown.VAT);
 	}
 
 	public VatCategory() {
@@ -205,6 +196,6 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 //		LOG.warning("getTaxRateAsString:"+getTaxRateAsString());
 //		LOG.warning("joined:"+joined);
 		String id = getID()==null ? "'noID'" : getID().getValue();
-		return id + " " + getTaxRateAsString()+" - " + VAT + joined;
+		return id + " " + getTaxRateAsString()+" - " + CoreInvoiceVatBreakdown.VAT + joined;
 	}
 }
