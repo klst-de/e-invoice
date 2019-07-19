@@ -349,34 +349,6 @@ DueDateDateTime Fälligkeitsdatum
 
 	 */
 	
-////	@Override
-//	public void setDueDate(String ymd) {
-//		setDueDate(DateTimeFormats.ymdToTs(ymd));
-//	}
-////	@Override
-//	public void setDueDate(Timestamp ts) { // TODO zusammen mit BT20
-//		if(ts==null) return;  // optional
-//		HeaderTradeSettlementType headerTradeSettlement = getApplicableHeaderTradeSettlement();
-////		List<TradePaymentTermsType> tradePaymentTermsList = headerTradeSettlement.getSpecifiedTradePaymentTerms();
-//		
-//		TradePaymentTermsType tradePaymentTerms = new TradePaymentTermsType();
-//		// TODO befüllen:
-////		List<TextType> textList = tradePaymentTerms.getDescription(); // Liste Zahlungsbedingungen BT-20
-//		DateTimeType dateTime = new DateTimeType();
-//		DateTimeType.DateTimeString dts = new DateTimeType.DateTimeString(); // DateTimeString ist inner class in DateTimeType
-//		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
-//		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
-//		dateTime.setDateTimeString(dts);
-//		tradePaymentTerms.setDueDateDateTime(dateTime);
-//		
-////		tradePaymentTermsList.add(tradePaymentTerms);
-//		headerTradeSettlement.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
-//		
-//		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-//		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(headerTradeSettlement);
-//		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
-//	}
-
 	@Override
 	public Timestamp getDueDateAsTimestamp() {
 		return getDueDateAsTimestamp(this);
@@ -1102,6 +1074,27 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 
 	/**
 	 * VAT BREAKDOWN
+
+1 .. 1 SupplyChainTradeTransaction Gruppierung der Informationen zum Geschäftsvorfall
+1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
+0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung                                                 BG-23 xs:sequence 
+
+       VatBreakdown extends ApplicableTradeTax
+
+1 .. 1 CalculatedAmount Kategoriespezifischer Steuerbetrag                                            BT-117 
+1 .. 1 TypeCode Code der Umsatzsteuerkategorie                                                        BT-118-0 
+0 .. 1 ExemptionReason Grund der Steuerbefreiung (Freitext)                                           BT-120 
+1 .. 1 BasisAmount Steuerbasisbetrag                                                                  BT-116 
+0 .. 1 LineTotalBasisAmount Warenbetrag des Steuersatzes 
+0 .. 1 AllowanceChargeBasisAmount Gesamtbetrag Zu- und Abschläge des Steuersatzes auf Dokumentenebene 
+1 .. 1 CategoryCode Codierte Bezeichnung einer Umsatzsteuerkategorie                                  BT-118 
+0 .. 1 ExemptionReasonCode Code für den Umsatzsteuerbefreiungsgrund                                   BT-121 
+0 .. 1 TaxPointDate Datum der Steuerfälligkeit xs:choice 
+1 .. 1 DateString Datum der Steuerfälligkeit, Wert                                                    BT-7 
+       required format Datum, Format                                                                  BT-7-0 
+0 .. 1 DueDateTypeCode Code für das Datum der Steuerfälligkeit                                        BT-8 
+0 .. 1 RateApplicablePercent Kategoriespezifischer Umsatzsteuersatz                                   BT-119
+
 	 * 
 	 * @param mandatory taxableAmount : VAT category taxable amount
 	 * @param mandatory tax : VAT category tax amount
