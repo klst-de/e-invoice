@@ -3,6 +3,7 @@ package com.klst.xrechnung.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -60,11 +61,14 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
-        	cii.addVATBreakDown( new Amount(tradeTax.getBasisAmount().get(0).getValue())
-        						,new Amount(tradeTax.getCalculatedAmount().get(0).getValue())
-        						,TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
-        						,tradeTax.getRateApplicablePercent()==null ? null : tradeTax.getRateApplicablePercent().getValue()
-        						);
+        	VatBreakdown vatBreakdown = new VatBreakdown( new Amount(tradeTax.getBasisAmount().get(0).getValue())
+					,new Amount(tradeTax.getCalculatedAmount().get(0).getValue())
+					,TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
+					,tradeTax.getRateApplicablePercent()==null ? null : tradeTax.getRateApplicablePercent().getValue()
+					);
+        	vatBreakdown.setTaxExemption(tradeTax.getExemptionReason()==null ? null : tradeTax.getExemptionReason().getValue()
+        			, tradeTax.getExemptionReasonCode()==null ? null : tradeTax.getExemptionReasonCode().getValue());
+        	cii.addVATBreakDown(vatBreakdown);
         });
 		
         List<TradeLineItem> lines = testDoc.getLines();

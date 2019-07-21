@@ -139,6 +139,12 @@ public interface CoreInvoiceVatBreakdown {
 	public void setTaxCategoryRate(BigDecimal taxableAmount); // use ctor
 	public BigDecimal getTaxCategoryRate();
 
+	/**
+	 * VAT exemption reason text or code
+	 * 
+	 * @param text BT-120 0..1 (optional, therefore can be null)
+	 * @param code BT-121 0..1 (optional, therefore can be null)
+	 */
 	public void setTaxExemption(String text, String code);
 	/**
 	 * VAT exemption reason text

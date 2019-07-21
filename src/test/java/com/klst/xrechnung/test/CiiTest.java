@@ -80,6 +80,15 @@ public class CiiTest {
    }
 
 	@Test
+    public void ciixml04() { // wg. ram:ExemptionReason
+    	InvoiceFactory factory = new CreateCiiXXXInvoice("01.04a-INVOICE_uncefact.xml");
+    	byte[] bytes = factory.toCii(); // the xml
+    	String xml = new String(bytes);
+    	LOG.info("xml=\n"+xml);
+//    	assertTrue(check(bytes));
+   }
+
+	@Test
     public void ciixml05() {
     	InvoiceFactory factory = new CreateCiiXXXInvoice("01.05a-INVOICE_uncefact.xml");
     	byte[] bytes = factory.toCii(); // the xml
