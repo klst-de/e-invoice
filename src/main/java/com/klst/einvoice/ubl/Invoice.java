@@ -1476,42 +1476,6 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 		return result;
 	}
 	
-	static List<Map<Object,Object>> getVATBreakDown(TaxTotalType taxTotal) { // TODO raus wird noch in CreditNote gebraucht
-		List<TaxSubtotalType> taxSubtotals = taxTotal.getTaxSubtotal();
-		List<Map<Object,Object>> resultList = new ArrayList<Map<Object,Object>>(taxSubtotals.size());
-		taxSubtotals.forEach(taxSubtotal -> {
-			Map<Object,Object> map = new HashMap<Object,Object>();
-			
-			TaxableAmountType taxableAmount = taxSubtotal.getTaxableAmount(); // mandatory
-			map.put(TaxableAmountType.class, new Amount(taxableAmount));
-			
-			TaxAmountType taxAmount = taxSubtotal.getTaxAmount(); // mandatory
-			map.put(TaxAmountType.class, new Amount(taxAmount));
-			
-			TaxCategoryType taxCategory = taxSubtotal.getTaxCategory(); // mandatory
-			VatCategory vatCategory = new VatCategory(taxCategory);
-			map.put(VatCategory.class, vatCategory);
-			
-			// die optionalen "VAT exemption reason text" und "VAT exemption reason code"
-			List<TaxExemptionReasonType> taxExemptionReasons = taxCategory.getTaxExemptionReason();
-			List<String> taxExemptionReasonList = new ArrayList<String>(taxExemptionReasons.size());
-			taxExemptionReasons.forEach(taxExemptionReason -> {
-				vatCategory.addTaxExemptionReason(taxExemptionReason.getValue());
-				taxExemptionReasonList.add(taxExemptionReason.getValue());
-			});
-			map.put(TaxExemptionReasonType.class, taxExemptionReasonList);
-			
-			TaxExemptionReasonCodeType taxExemptionReasonCode = taxCategory.getTaxExemptionReasonCode();
-			if(taxExemptionReasonCode!=null) {
-				vatCategory.setTaxExemptionReasonCode(taxExemptionReasonCode.getValue());
-				map.put(TaxExemptionReasonCodeType.class, taxExemptionReasonCode.getValue());
-			}
-			
-			resultList.add(map);
-		});
-		return resultList;
-	}
-		
 	/* ADDITIONAL SUPPORTING DOCUMENTS             BG-24                       0..* (optional)
 	 * Eine Gruppe von Informationselementen mit Informationen über rechnungsbegründende Unterlagen, 
 	 * die Belege für die in der Rechnung gestellten Ansprüche enthalten.

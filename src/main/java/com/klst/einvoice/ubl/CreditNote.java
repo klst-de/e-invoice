@@ -1,9 +1,9 @@
 package com.klst.einvoice.ubl;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoice;
@@ -14,6 +14,7 @@ import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansCode;
+import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
@@ -41,9 +42,30 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmoun
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxInclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPointDateType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
 
+/*
+ 
+TODO
+    <cac:Price>
+      <cbc:PriceAmount currencyID="EUR">1085.00</cbc:PriceAmount>
+      <cbc:BaseQuantity unitCode="LH">8</cbc:BaseQuantity>              <================ fehlt
+    </cac:Price>
+ 
+         <cac:TaxSubtotal>
+            <cbc:TaxableAmount currencyID="EUR">135.63</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="EUR">27.13</cbc:TaxAmount>
+            <cac:TaxCategory>
+              <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5305">S</cbc:ID>   <============== IST <cbc:ID>S</cbc:ID>
+              <cbc:Percent>20</cbc:Percent>
+              <cac:TaxScheme>
+                <cbc:ID schemeAgencyID="6" schemeID="UN/ECE 5153">VAT</cbc:ID> <================= IST <cbc:ID>VAT</cbc:ID>
+              </cac:TaxScheme>
+           </cac:TaxCategory>
+        </cac:TaxSubtotal>
+
+ 
+ */
 public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentTotals {
 
 	private static final Logger LOG = Logger.getLogger(CreditNote.class.getName());
@@ -56,6 +78,8 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	
 	public CreditNote(String customization, String profile, DocumentNameCode code) {
 		this();
+		taxTotalFirst = new TaxTotalType();
+		super.getTaxTotal().add(taxTotalFirst); // garantiert ein elem in List<TaxTotalType> 
 		setProcessControl(customization, profile);
 		setTypeCode(code); // BT-3		
 	}
@@ -63,6 +87,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	// cache:
 	Party sellerParty;
 	Party buyerParty;
+	TaxTotalType taxTotalFirst;
 	
 	// copy-ctor
 	public CreditNote(CreditNoteType doc) {
@@ -85,7 +110,8 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		addPaymentInstructions(doc);
 		setDocumentTotals(doc);
 		setInvoiceTax(getInvoiceTax(doc));
-		addVATBreakDown(doc);
+//		addVATBreakDown(doc);
+		addVATBreakDown(getVATBreakDowns(doc));
 		addLines(doc);
 		LOG.info("ctor ENDE.");
 	}
@@ -679,7 +705,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	}
 	
 	static Amount getInvoiceTax(CreditNoteType doc) {
-		TaxTotalType taxTotal = getFirstTaxTotal(doc);
+		TaxTotalType taxTotal = doc.getTaxTotal().get(0); // getFirstTaxTotal(doc);
 		TaxAmountType amount = taxTotal.getTaxAmount();
 		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
@@ -710,55 +736,39 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		taxTotal.setTaxAmount(taxAmount);
 	}
 	private TaxTotalType getFirstTaxTotal() {
-		return getFirstTaxTotal(this);
-	}
-	// das garantiert nur ein taxTotal element
-	static private TaxTotalType getFirstTaxTotal(CreditNoteType doc) {
-		List<TaxTotalType> taxTotals = doc.getTaxTotal();
-		if(taxTotals.isEmpty()) {
-			TaxTotalType taxTotal = new TaxTotalType();
-			taxTotals.add(taxTotal);
-		}
-		return taxTotals.get(0);
+		return this.getTaxTotal().get(0);
 	}
 
-	// TODO BG-23  VAT BREAKDOWN
-	public void addVATBreakDown(Amount taxableAmount, Amount tax, VatCategory vatCategory) {
+	// BG-23  VAT BREAKDOWN
+	public void addVATBreakDown(List<VatBreakdown> vatBreakdowns) {
 		TaxTotalType taxTotal = getFirstTaxTotal();
-		TaxSubtotalType taxSubtotal = new TaxSubtotalType();
 		
-		TaxableAmountType taxableAmt = new TaxableAmountType();
-		taxableAmount.copyTo(taxableAmt);
-		taxSubtotal.setTaxableAmount(taxableAmt);
-
-		TaxAmountType taxAmount = new TaxAmountType();
-		tax.copyTo(taxAmount);
-		taxSubtotal.setTaxAmount(taxAmount);
+		vatBreakdowns.forEach(vbd -> {
+			taxTotal.getTaxSubtotal().add(vbd);
+		});	
+	}
+	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
+		TaxTotalType taxTotal = getFirstTaxTotal();
 		
-		taxSubtotal.setTaxCategory(vatCategory);
-
-		List<TaxSubtotalType> taxSubtotals = taxTotal.getTaxSubtotal();
-		taxSubtotals.add(taxSubtotal);
+		TaxSubtotalType taxSubtotal = new VatBreakdown(taxableAmount, tax, taxCategoryCode, taxRate);
+		taxTotal.getTaxSubtotal().add(taxSubtotal);
 	}
-
-	public void addVATBreakDown(CreditNoteType doc) {
-		TaxTotalType myTaxTotal = getFirstTaxTotal();
-		List<TaxSubtotalType> myTaxSubtotals = myTaxTotal.getTaxSubtotal();
-		TaxTotalType taxTotal = getFirstTaxTotal(doc);
-		List<TaxSubtotalType> taxSubtotals = taxTotal.getTaxSubtotal();
-		taxSubtotals.forEach(taxSubtotal -> {
-			myTaxSubtotals.add(taxSubtotal);
-		});
+	public void addVATBreakDown(VatBreakdown vatBreakdown) {
+		TaxTotalType taxTotal = getFirstTaxTotal();
+		taxTotal.getTaxSubtotal().add(vatBreakdown);
 	}
-
-	// key TaxableAmountType.class ... oder TaxCategory
-	// val amount ... oder TaxCategory-Objekt%
-	public List<Map<Object,Object>> getVATBreakDown() {
-		return getVATBreakDown(this);
+	public List<VatBreakdown> getVATBreakDowns() {
+		return getVATBreakDowns(this);
 	}
-	List<Map<Object,Object>> getVATBreakDown(CreditNoteType doc) {
-		TaxTotalType taxTotal = getFirstTaxTotal(doc);
-		return Invoice.getVATBreakDown(taxTotal);
+	static List<VatBreakdown> getVATBreakDowns(CreditNoteType doc) {
+		TaxTotalType taxTotal = doc.getTaxTotal().get(0);
+		List<TaxSubtotalType> taxSuptotalList = taxTotal.getTaxSubtotal();
+		List<VatBreakdown> result = new ArrayList<VatBreakdown>(taxSuptotalList.size()); // VatBreakdown extends TaxSubtotalType
+		taxSuptotalList.forEach(vbd -> {
+			VatBreakdown taxSubtotal = new VatBreakdown(vbd);
+			result.add(taxSubtotal);
+		});	
+		return result;
 	}
 
 	// TODO BG-24  ADDITIONAL SUPPORTING DOCUMENTS

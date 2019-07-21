@@ -165,44 +165,19 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		return ublInvoice;
 	}
 	void makeVatBreakDownGroup2(CreditNote ublInvoice) {
-		List<Map<Object, Object>> vatBreakDowns = testCreditNote.getVATBreakDown();
-		vatBreakDowns.forEach(vatBreakDown -> {
-			VatCategory vc = (VatCategory) vatBreakDown.get(VatCategory.class);
-			LOG.info("vc =============================" +vc + " ID.value:"+vc.getID().getValue() +
-					"TaxCategoryCode:"+vc.getTaxCategoryCode()
-					);
-			VatCategory vatCategory = null;
-			if(vc.getTaxCategoryCode().equals(TaxCategoryCode.StandardRate)) {
-				vatCategory = new VatCategory(TaxCategoryCode.StandardRate, new Percent(vc.getPercent().getValue()));
-			} else if(vc.getTaxCategoryCode().equals(TaxCategoryCode.ServicesOutsideScope)) {
-				vatCategory = new VatCategory(TaxCategoryCode.ServicesOutsideScope, new Percent(vc.getPercent().getValue()));
-			} else {
-				vatCategory = new VatCategory(TaxCategoryCode.ExemptFromTax, new Percent(vc.getPercent().getValue()));
-				LOG.warning("vatCategory =============================" +vatCategory);
-			}
-			LOG.info("vc.TaxCategoryCode:"+vc.getTaxCategoryCode() + " new vatCategory:" +vatCategory);
-			
-			// die optionalen "VAT exemption reason text" und "VAT exemption reason code"
-			List<String> taxExemptionReasonList = (List<String>) vatBreakDown.get(TaxExemptionReasonType.class);
-			if(taxExemptionReasonList==null) {
-				LOG.info("taxExemptionReasonList =============================" +taxExemptionReasonList);
-			} else for(int l=0; l<taxExemptionReasonList.size(); l++){
-				
-				LOG.warning("TaxExemptionReason TODO ============================= #" +l);
-				vatCategory.addTaxExemptionReason(taxExemptionReasonList.get(l));
-			}
-			String reasonCode = (String) vatBreakDown.get(TaxExemptionReasonCodeType.class);
-			if(reasonCode!=null) {
-				vatCategory.setTaxExemptionReasonCode(reasonCode);
-			}
-			
-			LOG.info("vatCategory =============================" +vatCategory);
-			ublInvoice.addVATBreakDown( (Amount) vatBreakDown.get(TaxableAmountType.class), 
-					(Amount) vatBreakDown.get(TaxAmountType.class), 
-					vatCategory);
-			
-		});
-		LOG.info("finished. "+vatBreakDowns.size() + " vatBreakDowns.");
+        List<VatBreakdown> vbdList = testCreditNote.getVATBreakDowns();
+        LOG.info("CreditNote VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
+        vbdList.forEach(tradeTax -> {
+        	VatBreakdown vatBreakdown = new VatBreakdown(
+        	  new Amount(tradeTax.getTaxableAmount().getCurrencyID(), tradeTax.getTaxableAmount().getValue())
+			, new Amount(tradeTax.getTaxAmount().getCurrencyID(), tradeTax.getTaxAmount().getValue())
+			, TaxCategoryCode.valueOf(tradeTax.getTaxCategory())
+			, tradeTax.getTaxCategory().getPercent()==null ? null : tradeTax.getTaxCategory().getPercent().getValue()
+			); 
+        	vatBreakdown.setTaxExemption(tradeTax.getTaxExemptionReasonText() , tradeTax.getTaxExemptionReasonCode());
+        	ublInvoice.addVATBreakDown(vatBreakdown);
+        });
+		LOG.info("finished. "+ublInvoice.getVATBreakDowns().size() + " vatBreakDowns.");
 	}
 
 	@Override
@@ -299,7 +274,6 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
         	ublInvoice.addVATBreakDown(vatBreakdown);
         });
 		LOG.info("finished. "+ublInvoice.getVATBreakDowns().size() + " vatBreakDowns.");
-
 	}
 	
 	void makeLineGroup(Invoice ublDoc) {
