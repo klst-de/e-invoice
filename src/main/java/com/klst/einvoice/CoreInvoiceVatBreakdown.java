@@ -140,7 +140,7 @@ public interface CoreInvoiceVatBreakdown {
 	public BigDecimal getTaxCategoryRate();
 
 	/**
-	 * VAT exemption reason text or code
+	 * VAT exemption reason text and code
 	 * 
 	 * @param text BT-120 0..1 (optional, therefore can be null)
 	 * @param code BT-121 0..1 (optional, therefore can be null)

@@ -9,6 +9,7 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeTyp
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 
 public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdown {
@@ -25,6 +26,8 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 			, TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
 			, tradeTax.getRateApplicablePercent()==null ? null : tradeTax.getRateApplicablePercent().getValue()
 			);
+		setTaxExemption(tradeTax.getExemptionReason()==null ? null : tradeTax.getExemptionReason().getValue()
+				, tradeTax.getExemptionReasonCode()==null ? null : tradeTax.getExemptionReasonCode().getValue());
 	}
 
 	public VatBreakdown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
@@ -129,22 +132,44 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 		return percent==null ? null : percent.getValue();
 	}
 
+/*
+
+            <ram:ApplicableTradeTax>
+                <ram:CalculatedAmount>0</ram:CalculatedAmount>
+                <ram:TypeCode>VAT</ram:TypeCode>
+                <ram:ExemptionReason>als gemeinnützig anerkannt</ram:ExemptionReason>
+                <ram:BasisAmount>120</ram:BasisAmount>
+                <ram:CategoryCode>O</ram:CategoryCode>
+                <ram:RateApplicablePercent>0</ram:RateApplicablePercent>
+            </ram:ApplicableTradeTax>
+
+
+ */
+	/**
+	 * VAT exemption reason text and code
+	 *
+	 * @see com.klst.einvoice.CoreInvoiceVatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
+	 */
 	@Override
-	public void setTaxExemption(String text, String code) {
-		// TODO Auto-generated method stub
-		
+	public void setTaxExemption(String text, String id) {
+		if(text!=null) {
+			super.setExemptionReason(CrossIndustryInvoice.newTextType(text));
+		}
+		if(id!=null) {
+			CodeType code = new CodeType();
+			code.setValue(id);
+			super.setExemptionReasonCode(code);
+		}
 	}
 
 	@Override
 	public String getTaxExemptionReasonText() {
-		// TODO Auto-generated method stub
-		return null;
+		return super.getExemptionReason()==null ? null : super.getExemptionReason().getValue();
 	}
 
 	@Override
 	public String getTaxExemptionReasonCode() {
-		// TODO Auto-generated method stub
-		return null;
+		return super.getExemptionReasonCode()==null ? null : super.getExemptionReasonCode().getValue();
 	}
 
 }

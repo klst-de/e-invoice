@@ -1,6 +1,7 @@
 package com.klst.einvoice.ubl;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -11,6 +12,8 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxS
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSubtotalType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PercentType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
 
 public class VatBreakdown extends TaxSubtotalType implements CoreInvoiceVatBreakdown {
@@ -22,16 +25,20 @@ public class VatBreakdown extends TaxSubtotalType implements CoreInvoiceVatBreak
 	// copy ctor
 	public VatBreakdown(TaxSubtotalType tradeTax) {
 		this();
-		init( new Amount(tradeTax.getTaxableAmount().getValue())
-			, new Amount(tradeTax.getTaxAmount().getValue())
+		List<TaxExemptionReasonType> taxExemptionReasonList = tradeTax.getTaxCategory().getTaxExemptionReason();
+		TaxExemptionReasonCodeType tec = tradeTax.getTaxCategory().getTaxExemptionReasonCode();
+		init( new Amount(tradeTax.getTaxableAmount().getCurrencyID(), tradeTax.getTaxableAmount().getValue())
+			, new Amount(tradeTax.getTaxAmount().getCurrencyID(), tradeTax.getTaxAmount().getValue())
 			, TaxCategoryCode.valueOf(tradeTax.getTaxCategory())
 			, tradeTax.getTaxCategory().getPercent()==null ? null : tradeTax.getTaxCategory().getPercent().getValue()
+			, taxExemptionReasonList.isEmpty() ? null : taxExemptionReasonList.get(0).getValue()
+			, tec==null ? null : tec.getValue()
 			);
 	}
 
-	public VatBreakdown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
+	public VatBreakdown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent, String exemptionText, String exemptionCode) {
 		this();
-		init(taxableAmount, taxAmount, codeEnum, percent);
+		init(taxableAmount, taxAmount, codeEnum, percent, exemptionText, exemptionCode);
 	}
 
 	/**
@@ -40,12 +47,16 @@ public class VatBreakdown extends TaxSubtotalType implements CoreInvoiceVatBreak
 	 * @param taxableAmount BT-116 BasisAmount
 	 * @param taxAmount     BT-117 CalculatedAmount
 	 * @param codeEnum      BT-118 CategoryCode
-	 * @param percent       BT-119 RateApplicablePercent
+	 * @param taxRate       BT-119 RateApplicablePercent
+	 * @param exemptionText BT-120
+	 * @param exemptionCode BT-121
 	 */
-	void init(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
+	void init(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal taxRate, String exemptionText, String exemptionCode) {
 		setTaxBaseAmount(taxableAmount);
 		setCalculatedTaxAmount(taxAmount);
-		setTaxCategoryCodeAndRate(codeEnum, percent);
+//		setTaxCategoryCodeAndRate(codeEnum, taxRate);
+		setTaxCategoryAndRate(codeEnum, CoreInvoiceVatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate)
+				, exemptionText, exemptionCode);
 	}
 
 	@Override
@@ -72,7 +83,7 @@ public class VatBreakdown extends TaxSubtotalType implements CoreInvoiceVatBreak
 		return new Amount(super.getTaxAmount().getValue());
 	}
 
-	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, String vat, Percent taxRate) {
+	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, String vat, Percent taxRate, String exemptionText, String exemptionCode) {
 		TaxCategoryType taxCategory = new TaxCategoryType();
 		taxCategory.setID(Invoice.newIDType(codeEnum.getValue(), null));
 		
@@ -83,16 +94,36 @@ public class VatBreakdown extends TaxSubtotalType implements CoreInvoiceVatBreak
 		if(taxRate!=null) {
 			taxCategory.setPercent(taxRate);
 		}
+		
+		if(exemptionText!=null) {
+			TaxExemptionReasonType taxExemptionReason = new TaxExemptionReasonType();
+			taxExemptionReason.setValue(exemptionText);
+			taxCategory.getTaxExemptionReason().add(taxExemptionReason);
+		}
+		
+		if(exemptionCode!=null) {
+			TaxExemptionReasonCodeType taxExemptionReasonCode = new TaxExemptionReasonCodeType();
+			taxExemptionReasonCode.setValue(exemptionCode);
+			taxCategory.setTaxExemptionReasonCode(taxExemptionReasonCode);
+		}
             
 		super.setTaxCategory(taxCategory);
 	}
 
-	@Override
+	/**
+	 * non public - use ctor
+	 * 
+ 	 * set tax category code and rate
+	 * 
+	 * @param codeEnum BT-118
+	 * @param percent  BT-119
+	 */
+// TODO raus	@Override
 	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal taxRate) {
-		setTaxCategoryAndRate(codeEnum, CoreInvoiceVatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate));
+		setTaxCategoryAndRate(codeEnum, CoreInvoiceVatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate), null, null);
 	}
 
-	@Override
+// TODO raus	@Override
 	public void setTaxCategoryCode(TaxCategoryCode code) {
 		setTaxCategoryCodeAndRate(code, null);	
 	}
@@ -102,7 +133,7 @@ public class VatBreakdown extends TaxSubtotalType implements CoreInvoiceVatBreak
 		return TaxCategoryCode.valueOf(super.getTaxCategory());
 	}
 
-	@Override
+// TODO raus	@Override
 	public void setTaxCategoryRate(BigDecimal taxableAmount) {
 		// use ctor
 	}
@@ -113,22 +144,46 @@ public class VatBreakdown extends TaxSubtotalType implements CoreInvoiceVatBreak
 		return percent==null ? null : percent.getValue();
 	}
 
-	@Override
+	/* ABER es muss mit cac:TaxCategory ==> als param zu setTaxCategoryCodeAndRate ==> ctor
+        <cac:TaxSubtotal>   ----------------------- ein VatBreakdown
+            <cbc:TaxableAmount currencyID="EUR">120</cbc:TaxableAmount>  --------- gehört nicht zu VatBreakdown
+            <cbc:TaxAmount currencyID="EUR">0</cbc:TaxAmount>
+            
+            <cac:TaxCategory>      
+                <cbc:ID>O</cbc:ID>
+                <cbc:Percent>0</cbc:Percent>
+                <cbc:TaxExemptionReason>als gemeinnützig anerkannt</cbc:TaxExemptionReason>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:TaxCategory>
+            
+        </cac:TaxSubtotal>
+ 
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CoreInvoiceVatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
+	 */
+// raus 	@Override
 	public void setTaxExemption(String text, String code) {
-		// TODO Auto-generated method stub
+		if(text!=null) {
+			// TODO   === ctor
+		}
 		
 	}
 
 	@Override
-	public String getTaxExemptionReasonText() {
-		// TODO Auto-generated method stub
+	public String getTaxExemptionReasonText() { // TODO TaxCategory ID == ServicesOutsideScope oder Percent==0 suchen
+		List<TaxExemptionReasonType> list = super.getTaxCategory().getTaxExemptionReason();
+		if(list.isEmpty()) return null;
+		if(list.size()==1) return list.get(0)==null ? null : list.get(0).getValue();
+		// TODO TaxCategory ID == ServicesOutsideScope oder Percent==0 suchen
 		return null;
 	}
 
 	@Override
 	public String getTaxExemptionReasonCode() {
-		// TODO Auto-generated method stub
-		return null;
+		TaxExemptionReasonCodeType tec = super.getTaxCategory().getTaxExemptionReasonCode();
+		return tec==null ? null : tec.getValue();
 	}
 
 }
