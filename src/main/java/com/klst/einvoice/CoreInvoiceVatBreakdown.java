@@ -139,12 +139,38 @@ public interface CoreInvoiceVatBreakdown {
 	public void setTaxCategoryRate(BigDecimal taxableAmount); // use ctor
 	public BigDecimal getTaxCategoryRate();
 
-	// TODO: javadoc
-	// BT-120 ++ 0..1 VAT exemption reason text
-	// BT-121 ++ 0..1 VAT exemption reason code
 	public void setTaxExemption(String text, String code);
+	/**
+	 * VAT exemption reason text
+	 * <p>
+	 * A textual statement of the reason why the amount is exempted from VAT
+	 *  or why no VAT is being charged Articles 226 items 11 to 15 Directive 2006/112/EC.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-120
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R48, R49, R51
+	 * 
+	 * @return Text
+	 * 
+	 * @see <a href="http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02006L0112-20150101">COUNCIL DIRECTIVE. 2006/112/EC</a> 
+	 *  of 28 November 2006 on the common system of value added tax – last version: 2006L0112 - EN - 01.01.2015
+	 */
 	// BT-120 ExemptionReason Grund der Steuerbefreiung (Freitext)
 	public String getTaxExemptionReasonText();
+	/**
+	 * VAT exemption reason code
+	 * <p>
+	 * A coded statement of the reason for why the amount is exempted from VAT.
+	 * Code list issued and maintained by the Connecting Europe Facility.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-121
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R48, R49, R51 R55
+	 * 
+	 * @return Code
+	 */
 	// BT-121 ExemptionReasonCode Code für den Umsatzsteuerbefreiungsgrund
 	// Hinweis: Codeliste von der Connecting Europe Facility ausgegeben und geführt.
 	public String getTaxExemptionReasonCode();
