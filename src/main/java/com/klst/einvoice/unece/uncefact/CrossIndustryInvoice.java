@@ -18,28 +18,19 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.CurrencyCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.CreditorFinancialAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentContextParameterType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentLineDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeAgreementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeDeliveryType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePriceType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeProductType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementLineMonetarySummationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
@@ -47,8 +38,6 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 // @see https://www.unece.org/fileadmin/DAM/cefact/rsm/RSM_CrossIndustryInvoice_v2.0.pdf
@@ -1082,22 +1071,24 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
        VatBreakdown extends ApplicableTradeTax
 
 	 */
-	public void addVATBreakDown(List<VatBreakdown> VatBreakdowns) {
+	public void addVATBreakDown(List<VatBreakdown> vatBreakdowns) {
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
 		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
 		List<TradeTaxType> tradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		VatBreakdowns.forEach(vbd -> {
+		vatBreakdowns.forEach(vbd -> {
 			tradeTaxes.add(vbd);
 		});	
 	}
-	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
+	public void addVATBreakDown(VatBreakdown vatBreakdown) {
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
 		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
 
-		TradeTaxType tradeTax = new VatBreakdown(taxableAmount, tax, taxCategoryCode, taxRate);
-		
 		List<TradeTaxType> tradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		tradeTaxes.add(tradeTax);
+		tradeTaxes.add(vatBreakdown);
+	}
+	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
+		VatBreakdown vatBreakdown = new VatBreakdown(taxableAmount, tax, taxCategoryCode, taxRate);
+		addVATBreakDown(vatBreakdown);
 	}
 	public List<VatBreakdown> getVATBreakDowns() {
 		return getVATBreakDowns(this);
@@ -1108,11 +1099,11 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 		HeaderTradeSettlementType applicableHeaderTradeSettlement = supplyChainTradeTransaction.getApplicableHeaderTradeSettlement();
 		if(applicableHeaderTradeSettlement==null) return null;
 		List<TradeTaxType> list = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		List<VatBreakdown> resultLines = new ArrayList<VatBreakdown>(list.size()); // VatBreakdown extends TradeTaxType
+		List<VatBreakdown> result = new ArrayList<VatBreakdown>(list.size()); // VatBreakdown extends TradeTaxType
 		list.forEach(vbd -> {
-			resultLines.add(new VatBreakdown(vbd));
+			result.add(new VatBreakdown(vbd));
 		});
-		return resultLines;
+		return result;
 	
 	}
 	

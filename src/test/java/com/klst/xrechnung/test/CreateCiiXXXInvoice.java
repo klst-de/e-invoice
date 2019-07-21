@@ -3,20 +3,14 @@ package com.klst.xrechnung.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.klst.einvoice.ubl.CommercialInvoice;
-import com.klst.einvoice.ubl.Invoice;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
-import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
-import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
 import com.klst.einvoice.unece.uncefact.VatBreakdown;
 import com.klst.marshaller.CiiTransformer;
-import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
