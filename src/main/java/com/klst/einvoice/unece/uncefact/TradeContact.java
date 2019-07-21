@@ -26,7 +26,9 @@ public class TradeContact extends TradeContactType implements IContact {
 		} else {
 			this.setContactTelephone(universalCommunicationType.getCompleteNumber().getValue());
 		}
-		this.setContactEmail(contact.getEmailURIUniversalCommunication().getURIID().getValue());
+		if(contact.getEmailURIUniversalCommunication()!=null) {
+			this.setContactEmail(contact.getEmailURIUniversalCommunication().getURIID().getValue());
+		}
 	}
 
 	/**
