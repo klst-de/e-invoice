@@ -8,12 +8,14 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
+import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.DocumentTotals;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansCode;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxTotalType;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CurrencyCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
@@ -1072,6 +1074,19 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
        VatBreakdown extends ApplicableTradeTax
 
 	 */
+	/**
+	 * Adds a mandatory VAT BREAKDOWN element
+	 * 
+	 * @param vatBreakdown
+	 */
+	@Override
+	public void addVATBreakDown(CoreInvoiceVatBreakdown vatBreakdown) {
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
+		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
+
+		List<TradeTaxType> tradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
+		tradeTaxes.add((VatBreakdown)vatBreakdown);
+	}
 	public void addVATBreakDown(List<VatBreakdown> vatBreakdowns) {
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
 		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
@@ -1079,13 +1094,6 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 		vatBreakdowns.forEach(vbd -> {
 			tradeTaxes.add(vbd);
 		});	
-	}
-	public void addVATBreakDown(VatBreakdown vatBreakdown) {
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
-
-		List<TradeTaxType> tradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		tradeTaxes.add(vatBreakdown);
 	}
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
 		VatBreakdown vatBreakdown = new VatBreakdown(taxableAmount, tax, taxCategoryCode, taxRate);

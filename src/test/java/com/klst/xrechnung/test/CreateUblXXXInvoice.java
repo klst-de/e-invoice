@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoiceLine;
+import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.ubl.CommercialInvoice;
 import com.klst.einvoice.ubl.Contact;
@@ -264,7 +265,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
-        	VatBreakdown vatBreakdown = new VatBreakdown(
+        	CoreInvoiceVatBreakdown vatBreakdown = new VatBreakdown(
         	  new Amount(tradeTax.getTaxableAmount().getCurrencyID(), tradeTax.getTaxableAmount().getValue())
 			, new Amount(tradeTax.getTaxAmount().getCurrencyID(), tradeTax.getTaxAmount().getValue())
 			, TaxCategoryCode.valueOf(tradeTax.getTaxCategory())

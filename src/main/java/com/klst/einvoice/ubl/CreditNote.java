@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
+import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.IBANId;
@@ -740,6 +741,16 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	}
 
 	// BG-23  VAT BREAKDOWN
+	/**
+	 * Adds a mandatory VAT BREAKDOWN element
+	 * 
+	 * @param vatBreakdown
+	 */
+	@Override
+	public void addVATBreakDown(CoreInvoiceVatBreakdown vatBreakdown) {
+		TaxTotalType taxTotal = getFirstTaxTotal();
+		taxTotal.getTaxSubtotal().add((VatBreakdown)vatBreakdown);
+	}
 	public void addVATBreakDown(List<VatBreakdown> vatBreakdowns) {
 		TaxTotalType taxTotal = getFirstTaxTotal();
 		

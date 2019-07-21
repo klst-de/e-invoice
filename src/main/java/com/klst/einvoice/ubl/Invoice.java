@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
+import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -1401,6 +1402,16 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 	 * Eine Gruppe von Informationselementen, die Informationen über die Umsatzsteueraufschlüsselung in verschiedene Kategorien liefern.
 	 * 
 	 */
+	/**
+	 * Adds a mandatory VAT BREAKDOWN element
+	 * 
+	 * @param vatBreakdown
+	 */
+	@Override
+	public void addVATBreakDown(CoreInvoiceVatBreakdown vatBreakdown) {
+		TaxTotalType taxTotal = getFirstTaxTotal();
+		taxTotal.getTaxSubtotal().add((VatBreakdown)vatBreakdown);
+	}
 	public void addVATBreakDown(List<VatBreakdown> vatBreakdowns) {
 		TaxTotalType taxTotal = getFirstTaxTotal();
 		
@@ -1457,10 +1468,6 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 		
 		TaxSubtotalType taxSubtotal = new VatBreakdown(taxableAmount, tax, taxCategoryCode, taxRate);
 		taxTotal.getTaxSubtotal().add(taxSubtotal);
-	}
-	public void addVATBreakDown(VatBreakdown vatBreakdown) {
-		TaxTotalType taxTotal = getFirstTaxTotal();
-		taxTotal.getTaxSubtotal().add(vatBreakdown);
 	}
 	public List<VatBreakdown> getVATBreakDowns() {
 		return getVATBreakDowns(this);

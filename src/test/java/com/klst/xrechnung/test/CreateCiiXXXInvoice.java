@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoiceLine;
+import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
@@ -56,7 +57,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
-        	VatBreakdown vatBreakdown = new VatBreakdown( new Amount(tradeTax.getBasisAmount().get(0).getValue())
+        	CoreInvoiceVatBreakdown vatBreakdown = new VatBreakdown( new Amount(tradeTax.getBasisAmount().get(0).getValue())
 					,new Amount(tradeTax.getCalculatedAmount().get(0).getValue())
 					,TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
 					,tradeTax.getRateApplicablePercent()==null ? null : tradeTax.getRateApplicablePercent().getValue()

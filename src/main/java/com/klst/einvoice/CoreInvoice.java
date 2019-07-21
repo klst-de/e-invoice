@@ -403,7 +403,10 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 // CopyIndicator . Datentyp: udt:IndicatorType . Kardinalität: 0 .. 1 , nur EXTENDED
 // LanguageID Sprachkennzeichen . Datentyp: udt:IDType . Kardinalität: 0 .. 1 , nur EXTENDED
 	
-	// INVOICE LINE BG-25 1..* (mandatory)
+	// VAT BREAKDOWN BG-23 1..* (mandatory)
+	public void addVATBreakDown(CoreInvoiceVatBreakdown vatBreakdown);
+	
+	// INVOICE LINE  BG-25 1..* (mandatory)
 	public void addLine(CoreInvoiceLine line);
 	
 }
