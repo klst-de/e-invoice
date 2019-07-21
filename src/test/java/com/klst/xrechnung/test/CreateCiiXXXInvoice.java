@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
@@ -68,7 +69,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         List<TradeLineItem> lines = testDoc.getLines();
         LOG.info("LineGroup starts for "+lines.size() + " lines.");
         lines.forEach(testLine -> {
-        	TradeLineItem line = new TradeLineItem
+        	CoreInvoiceLine line = new TradeLineItem
         			( testLine.getId()
         			, testLine.getQuantity()
         			, testLine.getLineTotalAmount()

@@ -1552,6 +1552,7 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 	 * 
 	 * @param line
 	 */
+	@Override
 	public void addLine(CoreInvoiceLine line) {
 		List<InvoiceLineType> lines = this.getInvoiceLine();
 		lines.add((InvoiceLineType)line);

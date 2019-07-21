@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoice;
+import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.IBANId;
@@ -763,12 +764,17 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	// TODO BG-24  ADDITIONAL SUPPORTING DOCUMENTS
 	
 	// wie BG-25  INVOICE LINE
-	public List<CreditNoteLineType> addLine(CreditNoteLineType line) {
+	/**
+	 * Adds a mandatory invoice line element
+	 * 
+	 * @param line
+	 */
+	@Override
+	public void addLine(CoreInvoiceLine line) {
 		List<CreditNoteLineType> lines = this.getCreditNoteLine();
-		lines.add(line);
-		return lines;
+		lines.add((CreditNoteLineType)line);
 	}
-
+	
 	public List<CreditNoteLineType> addLines(CreditNoteType doc) {
 		List<CreditNoteLineType> lines = doc.getCreditNoteLine();
 		List<CreditNoteLineType> resultLines = super.getCreditNoteLine();

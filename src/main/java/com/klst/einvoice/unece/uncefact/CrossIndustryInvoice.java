@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoice;
+import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.DocumentTotals;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
@@ -1116,6 +1117,17 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 
 	 */
 	
+	/**
+	 * Adds a mandatory invoice line element
+	 * 
+	 * @param line
+	 */
+	@Override
+	public void addLine(CoreInvoiceLine line) {
+		List<TradeLineItem> lines = this.getLines();
+		lines.add((TradeLineItem)line);
+	}
+	
 	public void addLine(SupplyChainTradeLineItemType line) {
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
 		supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem().add(line);
@@ -1125,7 +1137,8 @@ Invoice total amount with VAT (BT-112) = Invoice total amount without VAT (BT-10
 	public void addLines(CrossIndustryInvoiceType doc) {
 		List<TradeLineItem> lines = getLines(doc);
 		lines.forEach(line -> {
-			addLine(new TradeLineItem(line));
+			CoreInvoiceLine invoiceLine = new TradeLineItem(line); // TradeLineItem implements CoreInvoiceLine
+			addLine(invoiceLine);
 		});
 	}
 
