@@ -1,5 +1,6 @@
 package com.klst.einvoice.ubl;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansCode;
+import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;
@@ -121,6 +123,8 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	
 	public Invoice(String customization, String profile, DocumentNameCode code) {
 		this();
+		taxTotalFirst = new TaxTotalType();
+		super.getTaxTotal().add(taxTotalFirst); // garantiert ein elem in List<TaxTotalType> 
 		setProcessControl(customization, profile);
 		setTypeCode(code); // BT-3	
 		sellerParty = null;
@@ -130,10 +134,15 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	// cache:
 	Party sellerParty;
 	Party buyerParty;
+	TaxTotalType taxTotalFirst;
 	
 	// copy-ctor
 	Invoice(InvoiceType doc) {
 		this(getCustomization(doc), getProfile(doc), getTypeCode(doc));
+		
+//		taxTotalFirst = doc.getTaxTotal().get(0);
+//		addVATBreakDown(taxTotalFirst);
+		
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));
 		setDocumentCurrency(getDocumentCurrency(doc));
@@ -151,7 +160,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		addPaymentInstructions(doc);		
 		setDocumentTotals(doc);
 		setInvoiceTax(getInvoiceTax(doc));
-		addVATBreakDown(doc);
+		addVATBreakDown(getVATBreakDowns(doc));
 		addLines(doc);
 	}
 	
@@ -1353,7 +1362,7 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 	}
 	
 	static Amount getInvoiceTax(InvoiceType doc) {
-		TaxTotalType taxTotal = getFirstTaxTotal(doc);
+		TaxTotalType taxTotal = doc.getTaxTotal().get(0); // getFirstTaxTotal(doc);
 		TaxAmountType amount = taxTotal.getTaxAmount();
 		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
@@ -1384,96 +1393,90 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 		taxTotal.setTaxAmount(taxAmount);
 	}
 	
-	// wg. Ungültiger Content wurde beginnend mit Element 'cac:TaxSubtotal' gefunden. '{"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2":TaxAmount}' wird erwartet.
 	private TaxTotalType getFirstTaxTotal() {
-		return getFirstTaxTotal(this);
-	}
-	// das garantiert nur ein taxTotal element
-	static private TaxTotalType getFirstTaxTotal(InvoiceType doc) {
-		List<TaxTotalType> taxTotals = doc.getTaxTotal();
-		if(taxTotals.isEmpty()) {
-			TaxTotalType taxTotal = new TaxTotalType();
-			taxTotals.add(taxTotal);
-		}
-		return taxTotals.get(0);
+		return this.getTaxTotal().get(0);
 	}
 	
 	/* VAT BREAKDOWN                               BG-23                       1..* (mandatory)
 	 * Eine Gruppe von Informationselementen, die Informationen über die Umsatzsteueraufschlüsselung in verschiedene Kategorien liefern.
 	 * 
-VAT category taxable amount BT-116 Amount 1
-Summe aller zu versteuernden Beträge, für die ein bestimmter Code der Umsatzsteuerkategorie und ein bestimmter
-Umsatzsteuersatz gelten (falls ein kategoriespezifischer Umsatzsteuersatz gilt).
-VAT category tax amount BT-117 Amount 1
-Der für die betreffende Umsatzsteuerkategorie zu entrichtende Gesamtbetrag.
-Anmerkung: Die Berechnung erfolgt durch Multiplikation des VAT category taxable amount mit der VAT category
-rate der jeweiligen VAT category.
-VAT category code BT-118 Code 1
-Codierte Bezeichnung einer Umsatzsteuerkategorie.
-Anmerkung: Folgende Codes aus der Codeliste UNTDID 5305 werden verwendet:
-VAT category rate BT-119 Percentage 1
-Der Umsatzsteuersatz, angegeben als für die betreffende Umsatzsteuerkategorie geltender Prozentsatz.
-Sofern die Rechnung von der Umsatzsteuer ausgenommen ist, ist der Wert „0“ zu übermitteln.
-Anmerkung: VAT category code und VAT category rate müssen konsistent sein.
-VAT exemption reason text BT-120 Text 0..1
-In Textform angegebener Grund für die Ausnahme des Betrages von der Umsatzsteuerpflicht. Sofern die Umsatzsteuerkategorie
-„AE“ für die Rechnung gilt, ist hier der Text „Umkehrung der Steuerschuldnerschaft“ oder der entsprechende
-Normtext in der für die Rechnung gewählten Sprache anzugeben.
-VAT exemption reason code BT-121 Code 0..1
-Ein Code für den Grund für die Ausnahme des Betrages von der Umsatzsteuerpflicht. Die Code-Liste wird von der
-Connecting Europe Facility gepflegt und herausgegeben
 	 */
-	/**
-	 * VAT BREAKDOWN
-	 * <p>
-	 * A group of business terms providing information about VAT breakdown by different categories, rates and exemption reasons
-	 * <p>
-	 * Cardinality: 1..n (mandatory)
-	 * <br>ID: BG-23
-	 * <br>Req.ID: R38, R45, R47, R48, R49
-	 * 
-	 * @param mandatory taxableAmount : VAT category taxable amount, BT-116/R50
-	 * @param mandatory tax : VAT category tax amount, BT-117/R49
-	 * @param mandatory vatCategory : VAT category code and rate, BT-118 + BT-119
-	 */
-	public void addVATBreakDown(Amount taxableAmount, Amount tax, VatCategory vatCategory) {
+	public void addVATBreakDown(List<VatBreakdown> vatBreakdowns) {
 		TaxTotalType taxTotal = getFirstTaxTotal();
-		TaxSubtotalType taxSubtotal = new TaxSubtotalType();
 		
-		TaxableAmountType taxableAmt = new TaxableAmountType();
-		taxableAmount.copyTo(taxableAmt);
-		taxSubtotal.setTaxableAmount(taxableAmt);
+		vatBreakdowns.forEach(vbd -> {
+			taxTotal.getTaxSubtotal().add(vbd);
+		});	
+	}
+	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
+/*
+    <cac:TaxTotal>
+        <cbc:TaxAmount currencyID="EUR">22.04</cbc:TaxAmount>
+        <cac:TaxSubtotal>                           ---- VatBreakdown extends TaxSubtotalType
+            <cbc:TaxableAmount currencyID="EUR">314.86</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="EUR">22.04</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>7</cbc:Percent>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+    </cac:TaxTotal>
 
-		TaxAmountType taxAmount = new TaxAmountType();
-		tax.copyTo(taxAmount);
-		taxSubtotal.setTaxAmount(taxAmount);
+    <cac:TaxTotal>
+        <cbc:TaxAmount currencyID="EUR">20.73</cbc:TaxAmount>
+        <cac:TaxSubtotal>
+            <cbc:TaxableAmount currencyID="EUR">183.23</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="EUR">10.99</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>6</cbc:Percent>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+        <cac:TaxSubtotal>
+        <!-- 37,9 -->
+            <cbc:TaxableAmount currencyID="EUR">46.37</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="EUR">9.74</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>21</cbc:Percent>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+    </cac:TaxTotal>
+ 
+ */
+		TaxTotalType taxTotal = getFirstTaxTotal();
 		
-		taxSubtotal.setTaxCategory(vatCategory);
-
-		List<TaxSubtotalType> taxSubtotals = taxTotal.getTaxSubtotal();
-		taxSubtotals.add(taxSubtotal);
+		TaxSubtotalType taxSubtotal = new VatBreakdown(taxableAmount, tax, taxCategoryCode, taxRate);
+		taxTotal.getTaxSubtotal().add(taxSubtotal);
 	}
-
-	public void addVATBreakDown(InvoiceType doc) {
-		TaxTotalType myTaxTotal = getFirstTaxTotal();
-		List<TaxSubtotalType> myTaxSubtotals = myTaxTotal.getTaxSubtotal();
-		TaxTotalType taxTotal = getFirstTaxTotal(doc);
-		List<TaxSubtotalType> taxSubtotals = taxTotal.getTaxSubtotal();
-		taxSubtotals.forEach(taxSubtotal -> {
-			myTaxSubtotals.add(taxSubtotal);
-		});
+	public void addVATBreakDown(VatBreakdown vatBreakdown) {
+		TaxTotalType taxTotal = getFirstTaxTotal();
+		taxTotal.getTaxSubtotal().add(vatBreakdown);
 	}
-
-	// key TaxableAmountType.class ... oder TaxCategory
-	// val amount ... oder TaxCategory-Objekt%
-	public List<Map<Object,Object>> getVATBreakDown() {
-		return getVATBreakDown(this);
+	public List<VatBreakdown> getVATBreakDowns() {
+		return getVATBreakDowns(this);
 	}
-	List<Map<Object,Object>> getVATBreakDown(InvoiceType doc) {
-		TaxTotalType taxTotal = getFirstTaxTotal(doc);
-		return getVATBreakDown(taxTotal);
+	static List<VatBreakdown> getVATBreakDowns(InvoiceType doc) {
+		TaxTotalType taxTotal = doc.getTaxTotal().get(0);
+		List<TaxSubtotalType> taxSuptotalList = taxTotal.getTaxSubtotal();
+		List<VatBreakdown> result = new ArrayList<VatBreakdown>(taxSuptotalList.size()); // VatBreakdown extends TaxSubtotalType
+		taxSuptotalList.forEach(vbd -> {
+			VatBreakdown taxSubtotal = new VatBreakdown(vbd);
+			result.add(taxSubtotal);
+		});	
+		return result;
 	}
-	static List<Map<Object,Object>> getVATBreakDown(TaxTotalType taxTotal) {
+	
+	static List<Map<Object,Object>> getVATBreakDown(TaxTotalType taxTotal) { // TODO raus wird noch in CreditNote gebraucht
 		List<TaxSubtotalType> taxSubtotals = taxTotal.getTaxSubtotal();
 		List<Map<Object,Object>> resultList = new ArrayList<Map<Object,Object>>(taxSubtotals.size());
 		taxSubtotals.forEach(taxSubtotal -> {

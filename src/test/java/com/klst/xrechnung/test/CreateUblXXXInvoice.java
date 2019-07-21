@@ -19,6 +19,7 @@ import com.klst.einvoice.ubl.Invoice;
 import com.klst.einvoice.ubl.InvoiceLine;
 import com.klst.einvoice.ubl.PaymentMeans;
 import com.klst.einvoice.ubl.Percent;
+import com.klst.einvoice.ubl.VatBreakdown;
 import com.klst.einvoice.ubl.VatCategory;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.IBANId;
@@ -285,40 +286,20 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makeVatBreakDownGroup(Invoice ublInvoice) {
-		List<Map<Object, Object>> vatBreakDowns = testDoc.getVATBreakDown();
-		vatBreakDowns.forEach(vatBreakDown -> {
-			VatCategory vc = (VatCategory) vatBreakDown.get(VatCategory.class);
-			VatCategory vatCategory = null;
-			if(vc.getTaxCategoryCode().equals(TaxCategoryCode.StandardRate)) {
-				vatCategory = new VatCategory(TaxCategoryCode.StandardRate, new Percent(vc.getPercent().getValue()));
-			} else if(vc.getTaxCategoryCode().equals(TaxCategoryCode.ServicesOutsideScope)) {
-				vatCategory = new VatCategory(TaxCategoryCode.ServicesOutsideScope, new Percent(vc.getPercent().getValue()));
-			} else {
-				vatCategory = new VatCategory(TaxCategoryCode.ExemptFromTax, new Percent(vc.getPercent().getValue()));
-			}
-			LOG.info("vc.TaxCategoryCode:"+vc.getTaxCategoryCode() + " new vatCategory:" +vatCategory);
-			
-			// die optionalen "VAT exemption reason text" und "VAT exemption reason code"
-			List<String> taxExemptionReasonList = (List<String>) vatBreakDown.get(TaxExemptionReasonType.class);
-			if(taxExemptionReasonList==null) {
-				LOG.info("taxExemptionReasonList:" +taxExemptionReasonList);
-			} else for(int l=0; l<taxExemptionReasonList.size(); l++){
-				
-				LOG.warning("TaxExemptionReason TODO #" +l);
-				vatCategory.addTaxExemptionReason(taxExemptionReasonList.get(l));
-			}
-			String reasonCode = (String) vatBreakDown.get(TaxExemptionReasonCodeType.class);
-			if(reasonCode!=null) {
-				vatCategory.setTaxExemptionReasonCode(reasonCode);
-			}
-			
-			LOG.info("vatCategory:" +vatCategory);
-			ublInvoice.addVATBreakDown( (Amount) vatBreakDown.get(TaxableAmountType.class), 
-					(Amount) vatBreakDown.get(TaxAmountType.class), 
-					vatCategory);
-			
-		});
-		LOG.info("finished. "+vatBreakDowns.size() + " vatBreakDowns.");
+        List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
+        LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
+        vbdList.forEach(tradeTax -> {
+        	VatBreakdown vatBreakdown = new VatBreakdown(
+        	  new Amount(tradeTax.getTaxableAmount().getCurrencyID(), tradeTax.getTaxableAmount().getValue())
+			, new Amount(tradeTax.getTaxAmount().getCurrencyID(), tradeTax.getTaxAmount().getValue())
+			, TaxCategoryCode.valueOf(tradeTax.getTaxCategory())
+			, tradeTax.getTaxCategory().getPercent()==null ? null : tradeTax.getTaxCategory().getPercent().getValue()
+			); 
+        	vatBreakdown.setTaxExemption(tradeTax.getTaxExemptionReasonText() , tradeTax.getTaxExemptionReasonCode());
+        	ublInvoice.addVATBreakDown(vatBreakdown);
+        });
+		LOG.info("finished. "+ublInvoice.getVATBreakDowns().size() + " vatBreakDowns.");
+
 	}
 	
 	void makeLineGroup(Invoice ublDoc) {
@@ -425,11 +406,13 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				
 				String paymentTerm = cmInvoice.getPaymentTerm();
 				
-				List<Map<Object,Object>> vatBreakDownList = cmInvoice.getVATBreakDown();
-				Map<Object, Object> vatBreakDown = null;
+				List<VatBreakdown> vatBreakDownList = cmInvoice.getVATBreakDowns();
+				VatBreakdown vatBreakDown = null;
+//				List<Map<Object,Object>> vatBreakDownList = cmInvoice.getVATBreakDown();
+//				Map<Object, Object> vatBreakDown = null;
 				if(vatBreakDownList.isEmpty()) {
 					LOG.warning("vatBreakDownList is empty");
-					vatBreakDown = new HashMap<Object,Object>();
+//					vatBreakDown = new HashMap<Object,Object>();
 				} else {
 					vatBreakDown = vatBreakDownList.get(0); // first
 				} 
@@ -478,9 +461,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 						" \ninvoice paymentInstructions#:"+		cmInvoice.getPaymentInstructions().size() +					
 						" \ninvoice paymentInstruction.PaymentMeans="+	paymentInstruction.getPaymentMeans()+" "+paymentInstruction.getFinancialAccount().getID().getValue() +				
 						" \ninvoice paymentTerms.1st Note="+	paymentTerm +				
-						" \ninvoice VATBreakDown.TaxableAmount="+	vatBreakDown.get(TaxableAmountType.class) +					
-						" \ninvoice VATBreakDown.TaxAmount="+		vatBreakDown.get(TaxAmountType.class) +					
-						" \ninvoice VATBreakDown.VatCategory="+		vatBreakDown.get(VatCategory.class) +					
+//						" \ninvoice VATBreakDown.TaxableAmount="+	vatBreakDown.get(TaxableAmountType.class) +					
+//						" \ninvoice VATBreakDown.TaxAmount="+		vatBreakDown.get(TaxAmountType.class) +					
+//						" \ninvoice VATBreakDown.VatCategory="+		vatBreakDown.get(VatCategory.class) +					
 						" \ninvoice invoiceLines#:"+		invoiceLines.size() 
 						);
 				invoiceLines.forEach(invoiceLine -> {
