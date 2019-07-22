@@ -415,9 +415,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 						" \ninvoice SellerRegion="+			cmInvoice.getSellerPostalAddress().getCountrySubdivision() +					
 						" \ninvoice SellerPostCode City="+	cmInvoice.getSellerPostalAddress().getPostCode()+" "+cmInvoice.getSellerPostalAddress().getCity() + 					
 						" \ninvoice SellerStreet Building="+cmInvoice.getSellerPostalAddress().getStreet()+" "+cmInvoice.getSellerPostalAddress().getBuilding() + 					
-						" \ninvoice SellerContactPoint="+		cmInvoice.getSellerContact().getContactPoint() +					
-						" \ninvoice SellerContactTelephone="+	cmInvoice.getSellerContact().getContactTelephone() +					
-						" \ninvoice SellerContactEmail="+		cmInvoice.getSellerContact().getContactEmail() +					
+						" \ninvoice SellerContactPoint="+		(cmInvoice.getSellerContact()==null ? "null" : cmInvoice.getSellerContact().getContactPoint()) +					
+						" \ninvoice SellerContactTelephone="+	(cmInvoice.getSellerContact()==null ? "null" : cmInvoice.getSellerContact().getContactTelephone()) +					
+						" \ninvoice SellerContactEmail="+		(cmInvoice.getSellerContact()==null ? "null" : cmInvoice.getSellerContact().getContactEmail()) +					
 						" \ninvoice BuyerCountryCode="+		cmInvoice.getBuyerPostalAddress().getCountryCode() +					
 						" \ninvoice BuyerRegion="+			cmInvoice.getBuyerPostalAddress().getCountrySubdivision() +					
 						" \ninvoice BuyerPostCode City="+	cmInvoice.getBuyerPostalAddress().getPostCode()+" "+cmInvoice.getBuyerPostalAddress().getCity() + 					
