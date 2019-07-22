@@ -53,6 +53,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		
 		cii.setSellerParty(testDoc.getSellerParty()); // statt makeSellerGroup(cii);
 		cii.setBuyerParty(testDoc.getBuyerParty());
+		
+		cii.addPaymentInstructions(testDoc.getPaymentMeansCode(), null, null); //paymentMeansText, remittanceInformation);
 		// ... TODO
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
@@ -70,6 +72,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         List<TradeLineItem> lines = testDoc.getLines();
         LOG.info("LineGroup starts for "+lines.size() + " lines.");
         lines.forEach(testLine -> {
+        	LOG.info("testLine.getTaxCategory() = "+testLine.getTaxCategory() + " , testLine.getTaxRate() = "+testLine.getTaxRate());
         	CoreInvoiceLine line = new TradeLineItem
         			( testLine.getId()
         			, testLine.getQuantity()
