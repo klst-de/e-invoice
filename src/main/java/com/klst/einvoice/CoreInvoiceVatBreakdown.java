@@ -18,7 +18,7 @@ import com.klst.untdid.codelist.TaxCategoryCode;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for (en)EN_16931_1_2017 rule and request IDs
  */
-/* (de) rules / Geschäftsregel::
+/* (de) rules / Geschäftsregel:
  * 
  * BR-CO-17 Umsatzsteueraufschlüsselung : 
  * Kategoriespezifischer Steuerbetrag (BT-117) = kategoriespezifischer Steuerbasisbetrag (BT-116) x (kategoriespezifischer Umsatzsteuersatz (BT-119)/100), 
