@@ -60,6 +60,9 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 		TradeTaxType tradeTax = specifiedLineTradeSettlement.getApplicableTradeTax().get(0);
 		PercentType percent = tradeTax.getRateApplicablePercent();
+//		LOG.info("specifiedLineTradeSettlement:"+specifiedLineTradeSettlement + " tradeTax.getCategoryCode()="+tradeTax.getCategoryCode() 
+//		+ "\n TaxCategoryCode:"+TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
+//		);
 		init( associatedDocumentLineDocument.getLineID().getValue()
 			, new Quantity(specifiedLineTradeDelivery.getBilledQuantity().getUnitCode(), specifiedLineTradeDelivery.getBilledQuantity().getValue())
 			, new Amount(specifiedLineTradeSettlement.getSpecifiedTradeSettlementLineMonetarySummation().getLineTotalAmount().get(0).getValue())
@@ -362,7 +365,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 */
 	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, Percent percent) {
 		TaxCategoryCodeType taxCategoryCode = new TaxCategoryCodeType();
-		taxCategoryCode.setValue(taxCategoryCode.getValue());
+		taxCategoryCode.setValue(codeEnum.getValue());
 
 		TradeTaxType tradeTax = new TradeTaxType();
 		tradeTax.setCategoryCode(taxCategoryCode);
