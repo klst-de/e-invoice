@@ -469,7 +469,7 @@ DueDateDateTime Fälligkeitsdatum
 
         <ram:IncludedNote>
             <ram:Content>[Invoice note]</ram:Content>
-            <ram:SubjectCode>ADU</ram:SubjectCode>                  <============ fehlt
+            <ram:SubjectCode>ADU</ram:SubjectCode>                  <============ wird weggelassen bei get
         </ram:IncludedNote>
 
 
@@ -490,7 +490,11 @@ DueDateDateTime Fälligkeitsdatum
 		ExchangedDocumentType ed = doc.getExchangedDocument();
 		List<NoteType> noteList = ed.getIncludedNote();
 		List<String> res = new ArrayList<String>(noteList.size());
-		noteList.forEach(note -> res.add(note.getContent().get(0).getValue()));
+		noteList.forEach(note -> {
+			CodeType code = note.getSubjectCode();
+			if(code!=null) LOG.warning("---SubjectCode:"+code.getValue() + "(wird weggelassen), Content:"+note.getContent().get(0).getValue());
+			res.add(note.getContent().get(0).getValue());
+		});
 		return res;
 	}
 
