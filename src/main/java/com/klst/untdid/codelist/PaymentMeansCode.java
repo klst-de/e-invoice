@@ -5,6 +5,7 @@ import java.util.Map;
 
 //import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InvoiceTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.CodeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
 
 /* urn:xoev-de:kosit:codeliste:untdid.4461
  * United Nations Trade Data Interchange Directory (UNTDID), http://www.unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tredi2.htm
@@ -105,9 +106,9 @@ public enum PaymentMeansCode {
         return valueOf(code);
     }
 
-//    public static PaymentMeansCode valueOf(DocumentCodeType ciiCode) {
-//    	int code = Integer.parseInt(ciiCode.getValue());
-//        return valueOf(code);
-//    }
+    public static PaymentMeansCode valueOf(PaymentMeansCodeType ciiCode) {
+    	int code = Integer.parseInt(ciiCode.getValue());
+        return valueOf(code);
+    }
 
 }
