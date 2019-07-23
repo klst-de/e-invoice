@@ -90,12 +90,37 @@ public interface PaymentInstructions {
 	 * <p>
 	 * A textual value used to establish a link between the payment and the Invoice, issued by the Seller.
 	 * <p>
+	 * Used for creditor's critical reconciliation information. 
+	 * This information element helps the Seller to assign an incoming payment to the relevant payment process.
+	 * When specifying the textual value, which is commonly the invoice number of the invoice being paid, 
+	 * but may be another seller reference, the buyer should indicate this reference in his payment order when executing the payment. 
+	 * In a payment transaction this reference is transferred back to the Seller as Remittance Information.
+	 * <p>
+	 * In order to allow for automatic processing of cross-border SEPA payments, only Latin characters should be used in this field, 
+	 * with a maximum of 140 characters. Reference section 1.4 of the SEPA credit transfer and 
+	 * SEPA direct debit scheme implementation guides [13] and [14] for details of the allowed characters. 
+	 * Other rules may apply for SEPA payments within national borders.
+	 * 
+	 * If remittance information is structured according to the ISO 11649:2009 standard for Structured RF Creditor Reference,
+	 * it shall be mapped to the Structured Remittance Information Creditor Reference field in SEPA payments messages.
+	 * If remittance information is structured according to the EACT standard for automated reconciliation, 
+	 * it shall be mapped to the Unstructured Remittance Information field in SEPA payments messages.
+	 * 
+	 * If remittance information is to be mapped to the End To End Identification field or to the 
+	 * Structured Remittance Information Creditor Reference field in SEPA payments messages, 
+	 * then in addition to the Latin character set restriction, 
+	 * the content shall not start or end with a '/' and the content shall not contain '//'s.
+	 * <p>
 	 * Cardinality: 	0..1
 	 * <br>EN16931-ID: 	BT-83
 	 * <br>Rule ID: 	 
 	 * <br>Request ID: 	R56, R62 
 	 * 
 	 * @param Text
+	 * 
+	 * @see <a href="https://www.europeanpaymentscouncil.eu/what-we-do/sepa-credit-transfer">SEPA Credit Transfer Scheme Implementation Guide</a> for [13]
+	 * 
+	 * @see <a href="https://www.europeanpaymentscouncil.eu/what-we-do/sepa-direct-debit">SEPA Direct Debit Scheme Implementation Guide</a> for [14]
 	 */
 	// PaymentReference Verwendungszweck
 	public void setRemittanceInformation(String text);
