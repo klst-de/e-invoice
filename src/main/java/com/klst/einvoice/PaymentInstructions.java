@@ -16,7 +16,7 @@ import com.klst.untdid.codelist.PaymentMeansCode;
  */
 /*  (de) rules / Geschäftsregel:
  * 
- * BR-DE-1 :
+ * BR-DE-1 : Eine Gruppe von Informationselementen, die Informationen darüber liefern, wie die Zahlung erfolgen soll.
  * Eine Rechnung (INVOICE) muss Angaben zu „PAYMENT INSTRUCTIONS“ (BG-16) enthalten.
  * 
  * BR-49 Zahlungsanweisungen :
