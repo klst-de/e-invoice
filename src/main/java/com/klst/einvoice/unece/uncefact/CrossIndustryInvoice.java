@@ -10,6 +10,7 @@ import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.DocumentTotals;
+import com.klst.einvoice.PaymentInstructions;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansCode;
@@ -832,20 +833,16 @@ DueDateDateTime Fälligkeitsdatum
 			return financialAccount;
 		}
 	
-//	/*
-//	 * mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER
-//	 * 
-//	 * @param enum paymentMeansCode, BT-81 use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
-//	 * @param IBANId iban to create ibanlAccount element
-//	 * @param String remittanceInformation optional
-//	 * @return List with minimum 1 element
-//	 */
+	public void setPaymentInstructions(PaymentInstructions pi) {
+//		this.applicableHeaderTradeSettlement.addBG16(pi); // TODO ---------------- Baustelle
+	}
 	/**
 	 * add group PAYMENT INSTRUCTIONS, BG-16 Cardinality 0..1
 	 * 
-	 * @param code
-	 * @param paymentMeansText
-	 * @param remittanceInformation
+	 * @param code                   mandatory BT-81
+	 * @param paymentMeansText       optional  BT-82 (can be null)
+	 * @param remittanceInformation  optional  BT-83
+//	 * @param creditTransfer         optional  BG-17 TODO
 	 */
 	public void addPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
 		this.applicableHeaderTradeSettlement.addBG16(code, paymentMeansText, remittanceInformation);
@@ -1172,6 +1169,14 @@ TODO
 	}	
 
 	// ----------------- gemeinsam mit TradeParty
+	static IDType newIDType(IBANId iban) {
+		return newIDType(iban.getValue(), iban.getSchemeID());
+	}
+	
+	static IDType newIDType(BICId bic) {
+		return newIDType(bic.getValue(), bic.getSchemeID());
+	}
+	
 	static IDType newIDType(String value, String schemeID) {
 		IDType ID = new IDType();
 		ID.setValue(value);
