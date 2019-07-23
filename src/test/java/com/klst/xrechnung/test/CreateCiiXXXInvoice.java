@@ -54,7 +54,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setSellerParty(testDoc.getSellerParty()); // statt makeSellerGroup(cii);
 		cii.setBuyerParty(testDoc.getBuyerParty());
 		
-		cii.addPaymentInstructions(testDoc.getPaymentMeansCode(), null, null); //paymentMeansText, remittanceInformation);
+		cii.addPaymentInstructions(testDoc.getPaymentMeansCode(), null, testDoc.getRemittanceInformation()); //paymentMeansText, remittanceInformation);
 		// ... TODO
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");

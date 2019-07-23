@@ -832,19 +832,30 @@ DueDateDateTime Fälligkeitsdatum
 			return financialAccount;
 		}
 	
-	/**
-	 * mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER
-	 * 
-	 * @param enum paymentMeansCode, BT-81 use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
-	 * @param IBANId iban to create ibanlAccount element
-	 * @param String remittanceInformation optional
+//	/*
+//	 * mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER
+//	 * 
+//	 * @param enum paymentMeansCode, BT-81 use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
+//	 * @param IBANId iban to create ibanlAccount element
+//	 * @param String remittanceInformation optional
 //	 * @return List with minimum 1 element
+//	 */
+	/**
+	 * add group PAYMENT INSTRUCTIONS, BG-16 Cardinality 0..1
+	 * 
+	 * @param code
+	 * @param paymentMeansText
+	 * @param remittanceInformation
 	 */
 	public void addPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
-		this.applicableHeaderTradeSettlement.bg16(code, paymentMeansText, remittanceInformation);
+		this.applicableHeaderTradeSettlement.addBG16(code, paymentMeansText, remittanceInformation);
 	}
 	public PaymentMeansCode getPaymentMeansCode() {
 		return this.applicableHeaderTradeSettlement.getPaymentMeansCode();
+	}
+	// BG-16.BT-83 - 0..1/0..1
+	public String getRemittanceInformation() {
+		return this.applicableHeaderTradeSettlement.getRemittanceInformation();
 	}
 	
 	public void setPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {

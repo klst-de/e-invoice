@@ -23,7 +23,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType i
 	// copy ctor
 	public ApplicableHeaderTradeSettlement(HeaderTradeSettlementType hts) {
 		this();
-		LOG.info("TODO init( ... hts.SpecifiedTradeSettlementPaymentMeans#:" + hts.getSpecifiedTradeSettlementPaymentMeans().size());
+		LOG.info("do bg16( ... hts.SpecifiedTradeSettlementPaymentMeans#:" + hts.getSpecifiedTradeSettlementPaymentMeans().size());
 		super.getSpecifiedTradePaymentTerms(); // List<TradePaymentTermsType> 0..n
 		List<TradeSettlementPaymentMeansType> tspmList = hts.getSpecifiedTradeSettlementPaymentMeans();
 		List<TextType> list = null; 
@@ -33,9 +33,15 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType i
 			list = tspmList.get(0).getInformation();  // text des ersten tspmList elements!!!!
 		}
 		
-		List<TextType> prList = super.getPaymentReference();
+		List<TextType> prList = hts.getPaymentReference(); // BT-83
+		if(!prList.isEmpty()) {
+			prList.forEach(remittanceInformation -> {
+				LOG.info("remittanceInformation:"+remittanceInformation.getValue());
+			});
+			
+		}
 
-		bg16( tspmList.isEmpty() ? null : PaymentMeansCode.valueOf(tspmList.get(0).getTypeCode())
+		addBG16( tspmList.isEmpty() ? null : PaymentMeansCode.valueOf(tspmList.get(0).getTypeCode())
 			, list.isEmpty() ? null : list.get(0).getValue()
 			, prList.isEmpty() ? null : prList.get(0).getValue()
 			);
@@ -44,11 +50,19 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType i
 	public ApplicableHeaderTradeSettlement(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
 		this();
 		super.getSpecifiedTradePaymentTerms(); // List<TradePaymentTermsType> 0..n
-		bg16(code, paymentMeansText, remittanceInformation);
+		addBG16(code, paymentMeansText, remittanceInformation);
 	}
 	
-	void bg16(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
-		addPaymentMeansCT(code, paymentMeansText);
+	/**
+	 * add a group PAYMENT INSTRUCTIONS, BG-16 Cardinality 0..1
+	 * 
+	 * @param code
+	 * @param paymentMeansText
+	 * @param remittanceInformation
+	 */
+	void addBG16(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
+//		LOG.info("code:"+code + " paymentMeansText:"+paymentMeansText + " remittanceInformation:"+remittanceInformation);
+		setPaymentMeans(code, paymentMeansText);
 		setRemittanceInformation(remittanceInformation);
 	}
 
@@ -97,7 +111,10 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType i
 0 .. 1 PaymentReference Verwendungszweck                                      BT-83
 
 	 */
-	public void addPaymentMeansCT(PaymentMeansCode code, String text) { // code+text
+	
+	// use addBG16 
+	@Override
+	public void setPaymentMeans(PaymentMeansCode code, String text) { // code+text
 		
 		TradeSettlementPaymentMeansType tspm = new TradeSettlementPaymentMeansType();
 		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
@@ -112,29 +129,21 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType i
 	}
 	@Override
 	public void setPaymentMeansCode(PaymentMeansCode code) { // use addPaymentMeansCT
-//		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
-//		pmc.setValue(code.getValueAsString());
-//		super.setTypeCode(pmc);
-		addPaymentMeansCT(code, null);
+		setPaymentMeans(code, null);
 	}
 
 	@Override
 	public PaymentMeansCode getPaymentMeansCode() {
-//		PaymentMeansCodeType paymentMeansCode = super.getTypeCode();
-//		return PaymentMeansCode.valueOf(paymentMeansCode);
 		List<TradeSettlementPaymentMeansType> tspmList = super.getSpecifiedTradeSettlementPaymentMeans();
 		return tspmList.isEmpty() ? null : PaymentMeansCode.valueOf(tspmList.get(0).getTypeCode()); // Code des ersten tspmList elements!!!!
 	}
 
-	@Override
-	public void setPaymentMeansText(String text) { // use addPaymentMeansCT
-		// TODO Auto-generated method stub		
+	@Deprecated
+	void setPaymentMeansText(String text) { // use setPaymentMeans(PaymentMeansCode code, String text)
 	}
 
 	@Override
 	public String getPaymentMeansText() {
-//		List<TextType> list = super.getInformation();
-//		return list.isEmpty() ? null : list.get(0).getValue();
 		List<TradeSettlementPaymentMeansType> tspmList = super.getSpecifiedTradeSettlementPaymentMeans();
 		if(tspmList.isEmpty()) return null;
 		List<TextType> list = tspmList.get(0).getInformation();  // text des ersten tspmList elements!!!!

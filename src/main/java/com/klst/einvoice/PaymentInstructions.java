@@ -3,13 +3,13 @@ package com.klst.einvoice;
 import com.klst.untdid.codelist.PaymentMeansCode;
 
 /**
- * BG-16 + 0..1 PAYMENT INSTRUCTIONS
+ * BG-16 0..1 PAYMENT INSTRUCTIONS
  * <p>
  * A group of business terms providing information about the payment. 
  * <p>
  * Cardinality: 0..1
  * <br>EN16931-ID: 	BG-16
- * <br>Rule ID: 	BR-DE-1 (1..1)
+ * <br>Rule ID: 	BR-DE-1 (1..1 this cius rule makes it mandatory)
  * <br>Request ID: 	R58
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for (en)EN_16931_1_2017 rule and request IDs
@@ -37,7 +37,7 @@ public interface PaymentInstructions {
 	 * <br>Rule ID: 	BR-49
 	 * <br>Request ID: 	R58
 	 * 
-	 * @param Code
+	 * @return Code
 	 */
 	/* BT-81 1..1 TypeCode Code für die Zahlungsart
 	 * 
@@ -57,8 +57,8 @@ public interface PaymentInstructions {
 	 * 59 : SEPA Direct Debit 
 	 * 97 : Report
 	 */
-	public void setPaymentMeansCode(PaymentMeansCode code); // use ctor
 	public PaymentMeansCode getPaymentMeansCode();
+	public void setPaymentMeansCode(PaymentMeansCode code); // use setPaymentMeans to set BT-81 + BT-82
 
 	/**
 	 * Payment means text
@@ -71,12 +71,20 @@ public interface PaymentInstructions {
 	 * <br>Rule ID: 	 
 	 * <br>Request ID: 	R58
 	 * 
-	 * @param Text
+	 * @return Text
  	 */
 	// Information Text zur Zahlungsart
-	public void setPaymentMeansText(String text); // use ctor
 	public String getPaymentMeansText();
+//	public void setPaymentMeansText(String text); // use setPaymentMeans
 	
+	/**
+	 * setter Payment means code + text
+	 * 
+	 * @param code mandatory BT-81
+	 * @param text optional  BT-82 (can be null)
+	 */
+	public void setPaymentMeans(PaymentMeansCode code, String text);
+
 	/**
 	 * Remittance information
 	 * <p>
@@ -90,7 +98,7 @@ public interface PaymentInstructions {
 	 * @param Text
 	 */
 	// PaymentReference Verwendungszweck
-	public void setRemittanceInformation(String text); // use ctor
+	public void setRemittanceInformation(String text);
 	public String getRemittanceInformation();
 
 }
