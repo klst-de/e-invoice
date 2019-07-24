@@ -8,8 +8,10 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
+import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
+import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.VatBreakdown;
 import com.klst.marshaller.CiiTransformer;
@@ -55,6 +57,11 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setBuyerParty(testDoc.getBuyerParty());
 		
 		cii.addPaymentInstructions(testDoc.getPaymentMeansCode(), null, testDoc.getRemittanceInformation()); //paymentMeansText, remittanceInformation);
+		CreditTransfer testCT = testDoc.getCreditTransfer();
+		CreditTransfer ciiCT = cii.getCreditTransfer();
+		LOG.info("testCT.PaymentAccountID "+testCT.getPaymentAccountID() + ", testCT.PaymentAccountName "+testCT.getPaymentAccountName());
+		ciiCT.setPaymentAccountID(new IBANId(testCT.getPaymentAccountID()));
+		ciiCT.setPaymentAccountName(testCT.getPaymentAccountName());
 		// ... TODO
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");

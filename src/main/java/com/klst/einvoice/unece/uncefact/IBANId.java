@@ -14,4 +14,7 @@ public class IBANId extends IdentifierType {
 		this.setSchemeID("IBAN"); 
 	}
 
+	public String toString() {
+		return "["+this.getValue() + ", SchemeID="+this.getSchemeID()+"]";
+	}
 }

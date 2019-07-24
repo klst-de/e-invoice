@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.PaymentInstructions;
+import com.klst.einvoice.PaymentInstructionsFactory;
 import com.klst.untdid.codelist.PaymentMeansCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
@@ -12,7 +15,8 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
-public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType implements PaymentInstructions {
+public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType 
+	implements PaymentInstructions, PaymentInstructionsFactory, CreditTransferFactory {
 
 	private static final Logger LOG = Logger.getLogger(ApplicableHeaderTradeSettlement.class.getName());
 	
@@ -20,18 +24,39 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType i
 		super();
 	}
 
-	// copy ctor
-	public ApplicableHeaderTradeSettlement(HeaderTradeSettlementType hts) {
-		this();
-		LOG.info("do bg16( ... hts.SpecifiedTradeSettlementPaymentMeans#:" + hts.getSpecifiedTradeSettlementPaymentMeans().size());
-		super.getSpecifiedTradePaymentTerms(); // List<TradePaymentTermsType> 0..n
+	PaymentInstructions pi;
+	
+	@Override // implements PaymentInstructionsFactory
+	public PaymentInstructions createPaymentInstructions(PaymentMeansCode code, String paymentMeansText) {
+		return new TradeSettlementPaymentMeans(code, paymentMeansText);
+//		return new ApplicableHeaderTradeSettlement(code, paymentMeansText, null);
+	}
+	PaymentInstructions createPaymentInstructions(HeaderTradeSettlementType hts) {
 		List<TradeSettlementPaymentMeansType> tspmList = hts.getSpecifiedTradeSettlementPaymentMeans();
+		LOG.info("do bg16( ... hts.SpecifiedTradeSettlementPaymentMeans, aka BG-16 tspmList#:" + tspmList.size());
+		
+		TradeSettlementPaymentMeansType tspm = null;
+		PaymentMeansCode pmc = null; // BT-81
+		String paymentMeansText = null;
+		
 		List<TextType> list = null; 
 		if(tspmList.isEmpty()) {
 			list = new ArrayList<TextType>();
 		} else {
-			list = tspmList.get(0).getInformation();  // text des ersten tspmList elements!!!!
+			tspm = tspmList.get(0);
+			pmc = PaymentMeansCode.valueOf(tspm.getTypeCode());
+			list = tspm.getInformation();  // BT-82 text des ersten tspmList elements!!!!
+			paymentMeansText = list.isEmpty() ? null : list.get(0).getValue();
 		}
+		return new TradeSettlementPaymentMeans(tspm); // geht auch, da TradeSettlementPaymentMeans implements PaymentInstructions
+//		return this;
+	}
+
+	// copy ctor
+	public ApplicableHeaderTradeSettlement(HeaderTradeSettlementType hts) {
+		this();
+		super.getSpecifiedTradePaymentTerms(); // List<TradePaymentTermsType> 0..n
+		pi = createPaymentInstructions(hts);
 		
 		List<TextType> prList = hts.getPaymentReference(); // BT-83
 		if(!prList.isEmpty()) {
@@ -41,30 +66,44 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType i
 			
 		}
 
-		addBG16( tspmList.isEmpty() ? null : PaymentMeansCode.valueOf(tspmList.get(0).getTypeCode())
-			, list.isEmpty() ? null : list.get(0).getValue()
-			, prList.isEmpty() ? null : prList.get(0).getValue()
-			);
+		setBG16(pi);
+		setRemittanceInformation(prList.isEmpty() ? null : prList.get(0).getValue());
 	}
 
-	public ApplicableHeaderTradeSettlement(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
+	public ApplicableHeaderTradeSettlement(PaymentMeansCode pmc, String paymentMeansText, String remittanceInformation) {
 		this();
 		super.getSpecifiedTradePaymentTerms(); // List<TradePaymentTermsType> 0..n
-		addBG16(code, paymentMeansText, remittanceInformation);
-	}
-	
-	/**
-	 * add a group PAYMENT INSTRUCTIONS, BG-16 Cardinality 0..1
-	 * 
-	 * @param code
-	 * @param paymentMeansText
-	 * @param remittanceInformation
-	 */
-	void addBG16(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
-//		LOG.info("code:"+code + " paymentMeansText:"+paymentMeansText + " remittanceInformation:"+remittanceInformation);
-		setPaymentMeans(code, paymentMeansText);
+		pi = createPaymentInstructions(pmc, paymentMeansText);
+		setBG16(pi);
 		setRemittanceInformation(remittanceInformation);
 	}
+	
+	void setBG16(PaymentInstructions paymentInstructions) { // TODOrename to setPaymentInstructions
+// EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
+// CII:
+// 0 .. n SpecifiedTradeSettlementPaymentMeans Zahlungsanweisungen BG-16
+		if(paymentInstructions==null) return;
+		LOG.info("vor add SpecifiedTradeSettlementPaymentMeans.size="+super.getSpecifiedTradeSettlementPaymentMeans().size());
+		super.getSpecifiedTradeSettlementPaymentMeans().add((TradeSettlementPaymentMeans)paymentInstructions);
+	}
+//	/**
+//	 * add a group PAYMENT INSTRUCTIONS, BG-16 Cardinality 0..1
+//	 * 
+//	 * @param code                   mandatory BT-81
+////	 * @param iban                   mandatory BT-84            TODO
+////	 *                                                 interface CreditTransfer List wg.: 0..n CREDIT TRANSFER BG-17
+////	 *                                         oder    interface PAYMENT CARD INFORMATION 0..1 BG-18
+////	 *                                         oder    interface DIRECT DEBIT             0..1 BG-19
+//	 * @param paymentMeansText       optional  BT-82 (can be null)
+//	 * @param remittanceInformation  optional  BT-83
+//	 * @param creditTransfer         optional  BG-17
+//	 */
+//	void addBG16(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
+////		LOG.info("code:"+code + " paymentMeansText:"+paymentMeansText + " remittanceInformation:"+remittanceInformation);
+//		setBG16(createPaymentInstructions(code, paymentMeansText));
+//
+//		setRemittanceInformation(remittanceInformation);
+//	}
 
 	/*
 
@@ -99,11 +138,11 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType i
 0 .. 1 PayerPartyDebtorFinancialAccount Bankinstitut des Käufers xs:sequence 
 1 .. 1 IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos         BG-19/ BT-91           TODO
 0 .. 1 PayeePartyCreditorFinancialAccount Überweisung                         BG-17 xs:sequence 
-0 .. 1 IBANID Kennung des Zahlungskontos                                      BT-84 
-0 .. 1 AccountName Name des Zahlungskontos                                    BT-85 
-0 .. 1 ProprietaryID Nationale Kontonummer (nicht für SEPA)                   BT-84-0 
+0 .. 1 IBANID Kennung des Zahlungskontos                                      BT-84         ----------------- <<BT17
+0 .. 1 AccountName Name des Zahlungskontos                                    BT-85         ----------------- <<BT17
+0 .. 1 ProprietaryID Nationale Kontonummer (nicht für SEPA)                   BT-84-0       ----------------- <<BT17
 0 .. 1 PayeeSpecifiedCreditorFinancialInstitution Bankinstitut des Verkäufers xs:sequence 
-1 .. 1 BICID Kennung des Zahlungsdienstleisters                               BT-86
+1 .. 1 BICID Kennung des Zahlungsdienstleisters                               BT-86         ----------------- <<BT17
 
 0 .. 1 SupplyChainTradeTransaction Gruppierung der Informationen zum Geschäftsvorfall
 1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich xs:sequence 
@@ -112,20 +151,20 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType i
 
 	 */
 	
-	// use addBG16 
 	@Override
 	public void setPaymentMeans(PaymentMeansCode code, String text) { // code+text
-		
-		TradeSettlementPaymentMeansType tspm = new TradeSettlementPaymentMeansType();
-		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
-		pmc.setValue(code.getValueAsString());
-		tspm.setTypeCode(pmc);
-
-		if(text!=null) {
-			tspm.getInformation().add(CrossIndustryInvoice.newTextType(text));
-		}
-
+		TradeSettlementPaymentMeansType tspm = (TradeSettlementPaymentMeans)createPaymentInstructions(code, text); // use addBG16
 		super.getSpecifiedTradeSettlementPaymentMeans().add(tspm);
+//		TradeSettlementPaymentMeansType tspm = new TradeSettlementPaymentMeansType();
+//		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
+//		pmc.setValue(code.getValueAsString());
+//		tspm.setTypeCode(pmc);
+//
+//		if(text!=null) {
+//			tspm.getInformation().add(CrossIndustryInvoice.newTextType(text));
+//		}
+//
+//		super.getSpecifiedTradeSettlementPaymentMeans().add(tspm);
 	}
 	@Override
 	public void setPaymentMeansCode(PaymentMeansCode code) { // use addPaymentMeansCT
@@ -134,8 +173,9 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType i
 
 	@Override
 	public PaymentMeansCode getPaymentMeansCode() {
-		List<TradeSettlementPaymentMeansType> tspmList = super.getSpecifiedTradeSettlementPaymentMeans();
-		return tspmList.isEmpty() ? null : PaymentMeansCode.valueOf(tspmList.get(0).getTypeCode()); // Code des ersten tspmList elements!!!!
+		return pi.getPaymentMeansCode();
+//		List<TradeSettlementPaymentMeansType> tspmList = super.getSpecifiedTradeSettlementPaymentMeans();
+//		return tspmList.isEmpty() ? null : PaymentMeansCode.valueOf(tspmList.get(0).getTypeCode()); // Code des ersten tspmList elements!!!!
 	}
 
 	@Deprecated
@@ -144,10 +184,11 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType i
 
 	@Override
 	public String getPaymentMeansText() {
-		List<TradeSettlementPaymentMeansType> tspmList = super.getSpecifiedTradeSettlementPaymentMeans();
-		if(tspmList.isEmpty()) return null;
-		List<TextType> list = tspmList.get(0).getInformation();  // text des ersten tspmList elements!!!!
-		return list.isEmpty() ? null : list.get(0).getValue();
+		return pi.getPaymentMeansText();
+//		List<TradeSettlementPaymentMeansType> tspmList = super.getSpecifiedTradeSettlementPaymentMeans();
+//		if(tspmList.isEmpty()) return null;
+//		List<TextType> list = tspmList.get(0).getInformation();  // text des ersten tspmList elements!!!!
+//		return list.isEmpty() ? null : list.get(0).getValue();
 	}
 
 	@Override
@@ -162,5 +203,22 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType i
 		return list.isEmpty() ? null : list.get(0).getValue();
 	}
 
+//	-------------------------------------------------
+
+	@Override
+	public CreditTransfer createCreditTransfer(IBANId iban) { // eigentlich ist es setXXXXX
+		LOG.info("class ßßßßßß:"+super.getSpecifiedTradeSettlementPaymentMeans().get(0).getClass());
+		TradeSettlementPaymentMeans tspm = (TradeSettlementPaymentMeans)super.getSpecifiedTradeSettlementPaymentMeans().get(0);
+//		tspm.setPaymentAccountID(iban);
+		LOG.info(">>>>>>>>>>>>>>>>> PaymentAccountI:"+tspm.getPaymentAccountID());
+		return tspm; // TODO
+//		return new TradeSettlementPaymentMeans(iban);
+	}
+
+	@Override
+	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic) {
+		return null; // TODO
+//		return new TradeSettlementPaymentMeans(accountId, accountName, bic);
+	}
 
 }

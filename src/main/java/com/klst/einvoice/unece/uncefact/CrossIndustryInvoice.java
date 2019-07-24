@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
+import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.untdid.codelist.DateTimeFormats;
@@ -98,7 +99,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		DocumentCodeType documentCode = new DocumentCodeType();
 		documentCode.setValue(documentNameCode.getValueAsString());
 		ed.setTypeCode(documentCode);
-		this.setExchangedDocument(ed);
+		super.setExchangedDocument(ed);
 	}
 
 	// copy-ctor
@@ -833,8 +834,15 @@ DueDateDateTime Fälligkeitsdatum
 			return financialAccount;
 		}
 	
-	public void setPaymentInstructions(PaymentInstructions pi) {
-//		this.applicableHeaderTradeSettlement.addBG16(pi); // TODO ---------------- Baustelle
+	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
+		/*
+
+EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
+	die Kardinalität ist 0..1, wg. BR-DE-1 (1..1 this cius rule makes it mandatory)
+	ich implemetierte setXXX so, dass PaymentInstructions null sein darf
+
+		 */
+		this.applicableHeaderTradeSettlement.setBG16(paymentInstructions);
 	}
 	/**
 	 * add group PAYMENT INSTRUCTIONS, BG-16 Cardinality 0..1
@@ -845,14 +853,21 @@ DueDateDateTime Fälligkeitsdatum
 //	 * @param creditTransfer         optional  BG-17 TODO
 	 */
 	public void addPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
-		this.applicableHeaderTradeSettlement.addBG16(code, paymentMeansText, remittanceInformation);
+		PaymentInstructions pi = this.applicableHeaderTradeSettlement.createPaymentInstructions(code, paymentMeansText);
+		this.applicableHeaderTradeSettlement.setBG16(pi);
+		this.applicableHeaderTradeSettlement.setRemittanceInformation(remittanceInformation);
 	}
 	public PaymentMeansCode getPaymentMeansCode() {
 		return this.applicableHeaderTradeSettlement.getPaymentMeansCode();
 	}
 	// BG-16.BT-83 - 0..1/0..1
 	public String getRemittanceInformation() {
+//this.applicableHeaderTradeSettlement.createCreditTransfer(null); // TEST raus
 		return this.applicableHeaderTradeSettlement.getRemittanceInformation();
+	}
+	
+	public CreditTransfer getCreditTransfer() {
+		return this.applicableHeaderTradeSettlement.createCreditTransfer(null); // TODO flick
 	}
 	
 	public void setPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {
