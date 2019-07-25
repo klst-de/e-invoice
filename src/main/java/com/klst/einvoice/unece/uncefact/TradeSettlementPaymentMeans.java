@@ -52,7 +52,7 @@ Datentyp: ram:TradeSettlementPaymentMeansType
  */                                              
 public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType implements PaymentInstructions, CreditTransfer
 // TODO , PAYMENT CARD INFORMATION, DIRECT DEBIT
-// PaymentInstructions IF wir ohne BT-83 implementiert
+// PaymentInstructions IF wird ohne BT-83 implementiert
 {
 	private static final Logger LOG = Logger.getLogger(TradeSettlementPaymentMeans.class.getName());
 

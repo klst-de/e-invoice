@@ -820,21 +820,19 @@ DueDateDateTime Fälligkeitsdatum
     </ram:ApplicableHeaderTradeSettlement>
 */
 
-	CreditorFinancialAccountType makeCreditTransfer(IBANId iban) {
-//	FinancialAccountType makeCreditTransfer(IbanId iban) {
-		CreditorFinancialAccountType financialAccount = new CreditorFinancialAccountType();
-		financialAccount.setIBANID(newIDType(iban.getValue(), iban.getSchemeID()));
-		return financialAccount;
-	}
-	public CreditorFinancialAccountType makeCreditTransfer(String account, String accountName, BICId bic) {
-			CreditorFinancialAccountType financialAccount = new CreditorFinancialAccountType();
-			financialAccount.setIBANID(newIDType(account, null)); // null : No identification scheme
-			financialAccount.setAccountName(newTextType(accountName));
-			financialAccount.setProprietaryID(newIDType(bic.getValue(), bic.getSchemeID()));
-			return financialAccount;
-		}
+//	CreditorFinancialAccountType makeCreditTransfer(IBANId iban) {
+//		CreditorFinancialAccountType financialAccount = new CreditorFinancialAccountType();
+//		financialAccount.setIBANID(newIDType(iban.getValue(), iban.getSchemeID()));
+//		return financialAccount;
+//	}
+//	public CreditorFinancialAccountType makeCreditTransfer(String account, String accountName, BICId bic) {
+//			CreditorFinancialAccountType financialAccount = new CreditorFinancialAccountType();
+//			financialAccount.setIBANID(newIDType(account, null)); // null : No identification scheme
+//			financialAccount.setAccountName(newTextType(accountName));
+//			financialAccount.setProprietaryID(newIDType(bic.getValue(), bic.getSchemeID()));
+//			return financialAccount;
+//		}
 	
-	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
 		/*
 
 EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
@@ -842,18 +840,19 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	ich implemetierte setXXX so, dass PaymentInstructions null sein darf
 
 		 */
-		this.applicableHeaderTradeSettlement.setBG16(paymentInstructions);
+	PaymentInstructions createPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
+		// ohne remittanceInformation:
+		return this.applicableHeaderTradeSettlement.createPaymentInstructions(code, paymentMeansText);
 	}
 	/**
-	 * add group PAYMENT INSTRUCTIONS, BG-16 Cardinality 0..1
+	 * group PAYMENT INSTRUCTIONS, BG-16 Cardinality 0..1
 	 * 
 	 * @param code                   mandatory BT-81
 	 * @param paymentMeansText       optional  BT-82 (can be null)
 	 * @param remittanceInformation  optional  BT-83
-//	 * @param creditTransfer         optional  BG-17 TODO
 	 */
-	public void addPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
-		PaymentInstructions pi = this.applicableHeaderTradeSettlement.createPaymentInstructions(code, paymentMeansText);
+	public void setPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
+		PaymentInstructions pi = createPaymentInstructions(code, paymentMeansText, remittanceInformation);
 		this.applicableHeaderTradeSettlement.setBG16(pi);
 		this.applicableHeaderTradeSettlement.setRemittanceInformation(remittanceInformation);
 	}
@@ -870,37 +869,6 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		return this.applicableHeaderTradeSettlement.createCreditTransfer(null); // TODO flick
 	}
 	
-	public void setPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {
-//		ubl FinancialAccountType ibanlAccount = new CreditTransfer(iban); // ubl CreditTransfer extends FinancialAccountType OASIS
-//		ubl PaymentMeansType paymentMeans = new PaymentInstruction(paymentMeansCode, financialAccount, remittanceInformation);
-		//in cii
-		TradeSettlementPaymentMeansType tradeSettlementPaymentMeans;
-		//= new TradeSettlementPaymentMeans(); extends TradeSettlementPaymentMeansType -- symetrisch zu PaymentInstruction extends PaymentMeansType
-		return; // TODO addPaymentInstructions(paymentMeansCode, ibanlAccount, remittanceInformation);
-	}
-	public class XXXTradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType {
-		
-		XXXTradeSettlementPaymentMeans() {
-			super();
-		}
-		// paymentMeansCode                            BT-81
-		// FinancialAccountType financialAccount     ???
-		// Payment means text                          BT-82 Text                  0..1 TODO
-		// Remittance information                      BT-83 Text                  0..1 optional
-		XXXTradeSettlementPaymentMeans(PaymentMeansCode paymentMeansCode, String text, String remittanceInformation) {
-			this();
-			PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
-			pmc.setValue(paymentMeansCode.getValueAsString());
-			super.setTypeCode(pmc);
-			
-			super.getInformation().add(newTextType(text)); // BT-82
-			// remittanceInformation ist nicht in TradeSettlementPaymentMeans, sondern in HeaderTradeSettlementType
-		}
-	}
-//	public List<TradeSettlementPaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {
-//		CreditorFinancialAccountType creditorFinancialAccount = makeCreditTransfer(iban);
-//		return addPaymentInstructions(paymentMeansCode, creditorFinancialAccount, remittanceInformation);
-//	}
 
 	/*
 wg. val-sch.1.1 	BR-CO-25 	error 	
