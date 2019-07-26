@@ -151,6 +151,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 
 	@Override
 	public void setPaymentAccountName(String name) {
+		LOG.info(", AccountName:"+name);
 		CreditorFinancialAccountType payeePartyCreditorFinancialAccount = getCreditorFinancialAccountType();
 		payeePartyCreditorFinancialAccount.setAccountName(CrossIndustryInvoice.newTextType(name));		
 		super.setPayeePartyCreditorFinancialAccount(payeePartyCreditorFinancialAccount);

@@ -205,7 +205,17 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 
 //	-------------------------------------------------
 
-	@Override
+	public CreditTransfer getCreditTransfer() {
+		if(super.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
+			LOG.warning("SpecifiedTradeSettlementPaymentMeans is empty");
+			return null;
+		}
+		LOG.info("SpecifiedTradeSettlementPaymentMeans is "+super.getSpecifiedTradeSettlementPaymentMeans().get(0).getClass());
+		TradeSettlementPaymentMeans tspm = (TradeSettlementPaymentMeans)super.getSpecifiedTradeSettlementPaymentMeans().get(0);
+		LOG.info("TradeSettlementPaymentMeans implementiert CreditTransfer >>>>>> 1..1 >>>>>>> PaymentAccount:"+tspm.getPaymentAccountID());
+		return tspm;
+	}
+	
 	public CreditTransfer createCreditTransfer(IBANId iban) { // eigentlich ist es setXXXXX
 		LOG.info("class ßßßßßß:"+super.getSpecifiedTradeSettlementPaymentMeans().get(0).getClass());
 		TradeSettlementPaymentMeans tspm = (TradeSettlementPaymentMeans)super.getSpecifiedTradeSettlementPaymentMeans().get(0);
@@ -213,6 +223,14 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		LOG.info(">>>>>>>>>>>>>>>>> PaymentAccountI:"+tspm.getPaymentAccountID());
 		return tspm; // TODO
 //		return new TradeSettlementPaymentMeans(iban);
+	}
+
+	@Override
+	public CreditTransfer createCreditTransfer(IBANId iban, String accountName) {
+		CreditTransfer ct = getCreditTransfer();
+		ct.setPaymentAccountID(iban);
+		ct.setPaymentAccountName(accountName);
+		return ct;
 	}
 
 	@Override

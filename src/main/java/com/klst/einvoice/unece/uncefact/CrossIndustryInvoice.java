@@ -21,12 +21,11 @@ import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryIn
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CurrencyCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.CreditorFinancialAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentContextParameterType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
@@ -35,7 +34,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
@@ -758,7 +756,10 @@ DueDateDateTime Fälligkeitsdatum
 	 * <br>ID: BG-13
 	 * <br>Req.ID: R31, R32, R57
 	 */
-// TODO
+	public void setDelivery(Object delivery) { // TODO setDelivery(Delivery delivery)
+		HeaderTradeDeliveryType value = new HeaderTradeDeliveryType(); // TODO
+		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(value);
+	}
 	
 // --------------------------------
 	/** 
@@ -866,9 +867,11 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	}
 	
 	public CreditTransfer getCreditTransfer() {
-		return this.applicableHeaderTradeSettlement.createCreditTransfer(null); // TODO flick
+		return this.applicableHeaderTradeSettlement.getCreditTransfer();
 	}
-	
+	public CreditTransfer createCreditTransfer(IBANId iban, String accountName) {
+		return this.applicableHeaderTradeSettlement.createCreditTransfer(iban, accountName);
+	}
 
 	/*
 wg. val-sch.1.1 	BR-CO-25 	error 	

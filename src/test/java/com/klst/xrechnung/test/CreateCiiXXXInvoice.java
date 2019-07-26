@@ -56,13 +56,14 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setSellerParty(testDoc.getSellerParty()); // statt makeSellerGroup(cii);
 		cii.setBuyerParty(testDoc.getBuyerParty());
 		
-		cii.addPaymentInstructions(testDoc.getPaymentMeansCode(), null, testDoc.getRemittanceInformation()); //paymentMeansText, remittanceInformation);
+		cii.setPaymentInstructions(testDoc.getPaymentMeansCode(), null, testDoc.getRemittanceInformation()); //paymentMeansText, remittanceInformation);
 		CreditTransfer testCT = testDoc.getCreditTransfer();
-		CreditTransfer ciiCT = cii.getCreditTransfer();
-		LOG.info("testCT.PaymentAccountID "+testCT.getPaymentAccountID() + ", testCT.PaymentAccountName "+testCT.getPaymentAccountName());
-		ciiCT.setPaymentAccountID(new IBANId(testCT.getPaymentAccountID()));
-		ciiCT.setPaymentAccountName(testCT.getPaymentAccountName());
-		// ... TODO
+		LOG.info("testCT.PaymentAccountID:"+testCT.getPaymentAccountID() 
+			+ ", testCT.PaymentAccountName:"+testCT.getPaymentAccountName()
+			+ ", testCT.getPaymentServiceProviderID:"+testCT.getPaymentServiceProviderID());
+		CreditTransfer ciiCT = cii.createCreditTransfer(new IBANId(testCT.getPaymentAccountID()), testCT.getPaymentAccountName());
+		
+		cii.setDelivery(null);// ... TODO
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
