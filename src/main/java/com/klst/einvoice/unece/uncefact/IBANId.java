@@ -4,6 +4,8 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Ide
 
 public class IBANId extends IdentifierType {
 
+	static final String IBAN = "IBAN";
+	
 	IBANId() {
 		super();
 	}
@@ -11,7 +13,7 @@ public class IBANId extends IdentifierType {
 	public IBANId(String iban) {
 		this();
 		this.setValue(iban);
-		this.setSchemeID("IBAN"); 
+		this.setSchemeID(IBAN); 
 	}
 
 	public String toString() {

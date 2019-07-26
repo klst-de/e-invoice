@@ -78,9 +78,19 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 			accountId = payeePartyCreditorFinancialAccount.getProprietaryID()==null ? null : payeePartyCreditorFinancialAccount.getProprietaryID().getValue();
 			accountName = payeePartyCreditorFinancialAccount.getAccountName()==null ? null : payeePartyCreditorFinancialAccount.getAccountName().getValue();
 		}
-		LOG.info("iban:"+iban + ", AccountName:"+accountName);
+		
+		CreditorFinancialInstitutionType creditorFinancialInstitution = tspm.getPayeeSpecifiedCreditorFinancialInstitution();
+		BICId bic = null;
+		if(creditorFinancialInstitution==null) {
+			// optional
+		} else {
+			bic = creditorFinancialInstitution.getBICID()==null ? null : new BICId(creditorFinancialInstitution.getBICID().getValue());			
+		}
+		
+		LOG.info("iban:"+iban + ", AccountName:"+accountName + ", bic:"+bic);
 		this.setPaymentAccountID(iban);
 		this.setPaymentAccountName(accountName);
+		this.setPaymentServiceProviderID(bic);
 	}
 	
 	public TradeSettlementPaymentMeans(PaymentMeansCode code, String paymentMeansText) {
@@ -161,14 +171,16 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 	public String getPaymentServiceProviderID() {
 		CreditorFinancialInstitutionType payeeSpecifiedCreditorFinancialInstitution = super.getPayeeSpecifiedCreditorFinancialInstitution();
 		if(payeeSpecifiedCreditorFinancialInstitution==null) return null;
-		return null;
+		return payeeSpecifiedCreditorFinancialInstitution.getBICID()==null ? null : payeeSpecifiedCreditorFinancialInstitution.getBICID().getValue();
 	}
 
 	@Override
 	public void setPaymentServiceProviderID(BICId bic) {
+		LOG.info(", bic:"+bic);
 		if(bic==null) return;
 		CreditorFinancialInstitutionType payeeSpecifiedCreditorFinancialInstitution = getCreditorFinancialInstitutionType();
-		payeeSpecifiedCreditorFinancialInstitution.setBICID(CrossIndustryInvoice.newIDType(bic));	
+		payeeSpecifiedCreditorFinancialInstitution.setBICID(CrossIndustryInvoice.newIDType(bic));
+		super.setPayeeSpecifiedCreditorFinancialInstitution(payeeSpecifiedCreditorFinancialInstitution);
 	}
 	@Override
 	public void setPaymentServiceProviderID(String id) {

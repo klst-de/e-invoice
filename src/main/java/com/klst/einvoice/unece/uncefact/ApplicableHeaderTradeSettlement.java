@@ -212,7 +212,8 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		}
 		LOG.info("SpecifiedTradeSettlementPaymentMeans is "+super.getSpecifiedTradeSettlementPaymentMeans().get(0).getClass());
 		TradeSettlementPaymentMeans tspm = (TradeSettlementPaymentMeans)super.getSpecifiedTradeSettlementPaymentMeans().get(0);
-		LOG.info("TradeSettlementPaymentMeans implementiert CreditTransfer >>>>>> 1..1 >>>>>>> PaymentAccount:"+tspm.getPaymentAccountID());
+		LOG.info("TradeSettlementPaymentMeans implementiert CreditTransfer >>>>>> 1..1 >>>>>>> PaymentAccount:" 
+				+ tspm.getPaymentAccountID());
 		return tspm;
 	}
 	
@@ -226,10 +227,11 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 	}
 
 	@Override
-	public CreditTransfer createCreditTransfer(IBANId iban, String accountName) {
+	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
 		CreditTransfer ct = getCreditTransfer();
 		ct.setPaymentAccountID(iban);
 		ct.setPaymentAccountName(accountName);
+		ct.setPaymentServiceProviderID(bic);
 		return ct;
 	}
 

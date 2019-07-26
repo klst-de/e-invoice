@@ -17,6 +17,6 @@ import com.klst.einvoice.unece.uncefact.IBANId;
 
 public interface CreditTransferFactory {
 	
-	public CreditTransfer createCreditTransfer(IBANId iban, String accountName); // SEPA Überweisung
+	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic); // SEPA Überweisung
 	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic); // non SEPA
 }

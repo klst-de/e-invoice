@@ -862,15 +862,14 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	}
 	// BG-16.BT-83 - 0..1/0..1
 	public String getRemittanceInformation() {
-//this.applicableHeaderTradeSettlement.createCreditTransfer(null); // TEST raus
 		return this.applicableHeaderTradeSettlement.getRemittanceInformation();
 	}
 	
 	public CreditTransfer getCreditTransfer() {
 		return this.applicableHeaderTradeSettlement.getCreditTransfer();
 	}
-	public CreditTransfer createCreditTransfer(IBANId iban, String accountName) {
-		return this.applicableHeaderTradeSettlement.createCreditTransfer(iban, accountName);
+	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
+		return this.applicableHeaderTradeSettlement.createCreditTransfer(iban, accountName, bic);
 	}
 
 	/*

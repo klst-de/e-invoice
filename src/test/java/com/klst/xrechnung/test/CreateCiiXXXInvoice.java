@@ -10,6 +10,7 @@ import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.unece.uncefact.Amount;
+import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
@@ -61,7 +62,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		LOG.info("testCT.PaymentAccountID:"+testCT.getPaymentAccountID() 
 			+ ", testCT.PaymentAccountName:"+testCT.getPaymentAccountName()
 			+ ", testCT.getPaymentServiceProviderID:"+testCT.getPaymentServiceProviderID());
-		CreditTransfer ciiCT = cii.createCreditTransfer(new IBANId(testCT.getPaymentAccountID()), testCT.getPaymentAccountName());
+		CreditTransfer ciiCT = cii.createCreditTransfer(new IBANId(testCT.getPaymentAccountID()), testCT.getPaymentAccountName(), testCT.getPaymentServiceProviderID()==null ? null : new BICId(testCT.getPaymentServiceProviderID()));
 		
 		cii.setDelivery(null);// ... TODO
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
