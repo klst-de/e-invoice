@@ -10,8 +10,8 @@ import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PaymentInstructionsFactory;
 import com.klst.untdid.codelist.PaymentMeansCode;
 
-import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
@@ -55,8 +55,24 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 	// copy ctor
 	public ApplicableHeaderTradeSettlement(HeaderTradeSettlementType hts) {
 		this();
+		List<TradePaymentTermsType> stptList = hts.getSpecifiedTradePaymentTerms();
 		super.getSpecifiedTradePaymentTerms(); // List<TradePaymentTermsType> 0..n
 		pi = createPaymentInstructions(hts);
+		setBG16(pi);
+		
+		if(stptList.isEmpty()) {
+			//
+		} else {
+			List<TextType> descriptionList = stptList.get(0).getDescription(); // BT-20 + 0..1 Payment terms
+			LOG.info("descriptionList#:"+descriptionList.size() + " super.SpecifiedTradePaymentTerms#"+super.getSpecifiedTradePaymentTerms().size());
+			if(descriptionList.isEmpty()) { 
+				// Description is optional
+			} else {
+				TradePaymentTermsType tradePaymentTerms = new TradePaymentTermsType();
+				tradePaymentTerms.getDescription().add(CrossIndustryInvoice.newTextType(descriptionList.get(0).getValue()));
+				super.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
+			}
+		}
 		
 		List<TextType> prList = hts.getPaymentReference(); // BT-83
 		if(!prList.isEmpty()) {
@@ -66,7 +82,6 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 			
 		}
 
-		setBG16(pi);
 		setRemittanceInformation(prList.isEmpty() ? null : prList.get(0).getValue());
 	}
 

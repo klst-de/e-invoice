@@ -36,12 +36,12 @@ public class CiiTest {
 	static private final String SUBJECT_CODE = "ADU";
 	static private final String NOTE_CONTENT = "A textual note that gives unstructured information that is relevant to the Invoice as a whole.";
 	
-	static private KositValidation check;
+	static private KositValidation validation;
 	static private Address testAddress;
 	
     @BeforeClass
     public static void staticSetup() {
-    	check = new KositValidation();
+    	validation = new KositValidation();
     	testAddress = new Address("CC", "9-PC", "String city", "String street");
     }
     
@@ -80,7 +80,7 @@ public class CiiTest {
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
-//    	assertTrue(check(bytes));
+    	assertTrue(validation.check(bytes));
    }
 
 	@Test
@@ -89,7 +89,7 @@ public class CiiTest {
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
-//    	assertTrue(check(bytes));
+    	assertTrue(validation.check(bytes));
    }
 
 	@Test
@@ -98,7 +98,7 @@ public class CiiTest {
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
-//    	assertTrue(check(bytes));
+    	assertTrue(validation.check(bytes));
    }
 
 	@Test
@@ -107,6 +107,6 @@ public class CiiTest {
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
-    	assertTrue(check.check(bytes));
+    	assertTrue(validation.check(bytes));
    }
 }

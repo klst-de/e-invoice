@@ -65,6 +65,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		this();
 		PaymentMeansCode pmc = tspm.getTypeCode()==null ? null : PaymentMeansCode.valueOf(tspm.getTypeCode());
 		String paymentMeansText = tspm.getInformation().isEmpty() ? null : tspm.getInformation().get(0).getValue();
+//		LOG.info("pmc:"+pmc + ", paymentMeansText:"+paymentMeansText);
 		init(pmc, paymentMeansText);
 		
 		CreditorFinancialAccountType payeePartyCreditorFinancialAccount = tspm.getPayeePartyCreditorFinancialAccount();
@@ -99,6 +100,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 	}
 	
 	void init(PaymentMeansCode code, String paymentMeansText) {
+		LOG.info("code:"+code + ", paymentMeansText:"+paymentMeansText);
 		if(code==null) return;
 		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
 		pmc.setValue(code.getValueAsString());

@@ -324,6 +324,19 @@ DueDateDateTime Fälligkeitsdatum
 		setPaymentTermsAndDate(description, DateTimeFormats.ymdToTs(ymd));
 	}
 
+//	public void setPaymentTerms(String paymentTerms) { // BT-20 + 0..1 Payment terms
+//		if(paymentTerms==null) return;
+//		TradePaymentTermsType tradePaymentTerm = new TradePaymentTermsType(); 
+//		tradePaymentTerm.getDescription().add(CrossIndustryInvoice.newTextType(paymentTerms));
+//		applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().add(tradePaymentTerm);
+//	}
+//	public String getPaymentTerms() {
+//		if(applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().isEmpty()) return null;
+//		List<TextType> descriptionList = applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().get(0).getDescription();
+//		return descriptionList==null ? null : descriptionList.get(0).getValue();
+//	}
+//
+
 	@Override
 	public void setPaymentTermsAndDate(String description, Timestamp ts) {
 		TradePaymentTermsType tradePaymentTerms = new TradePaymentTermsType();
@@ -870,22 +883,6 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	}
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
 		return this.applicableHeaderTradeSettlement.createCreditTransfer(iban, accountName, bic);
-	}
-
-	/*
-wg. val-sch.1.1 	BR-CO-25 	error 	
-[BR-CO-25]-In case the Amount due for payment (BT-115) is positive, 
-either the Payment due date (BT-9) or the Payment terms (BT-20) shall be present. 
-	 */
-	public void addPaymentTerms(String paymentTerms) {
-//		SupplyChainTradeTransactionType supplyChainTradeTransaction = getSupplyChainTradeTransaction();
-//		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
-		
-		TradePaymentTermsType tradePaymentTerm = new TradePaymentTermsType(); 
-		TextType text = new TextType();
-		text.setValue(paymentTerms);
-		tradePaymentTerm.getDescription().add(text);
-		applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().add(tradePaymentTerm);
 	}
 
 	// TODO Bauselle
