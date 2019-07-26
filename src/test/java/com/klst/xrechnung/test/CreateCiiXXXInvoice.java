@@ -14,6 +14,7 @@ import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
+import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.einvoice.unece.uncefact.VatBreakdown;
 import com.klst.marshaller.CiiTransformer;
 import com.klst.untdid.codelist.TaxCategoryCode;
@@ -54,8 +55,27 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		
 		makeOptionals(cii);
 		
-		cii.setSellerParty(testDoc.getSellerParty()); // statt makeSellerGroup(cii);
+
+		TradeParty sellerParty = testDoc.getSellerParty();
+		if(sellerParty.getSpecifiedTaxRegistration().isEmpty()) {
+			LOG.warning("sellerParty.getSpecifiedTaxRegistration().isEmpty() !!!!!!!!!!!!!" );
+		} else {
+			LOG.info("sellerParty.SpecifiedTaxRegistration#:"+sellerParty.getSpecifiedTaxRegistration().size()
+					+ " ID:"+sellerParty.getSpecifiedTaxRegistration().get(0).getID().getValue()
+					+ " schemeID:"+sellerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID()
+					);
+			if(sellerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID().equals("VA")) {
+				LOG.warning("Korrektur wg. https://github.com/klst-de/e-invoice/issues/5 schemeID is "+sellerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID());
+				sellerParty.getSpecifiedTaxRegistration().get(0).getID().setSchemeID(CoreInvoiceVatBreakdown.VAT);
+			} else {
+				LOG.info("schemeID is "+sellerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID());
+			}
+		}
+		
+		cii.setSellerParty(sellerParty);
 		cii.setBuyerParty(testDoc.getBuyerParty());
+		
+		cii.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp());
 		
 		cii.setPaymentInstructions(testDoc.getPaymentMeansCode(), null, testDoc.getRemittanceInformation()); //paymentMeansText, remittanceInformation);
 		CreditTransfer testCT = testDoc.getCreditTransfer();
