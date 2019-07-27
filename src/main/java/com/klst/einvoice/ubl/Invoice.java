@@ -1097,8 +1097,9 @@ Bsp: example-peppol-ubl-creditnote.xml :
 		setPaymentInstructions(code, paymentMeansText, remittanceInformation, ctList, paymentCard, directDebit);
 	}
 	public void setPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		// TODO
+			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
+		PaymentMeansType paymentMeans = new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransferList, paymentCard, directDebit);
+		super.getPaymentMeans().add(paymentMeans);
 	}
 	/**
 	 * mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER

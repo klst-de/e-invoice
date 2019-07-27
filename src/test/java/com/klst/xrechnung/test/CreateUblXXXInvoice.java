@@ -103,7 +103,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			if(paymentMeansCode==PaymentMeansCode.CreditTransfer
 					|| paymentMeansCode==PaymentMeansCode.DebitTransfer
 					) {
-				List<String> remittanceInformations = paymentInstruction.getRemittanceInformation();
+				List<String> remittanceInformations = paymentInstruction.getRemittanceInformation(); // TODO
 				String accountName = null;
 				LOG.warning("????? paymentInstruction.FinancialAccount.ID():"+
 						paymentInstruction.getFinancialAccount().getID().getValue() + " " + paymentInstruction.getFinancialAccount().getID().getSchemeID());
@@ -229,7 +229,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		paymentMeansList.forEach(paymentInstruction -> {
 			PaymentMeansCode paymentMeansCode = paymentInstruction.getPaymentMeans();
 			if(paymentMeansCode==PaymentMeansCode.CreditTransfer) {
-				List<String> remittanceInformations = paymentInstruction.getRemittanceInformation();
+				List<String> remittanceInformations = paymentInstruction.getRemittanceInformation(); // TODO
 				String accountName = null;
 				// das ist nicht richtig:
 //				IBANId iban = new IBANId(paymentInstruction.getFinancialAccount().getID().getValue());
