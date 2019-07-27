@@ -3,7 +3,6 @@ package com.klst.einvoice.ubl;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -11,8 +10,11 @@ import java.util.logging.Logger;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
+import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.DateTimeFormats;
@@ -30,7 +32,6 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Orde
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentTermsType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.SupplierPartyType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSubtotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BuyerReferenceType;
@@ -48,11 +49,8 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentM
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ProfileIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExclusiveAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxInclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPointDateType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
 // subklassen: CommercialInvoice , Partial invoice , Corrected invoice , Self-billed invoice
@@ -1082,6 +1080,26 @@ Bsp: example-peppol-ubl-creditnote.xml :
   </cac:PaymentMeans>
 
 	 */
+	/**
+	 * group PAYMENT INSTRUCTIONS, BG-16 Cardinality 0..1
+	 * 
+	 * @param code                   mandatory BT-81
+	 * @param paymentMeansText       optional  BT-82 (can be null)
+	 * @param remittanceInformation  optional  BT-83 (can be null)
+	 * @param creditTransfer         optional  BG-17 0..n, can be CreditTransfer object or List<CreditTransfer>
+	 * @param paymentCard            optional  BG-18 0..1
+	 * @param directDebit            optional  BG-19 0..1
+	 */
+	public void setPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation
+			, CreditTransfer creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		List<CreditTransfer> ctList = new ArrayList<CreditTransfer>();
+		if(creditTransfer!=null) ctList.add(creditTransfer);
+		setPaymentInstructions(code, paymentMeansText, remittanceInformation, ctList, paymentCard, directDebit);
+	}
+	public void setPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		// TODO
+	}
 	/**
 	 * mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER
 	 * 
