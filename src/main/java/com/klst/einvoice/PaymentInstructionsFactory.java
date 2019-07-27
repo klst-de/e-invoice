@@ -1,6 +1,6 @@
 package com.klst.einvoice;
 
-import com.klst.untdid.codelist.PaymentMeansCode;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 
 /**
  * abstract-factory, aka Kit for BG-16 PAYMENT INSTRUCTIONS
@@ -16,6 +16,6 @@ import com.klst.untdid.codelist.PaymentMeansCode;
 
 public interface PaymentInstructionsFactory {
 	
-	public PaymentInstructions createPaymentInstructions(PaymentMeansCode code, String paymentMeansText);
+	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText);
 	
 }

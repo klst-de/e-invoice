@@ -14,7 +14,7 @@ import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
-import com.klst.untdid.codelist.PaymentMeansCode;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
@@ -854,7 +854,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	ich implemetierte setXXX so, dass PaymentInstructions null sein darf
 
 		 */
-	PaymentInstructions createPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
+	PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
 		// ohne remittanceInformation:
 		return this.applicableHeaderTradeSettlement.createPaymentInstructions(code, paymentMeansText);
 	}
@@ -865,12 +865,12 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 * @param paymentMeansText       optional  BT-82 (can be null)
 	 * @param remittanceInformation  optional  BT-83
 	 */
-	public void setPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
+	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
 		PaymentInstructions pi = createPaymentInstructions(code, paymentMeansText, remittanceInformation);
 		this.applicableHeaderTradeSettlement.setBG16(pi);
 		this.applicableHeaderTradeSettlement.setRemittanceInformation(remittanceInformation);
 	}
-	public PaymentMeansCode getPaymentMeansCode() {
+	public PaymentMeansEnum getPaymentMeansCode() {
 		return this.applicableHeaderTradeSettlement.getPaymentMeansCode();
 	}
 	// BG-16.BT-83 - 0..1/0..1

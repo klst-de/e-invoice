@@ -19,7 +19,7 @@ import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
-import com.klst.untdid.codelist.PaymentMeansCode;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
@@ -1090,13 +1090,13 @@ Bsp: example-peppol-ubl-creditnote.xml :
 	 * @param paymentCard            optional  BG-18 0..1
 	 * @param directDebit            optional  BG-19 0..1
 	 */
-	public void setPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation
+	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, CreditTransfer creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		List<CreditTransfer> ctList = new ArrayList<CreditTransfer>();
 		if(creditTransfer!=null) ctList.add(creditTransfer);
 		setPaymentInstructions(code, paymentMeansText, remittanceInformation, ctList, paymentCard, directDebit);
 	}
-	public void setPaymentInstructions(PaymentMeansCode code, String paymentMeansText, String remittanceInformation
+	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
 		PaymentMeansType paymentMeans = new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransferList, paymentCard, directDebit);
 		super.getPaymentMeans().add(paymentMeans);
@@ -1110,11 +1110,11 @@ Bsp: example-peppol-ubl-creditnote.xml :
 	 * TODO @param String accountName                        BT-85 optional
 //	 * @return paymentMeansList with minimum 1 element
 	 */
-	public void setPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation, String accountName) {
+	public void setPaymentInstructions(PaymentMeansEnum paymentMeansCode, IBANId iban, String remittanceInformation, String accountName) {
 		FinancialAccountType ibanAccount = new FinancialAccount(iban); 
 		setPaymentInstructions(paymentMeansCode, ibanAccount, remittanceInformation, accountName);
 	}
-	public void setPaymentInstructions(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation, String accountName) {
+	public void setPaymentInstructions(PaymentMeansEnum paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation, String accountName) {
 		addPaymentInstructions(paymentMeansCode, financialAccount, remittanceInformation, accountName);
 	}
 //	public List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {
@@ -1122,7 +1122,7 @@ Bsp: example-peppol-ubl-creditnote.xml :
 //		return addPaymentInstructions(paymentMeansCode, ibanAccount, remittanceInformation);
 //	}
 	
-	List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, 
+	List<PaymentMeansType> addPaymentInstructions(PaymentMeansEnum paymentMeansCode, FinancialAccountType financialAccount, 
 			String remittanceInformation, String accountName) {
 		List<PaymentMeansType> paymentMeansList = super.getPaymentMeans();
 		LOG.info("paymentMeansCode:"+paymentMeansCode.toString() + ", (TODO)accountName:"+accountName + // TODO

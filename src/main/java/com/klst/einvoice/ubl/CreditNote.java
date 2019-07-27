@@ -14,7 +14,7 @@ import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
-import com.klst.untdid.codelist.PaymentMeansCode;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
@@ -473,14 +473,14 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	}
 
 	// wie BG-16  PAYMENT INSTRUCTIONS
-	public void setPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation, String accountName) {
+	public void setPaymentInstructions(PaymentMeansEnum paymentMeansCode, IBANId iban, String remittanceInformation, String accountName) {
 		FinancialAccountType ibanAccount = new FinancialAccount(iban); 
 		setPaymentInstructions(paymentMeansCode, ibanAccount, remittanceInformation, accountName);
 	}
-	public void setPaymentInstructions(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation, String accountName) {
+	public void setPaymentInstructions(PaymentMeansEnum paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation, String accountName) {
 		addPaymentInstructions(paymentMeansCode, financialAccount, remittanceInformation, accountName);
 	}
-	List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, 
+	List<PaymentMeansType> addPaymentInstructions(PaymentMeansEnum paymentMeansCode, FinancialAccountType financialAccount, 
 			String remittanceInformation, String accountName) {
 		List<PaymentMeansType> paymentMeansList = super.getPaymentMeans();
 		LOG.info("paymentMeansCode:"+paymentMeansCode.toString() + ", (TODO)accountName:"+accountName + // TODO

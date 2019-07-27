@@ -8,7 +8,7 @@ import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PaymentInstructionsFactory;
-import com.klst.untdid.codelist.PaymentMeansCode;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
@@ -27,7 +27,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 	PaymentInstructions pi;
 	
 	@Override // implements PaymentInstructionsFactory
-	public PaymentInstructions createPaymentInstructions(PaymentMeansCode code, String paymentMeansText) {
+	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText) {
 		return new TradeSettlementPaymentMeans(code, paymentMeansText);
 //		return new ApplicableHeaderTradeSettlement(code, paymentMeansText, null);
 	}
@@ -36,7 +36,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		LOG.info("do bg16( ... hts.SpecifiedTradeSettlementPaymentMeans, aka BG-16 tspmList#:" + tspmList.size());
 		
 		TradeSettlementPaymentMeansType tspm = null;
-		PaymentMeansCode pmc = null; // BT-81
+		PaymentMeansEnum pmc = null; // BT-81
 		String paymentMeansText = null;
 		
 		List<TextType> list = null; 
@@ -44,7 +44,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 			list = new ArrayList<TextType>();
 		} else {
 			tspm = tspmList.get(0);
-			pmc = PaymentMeansCode.valueOf(tspm.getTypeCode());
+			pmc = PaymentMeansEnum.valueOf(tspm.getTypeCode());
 			list = tspm.getInformation();  // BT-82 text des ersten tspmList elements!!!!
 			paymentMeansText = list.isEmpty() ? null : list.get(0).getValue();
 		}
@@ -85,7 +85,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		setRemittanceInformation(prList.isEmpty() ? null : prList.get(0).getValue());
 	}
 
-	public ApplicableHeaderTradeSettlement(PaymentMeansCode pmc, String paymentMeansText, String remittanceInformation) {
+	public ApplicableHeaderTradeSettlement(PaymentMeansEnum pmc, String paymentMeansText, String remittanceInformation) {
 		this();
 		super.getSpecifiedTradePaymentTerms(); // List<TradePaymentTermsType> 0..n
 		pi = createPaymentInstructions(pmc, paymentMeansText);
@@ -167,7 +167,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 	 */
 	
 	@Override
-	public void setPaymentMeans(PaymentMeansCode code, String text) { // code+text
+	public void setPaymentMeans(PaymentMeansEnum code, String text) { // code+text
 		TradeSettlementPaymentMeansType tspm = (TradeSettlementPaymentMeans)createPaymentInstructions(code, text); // use addBG16
 		super.getSpecifiedTradeSettlementPaymentMeans().add(tspm);
 //		TradeSettlementPaymentMeansType tspm = new TradeSettlementPaymentMeansType();
@@ -182,12 +182,12 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 //		super.getSpecifiedTradeSettlementPaymentMeans().add(tspm);
 	}
 	@Override
-	public void setPaymentMeansCode(PaymentMeansCode code) { // use addPaymentMeansCT
+	public void setPaymentMeansCode(PaymentMeansEnum code) { // use addPaymentMeansCT
 		setPaymentMeans(code, null);
 	}
 
 	@Override
-	public PaymentMeansCode getPaymentMeansCode() {
+	public PaymentMeansEnum getPaymentMeansCode() {
 		return pi.getPaymentMeansCode();
 //		List<TradeSettlementPaymentMeansType> tspmList = super.getSpecifiedTradeSettlementPaymentMeans();
 //		return tspmList.isEmpty() ? null : PaymentMeansCode.valueOf(tspmList.get(0).getTypeCode()); // Code des ersten tspmList elements!!!!

@@ -1,6 +1,6 @@
 package com.klst.einvoice;
 
-import com.klst.untdid.codelist.PaymentMeansCode;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 
 /**
  * BG-16 0..1 PAYMENT INSTRUCTIONS
@@ -57,8 +57,8 @@ public interface PaymentInstructions {
 	 * 59 : SEPA Direct Debit 
 	 * 97 : Report
 	 */
-	public PaymentMeansCode getPaymentMeansCode();
-	public void setPaymentMeansCode(PaymentMeansCode code); // use setPaymentMeans to set BT-81 + BT-82
+	public PaymentMeansEnum getPaymentMeansCode();
+	public void setPaymentMeansCode(PaymentMeansEnum code); // use setPaymentMeans to set BT-81 + BT-82
 
 	/**
 	 * Payment means text
@@ -83,7 +83,7 @@ public interface PaymentInstructions {
 	 * @param code mandatory BT-81
 	 * @param text optional  BT-82 (can be null)
 	 */
-	public void setPaymentMeans(PaymentMeansCode code, String text);
+	public void setPaymentMeans(PaymentMeansEnum code, String text);
 
 	/**
 	 * Remittance information

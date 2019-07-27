@@ -27,7 +27,7 @@ import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.marshaller.UblCreditNoteTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
 import com.klst.untdid.codelist.DocumentNameCode;
-import com.klst.untdid.codelist.PaymentMeansCode;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CommodityClassificationType;
@@ -99,9 +99,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("START PaymentGroup: paymentMeansList#:"+paymentMeansList.size());
 		paymentMeansList.forEach(paymentInstruction -> {
 			LOG.info("paymentInstruction PaymentMeans:" + paymentInstruction.toString());
-			PaymentMeansCode paymentMeansCode = paymentInstruction.getPaymentMeans();
-			if(paymentMeansCode==PaymentMeansCode.CreditTransfer
-					|| paymentMeansCode==PaymentMeansCode.DebitTransfer
+			PaymentMeansEnum paymentMeansCode = paymentInstruction.getPaymentMeans();
+			if(paymentMeansCode==PaymentMeansEnum.CreditTransfer
+					|| paymentMeansCode==PaymentMeansEnum.DebitTransfer
 					) {
 				List<String> remittanceInformations = paymentInstruction.getRemittanceInformation(); // TODO
 				String accountName = null;
@@ -227,8 +227,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	void makePaymentGroup(Invoice ublInvoice) {
 		List<PaymentMeans> paymentMeansList = testDoc.getPaymentInstructions();
 		paymentMeansList.forEach(paymentInstruction -> {
-			PaymentMeansCode paymentMeansCode = paymentInstruction.getPaymentMeans();
-			if(paymentMeansCode==PaymentMeansCode.CreditTransfer) {
+			PaymentMeansEnum paymentMeansCode = paymentInstruction.getPaymentMeans();
+			if(paymentMeansCode==PaymentMeansEnum.CreditTransfer) {
 				List<String> remittanceInformations = paymentInstruction.getRemittanceInformation(); // TODO
 				String accountName = null;
 				// das ist nicht richtig:
@@ -374,7 +374,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				PaymentMeans paymentInstruction = null;
 				if(paymentInstructions.isEmpty()) {
 					LOG.warning("paymentInstructions is empty");
-					paymentInstruction = new PaymentMeans(PaymentMeansCode.InCash, new FinancialAccount(new IBANId("nix")));
+					paymentInstruction = new PaymentMeans(PaymentMeansEnum.InCash, new FinancialAccount(new IBANId("nix")));
 				} else {
 					paymentInstruction = paymentInstructions.get(0); // first
 				}

@@ -10,7 +10,7 @@ import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
-import com.klst.untdid.codelist.PaymentMeansCode;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
@@ -106,14 +106,14 @@ CreditTransfer {
 	
 	// copy ctor
 	public PaymentMeans(PaymentMeansType paymentMeans) {
-		this(PaymentMeansCode.valueOf(paymentMeans.getPaymentMeansCode()), paymentMeans.getPayeeFinancialAccount());
+		this(PaymentMeansEnum.valueOf(paymentMeans.getPaymentMeansCode()), paymentMeans.getPayeeFinancialAccount());
 		LOG.info("ctor vor setPaymentIDs:"+this.toString());
 		setPaymentIDs(paymentMeans.getPaymentID());
 	}
 	
 	FinancialAccountType payeeFinancialAccount;
 	
-	public PaymentMeans(PaymentMeansCode code, String paymentMeansText, String remittanceInformation,
+	public PaymentMeans(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation,
 			List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
 		this();
 		init(code, paymentMeansText, remittanceInformation);
@@ -131,15 +131,15 @@ CreditTransfer {
 		}
 	}
 
-	void init(PaymentMeansCode code, String paymentMeansText, String remittanceInformation) {
+	void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
 		
 	}
 	
-	public PaymentMeans(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount) {
+	public PaymentMeans(PaymentMeansEnum paymentMeansCode, FinancialAccountType financialAccount) {
 		this(paymentMeansCode, financialAccount, null);
 	}
 	
-	PaymentMeans(PaymentMeansCode paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation) {
+	PaymentMeans(PaymentMeansEnum paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation) {
 		this();
 		
 		PaymentMeansCodeType paymentMeansCodeValue = new PaymentMeansCodeType();
@@ -174,9 +174,9 @@ CreditTransfer {
 		});
 	}
 	
-	public PaymentMeansCode getPaymentMeans() {
+	public PaymentMeansEnum getPaymentMeans() {
 		CodeType paymentMeansCode = super.getPaymentMeansCode();
-		return PaymentMeansCode.valueOf(paymentMeansCode);
+		return PaymentMeansEnum.valueOf(paymentMeansCode);
 	}
 	
 	public FinancialAccountType getFinancialAccount() {
@@ -201,13 +201,13 @@ CreditTransfer {
 	 * @param code BT-81 1..1 Code für die Zahlungsart
 	 * @param text BT-82 0..1 Text zur Zahlungsart
 	 */
-	public void setPaymentMeans(PaymentMeansCode code, String text) {
+	public void setPaymentMeans(PaymentMeansEnum code, String text) {
 		setPaymentMeans(code);
 		setPaymentMeansText(text);
 	}
 	
 	// BT-81 1..1 Code für die Zahlungsart
-	void setPaymentMeans(PaymentMeansCode code) {
+	void setPaymentMeans(PaymentMeansEnum code) {
 		PaymentMeansCodeType paymentMeansCodeValue = new PaymentMeansCodeType();
 		paymentMeansCodeValue.setValue(code.getValueAsString());
 		super.setPaymentMeansCode(paymentMeansCodeValue);

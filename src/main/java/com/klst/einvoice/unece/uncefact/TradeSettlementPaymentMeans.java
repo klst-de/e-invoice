@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.PaymentInstructions;
-import com.klst.untdid.codelist.PaymentMeansCode;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.CreditorFinancialAccountType;
@@ -63,7 +63,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 	// copy ctor
 	public TradeSettlementPaymentMeans(TradeSettlementPaymentMeansType tspm) {
 		this();
-		PaymentMeansCode pmc = tspm.getTypeCode()==null ? null : PaymentMeansCode.valueOf(tspm.getTypeCode());
+		PaymentMeansEnum pmc = tspm.getTypeCode()==null ? null : PaymentMeansEnum.valueOf(tspm.getTypeCode());
 		String paymentMeansText = tspm.getInformation().isEmpty() ? null : tspm.getInformation().get(0).getValue();
 //		LOG.info("pmc:"+pmc + ", paymentMeansText:"+paymentMeansText);
 		init(pmc, paymentMeansText);
@@ -94,12 +94,12 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		this.setPaymentServiceProviderID(bic);
 	}
 	
-	public TradeSettlementPaymentMeans(PaymentMeansCode code, String paymentMeansText) {
+	public TradeSettlementPaymentMeans(PaymentMeansEnum code, String paymentMeansText) {
 		this();
 		init(code, paymentMeansText);
 	}
 	
-	void init(PaymentMeansCode code, String paymentMeansText) {
+	void init(PaymentMeansEnum code, String paymentMeansText) {
 		LOG.info("code:"+code + ", paymentMeansText:"+paymentMeansText);
 		if(code==null) return;
 		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
@@ -193,12 +193,12 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 
 //	wg. implements PaymentInstructions : (ABER an RemittanceInformation komme ich nicht dran!) ---------------------------- :
 	@Override
-	public PaymentMeansCode getPaymentMeansCode() {
-		return PaymentMeansCode.valueOf(super.getTypeCode());
+	public PaymentMeansEnum getPaymentMeansCode() {
+		return PaymentMeansEnum.valueOf(super.getTypeCode());
 	}
 
 	@Override
-	public void setPaymentMeansCode(PaymentMeansCode code) {
+	public void setPaymentMeansCode(PaymentMeansEnum code) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -210,7 +210,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 	}
 
 	@Override
-	public void setPaymentMeans(PaymentMeansCode code, String text) {
+	public void setPaymentMeans(PaymentMeansEnum code, String text) {
 		// TODO Auto-generated method stub
 		
 	}
