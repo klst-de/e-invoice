@@ -871,7 +871,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		this.applicableHeaderTradeSettlement.setRemittanceInformation(remittanceInformation);
 	}
 	public PaymentMeansEnum getPaymentMeansCode() {
-		return this.applicableHeaderTradeSettlement.getPaymentMeansCode();
+		return this.applicableHeaderTradeSettlement.getPaymentMeansEnum();
 	}
 	// BG-16.BT-83 - 0..1/0..1
 	public String getRemittanceInformation() {

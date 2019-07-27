@@ -193,12 +193,12 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 
 //	wg. implements PaymentInstructions : (ABER an RemittanceInformation komme ich nicht dran!) ---------------------------- :
 	@Override
-	public PaymentMeansEnum getPaymentMeansCode() {
+	public PaymentMeansEnum getPaymentMeansEnum() {
 		return PaymentMeansEnum.valueOf(super.getTypeCode());
 	}
 
 	@Override
-	public void setPaymentMeansCode(PaymentMeansEnum code) {
+	public void setPaymentMeansEnum(PaymentMeansEnum code) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -57,7 +57,7 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeTy
               Amounts which two partners owe to each other to be compensated in order to avoid useless payments.
 
  */
-public enum PaymentMeansCode {
+public enum PaymentMeansEnum {
 
 	InCash 				(10),
 	Cheque				(20),
@@ -76,7 +76,7 @@ public enum PaymentMeansCode {
 	 */
 	public static final String SCHEME_ID  = "UN/EDIFACT 4461";
 
-	PaymentMeansCode(int value) {
+	PaymentMeansEnum(int value) {
 		this.value = value;
 	}
 	
@@ -90,23 +90,23 @@ public enum PaymentMeansCode {
 		return ""+value;
 	}
 
-    private static Map<Integer, PaymentMeansCode> map = new HashMap<Integer, PaymentMeansCode>();
+    private static Map<Integer, PaymentMeansEnum> map = new HashMap<Integer, PaymentMeansEnum>();
     static {
-        for (PaymentMeansCode documentNameCode : PaymentMeansCode.values()) {
+        for (PaymentMeansEnum documentNameCode : PaymentMeansEnum.values()) {
             map.put(documentNameCode.value, documentNameCode);
         }
     }
     
-    public static PaymentMeansCode valueOf(int code) {
+    public static PaymentMeansEnum valueOf(int code) {
         return map.get(code);
     }
 
-    public static PaymentMeansCode valueOf(CodeType ublCode) {
+    public static PaymentMeansEnum valueOf(CodeType ublCode) {
     	int code = Integer.parseInt(ublCode.getValue());
         return valueOf(code);
     }
 
-    public static PaymentMeansCode valueOf(PaymentMeansCodeType ciiCode) {
+    public static PaymentMeansEnum valueOf(PaymentMeansCodeType ciiCode) {
     	int code = Integer.parseInt(ciiCode.getValue());
         return valueOf(code);
     }

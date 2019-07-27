@@ -182,13 +182,13 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 //		super.getSpecifiedTradeSettlementPaymentMeans().add(tspm);
 	}
 	@Override
-	public void setPaymentMeansCode(PaymentMeansEnum code) { // use addPaymentMeansCT
+	public void setPaymentMeansEnum(PaymentMeansEnum code) { // use addPaymentMeansCT
 		setPaymentMeans(code, null);
 	}
 
 	@Override
-	public PaymentMeansEnum getPaymentMeansCode() {
-		return pi.getPaymentMeansCode();
+	public PaymentMeansEnum getPaymentMeansEnum() {
+		return pi.getPaymentMeansEnum();
 //		List<TradeSettlementPaymentMeansType> tspmList = super.getSpecifiedTradeSettlementPaymentMeans();
 //		return tspmList.isEmpty() ? null : PaymentMeansCode.valueOf(tspmList.get(0).getTypeCode()); // Code des ersten tspmList elements!!!!
 	}

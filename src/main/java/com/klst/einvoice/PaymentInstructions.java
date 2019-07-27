@@ -57,8 +57,8 @@ public interface PaymentInstructions {
 	 * 59 : SEPA Direct Debit 
 	 * 97 : Report
 	 */
-	public PaymentMeansEnum getPaymentMeansCode();
-	public void setPaymentMeansCode(PaymentMeansEnum code); // use setPaymentMeans to set BT-81 + BT-82
+	public PaymentMeansEnum getPaymentMeansEnum();
+	public void setPaymentMeansEnum(PaymentMeansEnum code); // use setPaymentMeans to set BT-81 + BT-82
 
 	/**
 	 * Payment means text
