@@ -16,7 +16,6 @@ import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.unece.uncefact.Amount;
-import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -25,7 +24,6 @@ import com.klst.untdid.codelist.TaxCategoryCode;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.MonetaryTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderReferenceType;
@@ -45,7 +43,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExte
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PayableAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentCurrencyCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentMeansCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ProfileIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExclusiveAmountType;
@@ -156,7 +153,14 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		setSellerParty(getSellerParty(doc));
 		setBuyerParty(getBuyerParty(doc));
 		addDeliveries(doc);
-		addPaymentInstructions(doc);		
+		
+		List<PaymentMeansType> pmList = doc.getPaymentMeans();
+		if(pmList.isEmpty()) {
+			// LOG
+		} else {
+			super.getPaymentMeans().add(new PaymentMeans(pmList.get(0)));
+		}
+		
 		setDocumentTotals(doc);
 		setInvoiceTax(getInvoiceTax(doc));
 		addVATBreakDown(getVATBreakDowns(doc));
@@ -1096,108 +1100,42 @@ Bsp: example-peppol-ubl-creditnote.xml :
 		if(creditTransfer!=null) ctList.add(creditTransfer);
 		setPaymentInstructions(code, paymentMeansText, remittanceInformation, ctList, paymentCard, directDebit);
 	}
+	
+	public List<CreditTransfer> getCreditTransfer() {
+		if(super.getPaymentMeans().isEmpty()) return null;
+//		return PaymentMeans.getCreditTransfer(super.getPaymentMeans().get(0));
+		LOG.info("PaymentMeans.Class:"+super.getPaymentMeans().get(0).getClass());
+//		return new FinancialAccount(super.getPaymentMeans().get(0).getPayerFinancialAccount());
+		PaymentMeans pm = (PaymentMeans)super.getPaymentMeans().get(0);
+		return pm.getCreditTransfer();
+	}
+/* wo die factory?
+public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic); // SEPA Überweisung
+ */
+
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
+		// TODO in ubl gibt ex keine List<CreditTransfer> !!!
 		PaymentMeansType paymentMeans = new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransferList, paymentCard, directDebit);
 		super.getPaymentMeans().add(paymentMeans);
 	}
-	/**
-	 * mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER
-	 * 
-	 * @param enum paymentMeansCode, BT-81 : use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
-	 * @param String iban to create ibanlAccount element
-	 * @param String remittanceInformation                   BT-83 optional
-	 * TODO @param String accountName                        BT-85 optional
-//	 * @return paymentMeansList with minimum 1 element
-	 */
-	public void setPaymentInstructions(PaymentMeansEnum paymentMeansCode, IBANId iban, String remittanceInformation, String accountName) {
-		FinancialAccountType ibanAccount = new FinancialAccount(iban); 
-		setPaymentInstructions(paymentMeansCode, ibanAccount, remittanceInformation, accountName);
-	}
-	public void setPaymentInstructions(PaymentMeansEnum paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation, String accountName) {
-		addPaymentInstructions(paymentMeansCode, financialAccount, remittanceInformation, accountName);
-	}
-//	public List<PaymentMeansType> addPaymentInstructions(PaymentMeansCode paymentMeansCode, IBANId iban, String remittanceInformation) {
-//		FinancialAccountType ibanAccount = new FinancialAccount(iban); // CreditTransfer extends FinancialAccountType
-//		return addPaymentInstructions(paymentMeansCode, ibanAccount, remittanceInformation);
-//	}
 	
-	List<PaymentMeansType> addPaymentInstructions(PaymentMeansEnum paymentMeansCode, FinancialAccountType financialAccount, 
-			String remittanceInformation, String accountName) {
-		List<PaymentMeansType> paymentMeansList = super.getPaymentMeans();
-		LOG.info("paymentMeansCode:"+paymentMeansCode.toString() + ", (TODO)accountName:"+accountName + // TODO
-				", paymentMeansList size="+paymentMeansList.size()); // == 0 beim ersten mal	
-		PaymentMeansType paymentMeans = new PaymentMeans(paymentMeansCode, financialAccount, remittanceInformation);
-		paymentMeansList.add(paymentMeans);
-		return paymentMeansList;
-	}
-
-	public List<PaymentMeans> getPaymentInstructions() {
-		return getPaymentInstructions(this);
-	}
-	static List<PaymentMeans> getPaymentInstructions(InvoiceType doc) {
-		List<PaymentMeansType> paymentMeansList = doc.getPaymentMeans();
-		List<PaymentMeans> result = new ArrayList<PaymentMeans>(paymentMeansList.size());
-		paymentMeansList.forEach(paymentMeans -> {
-			result.add(new PaymentMeans(paymentMeans));
-		});
-		return result;
+	public PaymentMeansEnum getPaymentMeansEnum() {
+		if(super.getPaymentMeans().isEmpty()) return null;
+		return PaymentMeans.getPaymentMeansEnum(super.getPaymentMeans().get(0));
 	}
 	
-	public List<PaymentMeansType> addPaymentInstructions(InvoiceType doc) {
-		List<PaymentMeansType> result = this.getPaymentMeans();
-		List<PaymentMeansType> paymentMeansList = doc.getPaymentMeans();
-		LOG.info(" VOR doc.PaymentMeansList#:"+paymentMeansList.size() + " result.List#:"+result.size());
-		paymentMeansList.forEach(paymentMeans -> {
-			PaymentMeansCodeType pmc = paymentMeans.getPaymentMeansCode();
-			if(pmc==null) {
-				LOG.info("pmc==null");
-			} else {
-				LOG.info("pmc:"+pmc.getValue());
-			}
-			addPaymentInstructions(result, paymentMeans); // nicht direkt, da noch eine iteration:
-		});
-		LOG.info("NACH doc.PaymentMeansList#:"+paymentMeansList.size() + " result.List#:"+result.size());
-		result.forEach(pmt -> {
-			PaymentMeans pm = (PaymentMeans)pmt;
-			LOG.info("pm:"+pm.toString());
-		});
-		
-		return result;
+	public String getPaymentMeansText() {
+		return null; // TODO
+//		if(super.getPaymentMeans().isEmpty()) return null;
+//		return PaymentMeans.getPaymentMeansText(super.getPaymentMeans().get(0));
 	}
-	private List<PaymentMeansType> addPaymentInstructions(List<PaymentMeansType> result, PaymentMeansType paymentMeans) {
-/*
-    <cac:PaymentMeans>
-        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
-        <cbc:PaymentID>Deb. 10202 + Fact. 12115118</cbc:PaymentID>
-        <cac:PayeeFinancialAccount>
-            <cbc:ID>NL57 RABO 0107307510</cbc:ID>
-        </cac:PayeeFinancialAccount>
-    </cac:PaymentMeans>
-    <cac:PaymentMeans>
-        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
-        <cbc:PaymentID>Deb. 10202 / Fact. 12115118</cbc:PaymentID>
-        <cac:PayeeFinancialAccount>
-            <cbc:ID>NL03 INGB 0004489902</cbc:ID>
-        </cac:PayeeFinancialAccount>
-    </cac:PaymentMeans>
-
- */
-		PaymentMeansType resPaymentMeans = new PaymentMeans(paymentMeans);
-//		resPaymentMeans.setPaymentMeansCode(paymentMeans.getPaymentMeansCode());  // PaymentMeansCode
-//		resPaymentMeans.setPayeeFinancialAccount(paymentMeans.getPayeeFinancialAccount());  // financialAccount, zB ibanlAccount
-//		List<PaymentIDType> resPaymentIDs = resPaymentMeans.getPaymentID();
-//		List<PaymentIDType> inpPaymentIDs = paymentMeans.getPaymentID();
-//		LOG.info("PayeeFinancialAccount="+paymentMeans.getPayeeFinancialAccount() + 
-//				", inpPaymentIDs#:"+inpPaymentIDs.size());
-//		inpPaymentIDs.forEach(paymentID -> {
-//			resPaymentIDs.add(paymentID);  // darin remittanceInformation
-//			LOG.info("remittanceInformation:"+paymentID.getValue());
-//		});
-		result.add(resPaymentMeans);
-		return result;
+	
+	public String getRemittanceInformation() {
+		if(super.getPaymentMeans().isEmpty()) return null;
+		return PaymentMeans.getRemittanceInformation(super.getPaymentMeans().get(0));
 	}
-
+	
 	/* DOCUMENT LEVEL ALLOWANCES                   BG-20                       0..*
 	 * Eine Gruppe von Informationselementen, die Informationen über Nachlässe liefern, die für die Rechnung als Ganzes gelten.
 	 */

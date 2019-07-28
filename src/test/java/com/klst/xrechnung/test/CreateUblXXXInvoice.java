@@ -10,7 +10,10 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
+import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.ubl.CommercialInvoice;
 import com.klst.einvoice.ubl.Contact;
 import com.klst.einvoice.ubl.CreditNote;
@@ -94,32 +97,16 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setSellerParty(testCreditNote.getSellerParty());
 		ublInvoice.setBuyerParty(testCreditNote.getBuyerParty());
 
-//		void makePaymentGroup(Invoice ublInvoice) {
-		List<PaymentMeans> paymentMeansList = testCreditNote.getPaymentInstructions();
-		LOG.info("START PaymentGroup: paymentMeansList#:"+paymentMeansList.size());
-		paymentMeansList.forEach(paymentInstruction -> {
-			LOG.info("paymentInstruction PaymentMeans:" + paymentInstruction.toString());
-			PaymentMeansEnum paymentMeansCode = paymentInstruction.getPaymentMeans();
-			if(paymentMeansCode==PaymentMeansEnum.CreditTransfer
-					|| paymentMeansCode==PaymentMeansEnum.DebitTransfer
-					) {
-				List<String> remittanceInformations = paymentInstruction.getRemittanceInformation(); // TODO
-				String accountName = null;
-				LOG.warning("????? paymentInstruction.FinancialAccount.ID():"+
-						paymentInstruction.getFinancialAccount().getID().getValue() + " " + paymentInstruction.getFinancialAccount().getID().getSchemeID());
-				if(paymentInstruction.getFinancialAccount().getID().getSchemeID()==null) {
-					FinancialAccountType fa = new FinancialAccount(paymentInstruction.getFinancialAccount().getID().getValue(), null, null);
-					ublInvoice.setPaymentInstructions(paymentMeansCode, fa, remittanceInformations.isEmpty() ? null : remittanceInformations.get(0), accountName);
-				} else if(paymentInstruction.getFinancialAccount().getID().getSchemeID().equals("IBAN")) {
-					IBANId iban = new IBANId(paymentInstruction.getFinancialAccount().getID().getValue());
-					ublInvoice.setPaymentInstructions(paymentMeansCode, iban, remittanceInformations.isEmpty() ? null : remittanceInformations.get(0), accountName);
-				} else {
-					LOG.warning("TODO:"+paymentInstruction.getFinancialAccount().getID().getSchemeID());
-				}
-			} else {
-				LOG.warning("TODO:"+paymentMeansCode);
-			}
-		});
+		PaymentMeansEnum code = testCreditNote.getPaymentMeansEnum();
+		String paymentMeansText = testCreditNote.getPaymentMeansText();
+		String remittanceInformation = testCreditNote.getRemittanceInformation();
+		LOG.info("code:"+code + " paymentMeansText:"+paymentMeansText + " remittanceInformation:"+remittanceInformation);
+		List<CreditTransfer> creditTransfer = testCreditNote.getCreditTransfer();
+		PaymentCard paymentCard = null;
+		DirectDebit directDebit = null;
+		ublInvoice.setPaymentInstructions(code, paymentMeansText, remittanceInformation
+				, creditTransfer, paymentCard, directDebit);
+		
 		ublInvoice.setPaymentTermsAndDate(testCreditNote.getPaymentTerm(), testCreditNote.getDueDateAsTimestamp());
 		LOG.info("finished PaymentGroup.");
 
@@ -225,29 +212,15 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makePaymentGroup(Invoice ublInvoice) {
-		List<PaymentMeans> paymentMeansList = testDoc.getPaymentInstructions();
-		paymentMeansList.forEach(paymentInstruction -> {
-			PaymentMeansEnum paymentMeansCode = paymentInstruction.getPaymentMeans();
-			if(paymentMeansCode==PaymentMeansEnum.CreditTransfer) {
-				List<String> remittanceInformations = paymentInstruction.getRemittanceInformation(); // TODO
-				String accountName = null;
-				// das ist nicht richtig:
-//				IBANId iban = new IBANId(paymentInstruction.getFinancialAccount().getID().getValue());
-				LOG.warning("????? paymentInstruction.FinancialAccount.ID():"+
-						paymentInstruction.getFinancialAccount().getID().getValue() + " " + paymentInstruction.getFinancialAccount().getID().getSchemeID());
-				if(paymentInstruction.getFinancialAccount().getID().getSchemeID()==null) {
-					FinancialAccountType fa = new FinancialAccount(paymentInstruction.getFinancialAccount().getID().getValue(), null, null);
-					ublInvoice.setPaymentInstructions(paymentMeansCode, fa, remittanceInformations.isEmpty() ? null : remittanceInformations.get(0), accountName);
-				} else if(paymentInstruction.getFinancialAccount().getID().getSchemeID().equals("IBAN")) {
-					IBANId iban = new IBANId(paymentInstruction.getFinancialAccount().getID().getValue());
-					ublInvoice.setPaymentInstructions(paymentMeansCode, iban, remittanceInformations.isEmpty() ? null : remittanceInformations.get(0), accountName);
-				} else {
-					LOG.warning("TODO:"+paymentInstruction.getFinancialAccount().getID().getSchemeID());
-				}
-			} else {
-				LOG.warning("TODO:"+paymentMeansCode);
-			}
-		});
+		PaymentMeansEnum code = testDoc.getPaymentMeansEnum();
+		String paymentMeansText = testDoc.getPaymentMeansText();
+		String remittanceInformation = testDoc.getRemittanceInformation();
+		LOG.info("code:"+code + " paymentMeansText:"+paymentMeansText + " remittanceInformation:"+remittanceInformation);
+		List<CreditTransfer> creditTransfer = testDoc.getCreditTransfer();
+		PaymentCard paymentCard = null;
+		DirectDebit directDebit = null;
+		ublInvoice.setPaymentInstructions(code, paymentMeansText, remittanceInformation
+				, creditTransfer, paymentCard, directDebit);
 
 		ublInvoice.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp());
 		LOG.info("finished.");
@@ -370,14 +343,14 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					buyerContact = new Contact("nix", "0", "nix@nix.nix");
 				}
 				
-				List<PaymentMeans> paymentInstructions = cmInvoice.getPaymentInstructions();
-				PaymentMeans paymentInstruction = null;
-				if(paymentInstructions.isEmpty()) {
-					LOG.warning("paymentInstructions is empty");
-					paymentInstruction = new PaymentMeans(PaymentMeansEnum.InCash, new FinancialAccount(new IBANId("nix")));
-				} else {
-					paymentInstruction = paymentInstructions.get(0); // first
-				}
+//				List<PaymentMeans> paymentInstructions = cmInvoice.getPaymentInstructions();
+//				PaymentMeans paymentInstruction = null;
+//				if(paymentInstructions.isEmpty()) {
+//					LOG.warning("paymentInstructions is empty");
+//					paymentInstruction = new PaymentMeans(PaymentMeansEnum.InCash, new FinancialAccount(new IBANId("nix")));
+//				} else {
+//					paymentInstruction = paymentInstructions.get(0); // first
+//				}
 				
 				String paymentTerm = cmInvoice.getPaymentTerm();
 				
@@ -433,8 +406,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 						" \ninvoice InvoiceTotalTaxInclusive="+	cmInvoice.getInvoiceTotalTaxInclusive() +					
 						" \ninvoice DuePayable="+				cmInvoice.getDuePayable() +					
 						" \ninvoice InvoiceTax="+				cmInvoice.getInvoiceTax() +					
-						" \ninvoice paymentInstructions#:"+		cmInvoice.getPaymentInstructions().size() +					
-						" \ninvoice paymentInstruction.PaymentMeans="+	paymentInstruction.getPaymentMeans()+" "+paymentInstruction.getFinancialAccount().getID().getValue() +				
+//						" \ninvoice paymentInstructions#:"+		cmInvoice.getPaymentInstructions().size() +					
+//						" \ninvoice paymentInstruction.PaymentMeans="+	paymentInstruction.getPaymentMeansEnum()+" "+paymentInstruction.getFinancialAccount().getID().getValue() +				
 						" \ninvoice paymentTerms.1st Note="+	paymentTerm +				
 //						" \ninvoice VATBreakDown.TaxableAmount="+	vatBreakDown.get(TaxableAmountType.class) +					
 //						" \ninvoice VATBreakDown.TaxAmount="+		vatBreakDown.get(TaxAmountType.class) +					

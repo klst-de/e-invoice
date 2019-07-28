@@ -8,8 +8,6 @@ import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
-import com.klst.einvoice.unece.uncefact.BICId;
-import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
@@ -85,6 +83,8 @@ Bsp: example-peppol-ubl-creditnote.xml :
     </cac:PayeeFinancialAccount>
   </cac:PaymentMeans>
 
+Bsp: ubl-tc434-example1.xml       hat mehrere cac:PaymentMeans
+
 Bsp: miad :
     <cac:PaymentMeans>
         <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
@@ -95,8 +95,7 @@ Bsp: miad :
     </cac:PaymentMeans>
 
  */
-public class PaymentMeans extends PaymentMeansType implements // TODO PaymentInstructions, 
-CreditTransfer {
+public class PaymentMeans extends PaymentMeansType implements PaymentInstructions {
 
 	private static final Logger LOG = Logger.getLogger(PaymentMeans.class.getName());
 	
@@ -105,10 +104,14 @@ CreditTransfer {
 	}
 	
 	// copy ctor
-	public PaymentMeans(PaymentMeansType paymentMeans) {
-		this(PaymentMeansEnum.valueOf(paymentMeans.getPaymentMeansCode()), paymentMeans.getPayeeFinancialAccount());
-		LOG.info("ctor vor setPaymentIDs:"+this.toString());
-		setPaymentIDs(paymentMeans.getPaymentID());
+	public PaymentMeans(PaymentMeansType doc) {
+		this();
+		String paymentMeansText = null; // TODO wie unten
+		String remittanceInformation = doc.getPaymentID().isEmpty() ? null : doc.getPaymentID().get(0).getValue();
+		init(PaymentMeansEnum.valueOf(doc.getPaymentMeansCode()), paymentMeansText, remittanceInformation);
+		LOG.info("ctor vor new FinancialAccount: "+this.toString() + " remittanceInformation:"+remittanceInformation);
+		payeeFinancialAccount = new FinancialAccount(doc.getPayeeFinancialAccount());
+		super.setPayeeFinancialAccount(payeeFinancialAccount);
 	}
 	
 	FinancialAccountType payeeFinancialAccount;
@@ -119,9 +122,9 @@ CreditTransfer {
 		init(code, paymentMeansText, remittanceInformation);
 		if(creditTransferList.isEmpty() && paymentCard==null && directDebit==null) return;
 		
-		payeeFinancialAccount = new FinancialAccountType();
+		payeeFinancialAccount = new FinancialAccount();
 		creditTransferList.forEach(creditTransfer -> {
-			// TODO
+			payeeFinancialAccount = (FinancialAccount)creditTransfer;
 		});
 		if(paymentCard!=null) {
 			// TODO
@@ -129,61 +132,14 @@ CreditTransfer {
 		if(directDebit!=null) {
 			// TODO
 		}
+		super.setPayeeFinancialAccount(payeeFinancialAccount);
 	}
 
 	void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
-		
+		setPaymentMeans(code, paymentMeansText);
+		setRemittanceInformation(remittanceInformation);
 	}
 	
-	public PaymentMeans(PaymentMeansEnum paymentMeansCode, FinancialAccountType financialAccount) {
-		this(paymentMeansCode, financialAccount, null);
-	}
-	
-	PaymentMeans(PaymentMeansEnum paymentMeansCode, FinancialAccountType financialAccount, String remittanceInformation) {
-		this();
-		
-		PaymentMeansCodeType paymentMeansCodeValue = new PaymentMeansCodeType();
-		// Payment means type code                     BT-81 Code                  1 (mandatory)
-		//  Das als Code ausgedrückte erwartete oder genutzte Zahlungsmittel:
-		paymentMeansCodeValue.setValue(paymentMeansCode.getValueAsString());
-		super.setPaymentMeansCode(paymentMeansCodeValue);
-		
-		LOG.info("!!!!!!!!!!!! FinancialAccountType.ID:"+ (financialAccount.getID()==null ? null : financialAccount.getID().getValue()));
-		LOG.info("!!!!!!!!!!!! FinancialAccountType.FinancialInstitutionBranch:"+ (financialAccount.getFinancialInstitutionBranch()==null ? null 
-				: financialAccount.getFinancialInstitutionBranch().getFinancialInstitution()));
-		FinancialAccountType fa = new FinancialAccount(financialAccount);
-//		if(financialAccount.getID()!=null) {
-//			fa.setID(Invoice.newIDType(financialAccount.getID().getValue(), financialAccount.getID().getSchemeID()));	
-//		}
-		super.setPayeeFinancialAccount(fa);
-
-		// Remittance information                      BT-83 Text                  0..1 optional
-		// Ein Textwert, der zur Verknüpfung der Zahlung mit der vom Verkäufer ausgestellten Rechnung verwendet wird.
-		if(remittanceInformation!=null) {
-			List<PaymentIDType> paymentIDs = super.getPaymentID();
-			PaymentIDType paymentID = new PaymentIDType();
-			paymentID.setValue(remittanceInformation);
-			paymentIDs.add(paymentID);
-		}
-	}
-
-	void setPaymentIDs(List<PaymentIDType> paymentIDs) {
-		List<PaymentIDType> myPaymentIDs = super.getPaymentID();
-		paymentIDs.forEach(paymentID -> {
-			myPaymentIDs.add(paymentID);
-		});
-	}
-	
-	public PaymentMeansEnum getPaymentMeans() {
-		CodeType paymentMeansCode = super.getPaymentMeansCode();
-		return PaymentMeansEnum.valueOf(paymentMeansCode);
-	}
-	
-	public FinancialAccountType getFinancialAccount() {
-		return super.getPayeeFinancialAccount();
-	}
-	
-
 	public String toString() {
 		List<PaymentIDType> paymentIDList = super.getPaymentID();
 		String paymentIDs = paymentIDList.isEmpty() ? null : ("#="+paymentIDList.size() + ","+paymentIDList.get(0).getValue()+",...");
@@ -191,7 +147,7 @@ CreditTransfer {
 		String channelCode = paymentChannelCode==null ? null : paymentChannelCode.getValue();
 		FinancialAccountType fa = super.getPayerFinancialAccount();
 		String financialAccount = fa==null ? null : (fa.getID()==null ? null : fa.getID().getValue());
-		return "Code:"+getPaymentMeans().getValueAsString() + ", paymentIDs:"+paymentIDs + 
+		return "Code:"+getPaymentMeansEnum().getValueAsString() + ", paymentIDs:"+paymentIDs + 
 				", paymentChannelCode:"+channelCode + ", financialAccount:"+financialAccount;
 	}
 
@@ -201,18 +157,20 @@ CreditTransfer {
 	 * @param code BT-81 1..1 Code für die Zahlungsart
 	 * @param text BT-82 0..1 Text zur Zahlungsart
 	 */
+	@Override
 	public void setPaymentMeans(PaymentMeansEnum code, String text) {
-		setPaymentMeans(code);
+		setPaymentMeansEnum(code);
 		setPaymentMeansText(text);
 	}
 	
+	@Override
 	// BT-81 1..1 Code für die Zahlungsart
-	void setPaymentMeans(PaymentMeansEnum code) {
+	public void setPaymentMeansEnum(PaymentMeansEnum code) {
 		PaymentMeansCodeType paymentMeansCodeValue = new PaymentMeansCodeType();
 		paymentMeansCodeValue.setValue(code.getValueAsString());
 		super.setPaymentMeansCode(paymentMeansCodeValue);
 	}
-	
+
 	// BT-82 0..1 Text zur Zahlungsart
 	void setPaymentMeansText(String text) {
 		if(text==null) return; // optional
@@ -222,6 +180,8 @@ CreditTransfer {
 		super.getInstructionNote().add(instructionNote);
 	}
 	
+	@Override
+	// BT-83 0..1 Verwendungszweck
 	public void setRemittanceInformation(String text) {
 		if(text==null) return; // optional, Bsp in 01.14a-INVOICE_ubl.xml : <cbc:PaymentID>Deb. 12345 / Fact. 9876543</cbc:PaymentID>
 		// 01.15a-INVOICE_ubl.xml : <cbc:PaymentID>0000123456</cbc:PaymentID>
@@ -231,31 +191,33 @@ CreditTransfer {
 		paymentIDs.add(paymentID);
 	}
 	
-//	@Override
-//	public PaymentMeansCode getPaymentMeansCode() { // TODO muss umbenannt werden
-//		// The return type is incompatible with PaymentMeansType.getPaymentMeansCode()
-//		// TODO Auto-generated method stub
-//		return null;
+	@Override
+	public PaymentMeansEnum getPaymentMeansEnum() {
+		CodeType paymentMeansCode = super.getPaymentMeansCode();
+		return PaymentMeansEnum.valueOf(paymentMeansCode);
+	}
+//	@Deprecated
+//	public PaymentMeansEnum getPaymentMeans() {
+//		CodeType paymentMeansCode = super.getPaymentMeansCode();
+//		return PaymentMeansEnum.valueOf(paymentMeansCode);
 //	}
-//
-//	@Override
-//	public void setPaymentMeansCode(PaymentMeansCode code) {
-//		// TODO Auto-generated method stub
-//		
-//	}
-//
-//	@Override
-//	public String getPaymentMeansText() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	@Override
-//	public String getRemittanceInformation() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-	public List<String> getRemittanceInformation() { // TODO raus
+	static PaymentMeansEnum getPaymentMeansEnum(PaymentMeansType doc) {
+		CodeType paymentMeansCode = doc.getPaymentMeansCode();
+		return PaymentMeansEnum.valueOf(paymentMeansCode);
+	}
+
+	
+	@Override
+	public String getPaymentMeansText() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getRemittanceInformation() {
+		return super.getPaymentID().isEmpty() ? null : getRemittanceInformationList().get(0);
+	}
+	List<String> getRemittanceInformationList() {
 		List<PaymentIDType> paymentIDs = super.getPaymentID();
 		List<String> result = new ArrayList<String>(paymentIDs.size());
 		paymentIDs.forEach(paymentID -> {
@@ -263,62 +225,25 @@ CreditTransfer {
 		});
 		return result;
 	}
-
-//	----------------------------- implements CreditTransfer:
+	static String getRemittanceInformation(PaymentMeansType doc) {
+		return doc.getPaymentID().isEmpty() ? null : doc.getPaymentID().get(0).getValue();
+	}
+//	@Deprecated
+//	void setPaymentIDs(List<PaymentIDType> paymentIDs) {
+//		List<PaymentIDType> myPaymentIDs = super.getPaymentID();
+//		paymentIDs.forEach(paymentID -> {
+//			myPaymentIDs.add(paymentID);
+//		});
+//	}
 	
-	public List<CreditTransfer> getCreditTransfer() {
-		FinancialAccountType payeeFinancialAccount = super.getPayeeFinancialAccount(); // PayeeFinancialAccount
-		return null;
-		// TODO;  ?? doch noch ein FinancialAccount extends FinancialAccountType ?
+	public List<CreditTransfer> getCreditTransfer() { // CreditTransfer ist Interface
+		List<CreditTransfer> result = new ArrayList<CreditTransfer>();
+		if(payeeFinancialAccount==null) {
+			// LOG
+		} else {
+			result.add((FinancialAccount)payeeFinancialAccount);
+		}
+		return result;
 	}
 	
-	@Override
-	public String getPaymentAccountID() {
-		FinancialAccountType payeeFinancialAccount = super.getPayeeFinancialAccount(); 
-		if(payeeFinancialAccount==null) return null;
-		return payeeFinancialAccount.getID().getValue();
-	}
-
-	@Override
-	public void setPaymentAccountID(IBANId iban) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setPaymentAccountID(String id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getPaymentAccountName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setPaymentAccountName(String name) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getPaymentServiceProviderID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setPaymentServiceProviderID(BICId id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setPaymentServiceProviderID(String id) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
