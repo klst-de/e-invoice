@@ -11,6 +11,7 @@ import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.DocumentTotals;
@@ -18,6 +19,7 @@ import com.klst.einvoice.IContact;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentCardFactory;
 import com.klst.einvoice.unece.uncefact.Amount;
+import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
@@ -97,7 +99,7 @@ oder sensibler Daten Gebrauch gemacht werden.
 INVOICE LINE                                BG-25                       1..*
  */
 public class Invoice extends InvoiceType implements CoreInvoice, DocumentTotals
-	, PaymentCardFactory, DirectDebitFactory {
+	, CreditTransferFactory, PaymentCardFactory, DirectDebitFactory {
 
 	/*
 		customizationIDType.setValue("urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2");
@@ -1123,6 +1125,16 @@ Bsp: example-peppol-ubl-creditnote.xml :
 
 /*  die factories hier!!!!!! und nicht in class FinancialAccount TODO
  */
+	@Override
+	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
+		return new FinancialAccount(iban, accountName, bic);
+	}
+
+	@Override
+	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic) {
+		return new FinancialAccount(accountId, accountName, bic);
+	}
+
 	@Override
 	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
 		LOG.warning(NOT_IMPEMENTED); // TODO

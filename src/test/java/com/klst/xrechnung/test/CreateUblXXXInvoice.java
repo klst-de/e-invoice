@@ -241,7 +241,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		}
 		
 		ublInvoice.setPaymentInstructions(code, paymentMeansText, remittanceInformation
-				, creditTransfer, paymentCard, directDebit);
+				, creditTransfer, paymentCard, directDebit); // dd statt directDebit geht auch
 
 		ublInvoice.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp());
 		LOG.info("finished.");

@@ -1,7 +1,6 @@
 package com.klst.einvoice.ubl;
 
 import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
 
@@ -10,8 +9,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Fina
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 
 // Gruppe CREDIT TRANSFER                   BG-17
-// TODO BG-18 BG-19
-public class FinancialAccount extends FinancialAccountType implements CreditTransfer, CreditTransferFactory {
+public class FinancialAccount extends FinancialAccountType implements CreditTransfer {
 
 	FinancialAccount() {
 		super();
@@ -100,21 +98,6 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 		BranchType branch = new BranchType();
 		branch.setID(Invoice.newIDType(id, schema));
 		super.setFinancialInstitutionBranch(branch);
-	}
-
-//	----------------------------- implements CreditTransferFactory: TODO vll doch in Invoice?
-	
-	@Override
-	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
-		return new FinancialAccount(iban, accountName, bic);
-	}
-//	public static CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
-//		return new FinancialAccount(iban, accountName, bic);
-//	}
-
-	@Override
-	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic) {
-		return new FinancialAccount(accountId, accountName, bic);
 	}
 
 }
