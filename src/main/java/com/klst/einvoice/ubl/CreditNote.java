@@ -83,6 +83,8 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		super.getTaxTotal().add(taxTotalFirst); // garantiert ein elem in List<TaxTotalType> 
 		setProcessControl(customization, profile);
 		setTypeCode(code); // BT-3		
+		sellerParty = null;
+		buyerParty = null;		
 	}
 
 	// cache:
@@ -118,7 +120,6 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		
 		setDocumentTotals(doc);
 		setInvoiceTax(getInvoiceTax(doc));
-//		addVATBreakDown(doc);
 		addVATBreakDown(getVATBreakDowns(doc));
 		addLines(doc);
 		LOG.info("ctor ENDE.");
@@ -213,18 +214,24 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	}
 
 	// wie BT-9  Payment due date
-//	public void setDueDate(String ymd) {
-//		setDueDate(DateTimeFormats.ymdToTs(ymd));
-//	}
-	public void setDueDate(Timestamp ts) {
-		if(ts==null) return; // optional
-		return; // TODO not implemented
+	void setDueDate(Timestamp ts) {
+//		if(ts==null) return; // optional
+//		DueDateType dueDate = new DueDateType();
+//		dueDate.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
+//		super.setDueDate(dueDate);
 	}
+	
+	@Override
 	public Timestamp getDueDateAsTimestamp() {
-		return null; // TODO not implemented
+		return getDueDateAsTimestamp(this);
 	}
-
-	@Override // wie BT-9  Payment due date & BT-20 Payment terms
+	static Timestamp getDueDateAsTimestamp(CreditNoteType doc) {
+		return null;
+//		DueDateType dueDate = doc.getDueDate();
+//		return dueDate==null ? null : DateTimeFormats.xmlGregorianCalendarToTs(dueDate.getValue());
+	}
+	
+	@Override
 	public void setPaymentTermsAndDate(String description, String ymd) {
 		setPaymentTermsAndDate(description, DateTimeFormats.ymdToTs(ymd));
 	}
@@ -234,6 +241,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		addPaymentTerms(description); // BT-20 optional
 		setDueDate(ts); // BT-9 optional
 	}
+
 
 	// wie BT-10  Text
 	public void setBuyerReference(String reference) {
@@ -301,7 +309,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		return result;
 	}
 	
-	public List<PaymentTermsType> addPaymentTerms(String paymentTermsNote) {
+	List<PaymentTermsType> addPaymentTerms(String paymentTermsNote) {
 		PaymentTermsType paymentTerms = new PaymentTerms(paymentTermsNote);
 		List<PaymentTermsType> paymentTermsList = this.getPaymentTerms();
 		paymentTermsList.add(paymentTerms);
