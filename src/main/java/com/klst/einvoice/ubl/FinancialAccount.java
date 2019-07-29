@@ -39,12 +39,17 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 
 //	----------------------------- implements CreditTransfer:
 	
+	/*
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CreditTransfer#getPaymentAccountID()
+	 */
 	@Override
 	public String getPaymentAccountID() {
 		return super.getID().getValue();
 	}
 
 	@Override
+	// 1..1 BT-84   IBANID        Kennung des Zahlungskontos
 	public void setPaymentAccountID(IBANId iban) {
 		super.setID(Invoice.newIDType(iban.getValue(), iban.getSchemeID()));
 	}
@@ -54,12 +59,17 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 		super.setID(Invoice.newIDType(id, null));	
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CreditTransfer#getPaymentAccountName()
+	 */
 	@Override
 	public String getPaymentAccountName() {
 		return super.getName()==null ? null : super.getName().getValue();
 	}
 
 	@Override
+	// BT-85 0..1 Payment account name, AccountName, Name des Zahlungskontos
 	public void setPaymentAccountName(String name) {
 		if(name==null) return; // optional
 		NameType n = new NameType();
@@ -67,6 +77,10 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 		super.setName(n);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.klst.einvoice.CreditTransfer#getPaymentServiceProviderID()
+	 */
 	@Override
 	public String getPaymentServiceProviderID() {
 		return getPaymentServiceProviderID(this);
@@ -79,7 +93,9 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 	}
 
 	@Override
+	// BT-86 0..1 Payment service provider identifier, BICID,  Kennung des Zahlungsdienstleisters
 	public void setPaymentServiceProviderID(BICId id) {
+		if(id==null) return; // optional
 		setPaymentServiceProviderID(id.getValue(), id.getSchemeID());
 	}
 
