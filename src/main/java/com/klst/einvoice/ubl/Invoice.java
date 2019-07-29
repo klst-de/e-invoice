@@ -12,10 +12,13 @@ import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PaymentCard;
+import com.klst.einvoice.PaymentCardFactory;
 import com.klst.einvoice.unece.uncefact.Amount;
+import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -93,7 +96,8 @@ Von der Möglichkeit der Trennung von Rechnung und rechnungsbegründenden Unterl
 oder sensibler Daten Gebrauch gemacht werden.
 INVOICE LINE                                BG-25                       1..*
  */
-public class Invoice extends InvoiceType implements CoreInvoice, DocumentTotals {
+public class Invoice extends InvoiceType implements CoreInvoice, DocumentTotals
+	, PaymentCardFactory, DirectDebitFactory {
 
 	/*
 		customizationIDType.setValue("urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2");
@@ -1109,13 +1113,38 @@ Bsp: example-peppol-ubl-creditnote.xml :
 		PaymentMeans pm = (PaymentMeans)super.getPaymentMeans().get(0);
 		return pm.getCreditTransfer();
 	}
-/* wo die factory?
-public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic); // SEPA Überweisung
+	
+	public DirectDebit getDirectDebit() {
+		if(super.getPaymentMeans().isEmpty()) return null;
+		LOG.info("PaymentMeans.Class:"+super.getPaymentMeans().get(0).getClass());
+		PaymentMeans pm = (PaymentMeans)super.getPaymentMeans().get(0);
+		return pm.getDirectDebit();
+	}
+
+/*  die factories hier!!!!!! und nicht in class FinancialAccount TODO
  */
+	@Override
+	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
+		LOG.warning(NOT_IMPEMENTED); // TODO
+		return null;
+	}
+	@Override
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
+		LOG.warning(NOT_IMPEMENTED); // TODO
+		return null;
+	}
+
+	@Override
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
+		DirectDebit dd = new PaymentMandate(debitedAccountID); 
+		dd.setMandateReferencetID(mandateID);
+		dd.setBankAssignedCreditorID(bankAssignedCreditorID);
+		return dd;
+	}
 
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
-		// TODO in ubl gibt ex keine List<CreditTransfer> !!!
+		// TODO in ubl gibt ex keine List<CreditTransfer> !!! ABER mehrere PaymentMeans , siehe pepol
 		PaymentMeansType paymentMeans = new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransferList, paymentCard, directDebit);
 		super.getPaymentMeans().add(paymentMeans);
 	}

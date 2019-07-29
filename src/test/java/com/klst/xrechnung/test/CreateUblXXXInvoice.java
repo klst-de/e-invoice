@@ -26,6 +26,7 @@ import com.klst.einvoice.ubl.Percent;
 import com.klst.einvoice.ubl.VatBreakdown;
 import com.klst.einvoice.ubl.VatCategory;
 import com.klst.einvoice.unece.uncefact.Amount;
+import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.marshaller.UblCreditNoteTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
@@ -212,13 +213,33 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makePaymentGroup(Invoice ublInvoice) {
-		PaymentMeansEnum code = testDoc.getPaymentMeansEnum();
+		PaymentMeansEnum code = testDoc.getPaymentMeansEnum(); // TODO besser testDoc.getPaymentMeans().getPaymentMeansEnum()
 		String paymentMeansText = testDoc.getPaymentMeansText();
 		String remittanceInformation = testDoc.getRemittanceInformation();
 		LOG.info("code:"+code + " paymentMeansText:"+paymentMeansText + " remittanceInformation:"+remittanceInformation);
+		
 		List<CreditTransfer> creditTransfer = testDoc.getCreditTransfer();
-		PaymentCard paymentCard = null;
+		if(creditTransfer.isEmpty()) {
+			LOG.warning("creditTransfer.isEmpty");
+		} else {
+			IBANId iban = new IBANId(creditTransfer.get(0).getPaymentAccountID());
+			String accountName = creditTransfer.get(0).getPaymentAccountName();
+			BICId bic = new BICId(creditTransfer.get(0).getPaymentServiceProviderID());
+			LOG.info("iban:"+iban + " accountName:"+accountName + " bic:"+bic);
+//			CreditTransfer ct = FinancialAccount.createCreditTransfer(iban, accountName, bic);
+		}
+		
+		PaymentCard paymentCard = ublInvoice.createPaymentCard(null, null);
+		
 		DirectDebit directDebit = null;
+		DirectDebit dd = testDoc.getDirectDebit();
+		if(dd==null) {
+			LOG.warning("dd.isEmpty");
+		} else {
+			LOG.info("MandateReferencetID:"+dd.getMandateReferencetID() + " BankAssignedCreditorID:"+dd.getBankAssignedCreditorID() + " DebitedAccountID:"+dd.getDebitedAccountID());
+			directDebit = ublInvoice.createDirectDebit(dd.getMandateReferencetID(), dd.getBankAssignedCreditorID(), dd.getDebitedAccountID());
+		}
+		
 		ublInvoice.setPaymentInstructions(code, paymentMeansText, remittanceInformation
 				, creditTransfer, paymentCard, directDebit);
 

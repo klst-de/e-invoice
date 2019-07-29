@@ -17,6 +17,6 @@ import com.klst.einvoice.unece.uncefact.IBANId;
 public interface DirectDebitFactory {
 	
 	// alle para optional
-	public DirectDebit createCreditTransfer(String mandateID, String bankAssignedCreditorID, IBANId iban);
-	public DirectDebit createCreditTransfer(String mandateID, String bankAssignedCreditorID, String debitedAccountID);
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban);
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID);
 }

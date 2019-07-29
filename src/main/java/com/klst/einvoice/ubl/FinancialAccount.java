@@ -102,12 +102,15 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 		super.setFinancialInstitutionBranch(branch);
 	}
 
-//	----------------------------- implements CreditTransferFactory:
+//	----------------------------- implements CreditTransferFactory: TODO vll doch in Invoice?
 	
 	@Override
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
 		return new FinancialAccount(iban, accountName, bic);
 	}
+//	public static CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
+//		return new FinancialAccount(iban, accountName, bic);
+//	}
 
 	@Override
 	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic) {

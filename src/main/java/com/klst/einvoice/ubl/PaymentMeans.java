@@ -11,6 +11,7 @@ import com.klst.einvoice.PaymentInstructions;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMandateType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InstructionNoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentChannelCodeType;
@@ -85,6 +86,19 @@ Bsp: example-peppol-ubl-creditnote.xml :
 
 Bsp: ubl-tc434-example1.xml       hat mehrere cac:PaymentMeans
 
+Bsp: ubl-tc434-example5.xml       direct debit
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>49</cbc:PaymentMeansCode>
+        <cbc:InstructionNote>Half prepaid</cbc:InstructionNote>
+        <cbc:PaymentID>Payref1</cbc:PaymentID>
+        <cac:PaymentMandate>
+            <cbc:ID>123456</cbc:ID>
+            <cac:PayerFinancialAccount>
+                <cbc:ID>DK1212341234123412</cbc:ID>
+            </cac:PayerFinancialAccount>
+        </cac:PaymentMandate>
+    </cac:PaymentMeans>
+
 Bsp: miad :
     <cac:PaymentMeans>
         <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
@@ -106,15 +120,28 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	// copy ctor
 	public PaymentMeans(PaymentMeansType doc) {
 		this();
-		String paymentMeansText = null; // TODO wie unten
-		String remittanceInformation = doc.getPaymentID().isEmpty() ? null : doc.getPaymentID().get(0).getValue();
+//		String paymentMeansText = doc.getInstructionNote().isEmpty() ? null : doc.getInstructionNote().get(0).getValue();
+		String paymentMeansText = getPaymentMeansText(doc);
+		String remittanceInformation = getRemittanceInformation(doc);
+				// doc.getPaymentID().isEmpty() ? null : doc.getPaymentID().get(0).getValue();
 		init(PaymentMeansEnum.valueOf(doc.getPaymentMeansCode()), paymentMeansText, remittanceInformation);
 		LOG.info("ctor vor new FinancialAccount: "+this.toString() + " remittanceInformation:"+remittanceInformation);
-		payeeFinancialAccount = new FinancialAccount(doc.getPayeeFinancialAccount());
-		super.setPayeeFinancialAccount(payeeFinancialAccount);
+		if(doc.getPayeeFinancialAccount()==null) {
+			// kann null sein, zB. in ubl-tc434-example5.xml bei DirectDebit
+		} else {
+			payeeFinancialAccount = new FinancialAccount(doc.getPayeeFinancialAccount());
+			super.setPayeeFinancialAccount(payeeFinancialAccount);
+		}
+		if(doc.getPaymentMandate()==null) {
+			// kein DirectDebit
+		} else {
+			paymentMandate = new PaymentMandate(doc.getPaymentMandate());
+			super.setPaymentMandate(paymentMandate);
+		}
 	}
 	
 	FinancialAccountType payeeFinancialAccount;
+	PaymentMandateType paymentMandate;
 	
 	public PaymentMeans(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation,
 			List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
@@ -123,16 +150,18 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		if(creditTransferList.isEmpty() && paymentCard==null && directDebit==null) return;
 		
 		payeeFinancialAccount = new FinancialAccount();
+		paymentMandate = new PaymentMandate();
 		creditTransferList.forEach(creditTransfer -> {
 			payeeFinancialAccount = (FinancialAccount)creditTransfer;
+			super.setPayeeFinancialAccount(payeeFinancialAccount);
 		});
 		if(paymentCard!=null) {
 			// TODO
 		}
 		if(directDebit!=null) {
-			// TODO
+			paymentMandate = (PaymentMandate)directDebit;
+			super.setPaymentMandate(paymentMandate);
 		}
-		super.setPayeeFinancialAccount(payeeFinancialAccount);
 	}
 
 	void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
@@ -174,7 +203,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	// BT-82 0..1 Text zur Zahlungsart
 	void setPaymentMeansText(String text) {
 		if(text==null) return; // optional
-		// TODO überprüfen ob InstructionNote das korrekte element ist!!!!!!!!!
+		// Bsp: ubl-tc434-example5.xml
 		InstructionNoteType instructionNote = new InstructionNoteType();
 		instructionNote.setValue(text);
 		super.getInstructionNote().add(instructionNote);
@@ -183,7 +212,8 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	@Override
 	// BT-83 0..1 Verwendungszweck
 	public void setRemittanceInformation(String text) {
-		if(text==null) return; // optional, Bsp in 01.14a-INVOICE_ubl.xml : <cbc:PaymentID>Deb. 12345 / Fact. 9876543</cbc:PaymentID>
+		if(text==null) return; // optional, Bsp in 
+		// 01.14a-INVOICE_ubl.xml : <cbc:PaymentID>Deb. 12345 / Fact. 9876543</cbc:PaymentID>
 		// 01.15a-INVOICE_ubl.xml : <cbc:PaymentID>0000123456</cbc:PaymentID>
 		List<PaymentIDType> paymentIDs = super.getPaymentID();
 		PaymentIDType paymentID = new PaymentIDType();
@@ -196,21 +226,17 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		CodeType paymentMeansCode = super.getPaymentMeansCode();
 		return PaymentMeansEnum.valueOf(paymentMeansCode);
 	}
-//	@Deprecated
-//	public PaymentMeansEnum getPaymentMeans() {
-//		CodeType paymentMeansCode = super.getPaymentMeansCode();
-//		return PaymentMeansEnum.valueOf(paymentMeansCode);
-//	}
 	static PaymentMeansEnum getPaymentMeansEnum(PaymentMeansType doc) {
 		CodeType paymentMeansCode = doc.getPaymentMeansCode();
 		return PaymentMeansEnum.valueOf(paymentMeansCode);
 	}
 
-	
 	@Override
 	public String getPaymentMeansText() {
-		// TODO Auto-generated method stub
-		return null;
+		return super.getInstructionNote().isEmpty() ? null : super.getInstructionNote().get(0).getValue();
+	}
+	static String getPaymentMeansText(PaymentMeansType doc) {
+		return doc.getInstructionNote().isEmpty() ? null : doc.getInstructionNote().get(0).getValue();
 	}
 
 	@Override
@@ -228,15 +254,8 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	static String getRemittanceInformation(PaymentMeansType doc) {
 		return doc.getPaymentID().isEmpty() ? null : doc.getPaymentID().get(0).getValue();
 	}
-//	@Deprecated
-//	void setPaymentIDs(List<PaymentIDType> paymentIDs) {
-//		List<PaymentIDType> myPaymentIDs = super.getPaymentID();
-//		paymentIDs.forEach(paymentID -> {
-//			myPaymentIDs.add(paymentID);
-//		});
-//	}
 	
-	public List<CreditTransfer> getCreditTransfer() { // CreditTransfer ist Interface
+	public List<CreditTransfer> getCreditTransfer() { // CreditTransfer ist Interface, List da BG-17 CREDIT TRANSFER die Kardinalität 0..n hat
 		List<CreditTransfer> result = new ArrayList<CreditTransfer>();
 		if(payeeFinancialAccount==null) {
 			// LOG
@@ -246,4 +265,16 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		return result;
 	}
 	
+//	public List<DirectDebit> getDirectDebit() { // DirectDebit ist Interface, kein List da BG-19 die Kardinalität 0..1 hat
+	public DirectDebit getDirectDebit() { // DirectDebit ist Interface, kein List da BG-19 die Kardinalität 0..1 hat
+		return paymentMandate==null ? null : (DirectDebit)paymentMandate;
+//		List<DirectDebit> result = new ArrayList<DirectDebit>(); // ?????? doch List für alle ?????????
+//		if(paymentMandate==null) {
+//			// LOG
+//		} else {
+//			result.add((DirectDebit)paymentMandate);
+//		}
+//		return result;
+	}
+
 }
