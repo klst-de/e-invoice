@@ -1140,18 +1140,15 @@ Bsp: example-peppol-ubl-creditnote.xml :
 		LOG.warning(NOT_IMPEMENTED); // TODO
 		return null;
 	}
+	
 	@Override
 	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
-		LOG.warning(NOT_IMPEMENTED); // TODO
-		return null;
+		return PaymentMandate.createDirectDebit(mandateID, bankAssignedCreditorID, iban);
 	}
 
 	@Override
 	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
-		DirectDebit dd = new PaymentMandate(debitedAccountID); 
-		dd.setMandateReferencetID(mandateID);
-		dd.setBankAssignedCreditorID(bankAssignedCreditorID);
-		return dd;
+		return PaymentMandate.createDirectDebit(mandateID, bankAssignedCreditorID, debitedAccountID);
 	}
 
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation

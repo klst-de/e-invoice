@@ -6,12 +6,31 @@ import com.klst.einvoice.unece.uncefact.IBANId;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMandateType;
 
-// Gruppe DIRECT DEBIT BG-19 
+// Gruppe DIRECT DEBIT BG-19
+// CII:
 //0 .. 1 DirectDebitMandateID Kennung der Mandatsreferenz               BG-19/ BT-89
 //0 .. 1 CreditorReferenceID Kennung des Gläubigers                     BG-19/ BT-90
 //1 .. 1 IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos BG-19/ BT-91
 public class PaymentMandate extends PaymentMandateType implements DirectDebit {
 
+	static DirectDebit createDirectDebit(Object debitedAccountID) {
+		return debitedAccountID.getClass()==IBANId.class ? new PaymentMandate((IBANId)debitedAccountID) : new PaymentMandate((String)debitedAccountID);
+	}
+	/**
+	 * Factory method
+	 * 
+	 * @param mandateID
+	 * @param bankAssignedCreditorID
+	 * @param debitedAccountID
+	 * @return DirectDebit if object
+	 */
+	public static DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, Object debitedAccountID) {
+		DirectDebit directDebit = createDirectDebit(debitedAccountID); 
+		directDebit.setMandateReferencetID(mandateID);
+		directDebit.setBankAssignedCreditorID(bankAssignedCreditorID);
+		return directDebit;
+	}
+	
 	PaymentMandate() {
 		super();
 	}

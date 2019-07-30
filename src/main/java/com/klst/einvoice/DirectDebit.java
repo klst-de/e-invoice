@@ -18,9 +18,10 @@ import com.klst.einvoice.unece.uncefact.IBANId;
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for (en)EN_16931_1_2017 rule and request IDs
  */
 
+// CII:
+// 0 .. 1 DirectDebitMandateID Kennung der Mandatsreferenz               BG-19/ BT-89
 // 0 .. 1 CreditorReferenceID Kennung des Gläubigers                     BG-19/ BT-90
 // 1 .. 1 IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos BG-19/ BT-91
-// 0 .. 1 DirectDebitMandateID Kennung der Mandatsreferenz               BG-19/ BT-89
 
 /*  (de) rules / Geschäftsregel:
  * 
