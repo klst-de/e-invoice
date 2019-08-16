@@ -142,9 +142,6 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	Invoice(InvoiceType doc) {
 		this(getCustomization(doc), getProfile(doc), getTypeCode(doc));
 		
-//		taxTotalFirst = doc.getTaxTotal().get(0);
-//		addVATBreakDown(taxTotalFirst);
-		
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));
 		setDocumentCurrency(getDocumentCurrency(doc));
@@ -167,10 +164,16 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 			super.getPaymentMeans().add(new PaymentMeans(pmList.get(0)));
 		}
 		
-		setDocumentTotals(doc);
+		setDocumentTotals(doc); 
+//		LOG.info("getInvoiceTax(doc)======================"+getInvoiceTax(doc));
 		setInvoiceTax(getInvoiceTax(doc));
-		addVATBreakDown(getVATBreakDowns(doc));
+//		LOG.info("nach setInvoiceTax(getInvoiceTax(doc));");
+		List<VatBreakdown> vbdList = getVATBreakDowns(doc);
+		LOG.info("List<VatBreakdown> vbdList size ===== "+vbdList.size());
+		addVATBreakDown(vbdList);
+//		LOG.info("nach addVATBreakDown(getVATBreakDowns(doc));");
 		addLines(doc);
+//		LOG.info("nach addLines(doc);");
 	}
 	
 	/* Invoice number                              BT-1  Identifier            1 (mandatory) 
@@ -1315,9 +1318,15 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 		setDocumentTotals(lineExtension, taxExclusive, taxInclusive, payable);
 	}
 
+	// BG-22.BT-111
 	@Override
 	public void setInvoiceTaxInAccountingCurrency(Amount amount) {
-		// TODO Der Umsatzsteuergesamtbetrag, angegeben in der Abrechnungswährung, die im Land des Verkäufers gültig ist oder verlangt wird.
+		// Der Umsatzsteuergesamtbetrag, angegeben in der Abrechnungswährung, die im Land des Verkäufers gültig ist oder verlangt wird.
+		// TODO assert:
+		if(this.getDocumentCurrency().equals(this.getTaxCurrency())) {
+			LOG.warning("Document currency is "+getDocumentCurrency() + " equals to Tax Currency!");
+		}
+		setInvoiceTax(amount);
 	}
 
 	@Override
@@ -1337,62 +1346,63 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 		// TODO Der Betrag, um den der Rechnungsbetrag gerundet wurde.
 	}
 
-	/**
-	 * Invoice total VAT amount in accounting currency
-	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>Amount: BT-111
-	 * <br>Req.ID: R54
-	 * 
-	 * <p>Usage Note:
-	 * To be used when the VAT accounting currency (BT-6) differs from the Invoice currency code (BT-5) 
-	 * in accordance with article 230 of Directive 2006/112 / EC on VAT.
-	 * The VAT amount in accounting currency is not used in the calculation of the Invoice totals.
-	 * 
-	 * @param taxTotalAmount : The VAT total amount expressed in the accounting currency accepted or required in the country of the Seller.
-	 */
+	// BG-22.BT-110/BT-111
 	@Override
-	public void setInvoiceTax(Amount taxTotalAmount) {
-		// Der Gesamtbetrag der Umsatzsteuer für die Rechnung.
-		this.addInvioceTax(taxTotalAmount);
+	public void setInvoiceTax(Amount amount) {
+		TaxAmountType taxAmount = new TaxAmountType();
+		amount.copyTo(taxAmount);
+		taxTotalFirst.setTaxAmount(taxAmount);
 	}
-	
+
 	static Amount getInvoiceTax(InvoiceType doc) {
-		TaxTotalType taxTotal = doc.getTaxTotal().get(0); // getFirstTaxTotal(doc);
+		List<TaxTotalType> list = doc.getTaxTotal();
+		LOG.info("doc List<TaxTotalType>#:"+list.size());
+		if(list.isEmpty()) return null;
+		for(int i=0; i<list.size(); i++) {
+			TaxAmountType amount = list.get(i).getTaxAmount();
+			LOG.info("doc.DocumentCurrency:"+getDocumentCurrency(doc) + " doc.TaxCurrency:"+getTaxCurrency(doc) + " Amount:"+amount.getValue());
+			if(getTaxCurrency(doc)==null || getDocumentCurrency(doc).equals(getTaxCurrency(doc))) {
+				LOG.info("return new Amount("+amount.getValue()+amount.getCurrencyID());
+				return new Amount(amount.getCurrencyID(), amount.getValue());
+			}
+		}
+		return null;
+	}
+
+	TaxTotalType getTaxTotal(boolean sameCurrency) {
+		List<TaxTotalType> list = super.getTaxTotal();
+		if(list.isEmpty()) return null;
+		for(int i=0; i<list.size(); i++) {
+			TaxTotalType taxTotal = list.get(i);
+			TaxAmountType amount = taxTotal.getTaxAmount();
+			if(sameCurrency && (this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
+//				LOG.info("i:"+i+"/"+list.size() + " sameCurrency "+ this.getDocumentCurrency()+"=?="+this.getTaxCurrency() + " amount:"+amount);
+				return taxTotal;
+			} else if(!sameCurrency && !(this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
+//				LOG.info("i:"+i+"/"+list.size() + " !sameCurrency "+ this.getDocumentCurrency()+"=?="+this.getTaxCurrency());
+				return taxTotal;
+			}
+		}
+		return null;
+	}
+	Amount getInvoiceTax(boolean sameCurrency) {
+		TaxTotalType taxTotal = getTaxTotal(sameCurrency);
+		if(taxTotal==null) return null;
 		TaxAmountType amount = taxTotal.getTaxAmount();
 		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
-
+	// BG-22.BT-110
 	@Override
 	public Amount getInvoiceTax() {
-		// der durchlauf nur zur info, eingentlich darf es nur ein el geben
-		List<TaxTotalType> taxTotals = super.getTaxTotal();
-		taxTotals.forEach(taxTotal -> {
-			TaxAmountType amount = taxTotal.getTaxAmount();
-			Amount taxAmount = new Amount(amount.getCurrencyID(), amount.getValue());
-			LOG.info("taxAmount "+taxAmount);
-		});
-		if(taxTotals.size()>1) {
-			LOG.warning("inkonsistent: taxTotals.size="+taxTotals.size() + " darf maximal 1 sein" );
-		}
-		
-		TaxTotalType taxTotal = getFirstTaxTotal();
-		TaxAmountType amount = taxTotal.getTaxAmount();
-		return new Amount(amount.getCurrencyID(), amount.getValue());
+		return getInvoiceTax(true);
 	}	
+	// BG-22.BT-111
+	@Override
+	public Amount getInvoiceTaxInAccountingCurrency() {
+		return getInvoiceTax(false);
+	}
 
-	// so nicht in XRechnung-v1-2-0.pdf dokumentiert
-	void addInvioceTax(Amount taxSum) {
-		TaxTotalType taxTotal = getFirstTaxTotal();
-		TaxAmountType taxAmount = new TaxAmountType();
-		taxSum.copyTo(taxAmount);
-		taxTotal.setTaxAmount(taxAmount);
-	}
-	
-	private TaxTotalType getFirstTaxTotal() {
-		return this.getTaxTotal().get(0);
-	}
-	
+
 	/* VAT BREAKDOWN                               BG-23                       1..* (mandatory)
 	 * Eine Gruppe von Informationselementen, die Informationen über die Umsatzsteueraufschlüsselung in verschiedene Kategorien liefern.
 	 * 
@@ -1404,12 +1414,12 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 	 */
 	@Override
 	public void addVATBreakDown(CoreInvoiceVatBreakdown vatBreakdown) {
-		TaxTotalType taxTotal = getFirstTaxTotal();
+		TaxTotalType taxTotal = taxTotalFirst;
 		taxTotal.getTaxSubtotal().add((VatBreakdown)vatBreakdown);
 	}
 	public void addVATBreakDown(List<VatBreakdown> vatBreakdowns) {
-		TaxTotalType taxTotal = getFirstTaxTotal();
-		
+		TaxTotalType taxTotal = taxTotalFirst;
+//		LOG.info("anfügen #"+vatBreakdowns.size());
 		vatBreakdowns.forEach(vbd -> {
 			taxTotal.getTaxSubtotal().add(vbd);
 		});	
@@ -1459,7 +1469,7 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
     </cac:TaxTotal>
  
  */
-		TaxTotalType taxTotal = getFirstTaxTotal();
+		TaxTotalType taxTotal = taxTotalFirst;
 		
 		TaxSubtotalType taxSubtotal = new VatBreakdown(taxableAmount, tax, taxCategoryCode, taxRate);
 		taxTotal.getTaxSubtotal().add(taxSubtotal);
@@ -1468,7 +1478,9 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 		return getVATBreakDowns(this);
 	}
 	static List<VatBreakdown> getVATBreakDowns(InvoiceType doc) {
-		TaxTotalType taxTotal = doc.getTaxTotal().get(0);
+		List<TaxTotalType> taxTotalList = doc.getTaxTotal();
+		LOG.info("List<TaxTotalType> taxTotalList size="+taxTotalList.size());
+		TaxTotalType taxTotal = taxTotalList.get(0);
 		List<TaxSubtotalType> taxSuptotalList = taxTotal.getTaxSubtotal();
 		List<VatBreakdown> result = new ArrayList<VatBreakdown>(taxSuptotalList.size()); // VatBreakdown extends TaxSubtotalType
 		taxSuptotalList.forEach(vbd -> {
