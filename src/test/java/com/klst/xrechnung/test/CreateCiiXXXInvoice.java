@@ -98,6 +98,12 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         	cii.addVATBreakDown(vatBreakdown);
         });
 		
+        cii.setDocumentTotals(testDoc.getInvoiceLineNetTotal(), 
+				testDoc.getInvoiceTotalTaxExclusive(), 
+				testDoc.getInvoiceTotalTaxInclusive(), testDoc.getDuePayable());
+        cii.setInvoiceTax(testDoc.getInvoiceTax());
+//        cii.setInvoiceTaxInAccountingCurrency(  ...  ist nicht implementiert TODO
+
         List<TradeLineItem> lines = testDoc.getLines();
         LOG.info("LineGroup starts for "+lines.size() + " lines.");
         lines.forEach(testLine -> {
