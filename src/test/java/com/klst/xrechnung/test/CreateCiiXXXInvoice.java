@@ -46,12 +46,13 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 	@Override
 	CrossIndustryInvoice makeInvoice() {
+		LOG.info("\n\n");
 		CrossIndustryInvoice cii = new CrossIndustryInvoice(testDoc.getCustomization(), testDoc.getTypeCode());
 		cii.setId(testDoc.getId());
 		cii.setIssueDate(testDoc.getIssueDateAsTimestamp());
 		cii.setDocumentCurrency(testDoc.getDocumentCurrency());
-		cii.setTaxCurrency(testDoc.getTaxCurrency());
-		cii.setBuyerReference(testDoc.getBuyerReferenceValue());
+		cii.setTaxCurrency(testDoc.getTaxCurrency()); // BT-6 + 0..1 (optional)
+		cii.setBuyerReference(testDoc.getBuyerReferenceValue()); // BT-10 + 0..1 (optional)
 		
 		makeOptionals(cii);
 		
@@ -75,7 +76,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setSellerParty(sellerParty);
 		cii.setBuyerParty(testDoc.getBuyerParty());
 		
-		cii.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp());
+		LOG.info("testDoc.getPaymentTerm():"+testDoc.getPaymentTerm() + " testDoc.getDueDateAsTimestamp():"+testDoc.getDueDateAsTimestamp());
+		cii.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp()); // BT-9 & BT-20 (optional)
 		
 		cii.setPaymentInstructions(testDoc.getPaymentMeansCode(), null, testDoc.getRemittanceInformation()); //paymentMeansText, remittanceInformation);
 		CreditTransfer testCT = testDoc.getCreditTransfer();
@@ -134,7 +136,11 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		return cii;
 	}
 	void makeOptionals(CrossIndustryInvoice cii) {	
-		cii.setOrderReferenceID(testDoc.getOrderReferenceID());
+		
+		cii.setTaxPointDate(testDoc.getTaxPointDateAsTimestamp()); // BT-7 BT-7-0
+		
+		cii.setOrderReferenceID(testDoc.getOrderReferenceID()); // BT-14 + 0..1
+		
 		List<String> notes = testDoc.getNotes();
 		notes.forEach(note -> {
 			cii.setNote(note);

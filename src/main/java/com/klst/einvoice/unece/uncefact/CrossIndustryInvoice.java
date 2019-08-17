@@ -106,12 +106,13 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		this(getCustomization(doc), getProfile(doc), getTypeCode(doc));
 		supplyChainTradeTransaction = new SupplyChainTradeTransactionType();
 		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
+		setPaymentTermsAndDate(getPaymentTerm(applicableHeaderTradeSettlement), getDueDateAsTimestamp(applicableHeaderTradeSettlement)); // optional
+		
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));
 		setDocumentCurrency(getDocumentCurrency(doc));
 		setTaxCurrency(getTaxCurrency(doc)); // optional
 		setTaxPointDate(getTaxPointDateAsTimestamp(doc)); // optional
-		setPaymentTermsAndDate(getPaymentTerm(doc), getDueDateAsTimestamp(doc)); // optional
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional
 		setOrderReferenceID(getOrderReferenceID(doc)); // optional
 //		addPaymentTerms(doc);
@@ -300,24 +301,19 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		return getTaxPointDateAsTimestamp(applicableHeaderTradeSettlement);
 	}
 
-	/*
-DueDateDateTime Fälligkeitsdatum
-
-1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
-0 .. n SpecifiedTradePaymentTerms Detailinformationen zu Zahlungsbedingungen xs:sequence 
-0 .. 1 Description Zahlungsbedingungen BT-20 
-0 .. 1 DueDateDateTime Fälligkeitsdatum xs:choice 
-1 .. 1 DateTimeString Fälligkeitsdatum der Zahlung BT-9 
-       required format Datum, Format BT-9-0
-
-	 */
-	
+	// BT-9 0..1 DueDateDateTime Fälligkeitsdatum
 	@Override
 	public Timestamp getDueDateAsTimestamp() {
-		return getDueDateAsTimestamp(this);
+		return getDueDateAsTimestamp(applicableHeaderTradeSettlement);
 	}
-	static Timestamp getDueDateAsTimestamp(CrossIndustryInvoiceType doc) {
-		return null; // TODO
+	static Timestamp getDueDateAsTimestamp(ApplicableHeaderTradeSettlement headerTradeSettlement) {
+		if(headerTradeSettlement==null) return null;
+		List<TradePaymentTermsType> tradePaymentTermsList = headerTradeSettlement.getSpecifiedTradePaymentTerms(); // 0 .. n
+		// tradePaymentTermsList / Detailinformationen zu Zahlungsbedingungen
+		if(tradePaymentTermsList.isEmpty()) return null;
+		DateTimeType dateTime = tradePaymentTermsList.get(0).getDueDateDateTime();
+		if(dateTime==null) return null;
+		return DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue(), dateTime.getDateTimeString().getFormat());
 	}
 
 	@Override
@@ -325,29 +321,18 @@ DueDateDateTime Fälligkeitsdatum
 		setPaymentTermsAndDate(description, DateTimeFormats.ymdToTs(ymd));
 	}
 
-//	public void setPaymentTerms(String paymentTerms) { // BT-20 + 0..1 Payment terms
-//		if(paymentTerms==null) return;
-//		TradePaymentTermsType tradePaymentTerm = new TradePaymentTermsType(); 
-//		tradePaymentTerm.getDescription().add(CrossIndustryInvoice.newTextType(paymentTerms));
-//		applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().add(tradePaymentTerm);
-//	}
-//	public String getPaymentTerms() {
-//		if(applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().isEmpty()) return null;
-//		List<TextType> descriptionList = applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().get(0).getDescription();
-//		return descriptionList==null ? null : descriptionList.get(0).getValue();
-//	}
-//
-
+	// BT-9 & BT-20 : Payment terms & Payment due date
 	@Override
 	public void setPaymentTermsAndDate(String description, Timestamp ts) {
+		LOG.info("Payment terms description:"+description + " & Payment due date Timestamp:"+ts);
 		TradePaymentTermsType tradePaymentTerms = new TradePaymentTermsType();
 		if(description==null) {
-			LOG.warning("text==null");
+//			LOG.warning("text==null");
 		} else {
 			tradePaymentTerms.getDescription().add(newTextType(description)); // returns List<TextType>
 		}
 		if(ts==null) {
-			LOG.warning("Timestamp ts==null");
+//			LOG.warning("Timestamp ts==null");
 		} else {
 			tradePaymentTerms.setDueDateDateTime(newDateTime(ts));
 		}
@@ -370,17 +355,13 @@ DueDateDateTime Fälligkeitsdatum
 	public String getPaymentTerm() {
 		return getPaymentTerm(applicableHeaderTradeSettlement);
 	}
-	static String getPaymentTerm(HeaderTradeSettlementType headerTradeSettlement) {
+	static String getPaymentTerm(ApplicableHeaderTradeSettlement headerTradeSettlement) {
 		List<TradePaymentTermsType> tradePaymentTermsList = headerTradeSettlement.getSpecifiedTradePaymentTerms();
 		if(tradePaymentTermsList.isEmpty()) return null;
 		
 		TradePaymentTermsType tradePaymentTerms = tradePaymentTermsList.get(0); // da Cardinality 0..1 kann es nur einen geben
 		List<TextType> textList = tradePaymentTerms.getDescription();
 		return textList.isEmpty() ? null : textList.get(0).getValue();
-	}
-	static String getPaymentTerm(CrossIndustryInvoiceType doc) {
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement();
-		return getPaymentTerm(applicableHeaderTradeSettlement);
 	}
 
 	/* EN16931-ID: 	BT-10

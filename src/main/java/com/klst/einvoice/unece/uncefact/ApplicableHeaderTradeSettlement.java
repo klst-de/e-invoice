@@ -13,6 +13,7 @@ import com.klst.untdid.codelist.PaymentMeansEnum;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType 
@@ -72,9 +73,20 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 				tradePaymentTerms.getDescription().add(CrossIndustryInvoice.newTextType(descriptionList.get(0).getValue()));
 				super.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
 			}
+			DateTimeType dueDateDateTime = stptList.get(0).getDueDateDateTime(); // BT-9 0..1 Payment due date 
+			if(dueDateDateTime==null) {
+				// Payment due date is optional
+			} else {
+				List<TradePaymentTermsType> tradePaymentTermsList = super.getSpecifiedTradePaymentTerms();
+				if(tradePaymentTermsList.isEmpty()) {
+					tradePaymentTermsList.add(new TradePaymentTermsType());
+				}
+				TradePaymentTermsType tradePaymentTerms = tradePaymentTermsList.get(0);
+				tradePaymentTerms.setDueDateDateTime(dueDateDateTime);
+			}
 		}
 		
-		List<TextType> prList = hts.getPaymentReference(); // BT-83
+		List<TextType> prList = hts.getPaymentReference(); // BT-83 
 		if(!prList.isEmpty()) {
 			prList.forEach(remittanceInformation -> {
 				LOG.info("remittanceInformation:"+remittanceInformation.getValue());
@@ -83,6 +95,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		}
 
 		setRemittanceInformation(prList.isEmpty() ? null : prList.get(0).getValue());
+		
 	}
 
 	public ApplicableHeaderTradeSettlement(PaymentMeansEnum pmc, String paymentMeansText, String remittanceInformation) {
