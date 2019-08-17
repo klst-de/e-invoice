@@ -31,6 +31,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
@@ -119,8 +120,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setBuyerParty(getBuyerParty(doc));
 //		addDeliveries(doc);
 //		addPaymentInstructions(doc);		
-//		setDocumentTotals(doc);
-//		setInvoiceTax(getInvoiceTax(doc));
+		setDocumentTotals(getInvoiceLineNetTotal(doc), getInvoiceTotalTaxExclusive(doc), getInvoiceTotalTaxInclusive(doc), getDuePayable(doc));
+		setInvoiceTax(getInvoiceTax(doc));
 		addVATBreakDown(getVATBreakDowns(doc));
 		addLines(doc);
 	}
@@ -663,6 +664,25 @@ DueDateDateTime Fälligkeitsdatum
 		return sellerParty==null ? null : new TradeParty(sellerParty);
 	}
 
+	/**
+	 * set optional taxCompanyId  / Seller VAT identifier, BT-31, R52
+	 * 
+	 * @param taxCompany Identifier
+	 */
+	public void setSellerTaxCompanyId(String taxCompanyId) {
+		if(taxCompanyId==null) return;
+		TaxRegistrationType taxRegistration = new TaxRegistrationType();
+		taxRegistration.setID(newIDType(taxCompanyId, null));
+		TradeParty party = getSellerParty();
+		party.getSpecifiedTaxRegistration().add(taxRegistration);
+	}
+	public String getSellerTaxCompanyId() {
+		TradeParty party = getSellerParty();
+		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration();
+		if(taxRegistrationList.isEmpty()) return null;
+		return taxRegistrationList.get(0).getID().getValue();
+	}
+
 	/* BUYER                                       BG-7                        1 (mandatory) 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Erwerber liefern.
 	 */
@@ -885,26 +905,41 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		return this.applicableHeaderTradeSettlement.createCreditTransfer(iban, accountName, bic);
 	}
 
-	// TODO Bauselle
+	// BG-22.BT-106 - 1..1/1..1
 	@Override
 	public Amount getInvoiceLineNetTotal() {
-		return null;	
+		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getLineTotalAmount().get(0).getValue());
 	}
+	static Amount getInvoiceLineNetTotal(CrossIndustryInvoiceType doc) {
+		TradeSettlementHeaderMonetarySummationType stshms = getSpecifiedTradeSettlementHeaderMonetarySummation(doc); // 1..1
+		return new Amount(stshms.getLineTotalAmount().get(0).getValue());
+	}
+	// BG-22.BT-109 - 1..1/1..1
 	@Override
 	public Amount getInvoiceTotalTaxExclusive() {
-		return null;	
+		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxBasisTotalAmount().get(0).getValue());
 	}
+	static Amount getInvoiceTotalTaxExclusive(CrossIndustryInvoiceType doc) {
+		TradeSettlementHeaderMonetarySummationType stshms = getSpecifiedTradeSettlementHeaderMonetarySummation(doc); // 1..1
+		return new Amount(stshms.getTaxBasisTotalAmount().get(0).getValue());
+	}
+	// BG-22.BT-112 - 1..1/1..1
 	@Override
 	public Amount getInvoiceTotalTaxInclusive() {
-		return null;	
+		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getGrandTotalAmount().get(0).getValue());
 	}
+	static Amount getInvoiceTotalTaxInclusive(CrossIndustryInvoiceType doc) {
+		TradeSettlementHeaderMonetarySummationType stshms = getSpecifiedTradeSettlementHeaderMonetarySummation(doc); // 1..1
+		return new Amount(stshms.getGrandTotalAmount().get(0).getValue());
+	}
+	// BG-22.BT-115 - 1..1/1..1
 	@Override
 	public Amount getDuePayable() {
-		return null;	
+		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getDuePayableAmount().get(0).getValue());
 	}
-	@Override
-	public Amount getInvoiceTax() {
-		return null;	
+	static Amount getDuePayable(CrossIndustryInvoiceType doc) {
+		TradeSettlementHeaderMonetarySummationType stshms = getSpecifiedTradeSettlementHeaderMonetarySummation(doc); // 1..1
+		return new Amount(stshms.getDuePayableAmount().get(0).getValue());
 	}
 	
 	/**
@@ -915,16 +950,6 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 * @param taxInclusive : Invoice total amount with VAT
 	 * @param payable : Amount due for payment 
 	 */
-/*
-            <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
-                <ram:LineTotalAmount>314.86</ram:LineTotalAmount>
-                <ram:TaxBasisTotalAmount>314.86</ram:TaxBasisTotalAmount>
-                <ram: TaxTotalAmount currencyID="EUR">22.04</ram:TaxTotalAmount>  TODO
-                <ram:GrandTotalAmount>336.9</ram:GrandTotalAmount>
-                <ram:DuePayableAmount>336.9</ram:DuePayableAmount>
-            </ram:SpecifiedTradeSettlementHeaderMonetarySummation>
-
- */
 	@Override
 	public void setDocumentTotals(Amount lineExtension, Amount taxExclusive, Amount taxInclusive, Amount payable) {
 		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = getTradeSettlementHeaderMonetarySummation(applicableHeaderTradeSettlement);
@@ -950,15 +975,65 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		applicableHeaderTradeSettlement.setSpecifiedTradeSettlementHeaderMonetarySummation(tradeSettlementHeaderMonetarySummationType);
 	}
 
+	private Amount getInvoiceTax(boolean sameCurrency) {
+		List<AmountType> list = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxTotalAmount();
+		if(list.isEmpty()) return null;
+		for(int i=0; i<list.size(); i++) {
+			if(sameCurrency && (this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
+//				return new Amount(list.get(i).getValue());
+				return list.get(i).getCurrencyID()==null ? new Amount(list.get(i).getValue()) : new Amount(list.get(i).getCurrencyID(), list.get(i).getValue());
+			} else if(!sameCurrency && !(this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
+				return new Amount(list.get(i).getCurrencyID(), list.get(i).getValue());
+			}
+		}
+		return null;
+	}
+	// BG-22.BT-110/BT-111 - 1..1/0..2
+	/* zu BT-111: getTaxCurrency() BT-6 getDocumentCurrency() BT-5
+	 * Zu verwenden, wenn der Code für die Währung der Umsatzsteuerbuchung (BT-6) nach Artikel 230 der Richtlinie 2006/112/EG über Umsatzsteuer 
+	 * vom Code für die Rechnungswährung (BT-5) abweicht.
+	 */
+	@Override
+	public Amount getInvoiceTax() {
+		return getInvoiceTax(true);
+	}
+	@Override
+	public Amount getInvoiceTaxInAccountingCurrency() {
+		return getInvoiceTax(false);
+	}
+
+	static HeaderTradeSettlementType getApplicableHeaderTradeSettlement(CrossIndustryInvoiceType doc) {
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = doc.getSupplyChainTradeTransaction();
+		if(supplyChainTradeTransaction==null) return null;
+		return supplyChainTradeTransaction.getApplicableHeaderTradeSettlement(); // 1..1 : darf nicht null sein
+	}
+	static TradeSettlementHeaderMonetarySummationType getSpecifiedTradeSettlementHeaderMonetarySummation(CrossIndustryInvoiceType doc) {
+		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
+		if(applicableHeaderTradeSettlement==null) return null; // 1..1 : darf nicht null sein
+		return applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation(); // 1..1 : darf nicht null sein
+	}
+	static Amount getInvoiceTax(CrossIndustryInvoiceType doc) {
+		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
+		if(applicableHeaderTradeSettlement==null) return null;
+		List<AmountType> list = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxTotalAmount();
+		if(list.isEmpty()) return null;
+		for(int i=0; i<list.size(); i++) {
+			if(getTaxCurrency(doc)==null || getDocumentCurrency(doc).equals(getTaxCurrency(doc))) {
+				return list.get(i).getCurrencyID()==null ? new Amount(list.get(i).getValue()) : new Amount(list.get(i).getCurrencyID(), list.get(i).getValue());
+//			} else if(!sameCurrency && !(this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
+//				return new Amount(list.get(i).getCurrencyID(), list.get(i).getValue());
+			}
+		}
+		return null;	
+	}
 	/**
-	 * optional total amount of the invoice
+	 * optional total VAT amount of the invoice
 	 * 
 	 * @param taxTotalAmount : Invoice total VAT amount
 	 */
 	@Override
 	public void setInvoiceTax(Amount taxTotalAmount) {
 		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = getTradeSettlementHeaderMonetarySummation(applicableHeaderTradeSettlement);
-		
 		AmountType taxTotalAmt = new AmountType();
 		taxTotalAmount.copyTo(taxTotalAmt);
 		tradeSettlementHeaderMonetarySummationType.getTaxTotalAmount().add(taxTotalAmt); // add to list
@@ -968,8 +1043,11 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	
 	@Override
 	public void setInvoiceTaxInAccountingCurrency(Amount amount) {
-		// TODO Auto-generated method stub
-		
+		// TODO assert:
+		if(this.getDocumentCurrency().equals(this.getTaxCurrency())) {
+			LOG.warning("Document currency is "+getDocumentCurrency() + " equals to Tax Currency!");
+		}
+		setInvoiceTax(amount);	
 	}
 
 	@Override
@@ -1036,10 +1114,8 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		return result;
 	}
 	static List<VatBreakdown> getVATBreakDowns(CrossIndustryInvoiceType doc) {
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = doc.getSupplyChainTradeTransaction();
-		if(supplyChainTradeTransaction==null) return null;
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = supplyChainTradeTransaction.getApplicableHeaderTradeSettlement();
-		if(applicableHeaderTradeSettlement==null) return null;
+		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
+		if(applicableHeaderTradeSettlement==null) return null; // 1..1 : darf nicht null sein
 		List<TradeTaxType> list = applicableHeaderTradeSettlement.getApplicableTradeTax();
 		List<VatBreakdown> result = new ArrayList<VatBreakdown>(list.size()); // VatBreakdown extends TradeTaxType
 		list.forEach(vbd -> {

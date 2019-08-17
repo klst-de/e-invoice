@@ -15,7 +15,36 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
-public class TradeParty extends TradePartyType{
+/*
+            <ram:SellerTradeParty>
+                <ram:Name>[Seller name]</ram:Name>
+                <ram:Description>123/456/7890, HRA-Eintrag in […]</ram:Description>
+                <ram:SpecifiedLegalOrganization>
+                    <ram:ID>[HRA-Eintrag]</ram:ID>
+                    <ram:TradingBusinessName>[Seller trading name]</ram:TradingBusinessName>
+                </ram:SpecifiedLegalOrganization>
+                <ram:DefinedTradeContact>
+                    <ram:PersonName>nicht vorhanden</ram:PersonName>
+                    <ram:TelephoneUniversalCommunication>
+                        <ram:CompleteNumber>+49 1234-5678</ram:CompleteNumber>
+                    </ram:TelephoneUniversalCommunication>
+                    <ram:EmailURIUniversalCommunication>
+                        <ram:URIID>seller@email.de</ram:URIID>
+                    </ram:EmailURIUniversalCommunication>
+                </ram:DefinedTradeContact>
+                <ram:PostalTradeAddress>
+                    <ram:PostcodeCode>12345</ram:PostcodeCode>
+                    <ram:LineOne>[Seller address line 1]</ram:LineOne>
+                    <ram:CityName>[Seller city]</ram:CityName>
+                    <ram:CountryID>DE</ram:CountryID>
+                </ram:PostalTradeAddress>
+                <ram:SpecifiedTaxRegistration>
+                    <ram:ID schemeID="VA">DE 123456789</ram:ID>
+                </ram:SpecifiedTaxRegistration>
+            </ram:SellerTradeParty>
+
+ */
+public class TradeParty extends TradePartyType {
 
 	private static final Logger LOG = Logger.getLogger(TradeParty.class.getName());
 	
@@ -39,9 +68,15 @@ public class TradeParty extends TradePartyType{
 		if(legalOrganization!=null) {
 			super.setSpecifiedLegalOrganization(legalOrganization);
 		}
+		
 		List<TextType> textList = party.getDescription();
 		textList.forEach(companyLegalForm -> {
 			this.getDescription().add(companyLegalForm);
+		});
+		
+		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration();
+		taxRegistrationList.forEach(taxRegistration -> {
+			this.getSpecifiedTaxRegistration().add(taxRegistration);
 		});
 
 		addTaxSchemes(getTaxSchemes(party));

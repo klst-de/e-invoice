@@ -57,7 +57,7 @@ public class Amount extends AmountType implements Rounding {
 	}
 
 	void copyTo(un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType amount) {
-//		amount.setCurrencyID(this.getCurrencyID()); // wg. [CII-DT-031] - currencyID should not be present
+		amount.setCurrencyID(this.getCurrencyID());
 		amount.setValue(this.getValue(RoundingMode.HALF_UP));
 	}
 	
