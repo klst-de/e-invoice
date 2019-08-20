@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="e-invoice/de.klst.facturx-0.0.7.jar"/>
+    <jar path="e-invoice/de.klst.facturx-0.0.8.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/e-invoice/de.klst.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
         <sealing sealJar="true">
             <packagesToSeal/>
-            <packagesToUnSeal/>
+            <packagesToUnSeal>
+                <package handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.einvoice"/>
+                <package handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.einvoice.ubl"/>
+                <package handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.einvoice.unece.uncefact"/>
+            </packagesToUnSeal>
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
