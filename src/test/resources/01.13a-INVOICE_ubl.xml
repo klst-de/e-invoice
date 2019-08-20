@@ -32,9 +32,9 @@
                 </cac:Country>
             </cac:PostalAddress>
             <cac:PartyTaxScheme>
-                <cbc:CompanyID>123/456/789</cbc:CompanyID>
+                <cbc:CompanyID>DE123/456/789</cbc:CompanyID> <!-- DE... wg. BR-CO-09error[BR-CO-09] -->
                 <cac:TaxScheme>
-                    <cbc:ID>???</cbc:ID>
+                    <cbc:ID>VAT</cbc:ID> <!-- VAT statt ??? -->
                 </cac:TaxScheme>
             </cac:PartyTaxScheme>
             <cac:PartyLegalEntity>
