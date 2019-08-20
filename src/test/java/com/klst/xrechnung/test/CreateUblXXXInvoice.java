@@ -333,12 +333,12 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			if(documentNameCode==DocumentNameCode.CommercialInvoice) {
 				cmInvoice = new CommercialInvoice(invoice);
 				
-				String sellerRegistrationName = cmInvoice.getSellerParty().getName();
-				String sellerCompanyID = cmInvoice.getSellerParty().getCompanyID();
+				String sellerRegistrationName = cmInvoice.getSellerParty().getRegistrationName();
+				String sellerCompanyID = cmInvoice.getSellerParty().getCompanyId();
 				String sellerCompanyLegalForm = cmInvoice.getSellerParty().getCompanyLegalForm();
 				
-				String buyerRegistrationName = cmInvoice.getBuyerParty().getName();
-				String buyerCompanyID = cmInvoice.getBuyerParty().getCompanyID();
+				String buyerRegistrationName = cmInvoice.getBuyerParty().getRegistrationName();
+				String buyerCompanyID = cmInvoice.getBuyerParty().getCompanyId();
 				String buyerCompanyLegalForm = cmInvoice.getBuyerParty().getCompanyLegalForm();
 				
 				List<Map<Object,String>> sellerTaxSchemes = cmInvoice.getSellerTaxSchemes();

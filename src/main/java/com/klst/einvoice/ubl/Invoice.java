@@ -18,6 +18,7 @@ import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentCardFactory;
+import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
@@ -464,9 +465,16 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		return doc.getBuyerReference()==null ? null : doc.getBuyerReference().getValue();
 	}
 
-	// BT-11 Project reference 
-	public void setProjectReferenceID(String docRefId) {
+	@Override
+	public void setProjectReference(String reference, String schemeID) {
 		LOG.warning(NOT_IMPEMENTED);
+		
+	}
+
+	@Override
+	public String getProjectReferenceValue() {
+		LOG.warning(NOT_IMPEMENTED);
+		return null;
 	}
 
 	// BT-12 Contract reference 
@@ -805,7 +813,8 @@ SELLER CONTACT                              BG-6                        1
 	 * 
 	 * @param taxCompany Identifier
 	 */
-	public void setSellerTaxCompanyId(String taxCompanyId) {
+	@Deprecated // use Party
+	public void setSellerTaxCompanyId(String taxCompanyId) { // ==> party
 		Party party = getSellerParty();
 		party.addPartyTaxID(taxCompanyId);
 	}
@@ -917,7 +926,8 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * 
 	 * @param taxCompany Identifier
 	 */
-	public void setBuyerTaxCompanyId(String taxCompanyId) {
+	@Deprecated // use Party
+	public void setBuyerTaxCompanyId(String taxCompanyId) { // party.setTaxRegistrationId(taxCompanyId, countryCode) bzw (taxCompanyId, "VA")
 		Party party = getBuyerParty();
 		party.addPartyTaxID(taxCompanyId);
 	}
@@ -1570,22 +1580,22 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 	}
 
 	// Address
-	public void setSellerPostalAddress(Address address) {
+	public void setSellerPostalAddress(PostalAddress address) {
 		Party party = getSellerParty();
 		party.setAddress(address);
 	}
 	
-	public Address getSellerPostalAddress() {
+	public PostalAddress getSellerPostalAddress() {
 		Party party = getSellerParty();
 		return party.getAddress();
 	}
 	
-	public void setBuyerrPostalAddress(Address address) {
+	public void setBuyerrPostalAddress(PostalAddress address) {
 		Party party = getBuyerParty();
 		party.setAddress(address);
 	}
 	
-	public Address getBuyerPostalAddress() {
+	public PostalAddress getBuyerPostalAddress() {
 		Party party = getBuyerParty();
 		return party.getAddress();
 	}

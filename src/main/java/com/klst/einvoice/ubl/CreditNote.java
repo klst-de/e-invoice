@@ -257,6 +257,17 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		return doc.getBuyerReference()==null ? null : doc.getBuyerReference().getValue();
 	}
 
+	@Override
+	public void setProjectReference(String reference, String schemeID) {
+		LOG.warning(NOT_IMPEMENTED);
+		
+	}
+	@Override
+	public String getProjectReferenceValue() {
+		LOG.warning(NOT_IMPEMENTED);
+		return null;
+	}
+
 	// wie BT-14  Document reference
 	public void setOrderReferenceID(String docRefId) {
 		if(docRefId==null) return; // optional
@@ -412,10 +423,10 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		setSellerParty(party);
 	}
 	
-	public void setSellerTaxCompanyId(String taxCompanyId) {
-		Party party = getSellerParty();
-		party.addPartyTaxID(taxCompanyId);
-	}
+//	public void setSellerTaxCompanyId(String taxCompanyId) {
+//		Party party = getSellerParty();
+//		party.addPartyTaxID(taxCompanyId);
+//	}
 	
 	public void setSellerParty(Party party) {
 		SupplierPartyType supplierParty = new SupplierPartyType();
@@ -439,10 +450,10 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		setBuyerParty(party);
 	}
 
-	public void setBuyerTaxCompanyId(String taxCompanyId) {
-		Party party = getBuyerParty();
-		party.addPartyTaxID(taxCompanyId);
-	}
+//	public void setBuyerTaxCompanyId(String taxCompanyId) {
+//		Party party = getBuyerParty();
+//		party.addPartyTaxID(taxCompanyId);
+//	}
 	public void setBuyerParty(Party party) {
 		CustomerPartyType customerparty = new CustomerPartyType();
 		customerparty.setParty(party);
@@ -678,6 +689,12 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		Amount taxInclusive = getInvoiceTotalTaxInclusive(monetaryTotal);
 		Amount payable = getDuePayable(monetaryTotal);
 		setDocumentTotals(lineExtension, taxExclusive, taxInclusive, payable);
+	}
+
+	@Override
+	public Amount getInvoiceTaxInAccountingCurrency() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

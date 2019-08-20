@@ -85,7 +85,7 @@ public class CreateUblTest {
 
 	@Test
     public void ublZZZ() {
-    	InvoiceFactory factory = new CreateUblXXXInvoice("01.01a-INVOICE_ubl.xml");
+    	InvoiceFactory factory = new CreateUblXXXInvoice("01.13a-INVOICE_ubl.xml");
     	byte[] bytes = factory.toUbl(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);

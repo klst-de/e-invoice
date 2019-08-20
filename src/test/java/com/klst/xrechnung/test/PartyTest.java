@@ -71,19 +71,50 @@ public class PartyTest {
     
 	@Before 
     public void setup() {
+/*
+    <cac:AccountingSupplierParty>
+        <cac:Party>
+            <cac:PostalAddress>
+                <cbc:StreetName>[Seller address line 1]</cbc:StreetName>
+                <cbc:CityName>[Seller city]</cbc:CityName>
+                <cbc:PostalZone>12345</cbc:PostalZone>
+                <cac:Country>
+                    <cbc:IdentificationCode>DE</cbc:IdentificationCode>
+                </cac:Country>
+            </cac:PostalAddress>
+            <cac:PartyTaxScheme>
+                <cbc:CompanyID>DE123456789</cbc:CompanyID>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:PartyTaxScheme>
+            <cac:PartyLegalEntity>
+                <cbc:RegistrationName>[Seller name]</cbc:RegistrationName>
+                <cbc:CompanyID>HRB 123456</cbc:CompanyID>
+                <cbc:CompanyLegalForm>Sitz der Gesellschaft […], Registergericht […], Amtsgericht […]</cbc:CompanyLegalForm>
+            </cac:PartyLegalEntity>
+            <cac:Contact>
+                <cbc:Name>[Seller contact person]</cbc:Name>
+                <cbc:Telephone>+49 123456789</cbc:Telephone>
+                <cbc:ElectronicMail>xxx@schulung.de</cbc:ElectronicMail>
+            </cac:Contact>
+        </cac:Party>
+    </cac:AccountingSupplierParty>
+
+ */
     	InvoiceFactory factory = new CreateUblXXXInvoice(UBL_XML[5]);
     	invoice = factory.getTestDoc();
     	supplierparty = null;
 		supplierParty = invoice.getAccountingSupplierParty();
 		if(supplierParty!=null) {
 			supplierparty = new Party(supplierParty.getParty());
-			LOG.info("supplierparty.name:"+ (supplierparty.getName()) );
+			LOG.info("supplierparty.RegistrationName:"+ (supplierparty.getRegistrationName()) );
 		}
 		customerparty = null;
 		customerParty = invoice.getAccountingCustomerParty();
 		if(customerParty!=null) {
 			customerparty = new Party(customerParty.getParty());
-			LOG.info("customerparty.name:"+ (customerparty.getName()) );
+			LOG.info("customerparty.RegistrationName:"+ (customerparty.getRegistrationName()) );
 		}
     }
 
@@ -101,23 +132,24 @@ public class PartyTest {
     	Address address = null;
     	Contact contact = null;
     	Party party = new Party(name, address, contact, null, null);
-		assertEquals(name, party.getName());
+		assertEquals(name, party.getRegistrationName());
 		assertEquals(address, party.getAddress());
 		assertEquals(contact, party.getContact());
    }
 
-//    @Test
-//    public void ublAddName() {
-//    	String name = "party name";
-//		assertTrue(supplierparty.getNames().isEmpty());
-//		supplierparty.addName(name);
-//		assertTrue(supplierparty.getNames().size()==1);
-//		assertEquals(name, supplierparty.getNames().get(0));
-//   }
+    @Test
+    public void ublBusinessName() {
+    	String name = "party name";
+		assertTrue(supplierparty.getPartyName().isEmpty());
+		supplierparty.setTradingBusinessName(name);
+		assertTrue(supplierparty.getPartyName().size()==1);
+		assertEquals(name, supplierparty.getPartyName().get(0).getName().getValue());
+		assertEquals(name, supplierparty.getTradingBusinessName());
+   }
 
     @Test
     public void ublGetAddress() {
-    	Address address = supplierparty.getAddress();
+    	PostalAddress address = supplierparty.getAddress();
     	LOG.info(addressAsString(address));
     	assertEquals("[Seller city]", address.getCity());
     }
@@ -160,7 +192,7 @@ public class PartyTest {
     public void ublParty1Seller() {
     	LOG.info("supplierparty:"+ supplierparty);
     	assertNotNull(supplierparty);
-    	Address address = supplierparty.getAddress();
+    	PostalAddress address = supplierparty.getAddress();
     	IContact contact = supplierparty.getIContact();
     	assertNotNull(address);
     	assertNotNull(contact);
@@ -184,7 +216,8 @@ public class PartyTest {
     	assertNull(sellerparty.getIContact());
     	LOG.info("??????????????? invoice.getSellerTaxSchemes().size() "+invoice.getSellerTaxSchemes().size()); // Seller wurde überschrieben!
     	assertEquals(0, invoice.getSellerTaxSchemes().size());
-    	invoice.setSellerTaxCompanyId("Umsatzsteuer-Identifikationsnummer des Verkäufers");
+//    	invoice.setSellerTaxCompanyId("Umsatzsteuer-Identifikationsnummer des Verkäufers");
+    	invoice.getSellerParty().addPartyTaxID("Umsatzsteuer-Identifikationsnummer des Verkäufers");
     	taxSchemes = invoice.getSellerTaxSchemes();
     	assertEquals(1, taxSchemes.size());
     	LOG.info("seller taxScheme:" + taxSchemes.get(0).get(CompanyIDType.class) + "/" + taxSchemes.get(0).get(TaxSchemeType.class));
@@ -194,7 +227,7 @@ public class PartyTest {
     public void ublParty2Buyer() {
     	LOG.info("customerparty:"+ customerparty);
     	assertNotNull(customerparty);
-    	Address address = customerparty.getAddress();
+    	PostalAddress address = customerparty.getAddress();
     	assertNotNull(address);
     	LOG.info("customerparty address:" + addressAsString(address));
     	assertNull(customerparty.getIContact());
@@ -213,8 +246,8 @@ public class PartyTest {
 //    	LOG.info("PartyLegalEntities #:"+ partyLegalEntities.size());
 //		assertTrue(partyLegalEntities.size()==1);
 //		Map<Object,String> ple = partyLegalEntities.get(0);
-    	assertEquals("[Buyer name]", customerparty.getName());
-    	assertNull(customerparty.getCompanyID());
+    	assertEquals("[Buyer name]", customerparty.getRegistrationName());
+    	assertNull(customerparty.getCompanyId());
     	assertNull(customerparty.getCompanyLegalForm());
     }
   
@@ -224,8 +257,8 @@ public class PartyTest {
 //    	LOG.info("PartyLegalEntities #:"+ partyLegalEntities.size());
 //		assertTrue(partyLegalEntities.size()==1);
 //		Map<Object,String> ple = partyLegalEntities.get(0);
-    	assertEquals("[Seller name]", supplierparty.getName());
-    	assertEquals("HRB 123456", supplierparty.getCompanyID());
+    	assertEquals("[Seller name]", supplierparty.getRegistrationName());
+    	assertEquals("HRB 123456", supplierparty.getCompanyId());
     	assertEquals("Sitz der Gesellschaft […], Registergericht […], Amtsgericht […]", supplierparty.getCompanyLegalForm());
     }
 }

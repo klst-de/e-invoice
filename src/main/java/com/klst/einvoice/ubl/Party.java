@@ -6,10 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BG4_Seller;
+import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.PostalAddress;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ContactType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyIdentificationType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyLegalEntityType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyNameType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyTaxSchemeType;
@@ -19,6 +23,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyI
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyLegalFormType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.RegistrationNameType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.WebsiteURIType;
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.IdentifierType;
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
 
@@ -29,7 +34,7 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Tex
  * PartyTaxScheme
  * PartyLegalEntity
  */
-public class Party extends PartyType { // TODO implements ???
+public class Party extends PartyType implements BG4_Seller, BG7_Buyer {
 
 	private static final Logger LOG = Logger.getLogger(Party.class.getName());
 	
@@ -49,8 +54,11 @@ public class Party extends PartyType { // TODO implements ???
 		setContact(getContact(party));
 		setAddress(getPostalAddress(party));
 		addTaxSchemes(getTaxSchemes(party));
+		partyLegalEntity = new PartyLegalEntityType();
 		addLegalEntities(getPartyLegalEntities(party));
 	}
+	
+	PartyLegalEntityType partyLegalEntity;
 	
 	/**
 	 * 
@@ -61,24 +69,25 @@ public class Party extends PartyType { // TODO implements ???
 	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
 //	 * @param shipToTradeName  BT-70 0..1 ShipToTradeParty.Name Name des Waren- oder Dienstleistungsempfängers
 	 */
-	public Party(String name, Address address, Contact contact, String companyId, String companyLegalForm) {
+	public Party(String name, PostalAddress address, Contact contact, String companyId, String companyLegalForm) {
 		this();
 //		addName(name);
 		setAddress(address);
 		setContact(contact);
+		partyLegalEntity = new PartyLegalEntityType();
 		addLegalEntities(name, companyId, companyLegalForm);
 	}
 
 	// BT-70 PartyName/shipToTradeName
-	public void addName(String shipToTradeName) {
-		if(shipToTradeName==null) return;
-		LOG.info("name/shipToTradeName:"+shipToTradeName);
-		NameType name = new NameType();
-		name.setValue(shipToTradeName);
-		PartyNameType partyName = new PartyNameType();
-		partyName.setName(name);
-		super.getPartyName().add(partyName);
-	}
+//	public void addName(String shipToTradeName) { // ==> setTradingBusinessName
+//		if(shipToTradeName==null) return;
+//		LOG.info("name/shipToTradeName:"+shipToTradeName);
+//		NameType name = new NameType();
+//		name.setValue(shipToTradeName);
+//		PartyNameType partyName = new PartyNameType();
+//		partyName.setName(name);
+//		super.getPartyName().add(partyName);
+//	}
 //	
 //	void addName(List<String> names) {
 //		names.forEach(name -> {
@@ -100,18 +109,21 @@ public class Party extends PartyType { // TODO implements ???
 //	}
 	
 	// PostalAddress
-	public void setAddress(Address address) {
+	@Override
+	public PostalAddress getAddress() {
+		return getPostalAddress(this);
+	}
+
+	@Override
+	public void setAddress(PostalAddress address) {
 		this.setPostalAddress((AddressType)address);
 	}
+
 	void setAddress(AddressType address) {
 		super.setPostalAddress(address);
 	}
 	
-	public Address getAddress() {
-		return getPostalAddress(this);
-	}
-	
-	static Address getPostalAddress(PartyType party) {
+	static PostalAddress getPostalAddress(PartyType party) {
 		AddressType address = party.getPostalAddress();
 		if(address==null) return null; // defensiv, sollte nie null sein
 		return new Address(address);
@@ -137,27 +149,17 @@ public class Party extends PartyType { // TODO implements ???
 	//                oder "SELLER TAX REPRESENTATIVE PARTY" (BG-11) übermittelt werden. 
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.
 	public void addPartyTaxID(String companyId)  {
-		if(companyId==null) return;
-		List<PartyTaxSchemeType> partyTaxSchemeList = super.getPartyTaxScheme();
-		PartyTaxSchemeType partyTaxScheme = new PartyTaxSchemeType();
-		CompanyIDType companyID = new CompanyIDType();
-		companyID.setValue(companyId);
-		partyTaxScheme.setCompanyID(companyID);
-		
 		// use countryCode of the party (which is mandatory) as default see https://github.com/klst-de/e-invoice/issues/1
-		Address address = getAddress();
+		PostalAddress address = getAddress();
 		String countryCode = address==null ? null : address.getCountryCode();
-		TaxSchemeType taxScheme = VatCategory.getVatScheme(countryCode);
-		
-		partyTaxScheme.setTaxScheme(taxScheme);
-		partyTaxSchemeList.add(partyTaxScheme);	
+		setTaxRegistrationId(companyId, countryCode);
 	}
 	// wg copy ctor
 	void addTaxSchemes(List<Map<Object,String>> partyTaxSchemes)  {
 		partyTaxSchemes.forEach(partyTaxScheme -> {
-//			String taxScheme = partyTaxScheme==null ? null : partyTaxScheme.get(TaxSchemeType.class); // wird immer weggeworfen???????
+			String taxScheme = partyTaxScheme==null ? null : partyTaxScheme.get(TaxSchemeType.class);
 			String companyId = partyTaxScheme==null ? null : partyTaxScheme.get(CompanyIDType.class);
-			addPartyTaxID(companyId);
+			setTaxRegistrationId(companyId, taxScheme);
 		});
 	}
 	public List<Map<Object,String>> getTaxSchemes() { 
@@ -192,29 +194,10 @@ public class Party extends PartyType { // TODO implements ???
 	 * @param companyId optional / legal registration identifier, BT-30/BT-45
 	 * @param companyLegalForm optional / additional legal information, BT-33/BT-46
 	 */
-	void addLegalEntities(String name, String companyId, String companyLegalForm)  {
-		PartyLegalEntityType partyLegalEntity = new PartyLegalEntityType();
-		if(name!=null) {
-			RegistrationNameType registrationName = new RegistrationNameType();
-			registrationName.setValue(name);
-			partyLegalEntity.setRegistrationName(registrationName);
-		} else {
-			if(companyId==null && companyLegalForm==null) {
-				// for DeliveryParty all params can be null , do not create DeliveryParty PartyLegalEntity
-				// to avoid warning [UBL-CR-397]-A UBL invoice should not include the DeliveryParty PartyLegalEntity
-				return;
-			}
-		}
-		if(companyId!=null) {
-			CompanyIDType companyID = new CompanyIDType();
-			companyID.setValue(companyId);
-			partyLegalEntity.setCompanyID(companyID);
-		}
-		if(companyLegalForm!=null) {
-			CompanyLegalFormType clf = new CompanyLegalFormType();
-			clf.setValue(companyLegalForm);
-			partyLegalEntity.setCompanyLegalForm(clf);
-		}
+	void addLegalEntities(String registrationName, String companyId, String companyLegalForm)  {
+		setRegistrationName(registrationName);
+		setCompanyId(companyId);
+		setCompanyLegalForm(companyLegalForm);
 		super.getPartyLegalEntity().add(partyLegalEntity);
 	}
 	
@@ -227,15 +210,12 @@ public class Party extends PartyType { // TODO implements ???
 		});
 	}
 
-	public String getName() {
-		return getObject(RegistrationNameType.class);
-	}
-	public String getCompanyID() {
-		return getObject(CompanyIDType.class);
-	}
-	public String getCompanyLegalForm() {
-		return getObject(CompanyLegalFormType.class);
-	}
+//	String getName() {
+//		return getObject(RegistrationNameType.class);
+//	}
+//	public String getCompanyID() {
+//		return getObject(CompanyIDType.class);
+//	}
 	String getObject(Object clazz) {
 		List<Map<Object,String>> mapList = getPartyLegalEntities(this);
 		if(mapList.isEmpty()) {
@@ -263,6 +243,147 @@ public class Party extends PartyType { // TODO implements ???
 			result.add(map);
 		});
 		return result;
+	}
+// ----------------------------------------
+
+	@Override
+	public String getRegistrationName() {
+		return getObject(RegistrationNameType.class);
+	}
+
+	@Override
+	public void setRegistrationName(String name) {
+		if(name==null) return;
+		RegistrationNameType registrationName = new RegistrationNameType();
+		registrationName.setValue(name);
+		partyLegalEntity.setRegistrationName(registrationName);
+	}
+
+	@Override
+	public String getTradingBusinessName() {
+		List<PartyNameType> partyNameList = super.getPartyName();
+		return partyNameList.isEmpty() ? null : partyNameList.get(0).getName().getValue();
+	}
+
+	@Override
+	public void setTradingBusinessName(String businessName) {
+		if(businessName==null) return;
+		NameType name = new NameType();
+		name.setValue(businessName);
+		PartyNameType partyName = new PartyNameType();
+		partyName.setName(name);
+		super.getPartyName().add(partyName);
+	}
+
+	@Override
+	public String getId() {
+		List<PartyIdentificationType> partyIdentificationList = super.getPartyIdentification();
+		return partyIdentificationList.isEmpty() ? null : partyIdentificationList.get(0).getID().getValue(); // ohne schema
+	}
+
+	@Override
+	public void setId(String name) {
+		setId(name, null);
+	}
+
+	@Override
+	public void setId(String name, String schemeID) {
+		if(name==null) return;
+		PartyIdentificationType partyIdentification = new PartyIdentificationType();
+		partyIdentification.setID(Invoice.newIDType(name, schemeID));
+		super.getPartyIdentification().add(partyIdentification);
+	}
+
+	@Override
+	public String getCompanyId() {
+		return getObject(CompanyIDType.class);
+	}
+
+	@Override
+	public void setCompanyId(String name) {
+		setCompanyId(name, null);
+	}
+
+	@Override
+	public void setCompanyId(String name, String schemeID) {
+		if(name==null) return;
+		CompanyIDType companyID = new CompanyIDType();
+		companyID.setValue(name);
+		companyID.setSchemeID(schemeID);
+		partyLegalEntity.setCompanyID(companyID);
+	}
+
+	@Override
+	public String getTaxRegistrationId() {
+		return getTaxRegistrationId("VA");
+	}
+	@Override
+	public String getTaxRegistrationId(String schemeID) {
+		List<Map<Object,String>> mapList = getTaxSchemes();
+		if(mapList.size()==0) {
+			return null;
+		} else if(mapList.size()==1) {
+			Map<Object,String> map = mapList.get(0);
+			String [] val1 = map.values().toArray(new String[0]);
+			if(map.keySet().size()==1) {
+				return val1[0];
+			} else {
+				return map.get(schemeID)==null ? val1[0] : map.get(schemeID);
+			}
+		} else {
+			for(int i=0; i<mapList.size(); i++) {
+				Map<Object,String> map = mapList.get(i);
+				if(map.get(schemeID)!=null) {
+					return map.get(schemeID);
+				}
+			}
+			Map<Object,String> map = mapList.get(0);
+			String [] val1 = map.values().toArray(new String[0]);
+			return val1[0];
+		}
+	}
+
+	@Override
+	public void setTaxRegistrationId(String name, String schemeID) { 
+		if(name==null) return;
+		CompanyIDType companyID = new CompanyIDType();
+		companyID.setValue(name);
+		PartyTaxSchemeType partyTaxScheme = new PartyTaxSchemeType();
+		partyTaxScheme.setCompanyID(companyID);
+		
+		TaxSchemeType taxScheme = new TaxSchemeType();
+		taxScheme.setID(Invoice.newIDType(schemeID, null));
+		partyTaxScheme.setTaxScheme(taxScheme);
+		
+		super.getPartyTaxScheme().add(partyTaxScheme);
+	}
+
+	@Override
+	public String getCompanyLegalForm() {
+		return getObject(CompanyLegalFormType.class);
+	}
+
+	@Override
+	public void setCompanyLegalForm(String name) {
+		if(name==null) return;
+		CompanyLegalFormType clf = new CompanyLegalFormType();
+		clf.setValue(name);
+		partyLegalEntity.setCompanyLegalForm(clf);		
+	}
+
+	@Override
+	public String getUriUniversalCommunication() {
+		WebsiteURIType websiteURI = super.getWebsiteURI();
+		return websiteURI==null ? null : websiteURI.getValue(); // ohne schema
+	}
+
+	@Override
+	public void setUriUniversalCommunication(String name, String schemeID) {
+		if(name==null) return;
+		WebsiteURIType websiteURI = new WebsiteURIType();
+		websiteURI.setValue(name);
+		websiteURI.setSchemeID(schemeID);
+		super.setWebsiteURI(websiteURI);
 	}
 
 }
