@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
+import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
 
@@ -111,16 +112,30 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer {
 		return contact==null ? null : new Contact(contact);
 	}
 
-	// PartyTaxScheme
-	// wg. [BR-DE-16] In der Rechnung muss mindestens eines der Elemente "Seller VAT identifier" (BT-31), 
-	//                "Seller tax registration identifier" (BT-32) 
-	//                oder "SELLER TAX REPRESENTATIVE PARTY" (BG-11) übermittelt werden. 
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.
-	public void addPartyTaxID(String companyId)  {
-		// use countryCode of the party (which is mandatory) as default see https://github.com/klst-de/e-invoice/issues/1
+	public static final String DEFAULT_TAX_SCHEME = CoreInvoiceVatBreakdown.VAT;
+	
+	/**
+	 * Buyer/Seller VAT identifier - The VAT identifier (also known as VAT identification number).
+	 * <p>
+	 * VAT number prefixed by a country code based on EN ISO 3166-1 "Codes for the representation of names of countries and their subdivisions"
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>ID:      BT-48
+	 * <br>Req.ID:  R45, R52, R57
+	 * 
+	 * @param taxRegistrationId Identifier
+	 */
+	public void setTaxRegistrationId(String taxRegistrationId) {
+		// countryCode of the party (which is mandatory) as default prefix , see https://github.com/klst-de/e-invoice/issues/1
 		PostalAddress address = getAddress();
 		String countryCode = address==null ? null : address.getCountryCode();
-		setTaxRegistrationId(companyId, countryCode);
+		if(taxRegistrationId.startsWith(countryCode)) {
+			setTaxRegistrationId(taxRegistrationId, DEFAULT_TAX_SCHEME);
+		} else {
+			LOG.warning("taxRegistrationId does not start with countryCode:"+taxRegistrationId + " - silently done.");
+			setTaxRegistrationId(countryCode+taxRegistrationId, DEFAULT_TAX_SCHEME);
+		}
 	}
 	// wg copy ctor
 	void addTaxSchemes(List<Map<Object,String>> partyTaxSchemes)  {

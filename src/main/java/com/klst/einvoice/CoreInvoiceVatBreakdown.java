@@ -91,7 +91,9 @@ public interface CoreInvoiceVatBreakdown {
 	 * 
 	 * <br>EN16931-ID: 	BT-118-0
 	 */
-	public static final String VAT = "VAT"; // BT-118-0 TypeCode Code der Umsatzsteuerkategorie, Hinweis: Fester Wert = "VAT"
+	// BT-118-0 TypeCode Code der Umsatzsteuerkategorie, Hinweis: Fester Wert = "VAT"
+	// wird auch als default für BT-31-0, BT-32-0 TaxRegistrationId.schemeID verwendet, in CII steht "VA"
+	public static final String VAT = "VAT";
 
 	/**
 	 * set tax category code and rate

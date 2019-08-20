@@ -808,15 +808,10 @@ SELLER CONTACT                              BG-6                        1
 	/* Die Umsatzsteuer-Identifikationsnummer des Verkäufers. 
 	 * Verfügt der Verkäufer über eine solche, ist sie hier anzugeben, sofern nicht Angaben zum Seller tax representative gemacht werden.
 	 */
-	/**
-	 * set optional taxCompanyId  / Seller VAT identifier, BT-31, R52
-	 * 
-	 * @param taxCompany Identifier
-	 */
 	@Deprecated // use Party
 	public void setSellerTaxCompanyId(String taxCompanyId) { // ==> party
 		Party party = getSellerParty();
-		party.addPartyTaxID(taxCompanyId);
+		party.setTaxRegistrationId(taxCompanyId);
 	}
 	
 	/**
@@ -915,21 +910,10 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 		setBuyerParty(party);
 	}
 
-	/**
-	 * Buyer VAT identifier - The Buyer's VAT identifier (also known as Buyer VAT identification number).
-	 * <p>
-	 * VAT number prefixed by a country code based on EN ISO 3166-1 "Codes for the representation of names of countries and their subdivisions"
-	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>ID: BT-48
-	 * <br>Req.ID: R45, R52, R57
-	 * 
-	 * @param taxCompany Identifier
-	 */
 	@Deprecated // use Party
 	public void setBuyerTaxCompanyId(String taxCompanyId) { // party.setTaxRegistrationId(taxCompanyId, countryCode) bzw (taxCompanyId, "VA")
 		Party party = getBuyerParty();
-		party.addPartyTaxID(taxCompanyId);
+		party.setTaxRegistrationId(taxCompanyId);
 	}
 	
 	/**
