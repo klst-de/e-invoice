@@ -62,52 +62,20 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer {
 	
 	/**
 	 * 
-	 * @param name             BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
+	 * @param registrationName BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
 	 * @param address          BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
 	 * @param contact          BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
 	 * @param companyId        BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
 	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
-//	 * @param shipToTradeName  BT-70 0..1 ShipToTradeParty.Name Name des Waren- oder Dienstleistungsempfängers
 	 */
-	public Party(String name, PostalAddress address, Contact contact, String companyId, String companyLegalForm) {
+	public Party(String registrationName, PostalAddress address, Contact contact, String companyId, String companyLegalForm) {
 		this();
-//		addName(name);
 		setAddress(address);
 		setContact(contact);
 		partyLegalEntity = new PartyLegalEntityType();
-		addLegalEntities(name, companyId, companyLegalForm);
+		addLegalEntities(registrationName, companyId, companyLegalForm);
 	}
 
-	// BT-70 PartyName/shipToTradeName
-//	public void addName(String shipToTradeName) { // ==> setTradingBusinessName
-//		if(shipToTradeName==null) return;
-//		LOG.info("name/shipToTradeName:"+shipToTradeName);
-//		NameType name = new NameType();
-//		name.setValue(shipToTradeName);
-//		PartyNameType partyName = new PartyNameType();
-//		partyName.setName(name);
-//		super.getPartyName().add(partyName);
-//	}
-//	
-//	void addName(List<String> names) {
-//		names.forEach(name -> {
-//			addName(name);
-//		});
-//	}
-//
-//	public List<String> getNames() {
-//		return getNames(this);
-//	}
-//	
-//	static List<String> getNames(PartyType party) {
-//		List<PartyNameType> partyNames = party.getPartyName();
-//		List<String> result = new ArrayList<String>(partyNames.size());
-//		partyNames.forEach(partyName -> {
-//			result.add(partyName.getName().getValue());
-//		});
-//		return result;
-//	}
-	
 	// PostalAddress
 	@Override
 	public PostalAddress getAddress() {
@@ -198,7 +166,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer {
 		setRegistrationName(registrationName);
 		setCompanyId(companyId);
 		setCompanyLegalForm(companyLegalForm);
-		super.getPartyLegalEntity().add(partyLegalEntity);
 	}
 	
 	void addLegalEntities(List<Map<Object,String>> legalEntityList)  {
@@ -210,12 +177,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer {
 		});
 	}
 
-//	String getName() {
-//		return getObject(RegistrationNameType.class);
-//	}
-//	public String getCompanyID() {
-//		return getObject(CompanyIDType.class);
-//	}
 	String getObject(Object clazz) {
 		List<Map<Object,String>> mapList = getPartyLegalEntities(this);
 		if(mapList.isEmpty()) {
@@ -257,6 +218,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer {
 		RegistrationNameType registrationName = new RegistrationNameType();
 		registrationName.setValue(name);
 		partyLegalEntity.setRegistrationName(registrationName);
+		if(super.getPartyLegalEntity().isEmpty()) super.getPartyLegalEntity().add(partyLegalEntity);
 	}
 
 	@Override
@@ -311,6 +273,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer {
 		companyID.setValue(name);
 		companyID.setSchemeID(schemeID);
 		partyLegalEntity.setCompanyID(companyID);
+		if(super.getPartyLegalEntity().isEmpty()) super.getPartyLegalEntity().add(partyLegalEntity);
 	}
 
 	@Override
@@ -369,6 +332,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer {
 		CompanyLegalFormType clf = new CompanyLegalFormType();
 		clf.setValue(name);
 		partyLegalEntity.setCompanyLegalForm(clf);		
+		if(super.getPartyLegalEntity().isEmpty()) super.getPartyLegalEntity().add(partyLegalEntity);
 	}
 
 	@Override
