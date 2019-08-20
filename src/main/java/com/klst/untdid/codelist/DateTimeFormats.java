@@ -20,6 +20,28 @@ public class DateTimeFormats {
 		long timeInMillis = cal.toGregorianCalendar().getTimeInMillis();
 		return new Timestamp(timeInMillis);
 	}
+	
+	// UNTDID 2379 Format "102" : CCYYMMDD = "yyyyMMdd"
+	public static Timestamp yyyyMMddToTs(String ymd) {
+		Timestamp ts = null;
+		try {
+			DateFormat df = new SimpleDateFormat(CCYYMMDD);
+			ts = new Timestamp(((java.util.Date)df.parse(ymd)).getTime());
+		} catch (ParseException ex) {
+			// TODO Auto-generated catch block
+			ex.printStackTrace();
+		}
+		return ts;
+		
+	}
+	
+	public static Timestamp ymdToTs(String ymd, String format) {
+		if(format.equals(CCYYMMDD_QUALIFIER)) {
+			return yyyyMMddToTs(ymd);
+		}
+		return ymdToTs(ymd);
+	}
+	
 	public static Timestamp ymdToTs(String ymd) {
 		Timestamp ts = null;
 		if(ymd!=null) try {
@@ -30,15 +52,9 @@ public class DateTimeFormats {
 				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 				ts = new Timestamp(((java.util.Date)df.parse(ymd)).getTime());
 			} catch (ParseException ex) {
-				// try UNTDID 2379 Format "102" : CCYYMMDD
+				// try UNTDID 2379 Format "102" : yyyyMMddToTs
 			}
-			try {
-				DateFormat df = new SimpleDateFormat(CCYYMMDD);
-				ts = new Timestamp(((java.util.Date)df.parse(ymd)).getTime());
-			} catch (ParseException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
+			ts = yyyyMMddToTs(ymd);
 		}
 		return ts;
 	}
