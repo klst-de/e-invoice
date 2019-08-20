@@ -17,8 +17,6 @@ import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 
-import de.kosit.validationtool.api.Check;
-
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CiiTest {
 
@@ -26,8 +24,21 @@ public class CiiTest {
 	
 	private static final String[] CII_XML = {
 			"01.01a-INVOICE_uncefact.xml" ,
-			// ...
-			"01.15a-INVOICE_uncefact.xml" };
+			"01.02a-INVOICE_uncefact.xml" ,
+			"01.03a-INVOICE_uncefact.xml" ,
+			"01.04a-INVOICE_uncefact.xml" , // OK
+			"01.05a-INVOICE_uncefact.xml" ,
+			"01.06a-INVOICE_uncefact.xml" ,
+			"01.07a-INVOICE_uncefact.xml" ,
+			"01.08a-INVOICE_uncefact.xml" ,
+			"01.09a-INVOICE_uncefact.xml" ,
+			"01.10a-INVOICE_uncefact.xml" , // OK
+			"01.11a-INVOICE_uncefact.xml" ,
+			"01.12a-INVOICE_uncefact.xml" ,
+//			"01.13a-INVOICE_uncefact.xml" , // NOK
+			"01.14a-INVOICE_uncefact.xml" ,
+			"01.15a-INVOICE_uncefact.xml" 
+			};
 	
 	private static final String XRECHNUNG_12 = "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2";
 
@@ -93,14 +104,25 @@ public class CiiTest {
    }
 
 	@Test
-    public void ciixml05() {
-    	InvoiceFactory factory = new CreateCiiXXXInvoice("01.05a-INVOICE_uncefact.xml");
+    public void ciixml13() { // wg. <ram:ID schemeID="FC">123/456/789</ram:ID>
+    	InvoiceFactory factory = new CreateCiiXXXInvoice("01.13a-INVOICE_uncefact.xml");
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
     	assertTrue(validation.check(bytes));
    }
 
+    @Test
+    public void ciiAll() {
+    	for(int i=0; i<CII_XML.length; i++) {
+    		String fileName = CII_XML[i];
+        	InvoiceFactory factory = new CreateCiiXXXInvoice(fileName);
+        	byte[] bytes = factory.toUbl(); // the xml
+        	LOG.info("\n-------------------------------- "+fileName);
+        	assertTrue(validation.check(bytes));
+    	}
+   }
+    
 	@Test
     public void ciixml_last() {
     	InvoiceFactory factory = new CreateCiiXXXInvoice(CII_XML[CII_XML.length-1]);

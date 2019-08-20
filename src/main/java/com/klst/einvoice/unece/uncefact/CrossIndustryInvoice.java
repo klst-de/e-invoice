@@ -28,6 +28,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProcuringProjectType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
@@ -117,8 +118,11 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setOrderReferenceID(getOrderReferenceID(doc)); // optional
 //		addPaymentTerms(doc);
 		addNotes(doc);	
+		LOG.info("\n SellerParty:");;
 		setSellerParty(getSellerParty(doc));
+		LOG.info("\n BuyerParty:");;
 		setBuyerParty(getBuyerParty(doc));
+		LOG.info("\n ...");;
 //		addDeliveries(doc);
 //		addPaymentInstructions(doc);		
 		setDocumentTotals(getInvoiceLineNetTotal(doc), getInvoiceTotalTaxExclusive(doc), getInvoiceTotalTaxInclusive(doc), getDuePayable(doc));
@@ -387,6 +391,27 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		TextType text = headerTradeAgreement.getBuyerReference();
 		return text==null ? null : text.getValue();
 	}
+	
+	@Override
+	public void setProjectReference(String docRefId, String name) {
+		if(docRefId==null) return; // optional
+		ProcuringProjectType procuringProject = new ProcuringProjectType();
+		procuringProject.setID(CrossIndustryInvoice.newIDType(docRefId, null));
+		procuringProject.setName(CrossIndustryInvoice.newTextType(name));
+		
+		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
+		headerTradeAgreement.setSpecifiedProcuringProject(procuringProject);
+		
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+	}
+
+	@Override
+	public String getProjectReferenceValue() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 /* IssuerAssignedID Verkaufsauftragsreferenz
 	1 .. 1 ApplicableHeaderTradeAgreement Gruppierung der Vertragsangaben
@@ -646,18 +671,21 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	}
 
 	/**
-	 * set optional taxCompanyId  / Seller VAT identifier, BT-31, R52
+	 * set optional taxCompanyId  / Seller VAT identifier, BG-4.BT-31, R52
 	 * 
 	 * @param taxCompany Identifier
 	 */
+	@Deprecated // use Party
 	public void setSellerTaxCompanyId(String taxCompanyId) {
 		if(taxCompanyId==null) return;
 		TaxRegistrationType taxRegistration = new TaxRegistrationType();
 		taxRegistration.setID(newIDType(taxCompanyId, null));
 		TradeParty party = getSellerParty();
-		party.getSpecifiedTaxRegistration().add(taxRegistration);
+//		party.getSpecifiedTaxRegistration().add(taxRegistration);
+		party.addPartyTaxID(taxCompanyId); //, schemeID); 
 	}
-	public String getSellerTaxCompanyId() {
+	@Deprecated // use Party
+	public String getSellerTaxCompanyId() { // ohne Schema!
 		TradeParty party = getSellerParty();
 		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration();
 		if(taxRegistrationList.isEmpty()) return null;

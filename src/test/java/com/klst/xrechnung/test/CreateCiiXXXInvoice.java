@@ -13,6 +13,7 @@ import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.IBANId;
+import com.klst.einvoice.unece.uncefact.TradeContact;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.einvoice.unece.uncefact.VatBreakdown;
@@ -57,24 +58,84 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		makeOptionals(cii);
 		
 
-		TradeParty sellerParty = testDoc.getSellerParty();
-		if(sellerParty.getSpecifiedTaxRegistration().isEmpty()) {
-			LOG.warning("sellerParty.getSpecifiedTaxRegistration().isEmpty() !!!!!!!!!!!!!" );
-		} else {
-			LOG.info("sellerParty.SpecifiedTaxRegistration#:"+sellerParty.getSpecifiedTaxRegistration().size()
-					+ " ID:"+sellerParty.getSpecifiedTaxRegistration().get(0).getID().getValue()
-					+ " schemeID:"+sellerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID()
+		TradeParty testSellerParty = testDoc.getSellerParty();
+		TradeParty sellerParty = new TradeParty( testSellerParty.getRegistrationName() // BT-27 String name
+				                               , testSellerParty.getAddress()          // TradeAddress address
+				                               , (TradeContact)(testSellerParty.getIContact())         // TradeContact contact
+				                               , testSellerParty.getCompanyId()        // BT-30 String companyId
+				                               , testSellerParty.getCompanyLegalForm() // BT-33 String companyLegalForm
+				                               );
+//		sellerParty.setTradingBusinessName(testSellerParty.getTradingBusinessName()) ; // BT-28
+		sellerParty.setTradingBusinessName("Sitz der Gesellschaft: […], Registergericht: […] usw.") ; // BT-28
+		sellerParty.setId(testSellerParty.getId()); // BT-29
+		// BT-31 + BT-32
+		if(testSellerParty.getSpecifiedTaxRegistration().isEmpty()) {
+			LOG.warning("sellerParty.SpecifiedTaxRegistration().isEmpty() !!!!!!!!!!!!!" );
+		} 
+			/* 01.10a-INVOICE_uncefact.xml                      hat zwei Einträge:
+                <ram:SpecifiedTaxRegistration>
+                    <ram:ID schemeID="VA">DE123456789</ram:ID>
+                </ram:SpecifiedTaxRegistration>
+                <ram:SpecifiedTaxRegistration>
+                    <ram:ID schemeID="FC">123/456/789</ram:ID>
+                </ram:SpecifiedTaxRegistration>
+
+			 */
+		LOG.info("sellerParty.SpecifiedTaxRegistration#:"+testSellerParty.getSpecifiedTaxRegistration().size());
+		testSellerParty.getSpecifiedTaxRegistration().forEach(taxRegistration -> {
+			String BT_31 = taxRegistration.getID().getValue();
+			String BT_31_0 = taxRegistration.getID().getSchemeID();
+			LOG.info(" value ID/BT_31:"+BT_31
+					+" schemeID/BT_31_0:"+BT_31_0
 					);
-			if(sellerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID().equals("VA")) {
-				LOG.warning("Korrektur wg. https://github.com/klst-de/e-invoice/issues/5 schemeID is "+sellerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID());
-				sellerParty.getSpecifiedTaxRegistration().get(0).getID().setSchemeID(CoreInvoiceVatBreakdown.VAT);
-			} else {
-				LOG.info("schemeID is "+sellerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID());
+//			if(BT_31_0.equals("VA")) {
+//				// OK : Umsatzsteuernummer
+////				if(BT_31.startsWith(testSellerParty.getAddress().getCountryCode())) {
+////					// OK : Umsatzsteuernummer mit vorangestelltem Ländercode.
+////				} else {
+////					LOG.warning("Korrektur wg. https://github.com/klst-de/e-invoice/issues/5 : Umsatzsteuernummer mit vorangestelltem Ländercode. ");
+////					BT_31 = testSellerParty.getAddress().getCountryCode() + BT_31;
+////				}	
+//			} else {
+//				if(testSellerParty.getSpecifiedTaxRegistration().size()==1) {
+//					LOG.warning("Korrektur wg. https://github.com/klst-de/e-invoice/issues/5 : schemeID is "+BT_31_0);
+////					BT_31_0 = "VA";
+////					BT_31 = testSellerParty.getAddress().getCountryCode() + BT_31;
+//					sellerParty.setTaxRegistrationId(testSellerParty.getAddress().getCountryCode()+"123456789", "VA");
+//				} else {
+//					LOG.warning("KEINE Korrektur wg. https://github.com/klst-de/e-invoice/issues/5 : schemeID is "+BT_31_0);
+//				}
+//			}
+////			if(BT_31.startsWith(testSellerParty.getAddress().getCountryCode())) {
+////				// OK : Umsatzsteuernummer mit vorangestelltem Ländercode.
+////			} else {
+////				LOG.warning("Korrektur wg. https://github.com/klst-de/e-invoice/issues/5 : Umsatzsteuernummer mit vorangestelltem Ländercode. ");
+////				BT_31 = testSellerParty.getAddress().getCountryCode() + BT_31;
+////			}	
+			if(BT_31_0.equals("FC") && BT_31.equals("123/456/789") && testSellerParty.getSpecifiedTaxRegistration().size()==1) {
+				// harccoded patch wg. https://github.com/klst-de/e-invoice/issues/5
+				sellerParty.setTaxRegistrationId("DE123456789", "VA");
 			}
-		}
-		
+			sellerParty.setTaxRegistrationId(BT_31, BT_31_0);
+		});
+		LOG.info("?Seller identifier (BT-29):"+sellerParty.getRegistrationName()
+				+" legal registration identifier (BT-30):"+sellerParty.getCompanyLegalForm()
+				+" VAT identifier (BT-31):"+sellerParty.getTaxRegistrationId()
+				);
+//		sellerParty.setUriUniversalCommunication(testSellerParty.getUriUniversalCommunication()); // BT-34
 		cii.setSellerParty(sellerParty);
-		cii.setBuyerParty(testDoc.getBuyerParty());
+		
+		TradeParty buyerParty = testDoc.getBuyerParty();
+		if(buyerParty.getSpecifiedTaxRegistration().isEmpty()) {
+			LOG.warning("buyerParty.SpecifiedTaxRegistration().isEmpty() !!!!!!!!!!!!!" );
+		} else {
+			LOG.info("buyerParty.SpecifiedTaxRegistration#:"+buyerParty.getSpecifiedTaxRegistration().size()
+					+ " ID:"+buyerParty.getSpecifiedTaxRegistration().get(0).getID().getValue()
+					+ " schemeID:"+buyerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID()
+					);
+			buyerParty.setTaxRegistrationId(buyerParty.getSpecifiedTaxRegistration().get(0).getID().getValue(), buyerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID());
+		}
+		cii.setBuyerParty(buyerParty);
 		
 		LOG.info("testDoc.getPaymentTerm():"+testDoc.getPaymentTerm() + " testDoc.getDueDateAsTimestamp():"+testDoc.getDueDateAsTimestamp());
 		cii.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp()); // BT-9 & BT-20 (optional)
@@ -138,6 +199,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 	void makeOptionals(CrossIndustryInvoice cii) {	
 		
 		cii.setTaxPointDate(testDoc.getTaxPointDateAsTimestamp()); // BT-7 BT-7-0
+		
+//		cii.setProjectReference("PR12345678", "Project reference");
 		
 		cii.setOrderReferenceID(testDoc.getOrderReferenceID()); // BT-14 + 0..1
 		

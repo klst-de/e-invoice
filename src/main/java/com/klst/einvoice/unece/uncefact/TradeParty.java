@@ -1,50 +1,25 @@
 package com.klst.einvoice.unece.uncefact;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BG4_Seller;
+import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.PostalAddress;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LegalOrganizationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeContactType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.UniversalCommunicationType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
-/*
-            <ram:SellerTradeParty>
-                <ram:Name>[Seller name]</ram:Name>
-                <ram:Description>123/456/7890, HRA-Eintrag in […]</ram:Description>
-                <ram:SpecifiedLegalOrganization>
-                    <ram:ID>[HRA-Eintrag]</ram:ID>
-                    <ram:TradingBusinessName>[Seller trading name]</ram:TradingBusinessName>
-                </ram:SpecifiedLegalOrganization>
-                <ram:DefinedTradeContact>
-                    <ram:PersonName>nicht vorhanden</ram:PersonName>
-                    <ram:TelephoneUniversalCommunication>
-                        <ram:CompleteNumber>+49 1234-5678</ram:CompleteNumber>
-                    </ram:TelephoneUniversalCommunication>
-                    <ram:EmailURIUniversalCommunication>
-                        <ram:URIID>seller@email.de</ram:URIID>
-                    </ram:EmailURIUniversalCommunication>
-                </ram:DefinedTradeContact>
-                <ram:PostalTradeAddress>
-                    <ram:PostcodeCode>12345</ram:PostcodeCode>
-                    <ram:LineOne>[Seller address line 1]</ram:LineOne>
-                    <ram:CityName>[Seller city]</ram:CityName>
-                    <ram:CountryID>DE</ram:CountryID>
-                </ram:PostalTradeAddress>
-                <ram:SpecifiedTaxRegistration>
-                    <ram:ID schemeID="VA">DE 123456789</ram:ID>
-                </ram:SpecifiedTaxRegistration>
-            </ram:SellerTradeParty>
-
- */
-public class TradeParty extends TradePartyType {
+// BG-4 + 1..1 SELLER
+// BG-7 + 1..1 BUYER
+public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer { 
 
 	private static final Logger LOG = Logger.getLogger(TradeParty.class.getName());
 	
@@ -55,32 +30,53 @@ public class TradeParty extends TradePartyType {
 	// copy ctor
 	public TradeParty(TradePartyType party) {
 		this();
-		super.setName(party.getName());
-		setAddress(getPostalAddress(party));
-		TradeContact tc = getContact(party);
+		TextType name = party.getName(); // Name des Verkäufers BT-27, .. des Käufers BT-44
+		PostalAddress ta = getPostalAddress(party); // BG-5, BG-8
+		TradeContact tc = getContact(party); // BG-6, BF-9
+		LOG.info("copy ctor Name/BT-27,BT-44,...:"+name.getValue() + " Address:"+ta + " Contact:"+tc);
+		super.setName(name);
+		setAddress(ta);
 		if(tc==null) {
-			LOG.info("TradeContact tc is null");
+//			LOG.info("TradeContact tc is null");
 		} else {
 			setContact(tc);
 		}
 		
-		LegalOrganizationType legalOrganization = party.getSpecifiedLegalOrganization();
+		// BT-28 ++ 0..1 Seller trading name / TradingBusinessName
+		// BT-29 ++ 0..n Seller identifier
+		
+		legalOrganization = party.getSpecifiedLegalOrganization();
+		super.setSpecifiedLegalOrganization(legalOrganization);
 		if(legalOrganization!=null) {
-			super.setSpecifiedLegalOrganization(legalOrganization);
+			LOG.info("SpecifiedLegalOrganization.TradingBusinessName/BT-28:"+legalOrganization.getTradingBusinessName()
+				+ "  .ID/BT-30:"+legalOrganization.getID());
+//			super.setSpecifiedLegalOrganization(legalOrganization);
 		}
+		
+		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration(); // 0..n wg. BT-31, BT-32, BT-31-0, BT-32-0
+		taxRegistrationList.forEach(taxRegistration -> {
+//			this.getSpecifiedTaxRegistration().add(taxRegistration);
+//			taxRegistration.getID().getValue();
+//			taxRegistration.getID().getSchemeID();
+			this.addPartyTaxID(taxRegistration.getID().getValue(), taxRegistration.getID().getSchemeID());
+		});
+//		addTaxSchemes(getTaxSchemes(party));
 		
 		List<TextType> textList = party.getDescription();
 		textList.forEach(companyLegalForm -> {
-			this.getDescription().add(companyLegalForm);
+			LOG.info("Description/BT-33:"+legalOrganization); //
+			super.getDescription().add(companyLegalForm);
 		});
 		
-		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration();
-		taxRegistrationList.forEach(taxRegistration -> {
-			this.getSpecifiedTaxRegistration().add(taxRegistration);
+		// BT-34 ++ 0..1 Seller electronic address
+		List<UniversalCommunicationType> uriAddressList = party.getURIUniversalCommunication(); // 0..1
+		uriAddressList.forEach(uriAddress -> {
+			LOG.info("URIUniversalCommunication/BT-34:"+uriAddress.getURIID()); //
+			super.getURIUniversalCommunication().add(uriAddress);
 		});
-
-		addTaxSchemes(getTaxSchemes(party));
 	}
+	
+	LegalOrganizationType legalOrganization;
 	
 	/**
 	 * 
@@ -91,8 +87,10 @@ public class TradeParty extends TradePartyType {
 	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
 //	 * @param shipToTradeName  BT-70 0..1 ShipToTradeParty.Name Name des Waren- oder Dienstleistungsempfängers
 	 */
-	public TradeParty(String name, TradeAddress address, TradeContact contact, String companyId, String companyLegalForm) {
+	public TradeParty(String name, PostalAddress address, TradeContact contact, String companyId, String companyLegalForm) {
 		this();
+		legalOrganization = new LegalOrganizationType();
+		super.setSpecifiedLegalOrganization(legalOrganization);
 		if(name!=null) super.setName(CrossIndustryInvoice.newTextType(name));
 		if(address!=null) setAddress(address);
 		if(contact!=null) setContact(contact);
@@ -109,10 +107,10 @@ public class TradeParty extends TradePartyType {
        0177 : ODETTE
  */
 		if(companyId!=null) {
-			LegalOrganizationType legalOrganization = new LegalOrganizationType();
+//			LegalOrganizationType legalOrganization = new LegalOrganizationType();
 			String schemeID = null;
 			legalOrganization.setID(CrossIndustryInvoice.newIDType(companyId,schemeID));
-			super.setSpecifiedLegalOrganization(legalOrganization);
+//			super.setSpecifiedLegalOrganization(legalOrganization);
 		}
 		
 		if(companyLegalForm!=null) {
@@ -126,17 +124,27 @@ public class TradeParty extends TradePartyType {
 	}
 
 	// PostalAddress
-	public void setAddress(TradeAddress address) {
+	@Override
+	public PostalAddress getAddress() {
+		return getPostalAddress(this);
+	}
+
+	@Override
+	public void setAddress(PostalAddress address) {
 		this.setAddress((TradeAddressType)address);
 	}
+
+//	public void setAddress(TradeAddress address) {
+//		this.setAddress((TradeAddressType)address);
+//	}
 	void setAddress(TradeAddressType address) {
 		super.setPostalTradeAddress(address);
 	}
 	
-	public TradeAddress getAddress() {
-		return getPostalAddress(this);
-	}
-	static TradeAddress getPostalAddress(TradePartyType party) {
+//	public TradeAddress getAddress() {
+//		return getPostalAddress(this);
+//	}
+	static PostalAddress getPostalAddress(TradePartyType party) {
 		TradeAddressType address = party.getPostalTradeAddress();
 		if(address==null) return null; // defensiv, sollte nie null sein
 		return new TradeAddress(address);
@@ -166,7 +174,7 @@ public class TradeParty extends TradePartyType {
  */
 	static TradeContact getContact(TradePartyType party) {
 		List<TradeContactType> tradeContactList = party.getDefinedTradeContact();
-		LOG.info("tradeContactList#="+tradeContactList.size());
+		LOG.info("DefinedTradeContact List#="+tradeContactList.size());
 		if(tradeContactList.isEmpty()) return null;
 		return new TradeContact(tradeContactList.get(0));
 	}
@@ -202,41 +210,155 @@ public class TradeParty extends TradePartyType {
 	 * E.g. in some countries, if the Seller is not registered as a tax paying entity 
 	 * then the Buyer is required to withhold the amount of the tax and pay it on behalf of the Seller.
 	 */
-	public void addPartyTaxID(String companyId, String schemeID)  {
+	void addPartyTaxID(String companyId, String schemeID)  {
+		LOG.info("companyId:"+companyId + " schemeID:"+schemeID);
 		if(companyId==null) return;
 		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
 		TaxRegistrationType taxRegistration = new TaxRegistrationType();
 		taxRegistration.setID(CrossIndustryInvoice.newIDType(companyId,schemeID));
 		taxRegistrationList.add(taxRegistration);
 	}
-	public void addPartyTaxID(String companyId)  {
+	void addPartyTaxID(String companyId)  {
 		addPartyTaxID(companyId, "VA");
 	}
 
-	// void addTaxSchemes(List<Map<Object,String>> partyTaxSchemes)  {
-	void addTaxSchemes(List<Map<Object,String>> partyTaxSchemes)  {
-		for(int i=0; i<partyTaxSchemes.size(); i++) {
-			Map<Object,String> map = partyTaxSchemes.get(i);
-			map.forEach((k,v) -> {
-				addPartyTaxID((String)k,v);
-			});
-		}
+//	// void addTaxSchemes(List<Map<Object,String>> partyTaxSchemes)  {
+//	void addTaxSchemes(List<Map<Object,String>> partyTaxSchemes)  {
+//		for(int i=0; i<partyTaxSchemes.size(); i++) {
+//			Map<Object,String> map = partyTaxSchemes.get(i);
+//			map.forEach((k,v) -> {
+//				addPartyTaxID((String)k,v);
+//			});
+//		}
+//	}
+//
+//	public List<Map<Object,String>> getTaxSchemes() { 
+//		return getTaxSchemes(this);
+//	}
+//	static List<Map<Object,String>> getTaxSchemes(TradePartyType party) { 
+//		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration();
+//		LOG.info("taxRegistrationList#="+taxRegistrationList.size());
+//		List<Map<Object,String>> resultList = new ArrayList<Map<Object,String>>(taxRegistrationList.size());
+//		taxRegistrationList.forEach(taxRegistration -> {
+//			Map<Object,String> map = new HashMap<Object,String>();
+////			map.put(IDType.class, taxRegistration.getID().getValue());
+//			map.put(taxRegistration.getID().getSchemeID(), taxRegistration.getID().getValue());
+//			resultList.add(map);
+//		});
+//		return resultList;
+//	}
+
+//	------------------------------------------
+	
+	String getPartyName() {
+		return super.getName().getValue();
 	}
 
-	public List<Map<Object,String>> getTaxSchemes() { 
-		return getTaxSchemes(this);
-	}
-	static List<Map<Object,String>> getTaxSchemes(TradePartyType party) { 
-		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration();
-		LOG.info("taxRegistrationList#="+taxRegistrationList.size());
-		List<Map<Object,String>> resultList = new ArrayList<Map<Object,String>>(taxRegistrationList.size());
-		taxRegistrationList.forEach(taxRegistration -> {
-			Map<Object,String> map = new HashMap<Object,String>();
-//			map.put(IDType.class, taxRegistration.getID().getValue());
-			map.put(taxRegistration.getID().getSchemeID(), taxRegistration.getID().getValue());
-			resultList.add(map);
-		});
-		return resultList;
+	void setPartyName(String name) {
+		if(name==null) return;
+		super.setName(CrossIndustryInvoice.newTextType(name));
 	}
 	
+	@Override
+	public String getRegistrationName() {
+		return getPartyName();
+	}
+
+	@Override
+	public void setRegistrationName(String name) {
+		setPartyName(name);
+	}
+
+	@Override
+	public String getTradingBusinessName() {
+		TextType text = legalOrganization.getTradingBusinessName();
+		return text==null ? null : text.getValue();
+	}
+
+	@Override
+	public void setTradingBusinessName(String name) {
+		legalOrganization.setTradingBusinessName(CrossIndustryInvoice.newTextType(name));
+	}
+
+	@Override // 0..n returns the first
+	public String getId() {
+		List<IDType> list = this.getID();
+		return list.isEmpty() ? null : list.get(0).getValue();
+	}
+
+	@Override
+	public void setId(String name) {
+		setId(name, null);
+	}
+	@Override
+	public void setId(String name, String schemeID) {
+		if(name==null) return;
+		super.getID().add(CrossIndustryInvoice.newIDType(name, schemeID));
+	}
+
+	@Override
+	public String getCompanyId() {
+		IDType id = legalOrganization.getID();
+		return id==null ? null : id.getValue();
+	}
+
+	@Override
+	public void setCompanyId(String name) {
+		setCompanyId(name, null);
+	}
+	@Override
+	public void setCompanyId(String name, String schemeID) {
+		if(name==null) return;
+		legalOrganization.setID(CrossIndustryInvoice.newIDType(name, schemeID));
+	}
+
+	@Override
+	public String getTaxRegistrationId() {
+		return getTaxRegistrationId("VA");
+	}
+	@Override
+	public String getTaxRegistrationId(String schemeID) {
+		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
+		if(taxRegistrationList.isEmpty()) return null;
+		if(taxRegistrationList.size()==1) return taxRegistrationList.get(0).getID().getValue(); 
+		// jetzt default:
+		for(int i=0; i<taxRegistrationList.size(); i++) {
+			if(taxRegistrationList.get(i).getID().getSchemeID().equals(schemeID)) {
+				return taxRegistrationList.get(i).getID().getValue();
+			}
+		}
+ 		return taxRegistrationList.isEmpty() ? null : taxRegistrationList.get(0).getID().getValue(); // den ersten und ohne Schema
+	}
+
+	@Override
+	public void setTaxRegistrationId(String name, String schemeID) {
+		addPartyTaxID(name, schemeID);
+	}
+
+	@Override // 0..1 also genügt der erste
+	public String getCompanyLegalForm() {
+		List<TextType> textList = super.getDescription();
+		return textList.isEmpty() ? null : textList.get(0).getValue();
+	}
+
+	@Override
+	public void setCompanyLegalForm(String name) {
+		if(name==null) return;
+		super.getDescription().add(CrossIndustryInvoice.newTextType(name));
+	}
+
+	@Override // 0..1 also genügt der erste
+	public String getUriUniversalCommunication() {
+		List<UniversalCommunicationType> uriList = super.getURIUniversalCommunication();
+		return uriList.isEmpty() ? null : uriList.get(0).getURIID().getValue(); // ohne schema
+	}
+
+	@Override
+	public void setUriUniversalCommunication(String name, String schemeID) {
+		if(name==null) return;
+		UniversalCommunicationType universalCommunicationType = new UniversalCommunicationType();
+		universalCommunicationType.setURIID(CrossIndustryInvoice.newIDType(name, schemeID));
+		super.getURIUniversalCommunication().add(universalCommunicationType);
+	}
+
 }
