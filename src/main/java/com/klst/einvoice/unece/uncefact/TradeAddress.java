@@ -70,17 +70,9 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 				mStreet = mStreet + " " + building;
 			}
 		}
-//		if(building!=null) {
-//			TextType buildingName = new TextType();
-//			buildingName.setValue(building);
-//			this.setBuildingNumber(buildingName);
-//		}
 		if(mStreet!=null) {
 			// wg.  	[CII-DT-088] - StreetName shall not be used.
-//			TextType streetName = new TextType();
-//			streetName.setValue(street);
-//			this.setStreetName(streetName);
-			setAddressLine3(street);
+			setAddressLine3(mStreet);
 		}
 		
 	}
@@ -172,6 +164,16 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	@Override
 	public String getCountryCode() {
 		return super.getCountryID().getValue();
+	}
+
+	@Override
+	public String getStreet() {
+		return super.getStreetName()==null ? null : super.getStreetName().getValue();
+	}
+
+	@Override
+	public String getBuilding() {
+		return super.getBuildingNumber()==null ? null : super.getBuildingNumber().getValue();
 	}
 
 }
