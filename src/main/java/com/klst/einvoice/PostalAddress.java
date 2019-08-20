@@ -36,7 +36,7 @@ public interface PostalAddress {
 	public void setPostCode(String postCode);
 	public void setCountrySubdivision(String countrySubdivision);
 	public void setCountryCode(String countryCode);
-	// TODO testen in beiden Unterklassen
+
 	public String getAddressLine1();
 	public String getAddressLine2();
 	public String getAddressLine3();
@@ -44,4 +44,8 @@ public interface PostalAddress {
 	public String getPostCode();
 	public String getCountrySubdivision();
 	public String getCountryCode();
+	
+	// do not use:
+	public String getStreet(); // [CII-DT-088] - StreetName shall not be used.
+	public String getBuilding(); // [CII-DT-094] - BuildingNumber shall not be used.
 }
