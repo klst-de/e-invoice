@@ -302,7 +302,10 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void setBuyerReference(String reference);
 	public String getBuyerReferenceValue();
 
-	// BT-11 Project reference                                         TODO
+	// BT-11 Project reference
+	public void setProjectReference(String reference, String schemeID);
+	public String getProjectReferenceValue();
+	
 	// BT-12 Contract reference                                        TODO
 	// BT-13 Purchase order reference                                  TODO
 	
