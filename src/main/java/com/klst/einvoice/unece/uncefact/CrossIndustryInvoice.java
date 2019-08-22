@@ -12,6 +12,7 @@ import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.PaymentInstructions;
+import com.klst.einvoice.PostalAddress;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -124,6 +125,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setBuyerParty(getBuyerParty(doc));
 		LOG.info("\n PayeeParty:");;
 		setPayeeParty(getPayeeParty(doc));
+		LOG.info("\n SellerTaxRepresentativeParty:");;
+		setSellerTaxRepresentativeParty(getSellerTaxRepresentativeParty(doc)); // optional
 		LOG.info("\n ...");;
 //		addDeliveries(doc);
 //		addPaymentInstructions(doc);		
@@ -719,64 +722,11 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		return buyerParty==null ? null : new TradeParty(buyerParty);
 	}
 
-	/**
-1 .. 1 ApplicableHeaderTradeAgreement Gruppierung der Vertragsangaben xs:sequence 
-0 .. 1 BuyerReference Referenz des Käufers                              BT-10 
-1 .. 1 SellerTradeParty Verkäufer                                       BG-4  xs:sequence 
-0 .. 1 ID Kennung des Verkäufers                                        BT-29 
-0 .. n GlobalID Globaler Identifier des Verkäufers                      BT-29-0 
-      required schemeID Kennung des Schemas                             BT-29-1 
-1 .. 1 Name Name des Verkäufers                                         BT-27 
-0 .. 1 Description Sonstige rechtliche Informationen des Verkäufers     BT-33 
-0 .. 1 SpecifiedLegalOrganization Details zur Organisation xs:sequence 
-0 .. 1 ID Kennung der rechtlichen Registrierung des Verkäufers          BT-30 
-       required schemeID Kennung des Schemas                            BT-30-1
-1 .. 1 TradingBusinessName Handelsname des Verkäufers                   BT-28 
-0 .. 1 PostalTradeAddress Detailinformationen zur Geschäftsanschrift des Verkäufers xs:sequence 
-0 .. 1 PostcodeCode Postleitzahl 
-0 .. 1 LineOne Adresszeile 1 
-0 .. 1 LineTwo Adresszeile 2 
-0 .. 1 LineThree Adresszeile 3 
-0 .. 1 CityName Ort 
-1 .. 1 CountryID Land (Code) 
-0 .. 1 DefinedTradeContact Kontaktdaten des Verkäufers                  BG-6 xs:sequence SELLER CONTACT 
-0 .. 1 PersonName Kontaktstelle des Verkäufers                          BT-41 
-0 .. 1 DepartmentName Kontaktstelle des Verkäufers                      BT-41-0 
-0 .. 1 TelephoneUniversalCommunication Detailinformationen zur Telefonnummer des Verkäufers xs:sequence 
-1 .. 1 CompleteNumber Telefonnummer des Verkäufers                      BT-42       
-0 .. 1 FaxUniversalCommunication Detailinformationen zur Faxnummer des Verkäufers xs:sequence 
-1 .. 1 CompleteNumber Faxnummer des Verkäufers 
-0 .. 1 EmailURIUniversalCommunication Detailinformationen zur Emailadresse des Verkäufers xs:sequence 
-1 .. 1 URIID E-Mailadresse des Verkäufers                               BT-43 
-1 .. 1 PostalTradeAddress Postanschrift des Verkäufers                  BG-5 xs:sequence SELLER POSTAL ADDRESS 
-0 .. 1 PostcodeCode Postleitzahl der Verkäuferanschrift                 BT-38 
-0 .. 1 LineOne Zeile 1 der Verkäuferanschrift                           BT-35 
-0 .. 1 LineTwo Zeile 2 der Verkäuferanschrift                           BT-36 
-0 .. 1 LineThree Zeile 3 der Verkäuferanschrift                         BT-162 
-0 .. 1 CityName Stadt der Verkäuferanschrift                            BT-37 
-1 .. 1 CountryID Ländercode der Verkäuferanschrift                      BT-40 
-0 .. 1 CountrySubDivisionName Bundesland                                BT-39 
-0 .. 1 URIUniversalCommunication Details zur elektronischen Adresse xs:sequence 
-1 .. 1 URIID Elektronischen Adresse des Verkäufers                      BT-34 
-       required schemeID Kennung des Schemas                            BT-34-1
-0 .. n SpecifiedTaxRegistration Detailinformationen zu Steuerangaben des Verkäufers
-1 .. 1 ID Steuernummer des Verkäufers                                   BT-31,
-       Umsatzsteueridentnummer des Verkäufers                           BT-32 
-       required schemeID Art der Steuernummer des Verkäufers          BT-31-0, BT-32-0
-       
-1 .. 1 BuyerTradeParty Käufer                                           BG-7 xs:sequence 
-0 .. 1 ID Kennung des Käufers                                           BT-46
-...       
-       headerTradeAgreement.setSellerTradeParty(tradeParty);
-                           .setBuyerTradeParty(tradeParty);
-
-	 */
-
 	/* PAYEE                                       BG-10                       0..1
 	 * Eine Gruppe von Informationselementen, die Informationen über den Zahlungsempfänger liefern. 
 	 * Die Gruppe wird genutzt, wenn der Zahlungsempfänger nicht mit dem Verkäufer identisch ist.
-	 */
-/* 01.02a-INVOICE_uncefact.xml :
+	 *
+   01.02a-INVOICE_uncefact.xml :
         <ram:ApplicableHeaderTradeSettlement>
             <ram:TaxCurrencyCode>EUR</ram:TaxCurrencyCode>
             <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
@@ -794,8 +744,9 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
                 <ram:Name>[Payee name]</ram:Name>
             </ram:PayeeTradeParty>
  */
-	public void setPayee(String registrationName, String companyId, String companyLegalForm) {
-		TradeParty party = new TradeParty(registrationName, null, null, companyId, companyLegalForm);
+	public void setPayee(String registrationName, String id, String companyLegalForm) {
+		TradeParty party = new TradeParty(registrationName, null, null, null, companyLegalForm);
+		party.setId(id);
 		setPayeeParty(party);
 	}
 	public void setPayeeParty(TradeParty party) {
@@ -810,15 +761,37 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	static TradeParty getPayeeParty(CrossIndustryInvoiceType doc) {
 		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
 		if(applicableHeaderTradeSettlement==null) return null; // 1..1 : darf nicht null sein
-		TradePartyType tradeParty = applicableHeaderTradeSettlement.getPayeeTradeParty();
-		return tradeParty==null ? null : new TradeParty(tradeParty);
+		TradePartyType party = applicableHeaderTradeSettlement.getPayeeTradeParty();
+		return party==null ? null : new TradeParty(party);
 	}
 	
 	/* SELLER TAX REPRESENTATIVE PARTY             BG-11                       0..1
 	 * Eine Gruppe von Informationselementen, die Informationen über den Steuervertreter des Verkäufers liefern.
 	 */
+	// BT-62 ++ 1..1 Seller tax representative name / aka registrationName
+	
+	// BT-63 ++ 1..1 Seller tax representative VAT identifier
+	public void setSellerTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
+		TradeParty party = new TradeParty(registrationName, address, null, null, null);
+		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
+		setSellerTaxRepresentativeParty(party);
+	}
 	public void setSellerTaxRepresentativeParty(TradeParty party) {
-// TODO		LOG.warning(NOT_IMPEMENTED);
+		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
+		headerTradeAgreement.setSellerTaxRepresentativeTradeParty(party);
+		
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+	}
+
+	public TradeParty getSellerTaxRepresentativeParty() {
+		return getSellerTaxRepresentativeParty(this);
+	}
+	static TradeParty getSellerTaxRepresentativeParty(CrossIndustryInvoiceType doc) {
+		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		TradePartyType party = headerTradeAgreement.getSellerTaxRepresentativeTradeParty();
+		return party==null ? null : new TradeParty(party);
 	}
 
 	/* DELIVERY INFORMATION                        BG-13                       0..1

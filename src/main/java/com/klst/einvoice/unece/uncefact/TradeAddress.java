@@ -17,20 +17,14 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	// copy ctor
 	public TradeAddress(TradeAddressType address) {
 		this();
-		// TODO testen
-//		this.setCountryCode(((TradeAddress)address).getCountryCode());
-		// ==
 		this.setCountryCode(address.getCountryID().getValue());
 		
 		IDType region = address.getCountrySubDivisionID();
 		if(region!=null) this.setCountrySubdivision(region.getValue());
-//		this.setCountrySubdivision(((TradeAddress)address).getCountrySubdivision());
 		
-//		this.setPostCode(((TradeAddress)address).getPostCode());
-		this.setPostCode(address.getPostcodeCode().getValue());
+		this.setPostCode(address.getPostcodeCode()==null ? null : address.getPostcodeCode().getValue());
 		
-//		this.setCity(((TradeAddress)address).getCity());
-		this.setCity(address.getCityName().getValue());
+		this.setCity(address.getCityName()==null ? null : address.getCityName().getValue());
 		
 		super.setStreetName(address.getStreetName());
 		super.setBuildingName(address.getBuildingName());
