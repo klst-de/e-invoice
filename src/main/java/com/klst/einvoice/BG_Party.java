@@ -5,7 +5,9 @@ package com.klst.einvoice;
  * 
  * <br> BG-4 + 1..1 SELLER 
  * <br> BG-7 + 1..1 BUYER
- * ...
+ * <br> BG-10 + 0..1 PAYEE
+ * <br> BG-11 + 0..1 SELLER TAX REPRESENTATIVE PARTY
+ * <br> BG-13 + 0..1 DELIVERY INFORMATION / BT-70 BT-71 ShipToTradeParty
  */
 
 public interface BG_Party {

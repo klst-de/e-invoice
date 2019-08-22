@@ -137,6 +137,25 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		}
 		cii.setBuyerParty(buyerParty);
 		
+		TradeParty testPayeeParty = testDoc.getPayeeParty();
+		if(testPayeeParty==null) {
+			LOG.warning("testPayeeParty==null" );
+		} else {
+			LOG.info("testPayeeParty.RegistrationName:"+testPayeeParty.getRegistrationName()
+					+ " CompanyId:"+testPayeeParty.getCompanyId()
+					+ " CompanyLegalForm:"+testPayeeParty.getCompanyLegalForm()
+					);
+			TradeParty payeeParty = new TradeParty( testPayeeParty.getRegistrationName()
+                    , null         // TradeAddress address
+                    , null         // TradeContact contact
+                    , testPayeeParty.getCompanyId()
+                    , testPayeeParty.getCompanyLegalForm()
+                    );
+			payeeParty.setId(testPayeeParty.getId());
+			cii.setPayeeParty(payeeParty); // alternativ:
+//			cii.setPayee(registrationName, companyId, companyLegalForm);
+		}
+		
 		LOG.info("testDoc.getPaymentTerm():"+testDoc.getPaymentTerm() + " testDoc.getDueDateAsTimestamp():"+testDoc.getDueDateAsTimestamp());
 		cii.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp()); // BT-9 & BT-20 (optional)
 		

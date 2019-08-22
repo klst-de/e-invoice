@@ -3,6 +3,8 @@ package com.klst.einvoice.unece.uncefact;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BG10_Payee;
+import com.klst.einvoice.BG11_SellerTaxRepresentativeParty;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.IContact;
@@ -19,7 +21,9 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 // BG-4 + 1..1 SELLER
 // BG-7 + 1..1 BUYER
-public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer { 
+// BG-10 + 0..1 PAYEE
+// BG-11 + 0..1 SELLER TAX REPRESENTATIVE PARTY
+public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentativeParty { 
 
 	private static final Logger LOG = Logger.getLogger(TradeParty.class.getName());
 	
@@ -30,28 +34,23 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer 
 	// copy ctor
 	public TradeParty(TradePartyType party) {
 		this();
-		TextType name = party.getName(); // Name des Verkäufers BT-27, .. des Käufers BT-44
-		PostalAddress ta = getPostalAddress(party); // BG-5, BG-8
-		TradeContact tc = getContact(party); // BG-6, BF-9
-		LOG.info("copy ctor Name/BT-27,BT-44,...:"+name.getValue() + " Address:"+ta + " Contact:"+tc);
-		super.setName(name);
-		setAddress(ta);
-		if(tc==null) {
-//			LOG.info("TradeContact tc is null");
-		} else {
-			setContact(tc);
-		}
+		LegalOrganizationType legalOrganization = party.getSpecifiedLegalOrganization();
+		init( party.getName().getValue()
+			, getPostalAddress(party)
+			, getContact(party)
+			, legalOrganization==null ? null : legalOrganization.getID()==null ? null : legalOrganization.getID().getValue()
+			, party.getDescription().isEmpty() ? null : party.getDescription().get(0).getValue()
+			);
+		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getRegistrationName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
 		
 		// BT-28 ++ 0..1 Seller trading name / TradingBusinessName
+		setCompanyLegalForm(legalOrganization==null ? null : legalOrganization.getTradingBusinessName()==null ? null : legalOrganization.getTradingBusinessName().getValue());
 		// BT-29 ++ 0..n Seller identifier
-		
-		legalOrganization = party.getSpecifiedLegalOrganization();
-		super.setSpecifiedLegalOrganization(legalOrganization);
-		if(legalOrganization!=null) {
-			LOG.info("SpecifiedLegalOrganization.TradingBusinessName/BT-28:"+legalOrganization.getTradingBusinessName()
-				+ "  .ID/BT-30:"+legalOrganization.getID());
-//			super.setSpecifiedLegalOrganization(legalOrganization);
-		}
+		List<IDType> iDlist = party.getID();
+		iDlist.forEach(iD -> {
+//			this.setId(iD.getValue()); // oder:
+			super.getID().add(iD);
+		});
 		
 		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration(); // 0..n wg. BT-31, BT-32, BT-31-0, BT-32-0
 		taxRegistrationList.forEach(taxRegistration -> {
@@ -61,12 +60,6 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer 
 			this.addPartyTaxID(taxRegistration.getID().getValue(), taxRegistration.getID().getSchemeID());
 		});
 //		addTaxSchemes(getTaxSchemes(party));
-		
-		List<TextType> textList = party.getDescription();
-		textList.forEach(companyLegalForm -> {
-			LOG.info("Description/BT-33:"+legalOrganization); //
-			super.getDescription().add(companyLegalForm);
-		});
 		
 		// BT-34 ++ 0..1 Seller electronic address
 		List<UniversalCommunicationType> uriAddressList = party.getURIUniversalCommunication(); // 0..1
@@ -85,40 +78,23 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer 
 	 * @param contact          BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
 	 * @param companyId        BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
 	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
-//	 * @param shipToTradeName  BT-70 0..1 ShipToTradeParty.Name Name des Waren- oder Dienstleistungsempfängers
 	 */
 	public TradeParty(String name, PostalAddress address, TradeContact contact, String companyId, String companyLegalForm) {
 		this();
+		init(name, address, contact, companyId, companyLegalForm);
+	}
+	
+	void init(String registrationName, PostalAddress address, TradeContact contact, String companyId, String companyLegalForm) {
 		legalOrganization = new LegalOrganizationType();
-		super.setSpecifiedLegalOrganization(legalOrganization);
-		if(name!=null) super.setName(CrossIndustryInvoice.newTextType(name));
-		if(address!=null) setAddress(address);
+		setRegistrationName(registrationName);
+		setAddress(address);
 		if(contact!=null) setContact(contact);
-/*
-1 .. 1 SellerTradeParty Verkäufer                                       BG-4  xs:sequence 
-0 .. 1 Description Sonstige rechtliche Informationen des Verkäufers     BT-33 
-0 .. 1 SpecifiedLegalOrganization Details zur Organisation xs:sequence 
-0 .. 1 ID Kennung der rechtlichen Registrierung des Verkäufers          BT-30 
-       required schemeID Kennung des Schemas                            BT-30-1
-       EN16931-ID: BT-30-1 Anwendung: Insbesondere können folgende Codes genutzt werden: 
-       0021 : SWIFT 
-       0088 : EAN 
-       0060 : DUNS 
-       0177 : ODETTE
- */
-		if(companyId!=null) {
-//			LegalOrganizationType legalOrganization = new LegalOrganizationType();
-			String schemeID = null;
-			legalOrganization.setID(CrossIndustryInvoice.newIDType(companyId,schemeID));
-//			super.setSpecifiedLegalOrganization(legalOrganization);
-		}
-		
-		if(companyLegalForm!=null) {
-			super.getDescription().add(CrossIndustryInvoice.newTextType(companyLegalForm));
-		}
+		setCompanyId(companyId);
+		setCompanyLegalForm(companyLegalForm);
 	}
 
 	// BT-70 PartyName/shipToTradeName
+	@Deprecated
 	public void addName(String shipToTradeName) { // !wie Name
 		super.setName(CrossIndustryInvoice.newTextType(shipToTradeName));
 	}
@@ -131,19 +107,13 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer 
 
 	@Override
 	public void setAddress(PostalAddress address) {
-		this.setAddress((TradeAddressType)address);
+		if(address!=null) setAddress((TradeAddressType)address);
 	}
 
-//	public void setAddress(TradeAddress address) {
-//		this.setAddress((TradeAddressType)address);
-//	}
 	void setAddress(TradeAddressType address) {
 		super.setPostalTradeAddress(address);
 	}
 	
-//	public TradeAddress getAddress() {
-//		return getPostalAddress(this);
-//	}
 	static PostalAddress getPostalAddress(TradePartyType party) {
 		TradeAddressType address = party.getPostalTradeAddress();
 		if(address==null) return null; // defensiv, sollte nie null sein
@@ -222,36 +192,13 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer 
 		addPartyTaxID(companyId, "VA");
 	}
 
-//	// void addTaxSchemes(List<Map<Object,String>> partyTaxSchemes)  {
-//	void addTaxSchemes(List<Map<Object,String>> partyTaxSchemes)  {
-//		for(int i=0; i<partyTaxSchemes.size(); i++) {
-//			Map<Object,String> map = partyTaxSchemes.get(i);
-//			map.forEach((k,v) -> {
-//				addPartyTaxID((String)k,v);
-//			});
-//		}
-//	}
-//
-//	public List<Map<Object,String>> getTaxSchemes() { 
-//		return getTaxSchemes(this);
-//	}
-//	static List<Map<Object,String>> getTaxSchemes(TradePartyType party) { 
-//		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration();
-//		LOG.info("taxRegistrationList#="+taxRegistrationList.size());
-//		List<Map<Object,String>> resultList = new ArrayList<Map<Object,String>>(taxRegistrationList.size());
-//		taxRegistrationList.forEach(taxRegistration -> {
-//			Map<Object,String> map = new HashMap<Object,String>();
-////			map.put(IDType.class, taxRegistration.getID().getValue());
-//			map.put(taxRegistration.getID().getSchemeID(), taxRegistration.getID().getValue());
-//			resultList.add(map);
-//		});
-//		return resultList;
-//	}
-
 //	------------------------------------------
 	
 	String getPartyName() {
 		return super.getName().getValue();
+	}
+	static String getPartyName(TradePartyType party) {
+		return party.getName().getValue();
 	}
 
 	void setPartyName(String name) {
@@ -278,6 +225,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer 
 	@Override
 	public void setTradingBusinessName(String name) {
 		legalOrganization.setTradingBusinessName(CrossIndustryInvoice.newTextType(name));
+		super.setSpecifiedLegalOrganization(legalOrganization);
 	}
 
 	@Override // 0..n returns the first
@@ -310,6 +258,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer 
 	public void setCompanyId(String name, String schemeID) {
 		if(name==null) return;
 		legalOrganization.setID(CrossIndustryInvoice.newIDType(name, schemeID));
+		super.setSpecifiedLegalOrganization(legalOrganization);
 	}
 
 	@Override

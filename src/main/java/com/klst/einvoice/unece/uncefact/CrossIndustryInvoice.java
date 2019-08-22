@@ -122,6 +122,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setSellerParty(getSellerParty(doc));
 		LOG.info("\n BuyerParty:");;
 		setBuyerParty(getBuyerParty(doc));
+		LOG.info("\n PayeeParty:");;
+		setPayeeParty(getPayeeParty(doc));
 		LOG.info("\n ...");;
 //		addDeliveries(doc);
 //		addPaymentInstructions(doc);		
@@ -774,8 +776,42 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 * Eine Gruppe von Informationselementen, die Informationen über den Zahlungsempfänger liefern. 
 	 * Die Gruppe wird genutzt, wenn der Zahlungsempfänger nicht mit dem Verkäufer identisch ist.
 	 */
+/* 01.02a-INVOICE_uncefact.xml :
+        <ram:ApplicableHeaderTradeSettlement>
+            <ram:TaxCurrencyCode>EUR</ram:TaxCurrencyCode>
+            <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
+            <ram:PayeeTradeParty>
+                <ram:Name>VSB - Verlagsservice Braunschweig GmbH</ram:Name>
+            </ram:PayeeTradeParty>
+            
+   01.14a-INVOICE_uncefact.xml :
+           <ram:ApplicableHeaderTradeSettlement>
+            <ram:PaymentReference>Deb. 12345 / Fact. 9876543</ram:PaymentReference>
+            <ram:TaxCurrencyCode>EUR</ram:TaxCurrencyCode>
+            <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
+            <ram:PayeeTradeParty>
+                <ram:ID>74</ram:ID>
+                <ram:Name>[Payee name]</ram:Name>
+            </ram:PayeeTradeParty>
+ */
+	public void setPayee(String registrationName, String companyId, String companyLegalForm) {
+		TradeParty party = new TradeParty(registrationName, null, null, companyId, companyLegalForm);
+		setPayeeParty(party);
+	}
 	public void setPayeeParty(TradeParty party) {
-// TODO		LOG.warning(NOT_IMPEMENTED); 
+		applicableHeaderTradeSettlement.setPayeeTradeParty(party);
+	}
+
+	public TradeParty getPayeeParty() {
+		TradePartyType payeeParty = applicableHeaderTradeSettlement.getPayeeTradeParty();
+		return payeeParty==null ? null : new TradeParty(payeeParty);
+	}
+
+	static TradeParty getPayeeParty(CrossIndustryInvoiceType doc) {
+		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
+		if(applicableHeaderTradeSettlement==null) return null; // 1..1 : darf nicht null sein
+		TradePartyType tradeParty = applicableHeaderTradeSettlement.getPayeeTradeParty();
+		return tradeParty==null ? null : new TradeParty(tradeParty);
 	}
 	
 	/* SELLER TAX REPRESENTATIVE PARTY             BG-11                       0..1
