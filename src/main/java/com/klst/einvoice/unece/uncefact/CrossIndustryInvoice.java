@@ -650,7 +650,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 * @param companyId optional / Seller legal registration identifier, BT-30/R52
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
 	 */
-	public void setSeller(String registrationName, TradeAddress address, TradeContact contact, 
+	public void setSeller(String registrationName, PostalAddress address, TradeContact contact, 
 			String companyId, String companyLegalForm) {
 		                                  // BT-27        , BG-5   , BG-6   , BT-30    , BT-33
 		TradeParty party = new TradeParty(registrationName, address, contact, companyId, companyLegalForm);
@@ -675,32 +675,32 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		return sellerParty==null ? null : new TradeParty(sellerParty);
 	}
 
-	/**
-	 * set optional taxCompanyId  / Seller VAT identifier, BG-4.BT-31, R52
-	 * 
-	 * @param taxCompany Identifier
-	 */
-	@Deprecated // use Party
-	public void setSellerTaxCompanyId(String taxCompanyId) {
-		if(taxCompanyId==null) return;
-		TaxRegistrationType taxRegistration = new TaxRegistrationType();
-		taxRegistration.setID(newIDType(taxCompanyId, null));
-		TradeParty party = getSellerParty();
-//		party.getSpecifiedTaxRegistration().add(taxRegistration);
-		party.addPartyTaxID(taxCompanyId); //, schemeID); 
-	}
-	@Deprecated // use Party
-	public String getSellerTaxCompanyId() { // ohne Schema!
-		TradeParty party = getSellerParty();
-		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration();
-		if(taxRegistrationList.isEmpty()) return null;
-		return taxRegistrationList.get(0).getID().getValue();
-	}
+//	/**
+//	 * set optional taxCompanyId  / Seller VAT identifier, BG-4.BT-31, R52
+//	 * 
+//	 * @param taxCompany Identifier
+//	 */
+//	@Deprecated // use Party
+//	public void setSellerTaxCompanyId(String taxCompanyId) {
+//		if(taxCompanyId==null) return;
+//		TaxRegistrationType taxRegistration = new TaxRegistrationType();
+//		taxRegistration.setID(newIDType(taxCompanyId, null));
+//		TradeParty party = getSellerParty();
+////		party.getSpecifiedTaxRegistration().add(taxRegistration);
+//		party.addPartyTaxID(taxCompanyId); //, schemeID); 
+//	}
+//	@Deprecated // use Party
+//	public String getSellerTaxCompanyId() { // ohne Schema!
+//		TradeParty party = getSellerParty();
+//		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration();
+//		if(taxRegistrationList.isEmpty()) return null;
+//		return taxRegistrationList.get(0).getID().getValue();
+//	}
 
 	/* BUYER                                       BG-7                        1 (mandatory) 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Erwerber liefern.
 	 */
-	public void setBuyer(String registrationName, TradeAddress address, TradeContact contact) {
+	public void setBuyer(String registrationName, PostalAddress address, TradeContact contact) {
 		TradeParty party = new TradeParty(registrationName, address, contact, null, null); // BT-44, BG-8, BG-9, BT-45 optional, BT-46 optional
 		setSellerParty(party);
 	}
