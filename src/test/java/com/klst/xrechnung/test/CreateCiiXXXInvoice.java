@@ -156,7 +156,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			cii.setPayee(testPayeeParty.getRegistrationName(), testPayeeParty.getId(), testPayeeParty.getCompanyLegalForm());
 		}
 		
-		TradeParty testSellerTaxRepresentativeParty = testDoc.getSellerTaxRepresentativeParty();
+		TradeParty testSellerTaxRepresentativeParty = testDoc.getTaxRepresentativeParty();
 		if(testSellerTaxRepresentativeParty==null) {
 			LOG.warning("testPayeeParty==null" );
 		} else {
@@ -164,7 +164,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 					+ " CompanyId:"+testSellerTaxRepresentativeParty.getCompanyId()
 					+ " CompanyLegalForm:"+testSellerTaxRepresentativeParty.getCompanyLegalForm()
 					);
-			cii.setSellerTaxRepresentative(testSellerTaxRepresentativeParty.getRegistrationName()
+			cii.setTaxRepresentative(testSellerTaxRepresentativeParty.getRegistrationName()
 					, testSellerTaxRepresentativeParty.getAddress()
 					, testSellerTaxRepresentativeParty.getTaxRegistrationId()
 //					, CoreInvoiceVatBreakdown.VAT);

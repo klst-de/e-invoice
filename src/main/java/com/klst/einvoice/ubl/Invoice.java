@@ -22,6 +22,7 @@ import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
+import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -158,6 +159,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		setSellerParty(getSellerParty(doc));
 		setBuyerParty(getBuyerParty(doc));
 		setPayeeParty(getPayeeParty(doc));
+		setTaxRepresentativeParty(getTaxRepresentativeParty(doc));
 		addDeliveries(doc);
 		
 		List<PaymentMeansType> pmList = doc.getPaymentMeans();
@@ -954,8 +956,22 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	/* SELLER TAX REPRESENTATIVE PARTY             BG-11                       0..1
 	 * Eine Gruppe von Informationselementen, die Informationen über den Steuervertreter des Verkäufers liefern.
 	 */
-	public void setSellerTaxRepresentativeParty(Party party) {
-		LOG.warning(NOT_IMPEMENTED);
+	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
+		Party party = new Party(registrationName, address, null, null, null);
+		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
+		setTaxRepresentativeParty(party);
+	}
+	public void setTaxRepresentativeParty(Party party) {
+		super.setTaxRepresentativeParty(party);
+	}
+	
+	public Party getTaxRepresentativeParty() {
+		PartyType party = super.getTaxRepresentativeParty();
+		return party==null ? null : new Party(party);
+	}
+	static Party getTaxRepresentativeParty(InvoiceType doc) {
+		PartyType party = doc.getTaxRepresentativeParty();
+		return party==null ? null : new Party(party);
 	}
 
 	/* DELIVERY INFORMATION                        BG-13                       0..1

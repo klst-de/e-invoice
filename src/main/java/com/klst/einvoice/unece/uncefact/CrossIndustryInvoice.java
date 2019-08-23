@@ -126,7 +126,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		LOG.info("\n PayeeParty:");;
 		setPayeeParty(getPayeeParty(doc));
 		LOG.info("\n SellerTaxRepresentativeParty:");;
-		setSellerTaxRepresentativeParty(getSellerTaxRepresentativeParty(doc)); // optional
+		setTaxRepresentativeParty(getTaxRepresentativeParty(doc)); // optional
 		LOG.info("\n ...");;
 //		addDeliveries(doc);
 //		addPaymentInstructions(doc);		
@@ -771,12 +771,12 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	// BT-62 ++ 1..1 Seller tax representative name / aka registrationName
 	
 	// BT-63 ++ 1..1 Seller tax representative VAT identifier
-	public void setSellerTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
+	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
 		TradeParty party = new TradeParty(registrationName, address, null, null, null);
 		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
-		setSellerTaxRepresentativeParty(party);
+		setTaxRepresentativeParty(party);
 	}
-	public void setSellerTaxRepresentativeParty(TradeParty party) {
+	public void setTaxRepresentativeParty(TradeParty party) {
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
 		headerTradeAgreement.setSellerTaxRepresentativeTradeParty(party);
 		
@@ -785,10 +785,10 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
 	}
 
-	public TradeParty getSellerTaxRepresentativeParty() {
-		return getSellerTaxRepresentativeParty(this);
+	public TradeParty getTaxRepresentativeParty() {
+		return getTaxRepresentativeParty(this);
 	}
-	static TradeParty getSellerTaxRepresentativeParty(CrossIndustryInvoiceType doc) {
+	static TradeParty getTaxRepresentativeParty(CrossIndustryInvoiceType doc) {
 		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		TradePartyType party = headerTradeAgreement.getSellerTaxRepresentativeTradeParty();
 		return party==null ? null : new TradeParty(party);

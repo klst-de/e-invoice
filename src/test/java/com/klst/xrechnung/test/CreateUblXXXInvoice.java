@@ -97,6 +97,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		
 		ublInvoice.setSellerParty(testCreditNote.getSellerParty());
 		ublInvoice.setBuyerParty(testCreditNote.getBuyerParty());
+		ublInvoice.setPayeeParty(testCreditNote.getPayeeParty());
+		ublInvoice.setTaxRepresentativeParty(testCreditNote.getTaxRepresentativeParty());
 
 		PaymentMeansEnum code = testCreditNote.getPaymentMeansEnum();
 		String paymentMeansText = testCreditNote.getPaymentMeansText();
@@ -201,6 +203,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		});
 		
 		ublInvoice.setPayeeParty(testDoc.getPayeeParty());
+		ublInvoice.setTaxRepresentativeParty(testDoc.getTaxRepresentativeParty());
 		
 		LOG.info("finished.");
 	}

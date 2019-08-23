@@ -112,6 +112,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		setSellerParty(getSellerParty(doc));
 		setBuyerParty(getBuyerParty(doc));
 		setPayeeParty(getPayeeParty(doc));
+		setTaxRepresentativeParty(getTaxRepresentativeParty(doc));
 		addDeliveries(doc);
 		
 		List<PaymentMeansType> pmList = doc.getPaymentMeans();
@@ -479,6 +480,25 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	}
 	static Party getPayeeParty(CreditNoteType doc) {
 		PartyType party = doc.getPayeeParty();
+		return party==null ? null : new Party(party);
+	}
+
+	// wie BG-11  SELLER TAX REPRESENTATIVE PARTY
+	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
+		Party party = new Party(registrationName, address, null, null, null);
+		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
+		setTaxRepresentativeParty(party);
+	}
+	public void setTaxRepresentativeParty(Party party) {
+		super.setTaxRepresentativeParty(party);
+	}
+	
+	public Party getTaxRepresentativeParty() {
+		PartyType party = super.getTaxRepresentativeParty();
+		return party==null ? null : new Party(party);
+	}
+	static Party getTaxRepresentativeParty(CreditNoteType doc) {
+		PartyType party = doc.getTaxRepresentativeParty();
 		return party==null ? null : new Party(party);
 	}
 
