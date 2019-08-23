@@ -33,6 +33,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Docu
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.MonetaryTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentTermsType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.SupplierPartyType;
@@ -156,6 +157,7 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		addNotes(doc);	
 		setSellerParty(getSellerParty(doc));
 		setBuyerParty(getBuyerParty(doc));
+		setPayeeParty(getPayeeParty(doc));
 		addDeliveries(doc);
 		
 		List<PaymentMeansType> pmList = doc.getPaymentMeans();
@@ -800,18 +802,9 @@ SELLER CONTACT                              BG-6                        1
 	 * @param companyId optional / Seller legal registration identifier, BT-30/R52
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
 	 */
-	public void setSeller(String registrationName, Address address, Contact contact, String companyId, String companyLegalForm) {
+	public void setSeller(String registrationName, PostalAddress address, Contact contact, String companyId, String companyLegalForm) {
 		Party party = new Party(registrationName, address, contact, companyId, companyLegalForm);
 		setSellerParty(party);
-	}
-	
-	/* Die Umsatzsteuer-Identifikationsnummer des Verkäufers. 
-	 * Verfügt der Verkäufer über eine solche, ist sie hier anzugeben, sofern nicht Angaben zum Seller tax representative gemacht werden.
-	 */
-	@Deprecated // use Party
-	public void setSellerTaxCompanyId(String taxCompanyId) { // ==> party
-		Party party = getSellerParty();
-		party.setTaxRegistrationId(taxCompanyId);
 	}
 	
 	/**
@@ -905,17 +898,11 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * @param BUYER POSTAL ADDRESS mandatory, BG-8, R53
 	 * @param BUYER CONTACT optional, BG-9, R57
 	 */
-	public void setBuyer(String registrationName, Address address, Contact contact) {
+	public void setBuyer(String registrationName, PostalAddress address, Contact contact) {
 		Party party = new Party(registrationName, address, contact, null, null); 
 		setBuyerParty(party);
 	}
 
-	@Deprecated // use Party
-	public void setBuyerTaxCompanyId(String taxCompanyId) { // party.setTaxRegistrationId(taxCompanyId, countryCode) bzw (taxCompanyId, "VA")
-		Party party = getBuyerParty();
-		party.setTaxRegistrationId(taxCompanyId);
-	}
-	
 	/**
 	 * BUYER
 	 * <p>
@@ -946,8 +933,22 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Zahlungsempfänger liefern. 
 	 * Die Gruppe wird genutzt, wenn der Zahlungsempfänger nicht mit dem Verkäufer identisch ist.
 	 */
+	public void setPayee(String registrationName, String id, String companyLegalForm) {
+		Party party = new Party(registrationName, null, null, null, companyLegalForm);
+		party.setId(id);
+		setPayeeParty(party);
+	}
 	public void setPayeeParty(Party party) {
-		LOG.warning(NOT_IMPEMENTED);
+		super.setPayeeParty(party);
+	}
+	
+	public Party getPayeeParty() {
+		PartyType party = super.getPayeeParty();
+		return party==null ? null : new Party(party);
+	}
+	static Party getPayeeParty(InvoiceType doc) {
+		PartyType party = doc.getPayeeParty();
+		return party==null ? null : new Party(party);
 	}
 	
 	/* SELLER TAX REPRESENTATIVE PARTY             BG-11                       0..1

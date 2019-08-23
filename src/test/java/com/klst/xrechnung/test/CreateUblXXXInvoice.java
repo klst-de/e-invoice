@@ -199,6 +199,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		notes.forEach(note -> {
 			ublInvoice.setNote(note);
 		});
+		
+		ublInvoice.setPayeeParty(testDoc.getPayeeParty());
+		
 		LOG.info("finished.");
 	}
 	

@@ -13,6 +13,7 @@ import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.PaymentCard;
+import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
@@ -24,6 +25,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Cust
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.MonetaryTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentTermsType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.SupplierPartyType;
@@ -109,6 +111,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 		addNotes(doc);
 		setSellerParty(getSellerParty(doc));
 		setBuyerParty(getBuyerParty(doc));
+		setPayeeParty(getPayeeParty(doc));
 		addDeliveries(doc);
 		
 		List<PaymentMeansType> pmList = doc.getPaymentMeans();
@@ -418,15 +421,10 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	}
 
 	// wie BG-4  SELLER
-	public void setSeller(String sellerRegistrationName, Address address, Contact contact, String companyId, String companyLegalForm) {
+	public void setSeller(String sellerRegistrationName, PostalAddress address, Contact contact, String companyId, String companyLegalForm) {
 		Party party = new Party(sellerRegistrationName, address, contact, companyId, companyLegalForm);
 		setSellerParty(party);
 	}
-	
-//	public void setSellerTaxCompanyId(String taxCompanyId) {
-//		Party party = getSellerParty();
-//		party.addPartyTaxID(taxCompanyId);
-//	}
 	
 	public void setSellerParty(Party party) {
 		SupplierPartyType supplierParty = new SupplierPartyType();
@@ -445,15 +443,11 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	}
 
 	// wie BG-7  BUYER
-	public void setBuyer(String byuerRegistrationName, Address address, Contact contact) {
+	public void setBuyer(String byuerRegistrationName, PostalAddress address, Contact contact) {
 		Party party = new Party(byuerRegistrationName, address, contact, null, null); 
 		setBuyerParty(party);
 	}
 
-//	public void setBuyerTaxCompanyId(String taxCompanyId) {
-//		Party party = getBuyerParty();
-//		party.addPartyTaxID(taxCompanyId);
-//	}
 	public void setBuyerParty(Party party) {
 		CustomerPartyType customerparty = new CustomerPartyType();
 		customerparty.setParty(party);
@@ -467,6 +461,25 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	static Party getBuyerParty(CreditNoteType doc) {
 		CustomerPartyType customerparty = doc.getAccountingCustomerParty();
 		return customerparty==null ? null : new Party(customerparty.getParty());
+	}
+
+	// wie BG-10  PAYEE
+	public void setPayee(String registrationName, String id, String companyLegalForm) {
+		Party party = new Party(registrationName, null, null, null, companyLegalForm);
+		party.setId(id);
+		setPayeeParty(party);
+	}
+	public void setPayeeParty(Party party) {
+		super.setPayeeParty(party);
+	}
+
+	public Party getPayeeParty() {
+		PartyType party = super.getPayeeParty();
+		return party==null ? null : new Party(party);
+	}
+	static Party getPayeeParty(CreditNoteType doc) {
+		PartyType party = doc.getPayeeParty();
+		return party==null ? null : new Party(party);
 	}
 
 	// wie BG-13  DELIVERY INFORMATION
