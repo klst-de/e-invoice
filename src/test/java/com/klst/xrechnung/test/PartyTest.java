@@ -118,9 +118,9 @@ public class PartyTest {
 		}
     }
 
-	private String addressAsString(PostalAddress address) {
-		return address.getCountryCode() + " " + address.getPostCode() + " " + address.getCity();
-	}
+//	private String addressAsString(PostalAddress address) {
+//		return address.getCountryCode() + " " + address.getPostCode() + " " + address.getCity();
+//	}
 	
 	private String contactAsString(IContact contact) {
 		return " Contact: " + contact.getContactPoint() + " " + contact.getContactTelephone() + " " + contact.getContactEmail();
@@ -150,7 +150,7 @@ public class PartyTest {
     @Test
     public void ublGetAddress() {
     	PostalAddress address = supplierparty.getAddress();
-    	LOG.info(addressAsString(address));
+    	LOG.info("address:"+address);
     	assertEquals("[Seller city]", address.getCity());
     }
 
@@ -172,8 +172,8 @@ public class PartyTest {
 		assertTrue(names.size()==1);
     	assertEquals("Schulungsanbieter", names.get(0).getName().getValue());
     	
-    	Address address = deliveries.get(0).getLocationAddress();
-		LOG.info("Delivery LocationAddress:" + addressAsString(address));
+    	PostalAddress address = deliveries.get(0).getAddress();
+		LOG.info("Delivery LocationAddress:" + address);
     	assertEquals("Schulungsort", address.getCity());	
     }
     
@@ -196,7 +196,7 @@ public class PartyTest {
     	IContact contact = supplierparty.getIContact();
     	assertNotNull(address);
     	assertNotNull(contact);
-    	LOG.info("supplierparty address:" + addressAsString(address) + contactAsString(contact) + 
+    	LOG.info("supplierparty address:" + address + contactAsString(contact) + 
     			" TaxSchemes #:"+supplierparty.getTaxSchemes().size());
     	assertEquals(1, supplierparty.getTaxSchemes().size());
     	List<Map<Object,String>> taxSchemes = supplierparty.getTaxSchemes();
@@ -208,10 +208,10 @@ public class PartyTest {
   	
     	// Seller überschreiben: 
     	invoice.setSeller("sellerRegistrationName", testAddress, null, null, null); //contact, companyId, companyLegalForm);
-    	LOG.info("testAddress:" + addressAsString(testAddress));
+    	LOG.info("testAddress:" + testAddress);
     	SupplierPartyType sp = invoice.getAccountingSupplierParty();
     	Party sellerparty = new Party(sp.getParty());
-    	LOG.info("seller address:" + addressAsString(sellerparty.getAddress()) + " contact:"+sellerparty.getIContact());
+    	LOG.info("seller address:" + sellerparty.getAddress() + " contact:"+sellerparty.getIContact());
     	assertEquals(testAddress.getCountryCode(), sellerparty.getAddress().getCountryCode());	
     	assertNull(sellerparty.getIContact());
     	LOG.info("??????????????? invoice.getSellerTaxSchemes().size() "+invoice.getSellerTaxSchemes().size()); // Seller wurde überschrieben!
@@ -229,13 +229,13 @@ public class PartyTest {
     	assertNotNull(customerparty);
     	PostalAddress address = customerparty.getAddress();
     	assertNotNull(address);
-    	LOG.info("customerparty address:" + addressAsString(address));
+    	LOG.info("customerparty address:" + address);
     	assertNull(customerparty.getIContact());
     	invoice.setBuyer("buyerName", testAddress, null); //contact);
-    	LOG.info("testAddress:" + addressAsString(testAddress));
+    	LOG.info("testAddress:" + testAddress);
     	CustomerPartyType cp = invoice.getAccountingCustomerParty();
     	Party buyerparty = new Party(cp.getParty());
-    	LOG.info("buyer address:" + addressAsString(buyerparty.getAddress()) + " contact:"+buyerparty.getIContact());
+    	LOG.info("buyer address:" + buyerparty.getAddress() + " contact:"+buyerparty.getIContact());
     	assertEquals(testAddress.getCountryCode(), buyerparty.getAddress().getCountryCode());	
     	assertNull(buyerparty.getIContact());
     }

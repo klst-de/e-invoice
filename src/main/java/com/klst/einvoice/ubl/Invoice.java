@@ -22,7 +22,6 @@ import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
-import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -935,8 +934,9 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Zahlungsempfänger liefern. 
 	 * Die Gruppe wird genutzt, wenn der Zahlungsempfänger nicht mit dem Verkäufer identisch ist.
 	 */
-	public void setPayee(String registrationName, String id, String companyLegalForm) {
-		Party party = new Party(registrationName, null, null, null, companyLegalForm);
+	public void setPayee(String businessName, String id, String companyLegalForm) {
+		Party party = new Party(null, null, null, null, companyLegalForm);
+		party.setTradingBusinessName(businessName);
 		party.setId(id);
 		setPayeeParty(party);
 	}
@@ -988,7 +988,7 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * <br>Req.ID: R31, R32, R57
 	 */
 	public List<Delivery> getDeliveries() {
-		List<DeliveryType> deliveryList = this.getDelivery();
+		List<DeliveryType> deliveryList = super.getDelivery();
 		List<Delivery> result = new ArrayList<Delivery>(deliveryList.size());
 		deliveryList.forEach(delivery -> {
 			result.add(new Delivery(delivery));

@@ -249,4 +249,7 @@ public class Address extends AddressType implements PostalAddress {
 		return country.getIdentificationCode().getValue();
 	}
 
+	public String toString() {
+		return getCountryCode() + " " + getPostCode() + " " + getCity();
+	}
 }

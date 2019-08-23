@@ -18,9 +18,11 @@ import com.klst.einvoice.ubl.CommercialInvoice;
 import com.klst.einvoice.ubl.Contact;
 import com.klst.einvoice.ubl.CreditNote;
 import com.klst.einvoice.ubl.CreditNoteLine;
+import com.klst.einvoice.ubl.Delivery;
 import com.klst.einvoice.ubl.FinancialAccount;
 import com.klst.einvoice.ubl.Invoice;
 import com.klst.einvoice.ubl.InvoiceLine;
+import com.klst.einvoice.ubl.Party;
 import com.klst.einvoice.ubl.PaymentMeans;
 import com.klst.einvoice.ubl.Percent;
 import com.klst.einvoice.ubl.VatBreakdown;
@@ -202,8 +204,19 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			ublInvoice.setNote(note);
 		});
 		
-		ublInvoice.setPayeeParty(testDoc.getPayeeParty());
+//		ublInvoice.setPayeeParty(testDoc.getPayeeParty());
+		Party party = testDoc.getPayeeParty();
+		if(party==null) {
+			// nix
+		} else {
+			ublInvoice.setPayee(party.getTradingBusinessName() //String businessName
+					, party.getId() // String id
+					, party.getCompanyLegalForm()  // String companyLegalForm
+					);
+		}
 		ublInvoice.setTaxRepresentativeParty(testDoc.getTaxRepresentativeParty());
+		
+		ublInvoice.addDelivery(testDoc.getDeliveries());
 		
 		LOG.info("finished.");
 	}

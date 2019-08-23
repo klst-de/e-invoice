@@ -465,8 +465,9 @@ public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentT
 	}
 
 	// wie BG-10  PAYEE
-	public void setPayee(String registrationName, String id, String companyLegalForm) {
-		Party party = new Party(registrationName, null, null, null, companyLegalForm);
+	public void setPayee(String businessName, String id, String companyLegalForm) {
+		Party party = new Party(null, null, null, null, companyLegalForm);
+		party.setTradingBusinessName(businessName);
 		party.setId(id);
 		setPayeeParty(party);
 	}
