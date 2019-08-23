@@ -228,7 +228,7 @@ public class Address extends AddressType implements PostalAddress {
 	
 	@Override
 	public String getPostCode() {
-		return super.getPostalZone().getValue();
+		return super.getPostalZone()==null ? null : super.getPostalZone().getValue();
 	}
 	
 	@Override
@@ -250,6 +250,6 @@ public class Address extends AddressType implements PostalAddress {
 	}
 
 	public String toString() {
-		return getCountryCode() + " " + getPostCode() + " " + getCity();
+		return getCountryCode()==null ? "null" : getCountryCode() + " " +  getPostCode()==null ? "null" : getPostCode() + " " + getCity()==null ? "null" : getCity();
 	}
 }
