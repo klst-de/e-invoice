@@ -44,7 +44,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getRegistrationName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
 		
 		// BT-28 ++ 0..1 Seller trading name / TradingBusinessName
-		setCompanyLegalForm(legalOrganization==null ? null : legalOrganization.getTradingBusinessName()==null ? null : legalOrganization.getTradingBusinessName().getValue());
+		setTradingBusinessName(legalOrganization==null ? null : legalOrganization.getTradingBusinessName()==null ? null : legalOrganization.getTradingBusinessName().getValue());
 		// BT-29 ++ 0..n Seller identifier
 		List<IDType> iDlist = party.getID();
 		iDlist.forEach(iD -> {

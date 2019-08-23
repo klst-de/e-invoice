@@ -184,7 +184,7 @@ public class PartyTest {
     	List<Map<Object,String>> taxSchemes = party.getTaxSchemes();
     	LOG.info("TaxSchemes #:"+ taxSchemes.size());
     	assertTrue(taxSchemes.isEmpty());
-    	party.addPartyTaxID("DE123456789");
+    	party.setTaxRegistrationId("DE123456789");
     	LOG.info("TaxSchemes #:"+ taxSchemes.size());
     }
     
@@ -202,7 +202,7 @@ public class PartyTest {
     	List<Map<Object,String>> taxSchemes = supplierparty.getTaxSchemes();
     	assertEquals("DE123456789", taxSchemes.get(0).get(CompanyIDType.class));
     	LOG.info("supplierparty taxScheme:" + taxSchemes.get(0).get(CompanyIDType.class) + "/" + taxSchemes.get(0).get(TaxSchemeType.class));
-    	supplierparty.addPartyTaxID("Umsatzsteuer-Identifikationsnummer des Verkäufers");
+    	supplierparty.setTaxRegistrationId("Umsatzsteuer-Identifikationsnummer des Verkäufers");
     	LOG.info("TaxSchemes #:"+supplierparty.getTaxSchemes().size());
     	LOG.info("supplierparty taxScheme:" + supplierparty.getTaxSchemes().get(1).get(CompanyIDType.class) + "/" + supplierparty.getTaxSchemes().get(1).get(TaxSchemeType.class));
   	
@@ -217,7 +217,7 @@ public class PartyTest {
     	LOG.info("??????????????? invoice.getSellerTaxSchemes().size() "+invoice.getSellerTaxSchemes().size()); // Seller wurde überschrieben!
     	assertEquals(0, invoice.getSellerTaxSchemes().size());
 //    	invoice.setSellerTaxCompanyId("Umsatzsteuer-Identifikationsnummer des Verkäufers");
-    	invoice.getSellerParty().addPartyTaxID("Umsatzsteuer-Identifikationsnummer des Verkäufers");
+    	invoice.getSellerParty().setTaxRegistrationId("Umsatzsteuer-Identifikationsnummer des Verkäufers");
     	taxSchemes = invoice.getSellerTaxSchemes();
     	assertEquals(1, taxSchemes.size());
     	LOG.info("seller taxScheme:" + taxSchemes.get(0).get(CompanyIDType.class) + "/" + taxSchemes.get(0).get(TaxSchemeType.class));
