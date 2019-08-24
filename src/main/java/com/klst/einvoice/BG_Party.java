@@ -13,7 +13,7 @@ package com.klst.einvoice;
 public interface BG_Party {
 	
 	public PostalAddress getAddress();
-	public void setAddress(PostalAddress name);
+	public void setAddress(PostalAddress address);
 	
 	public String getRegistrationName();
 	public void setRegistrationName(String name);

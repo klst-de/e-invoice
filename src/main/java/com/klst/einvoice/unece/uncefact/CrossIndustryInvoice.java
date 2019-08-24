@@ -33,7 +33,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
@@ -82,7 +81,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		super();
 	}
 
-	ApplicableHeaderTradeSettlement applicableHeaderTradeSettlement;
+	HeaderTradeSettlementType applicableHeaderTradeSettlement;
+	HeaderTradeDeliveryType applicableHeaderTradeDelivery;
 	
 	public CrossIndustryInvoice(String customization, DocumentNameCode documentNameCode) {
 		this(customization, null, documentNameCode);
@@ -92,6 +92,9 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		this();
 		setProcessControl(customization, profile);
 		supplyChainTradeTransaction = new SupplyChainTradeTransactionType();
+		
+		applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery();
+		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 		
 		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(); // class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
@@ -107,6 +110,26 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 	public CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
 		this(getCustomization(doc), getProfile(doc), getTypeCode(doc));
 		supplyChainTradeTransaction = new SupplyChainTradeTransactionType();
+		
+		Object ahtd = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
+		LOG.info("applicableHeaderTradeDelivery:"+applicableHeaderTradeDelivery);
+		if(ahtd==null) {
+			LOG.info("ahtd==null");
+		} else {
+			HeaderTradeDeliveryType htd = (HeaderTradeDeliveryType)ahtd;
+			applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery(htd);
+			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
+			
+//			ApplicableHeaderTradeDelivery delivery = (ApplicableHeaderTradeDelivery)getDeliveryInformation(doc);
+//			if(delivery!=null) {
+//				setDeliveryInformation( delivery.getBusinessName() // String businessName
+//						, delivery.getActualDate() // Timestamp ts
+//						, delivery.getAddress() // PostalAddress address
+//						, delivery.getId() // String locationId
+//						); 
+//			}
+		}
+
 		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
 		setPaymentTermsAndDate(getPaymentTerm(applicableHeaderTradeSettlement), getDueDateAsTimestamp(applicableHeaderTradeSettlement)); // optional
 		
@@ -127,8 +150,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setPayeeParty(getPayeeParty(doc));
 		LOG.info("\n SellerTaxRepresentativeParty:");;
 		setTaxRepresentativeParty(getTaxRepresentativeParty(doc)); // optional
-		LOG.info("\n ...");;
-//		addDeliveries(doc);
+		LOG.info("\n ...");
+		
 //		addPaymentInstructions(doc);		
 		setDocumentTotals(getInvoiceLineNetTotal(doc), getInvoiceTotalTaxExclusive(doc), getInvoiceTotalTaxInclusive(doc), getDuePayable(doc));
 		setInvoiceTax(getInvoiceTax(doc));
@@ -315,7 +338,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public Timestamp getDueDateAsTimestamp() {
 		return getDueDateAsTimestamp(applicableHeaderTradeSettlement);
 	}
-	static Timestamp getDueDateAsTimestamp(ApplicableHeaderTradeSettlement headerTradeSettlement) {
+	static Timestamp getDueDateAsTimestamp(HeaderTradeSettlementType headerTradeSettlement) {
 		if(headerTradeSettlement==null) return null;
 		List<TradePaymentTermsType> tradePaymentTermsList = headerTradeSettlement.getSpecifiedTradePaymentTerms(); // 0 .. n
 		// tradePaymentTermsList / Detailinformationen zu Zahlungsbedingungen
@@ -349,7 +372,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
 	}
 	
-	DateTimeType newDateTime(Timestamp ts) {
+	static DateTimeType newDateTime(Timestamp ts) {
 		if(ts==null) return null;
 		
 		DateTimeType dateTime = new DateTimeType();
@@ -364,7 +387,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public String getPaymentTerm() {
 		return getPaymentTerm(applicableHeaderTradeSettlement);
 	}
-	static String getPaymentTerm(ApplicableHeaderTradeSettlement headerTradeSettlement) {
+	static String getPaymentTerm(HeaderTradeSettlementType headerTradeSettlement) {
 		List<TradePaymentTermsType> tradePaymentTermsList = headerTradeSettlement.getSpecifiedTradePaymentTerms();
 		if(tradePaymentTermsList.isEmpty()) return null;
 		
@@ -807,10 +830,30 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 * <br>ID: BG-13
 	 * <br>Req.ID: R31, R32, R57
 	 */
-	public void setDelivery(Object delivery) { // TODO setDelivery(Delivery delivery)
-		HeaderTradeDeliveryType value = new HeaderTradeDeliveryType(); // TODO
-		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(value);
+	public void setDeliveryInformation(String businessName, Timestamp ts, PostalAddress address, String locationId) {
+		applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery(businessName, ts, address, locationId);
+		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 	}
+	
+	public void setDeliveryInformation(HeaderTradeDeliveryType headerTradeDelivery) {
+		applicableHeaderTradeDelivery = headerTradeDelivery;
+		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
+	}
+	
+	public HeaderTradeDeliveryType getDeliveryInformation() {
+//		return getDeliveryInformation(this);
+		HeaderTradeDeliveryType headerTradeDelivery = supplyChainTradeTransaction.getApplicableHeaderTradeDelivery();
+		if(headerTradeDelivery==null) return null;
+		return headerTradeDelivery;
+	}
+//	static HeaderTradeDeliveryType getDeliveryInformation(CrossIndustryInvoiceType doc) {
+//		HeaderTradeDeliveryType headerTradeDelivery = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
+//		LOG.info("HeaderTradeDeliveryType headerTradeDelivery:"+headerTradeDelivery);
+//		if(headerTradeDelivery==null) return null;
+//		LOG.info("HeaderTradeDeliveryType headerTradeDelivery.getShipToTradeParty():"+headerTradeDelivery.getShipToTradeParty());
+//		return new ApplicableHeaderTradeDelivery(headerTradeDelivery);
+////		return headerTradeDelivery==null ? null : new ApplicableHeaderTradeDelivery(headerTradeDelivery);
+//	}
 	
 // --------------------------------
 	/** 
@@ -894,7 +937,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		 */
 	PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
 		// ohne remittanceInformation:
-		return this.applicableHeaderTradeSettlement.createPaymentInstructions(code, paymentMeansText);
+		return ((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).createPaymentInstructions(code, paymentMeansText);
 	}
 	/**
 	 * group PAYMENT INSTRUCTIONS, BG-16 Cardinality 0..1
@@ -905,22 +948,22 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 */
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
 		PaymentInstructions pi = createPaymentInstructions(code, paymentMeansText, remittanceInformation);
-		this.applicableHeaderTradeSettlement.setBG16(pi);
-		this.applicableHeaderTradeSettlement.setRemittanceInformation(remittanceInformation);
+		((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).setBG16(pi);
+		((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).setRemittanceInformation(remittanceInformation);
 	}
 	public PaymentMeansEnum getPaymentMeansCode() {
-		return this.applicableHeaderTradeSettlement.getPaymentMeansEnum();
+		return ((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).getPaymentMeansEnum();
 	}
 	// BG-16.BT-83 - 0..1/0..1
 	public String getRemittanceInformation() {
-		return this.applicableHeaderTradeSettlement.getRemittanceInformation();
+		return ((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).getRemittanceInformation();
 	}
 	
 	public CreditTransfer getCreditTransfer() {
-		return this.applicableHeaderTradeSettlement.getCreditTransfer();
+		return ((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).getCreditTransfer();
 	}
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
-		return this.applicableHeaderTradeSettlement.createCreditTransfer(iban, accountName, bic);
+		return ((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).createCreditTransfer(iban, accountName, bic);
 	}
 
 	// BG-22.BT-106 - 1..1/1..1
