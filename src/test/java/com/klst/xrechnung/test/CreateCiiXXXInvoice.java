@@ -59,14 +59,13 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		
 
 		TradeParty testSellerParty = testDoc.getSellerParty();
-		TradeParty sellerParty = new TradeParty( testSellerParty.getRegistrationName() // BT-27 String name
+		TradeParty sellerParty = new TradeParty( testSellerParty.getBusinessName()     // BT-27 String name
 				                               , testSellerParty.getAddress()          // TradeAddress address
 				                               , (TradeContact)(testSellerParty.getIContact())         // TradeContact contact
 				                               , testSellerParty.getCompanyId()        // BT-30 String companyId
 				                               , testSellerParty.getCompanyLegalForm() // BT-33 String companyLegalForm
 				                               );
 //		sellerParty.setTradingBusinessName(testSellerParty.getTradingBusinessName()) ; // BT-28
-		sellerParty.setTradingBusinessName("Sitz der Gesellschaft: […], Registergericht: […] usw.") ; // BT-28
 		sellerParty.setId(testSellerParty.getId()); // BT-29
 		// BT-31 + BT-32
 		if(testSellerParty.getSpecifiedTaxRegistration().isEmpty()) {
@@ -133,7 +132,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 					+ " ID:"+buyerParty.getSpecifiedTaxRegistration().get(0).getID().getValue()
 					+ " schemeID:"+buyerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID()
 					);
-			buyerParty.setTaxRegistrationId(buyerParty.getSpecifiedTaxRegistration().get(0).getID().getValue(), buyerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID());
+//			buyerParty.setTaxRegistrationId(buyerParty.getSpecifiedTaxRegistration().get(0).getID().getValue(), buyerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID());
 		}
 		cii.setBuyerParty(buyerParty);
 		
@@ -141,8 +140,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		if(testPayeeParty==null) {
 			LOG.warning("testPayeeParty==null" );
 		} else {
-			LOG.info("testPayeeParty.RegistrationName:"+testPayeeParty.getRegistrationName()
-					+ " CompanyId:"+testPayeeParty.getCompanyId()
+			LOG.info("testPayeeParty.RegistrationName:"+testPayeeParty.getBusinessName()
+					+ " Id:"+testPayeeParty.getId()
 					+ " CompanyLegalForm:"+testPayeeParty.getCompanyLegalForm()
 					);
 //			TradeParty payeeParty = new TradeParty( testPayeeParty.getRegistrationName()
@@ -153,18 +152,18 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //                    );
 //			payeeParty.setId(testPayeeParty.getId());
 //			cii.setPayeeParty(payeeParty); // alternativ:
-			cii.setPayee(testPayeeParty.getRegistrationName(), testPayeeParty.getId(), testPayeeParty.getCompanyLegalForm());
+			cii.setPayee(testPayeeParty.getBusinessName(), testPayeeParty.getId(), testPayeeParty.getCompanyLegalForm());
 		}
 		
 		TradeParty testSellerTaxRepresentativeParty = testDoc.getTaxRepresentativeParty();
 		if(testSellerTaxRepresentativeParty==null) {
 			LOG.warning("testPayeeParty==null" );
 		} else {
-			LOG.info("testPayeeParty.RegistrationName:"+testSellerTaxRepresentativeParty.getRegistrationName()
-					+ " CompanyId:"+testSellerTaxRepresentativeParty.getCompanyId()
-					+ " CompanyLegalForm:"+testSellerTaxRepresentativeParty.getCompanyLegalForm()
+			LOG.info("testSellerTaxRepresentativeParty.Name:"+testSellerTaxRepresentativeParty.getBusinessName()
+					+ " Address:"+testSellerTaxRepresentativeParty.getAddress()
+					+ " TaxRegistrationId:"+testSellerTaxRepresentativeParty.getTaxRegistrationId()
 					);
-			cii.setTaxRepresentative(testSellerTaxRepresentativeParty.getRegistrationName()
+			cii.setTaxRepresentative(testSellerTaxRepresentativeParty.getBusinessName()
 					, testSellerTaxRepresentativeParty.getAddress()
 					, testSellerTaxRepresentativeParty.getTaxRegistrationId()
 //					, CoreInvoiceVatBreakdown.VAT);

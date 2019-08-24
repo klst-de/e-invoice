@@ -46,7 +46,7 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 		this();
 		PartyType party = delivery.getDeliveryParty();
 		Party deliveryParty = party==null ? null : new Party(party);
-		String businessName = deliveryParty==null ? null : deliveryParty.getTradingBusinessName();
+		String businessName = deliveryParty==null ? null : deliveryParty.getBusinessName();
 //		LOG.info("businessName:"+businessName);
 		
 		init( businessName
@@ -99,7 +99,7 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	void init(String businessName, Timestamp ts, PostalAddress address, String locationId) {
 		LOG.info("BT-70/businessName:"+businessName + " BT-72/Timestamp:"+ts + " BG-15 ++ 0..1 DELIVER TO ADDRESS:"+address + " BT-71/locationId:"+locationId);
 		Party party = new Party(null, null, null, null, null);
-		party.setTradingBusinessName(businessName);
+		party.setBusinessName(businessName);
 		setParty(party);		
 		setActualDate(ts);
 		setAddress(address);
@@ -155,13 +155,13 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	}
 
 	@Override
-	public String getTradingBusinessName() {
+	public String getBusinessName() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void setTradingBusinessName(String name) {
+	public void setBusinessName(String name) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -44,7 +44,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getRegistrationName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
 		
 		// BT-28 ++ 0..1 Seller trading name / TradingBusinessName
-		setTradingBusinessName(legalOrganization==null ? null : legalOrganization.getTradingBusinessName()==null ? null : legalOrganization.getTradingBusinessName().getValue());
+		setBusinessName(legalOrganization==null ? null : legalOrganization.getTradingBusinessName()==null ? null : legalOrganization.getTradingBusinessName().getValue());
 		// BT-29 ++ 0..n Seller identifier
 		List<IDType> iDlist = party.getID();
 		iDlist.forEach(iD -> {
@@ -84,20 +84,20 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		init(name, address, contact, companyId, companyLegalForm);
 	}
 	
-	void init(String registrationName, PostalAddress address, TradeContact contact, String companyId, String companyLegalForm) {
+	void init(String name, PostalAddress address, TradeContact contact, String companyId, String companyLegalForm) {
 		legalOrganization = new LegalOrganizationType();
-		setRegistrationName(registrationName);
+		setBusinessName(name);
 		setAddress(address);
 		if(contact!=null) setContact(contact);
 		setCompanyId(companyId);
 		setCompanyLegalForm(companyLegalForm);
 	}
 
-	// BT-70 PartyName/shipToTradeName
-	@Deprecated
-	public void addName(String shipToTradeName) { // !wie Name
-		super.setName(CrossIndustryInvoice.newTextType(shipToTradeName));
-	}
+//	// BT-70 PartyName/shipToTradeName
+//	@Deprecated
+//	public void addName(String shipToTradeName) { // !wie Name
+//		super.setName(CrossIndustryInvoice.newTextType(shipToTradeName));
+//	}
 
 	// PostalAddress
 	@Override
@@ -207,23 +207,23 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 	
 	@Override
-	public String getRegistrationName() {
+	public String getBusinessName() {
 		return getPartyName();
 	}
 
 	@Override
-	public void setRegistrationName(String name) {
+	public void setBusinessName(String name) {
 		setPartyName(name);
 	}
 
 	@Override
-	public String getTradingBusinessName() {
+	public String getRegistrationName() {
 		TextType text = legalOrganization.getTradingBusinessName();
 		return text==null ? null : text.getValue();
 	}
 
 	@Override
-	public void setTradingBusinessName(String name) {
+	public void setRegistrationName(String name) {
 		legalOrganization.setTradingBusinessName(CrossIndustryInvoice.newTextType(name));
 		super.setSpecifiedLegalOrganization(legalOrganization);
 	}

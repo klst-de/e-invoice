@@ -25,9 +25,28 @@ package com.klst.einvoice;
 //TODO Idee runter zu ubl und cii und public raus ?!
 public interface BG10_Payee extends BG_Party {
 	
-	// BT-59 ++ 1..1 Payee name / ram:Name
+/*
+CII:
+            <ram:PayeeTradeParty>
+                <ram:ID>74</ram:ID>
+                <ram:Name>[Payee name]</ram:Name>           -- BT-59 RegistrationName
+            </ram:PayeeTradeParty>
+UBL:
+    <cac:PayeeParty>
+        <cac:PartyIdentification>
+            <cbc:ID>74</cbc:ID>
+        </cac:PartyIdentification>
+        <cac:PartyName>                                     -- BT-59 TradingBusinessName
+            <cbc:Name>[Payee name]</cbc:Name>
+        </cac:PartyName>
+    </cac:PayeeParty>
+
+ */
+	// BT-59 ++ 1..1 Payee name / <ram:Name> / UBL: <cac:PartyName><cbc:Name>
+	// BT-27 ++ 1..1 Seller name / ram:Name / UBL: <cac:PartyLegalEntity><cbc:RegistrationName>
+	// BT-44 ++ 1..1 Buyer name / ram:Name / UBL: <cac:PartyLegalEntity><cbc:RegistrationName>
 	
-	// BT-60 ++ 0..1 Payee identifier / PayeeTradeParty <ram:ID><ram:GlobalID>
+	// BT-60 ++ 0..1 Payee identifier / <ram:ID> + <ram:GlobalID> / UBL: <cac:PartyIdentification><cbc:ID>
 	
 	// BT-61 ++ 0..1 Payee legal registration identifier / <ram:SpecifiedLegalOrganization><ram:ID>
 

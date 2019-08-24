@@ -67,7 +67,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		
 		// BT-28 ++ 0..1 Seller trading name / UBL: <cac:PartyName><cbc:Name>
 		List<PartyNameType> partyNameList = party.getPartyName();
-		setTradingBusinessName(partyNameList.isEmpty() ? null : partyNameList.get(0).getName().getValue());
+		setBusinessName(partyNameList.isEmpty() ? null : partyNameList.get(0).getName().getValue());
 		
 		// BT-29 ++ 0..n Seller identifier
 		List<PartyIdentificationType> partyIdentificationList = party.getPartyIdentification();
@@ -272,13 +272,13 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 
 	@Override
-	public String getTradingBusinessName() {
+	public String getBusinessName() {
 		List<PartyNameType> partyNameList = super.getPartyName();
 		return partyNameList.isEmpty() ? null : partyNameList.get(0).getName().getValue();
 	}
 
 	@Override
-	public void setTradingBusinessName(String businessName) {
+	public void setBusinessName(String businessName) {
 		if(businessName==null) return;
 		NameType name = new NameType();
 		name.setValue(businessName);

@@ -642,7 +642,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 * Seller (AccountingSupplierParty)
 	 * Seller is mandatory information and provided in cii element SellerTradeParty
 	 * 
-	 * @param registrationName mandatory BT-27 : The full formal name by which the Seller is registered 
+	 * @param name mandatory BT-27 : The full formal name by which the Seller is registered 
 	 *        in the national registry of legal entities or as a Taxable person or otherwise trades as a person or persons.
 	 * @param postalAddress mandatory group BG-5/R53 : A group of business terms providing information about the address of the Seller.
               Sufficient components of the address are to be filled to comply with legal requirements.
@@ -650,10 +650,10 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 * @param companyId optional / Seller legal registration identifier, BT-30/R52
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
 	 */
-	public void setSeller(String registrationName, PostalAddress address, TradeContact contact, 
+	public void setSeller(String name, PostalAddress address, TradeContact contact, 
 			String companyId, String companyLegalForm) {
 		                                  // BT-27        , BG-5   , BG-6   , BT-30    , BT-33
-		TradeParty party = new TradeParty(registrationName, address, contact, companyId, companyLegalForm);
+		TradeParty party = new TradeParty(name, address, contact, companyId, companyLegalForm);
 		setSellerParty(party);
 	}
 	
@@ -700,9 +700,9 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	/* BUYER                                       BG-7                        1 (mandatory) 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Erwerber liefern.
 	 */
-	public void setBuyer(String registrationName, PostalAddress address, TradeContact contact) {
-		TradeParty party = new TradeParty(registrationName, address, contact, null, null); // BT-44, BG-8, BG-9, BT-45 optional, BT-46 optional
-		setSellerParty(party);
+	public void setBuyer(String name, PostalAddress address, TradeContact contact) {
+		TradeParty party = new TradeParty(name, address, contact, null, null); // BT-44, BG-8, BG-9, BT-45 optional, BT-46 optional
+		setBuyerParty(party);
 	}
 	public void setBuyerParty(TradeParty party) {
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
@@ -744,8 +744,8 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
                 <ram:Name>[Payee name]</ram:Name>
             </ram:PayeeTradeParty>
  */
-	public void setPayee(String registrationName, String id, String companyLegalForm) {
-		TradeParty party = new TradeParty(registrationName, null, null, null, companyLegalForm);
+	public void setPayee(String name, String id, String companyLegalForm) {
+		TradeParty party = new TradeParty(name, null, null, null, companyLegalForm);
 		party.setId(id);
 		setPayeeParty(party);
 	}
@@ -768,11 +768,11 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	/* SELLER TAX REPRESENTATIVE PARTY             BG-11                       0..1
 	 * Eine Gruppe von Informationselementen, die Informationen über den Steuervertreter des Verkäufers liefern.
 	 */
-	// BT-62 ++ 1..1 Seller tax representative name / aka registrationName
+	// BT-62 ++ 1..1 Seller tax representative name
 	
 	// BT-63 ++ 1..1 Seller tax representative VAT identifier
-	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
-		TradeParty party = new TradeParty(registrationName, address, null, null, null);
+	public void setTaxRepresentative(String name, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
+		TradeParty party = new TradeParty(name, address, null, null, null);
 		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
 		setTaxRepresentativeParty(party);
 	}

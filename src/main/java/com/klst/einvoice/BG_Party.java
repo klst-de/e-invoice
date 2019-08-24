@@ -18,8 +18,8 @@ public interface BG_Party {
 	public String getRegistrationName();
 	public void setRegistrationName(String name);
 	
-	public String getTradingBusinessName();
-	public void setTradingBusinessName(String name);
+	public String getBusinessName();
+	public void setBusinessName(String name);
 	
 	public String getId(); // kleingeschrieben, nicht ID!
 	public void setId(String name);

@@ -936,7 +936,7 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 */
 	public void setPayee(String businessName, String id, String companyLegalForm) {
 		Party party = new Party(null, null, null, null, companyLegalForm);
-		party.setTradingBusinessName(businessName);
+		party.setBusinessName(businessName);
 		party.setId(id);
 		setPayeeParty(party);
 	}

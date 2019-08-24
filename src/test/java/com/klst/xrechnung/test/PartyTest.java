@@ -141,10 +141,10 @@ public class PartyTest {
     public void ublBusinessName() {
     	String name = "party name";
 		assertTrue(supplierparty.getPartyName().isEmpty());
-		supplierparty.setTradingBusinessName(name);
+		supplierparty.setBusinessName(name);
 		assertTrue(supplierparty.getPartyName().size()==1);
 		assertEquals(name, supplierparty.getPartyName().get(0).getName().getValue());
-		assertEquals(name, supplierparty.getTradingBusinessName());
+		assertEquals(name, supplierparty.getBusinessName());
    }
 
     @Test

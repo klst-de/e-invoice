@@ -15,27 +15,14 @@ package com.klst.einvoice;
 
 /* 01.01a-INVOICE_uncefact.xml :
 	<ram:SellerTradeParty>
-	    <ram:Name>[Seller name]</ram:Name>
+	    <ram:Name>[Seller name]</ram:Name>                                            -- BT-27 BusinessName
 	    <ram:Description>123/456/7890, HRA-Eintrag in […]</ram:Description>
 	    <ram:SpecifiedLegalOrganization>
 	        <ram:ID>[HRA-Eintrag]</ram:ID>
 	        <ram:TradingBusinessName>[Seller trading name]</ram:TradingBusinessName>
 	    </ram:SpecifiedLegalOrganization>
-	    <ram:DefinedTradeContact>
-	        <ram:PersonName>nicht vorhanden</ram:PersonName>
-	        <ram:TelephoneUniversalCommunication>
-	            <ram:CompleteNumber>+49 1234-5678</ram:CompleteNumber>
-	        </ram:TelephoneUniversalCommunication>
-	        <ram:EmailURIUniversalCommunication>
-	            <ram:URIID>seller@email.de</ram:URIID>
-	        </ram:EmailURIUniversalCommunication>
-	    </ram:DefinedTradeContact>
-	    <ram:PostalTradeAddress>
-	        <ram:PostcodeCode>12345</ram:PostcodeCode>
-	        <ram:LineOne>[Seller address line 1]</ram:LineOne>
-	        <ram:CityName>[Seller city]</ram:CityName>
-	        <ram:CountryID>DE</ram:CountryID>
-	    </ram:PostalTradeAddress>
+	    <ram:DefinedTradeContact> ... </ram:DefinedTradeContact>
+	    <ram:PostalTradeAddress> ...</ram:PostalTradeAddress>
 	    <ram:SpecifiedTaxRegistration>
 	        <ram:ID schemeID="VA">DE 123456789</ram:ID>
 	    </ram:SpecifiedTaxRegistration>
@@ -44,17 +31,10 @@ package com.klst.einvoice;
 dto UBL:
     <cac:AccountingSupplierParty>
         <cac:Party>
-            <cac:PartyName>
+            <cac:PartyName>                                                           -- BT-27 BusinessName                                                      -- 
                 <cbc:Name>[Seller trading name]</cbc:Name>
             </cac:PartyName>
-            <cac:PostalAddress>
-                <cbc:StreetName>[Seller address line 1]</cbc:StreetName>
-                <cbc:CityName>[Seller city]</cbc:CityName>
-                <cbc:PostalZone>12345</cbc:PostalZone>
-                <cac:Country>
-                    <cbc:IdentificationCode>DE</cbc:IdentificationCode>
-                </cac:Country>
-            </cac:PostalAddress>
+            <cac:PostalAddress> ... </cac:PostalAddress>
             <cac:PartyTaxScheme>
                 <cbc:CompanyID>DE 123456789</cbc:CompanyID>
                 <cac:TaxScheme>
@@ -62,15 +42,11 @@ dto UBL:
                 </cac:TaxScheme>
             </cac:PartyTaxScheme>
             <cac:PartyLegalEntity>
-                <cbc:RegistrationName>[Seller name]</cbc:RegistrationName>
+                <cbc:RegistrationName>[Seller name]</cbc:RegistrationName>                           registrationName
                 <cbc:CompanyID>[HRA-Eintrag]</cbc:CompanyID>
                 <cbc:CompanyLegalForm>123/456/7890, HRA-Eintrag in […]</cbc:CompanyLegalForm>
             </cac:PartyLegalEntity>
-            <cac:Contact>
-                <cbc:Name>nicht vorhanden</cbc:Name>
-                <cbc:Telephone>+49 1234-5678</cbc:Telephone>
-                <cbc:ElectronicMail>seller@email.de</cbc:ElectronicMail>
-            </cac:Contact>
+            <cac:Contact> ... </cac:Contact>
         </cac:Party>
     </cac:AccountingSupplierParty>
 
