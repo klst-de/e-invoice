@@ -24,11 +24,11 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 	// copy ctor
 	public ApplicableHeaderTradeDelivery(HeaderTradeDeliveryType delivery) {
 		this();
+		Timestamp ts = getActualDate(delivery);
 		TradePartyType tradeParty = delivery.getShipToTradeParty();
 		party = tradeParty==null ? null : new TradeParty(tradeParty);
-		LOG.info("party:"+party);
-		setActualDate(getActualDate(delivery));
-		LOG.info("BT-70/businessName:"+party.getBusinessName() + " BT-72/Timestamp:"+this.getActualDate() + " BG-15 ++ 0..1 DELIVER TO ADDRESS:"+party.getAddress() + " BT-71/locationId:"+party.getId());
+		LOG.info("party:"+party + " ts:"+ts);
+		setActualDate(ts);
 		setParty(party);	
 	}
 
@@ -51,6 +51,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 
 	// Party with businessName
 	public void setParty(BG_Party party) {
+		if(party==null) return;
 		super.setShipToTradeParty((TradePartyType)party);
 	}
 	
