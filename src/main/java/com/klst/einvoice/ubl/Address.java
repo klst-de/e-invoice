@@ -11,6 +11,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Coun
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.AdditionalStreetNameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BuildingNameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CityNameType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CountrySubentityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IdentificationCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PostalZoneType;
@@ -55,6 +56,7 @@ public class Address extends AddressType implements PostalAddress {
 		this();
 		// TODO testen
 		super.setCountry(address.getCountry());
+		super.setCountrySubentity(address.getCountrySubentity());
 		super.setRegion(address.getRegion());
 		super.setPostalZone(address.getPostalZone());
 		super.setCityName(address.getCityName());
@@ -174,10 +176,11 @@ public class Address extends AddressType implements PostalAddress {
 	}
 
 	@Override
-	public void setCountrySubdivision(String countrySubdivision) {
-		RegionType region = new RegionType();
-		region.setValue(countrySubdivision);
-		this.setRegion(region);
+	public void setCountrySubdivision(String name) {
+		if(name==null) return;
+		CountrySubentityType countrySubentity = new CountrySubentityType();
+		countrySubentity.setValue(name);
+		super.setCountrySubentity(countrySubentity);
 	}
 
 	@Override
@@ -233,11 +236,8 @@ public class Address extends AddressType implements PostalAddress {
 	
 	@Override
 	public String getCountrySubdivision() {
-		RegionType region = super.getRegion();
-		if(region==null) {
-			return null;
-		}
-		return region.getValue();
+		CountrySubentityType countrySubentity = super.getCountrySubentity();
+		return countrySubentity==null ? null : countrySubentity.getValue();
 	}
 	
 	@Override
