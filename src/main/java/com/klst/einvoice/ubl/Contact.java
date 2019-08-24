@@ -109,4 +109,16 @@ public class Contact extends ContactType implements IContact {
 		return electronicMail==null ? null : electronicMail.getValue();
 	}
 
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[");
+		stringBuilder.append(getContactPoint()==null ? "null" : getContactPoint());
+		stringBuilder.append(", ");
+		stringBuilder.append(getContactTelephone()==null ? "null" : getContactTelephone());
+		stringBuilder.append(", ");
+		stringBuilder.append(getContactEmail()==null ? "null" : getContactEmail());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
+	}
+
 }

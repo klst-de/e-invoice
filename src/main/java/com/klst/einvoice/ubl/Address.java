@@ -250,6 +250,15 @@ public class Address extends AddressType implements PostalAddress {
 	}
 
 	public String toString() {
-		return getCountryCode()==null ? "null" : getCountryCode() + " " +  getPostCode()==null ? "null" : getPostCode() + " " + getCity()==null ? "null" : getCity();
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[");
+		stringBuilder.append(getCountryCode()==null ? "null" : getCountryCode());
+		stringBuilder.append(", ");
+		stringBuilder.append(getPostCode()==null ? "null" : getPostCode());
+		stringBuilder.append(", ");
+		stringBuilder.append(getCity()==null ? "null" : getCity());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
 	}
+
 }

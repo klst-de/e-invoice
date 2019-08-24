@@ -62,4 +62,13 @@ public interface BG7_Buyer extends BG_Party {
  */
 	// BT-44 ++ 1..1 Buyer name / ram:Name / UBL: <cac:PartyLegalEntity><cbc:RegistrationName>
 	// ...
+	
+	// BG-8 ++ 1..1 BUYER POSTAL ADDRESS
+	public PostalAddress getAddress();
+	public void setAddress(PostalAddress address);
+	
+	// BG-9 ++ 0..1 BUYER CONTACT
+	public IContact getIContact();
+	public void setIContact(IContact contact);
+
 }

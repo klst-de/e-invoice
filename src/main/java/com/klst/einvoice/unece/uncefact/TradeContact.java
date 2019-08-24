@@ -16,9 +16,6 @@ public class TradeContact extends TradeContactType implements IContact {
 	// copy ctor
 	public TradeContact(TradeContactType contact) {
 		this();
-//		this.setContactPoint(((TradeContact)contact).getContactPoint());
-//		this.setContactTelephone(((TradeContact)contact).getContactTelephone());
-//		this.setContactEmail(((TradeContact)contact).getContactEmail());
 		this.setContactPoint(contact.getPersonName().getValue());
 		UniversalCommunicationType universalCommunicationType = contact.getTelephoneUniversalCommunication();
 		if(universalCommunicationType==null) {
@@ -89,4 +86,17 @@ public class TradeContact extends TradeContactType implements IContact {
 	public String getContactEmail() {
 		return super.getEmailURIUniversalCommunication().getURIID().getValue();
 	}
+	
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[");
+		stringBuilder.append(getContactPoint()==null ? "null" : getContactPoint());
+		stringBuilder.append(", ");
+		stringBuilder.append(getContactTelephone()==null ? "null" : getContactTelephone());
+		stringBuilder.append(", ");
+		stringBuilder.append(getContactEmail()==null ? "null" : getContactEmail());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
+	}
+
 }

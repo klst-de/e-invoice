@@ -41,7 +41,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 			, legalOrganization==null ? null : legalOrganization.getID()==null ? null : legalOrganization.getID().getValue()
 			, party.getDescription().isEmpty() ? null : party.getDescription().get(0).getValue()
 			);
-		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getRegistrationName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
+//		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getRegistrationName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
 		
 		// BT-28 ++ 0..1 Seller trading name / TradingBusinessName
 		setBusinessName(legalOrganization==null ? null : legalOrganization.getTradingBusinessName()==null ? null : legalOrganization.getTradingBusinessName().getValue());
@@ -79,16 +79,16 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	 * @param companyId        BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
 	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
 	 */
-	public TradeParty(String name, PostalAddress address, TradeContact contact, String companyId, String companyLegalForm) {
+	public TradeParty(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		this();
 		init(name, address, contact, companyId, companyLegalForm);
 	}
 	
-	void init(String name, PostalAddress address, TradeContact contact, String companyId, String companyLegalForm) {
+	void init(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		legalOrganization = new LegalOrganizationType();
 		setBusinessName(name);
 		setAddress(address);
-		if(contact!=null) setContact(contact);
+		if(contact!=null) setIContact(contact);
 		setCompanyId(companyId);
 		setCompanyLegalForm(companyLegalForm);
 	}
@@ -121,34 +121,32 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 
 	// Contact
-	public void setContact(TradeContact contact) {
-		List<TradeContactType> tradeContactList = super.getDefinedTradeContact();
-		TradeContactType tradeContact = new TradeContact((TradeContactType)contact);
-		tradeContactList.add(tradeContact);
-	}
-	
+	@Override
 	public IContact getIContact() {
 		return getContact(this);
 	}
-	
-/*
-0 .. 1 DefinedTradeContact Kontaktdaten des Verkäufers                  BG-6 xs:sequence SELLER CONTACT 
-0 .. 1 PersonName Kontaktstelle des Verkäufers                          BT-41 
-0 .. 1 DepartmentName Kontaktstelle des Verkäufers                      BT-41-0 
-0 .. 1 TelephoneUniversalCommunication Detailinformationen zur Telefonnummer des Verkäufers xs:sequence 
-1 .. 1 CompleteNumber Telefonnummer des Verkäufers                      BT-42       
-0 .. 1 FaxUniversalCommunication Detailinformationen zur Faxnummer des Verkäufers xs:sequence 
-1 .. 1 CompleteNumber Faxnummer des Verkäufers 
-0 .. 1 EmailURIUniversalCommunication Detailinformationen zur Emailadresse des Verkäufers xs:sequence 
-1 .. 1 URIID E-Mailadresse des Verkäufers                               BT-43 
- */
-	static TradeContact getContact(TradePartyType party) {
+	static IContact getContact(TradePartyType party) {
 		List<TradeContactType> tradeContactList = party.getDefinedTradeContact();
-		LOG.info("DefinedTradeContact List#="+tradeContactList.size());
-		if(tradeContactList.isEmpty()) return null;
-		return new TradeContact(tradeContactList.get(0));
+		return tradeContactList.isEmpty() ? null : new TradeContact(tradeContactList.get(0));
 	}
+
+	@Override
+	public void setIContact(IContact contact) {
+		super.getDefinedTradeContact().add((TradeContact)contact);	
+	}
+
 	
+	@Override
+	public IContact createContact(String contactName, String contactTel, String contactMail) {
+		return new TradeContact(contactName, contactTel, contactMail);
+	}
+
+	@Override
+	public IContact copyContact(IContact contact) {
+		return new TradeContact((TradeContactType)contact);
+	}
+
+
 	/*
 	 * 0..n : SpecifiedTaxRegistration - Detailinformationen zu Steuerangaben des Verkäufers
 	 * 1..1 : ID                       - Steuernummer des Verkäufers, Umsatzsteueridentnummer des Verkäufers

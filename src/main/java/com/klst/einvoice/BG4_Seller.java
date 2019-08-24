@@ -64,7 +64,7 @@ dto UBL:
  * 
  */
 //TODO Idee runter zu ubl und cii und public raus ?!
-public interface BG4_Seller extends BG_Party {
+public interface BG4_Seller extends BG_Party, IContactFactory {
 	
 	// BT-27 ++ 1..1 Seller name / ram:Name / UBL: <cac:PartyLegalEntity><cbc:RegistrationName>
 
@@ -89,5 +89,13 @@ public interface BG4_Seller extends BG_Party {
 	// BT-34 ++ 0..1 Seller electronic address / URIUniversalCommunication / <cac:Contact><cbc:ElectronicMail>
 	// CII in Doku steht : DefinedTradeContact.URIUniversalCommunication
 	//     in Beispielen : <ram:DefinedTradeContact><ram:EmailURIUniversalCommunication><ram:URIID>
-		
+	
+	// BG-5 ++ 1..1 SELLER POSTAL ADDRESS
+	public PostalAddress getAddress();
+	public void setAddress(PostalAddress address);
+
+	// BG-6 ++ 0..1 SELLER CONTACT
+	public IContact getIContact();
+	public void setIContact(IContact contact);
+	
 }

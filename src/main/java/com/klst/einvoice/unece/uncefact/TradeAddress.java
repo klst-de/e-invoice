@@ -169,5 +169,17 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	public String getBuilding() {
 		return super.getBuildingNumber()==null ? null : super.getBuildingNumber().getValue();
 	}
+	
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[");
+		stringBuilder.append(getCountryCode()==null ? "null" : getCountryCode());
+		stringBuilder.append(", ");
+		stringBuilder.append(getPostCode()==null ? "null" : getPostCode());
+		stringBuilder.append(", ");
+		stringBuilder.append(getCity()==null ? "null" : getCity());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
+	}
 
 }
