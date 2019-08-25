@@ -1,8 +1,15 @@
 package com.klst.einvoice;
 
-/* @see European standard EN 16931-1:2017
+/**
+ * BG-6 , BG-9 CONTACT
+ * <p>
+ * A group (BG) of business terms (BT) providing contact information relevant for the business partner.
  * 
- * 
+ * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for BGs, BTs, rules and request IDs
+ */
+
+/* 
+
 ID    | Level | Cardinality | Business Term         | Description | Usage Note | Req.ID | Semantic data type
 BG-6  | ++    | 0..1        | SELLER CONTACT        | A group of business terms providing contact information about the Seller. 
                                                                                | R57

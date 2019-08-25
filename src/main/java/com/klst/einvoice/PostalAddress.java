@@ -1,8 +1,40 @@
 package com.klst.einvoice;
 
-/*
+/**
+ * BG-5 , BG-8 : POSTAL ADDRESS
+ * <p>
+ * A group (BG) of business terms (BT) providing information about the business partner.
  * 
+ * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for BGs, BTs, rules and request IDs
+ */
+
+/*  (de) rules / Geschäftsregel:
  * 
+ * BR-8     : Verkäufer 
+ * Eine Rechnung muss die Postanschrift des Verkäufers (BG-5) enthalten.
+ * 
+ * BR-9     : Postanschrift des Verkäufers 
+ * Eine Postanschrift des Verkäufers (BG-5) muss einen Ländercode der Verkäuferanschrift (BT-40) enthalten.
+ * 
+ * BR-10    : Käufer 
+ * Eine Rechnung muss die Postanschrift des Käufers (BG-8) enthalten.
+ * 
+ * BR-11    : Postanschrift des Käufers 
+ * Die Postanschrift des Käufers muss einen Ländercode der Käuferanschrift (BT-55) enthalten.
+ * 
+ * BR-DE-3  : Stadt der Verkäuferanschrift
+ * Das Element „Seller city“ (BT-37) muss übermittelt werden.
+ * 
+ * BR-DE-4  : Postleitzahl der Verkäuferanschrift
+ * Das Element „Seller post code“ (BT-38) muss übermittelt werden.
+ * 
+ * BR-DE-8  : Stadt der Erwerberanschrift
+ * Das Element „Buyer city“ (BT-52) muss übermittelt werden.
+ * 
+ * BR-DE-9  : Postleitzahl der Erwerberanschrift
+ * Das Element „Buyer post code“ (BT-53) muss übermittelt werden.
+ * 
+
 ID    | Level | Cardinality | Business Term         | Description | Usage Note | Req.ID | Semantic data type
 BG-5  | ++    | 1..1        | SELLER POSTAL ADDRESS | A group of business terms providing information about the address of the Seller.
                                                                   | Sufficient components of the address are to be filled to comply with legal requirements. 
