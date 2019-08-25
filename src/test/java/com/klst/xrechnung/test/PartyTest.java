@@ -151,9 +151,24 @@ public class PartyTest {
     @Test
     public void ublGetContact() {
     	IContact contact = supplierparty.getIContact();
-    	LOG.info("contact:"+contact);
-     	assertEquals("[Seller contact person]", contact.getContactPoint());
+    	LOG.info("supplierparty.Contact" + contact);
+//        <cbc:Name>[Seller contact person]</cbc:Name>
+//        <cbc:Telephone>+49 123456789</cbc:Telephone>
+//        <cbc:ElectronicMail>xxx@schulung.de</cbc:ElectronicMail>
+    	assertEquals("[Seller contact person]", contact.getContactPoint());
+    	assertEquals("+49 123456789", contact.getContactTelephone());
+    	assertEquals("xxx@schulung.de", contact.getContactEmail());
     }
+    
+    @Test
+    public void ublSetContact() {
+    	IContact contact = supplierparty.createContact("contactName", "contactTel", "contactMail");
+    	LOG.info("contact" + contact);
+    	assertEquals("contactName", contact.getContactPoint());
+    	assertEquals("contactTel", contact.getContactTelephone());
+    	assertEquals("contactMail", contact.getContactEmail());
+    }
+    
     
     @Test
     public void ublGetNameOfDelieveryParty() {
@@ -247,4 +262,5 @@ public class PartyTest {
     	assertEquals("HRB 123456", supplierparty.getCompanyId());
     	assertEquals("Sitz der Gesellschaft […], Registergericht […], Amtsgericht […]", supplierparty.getCompanyLegalForm());
     }
+    
 }
