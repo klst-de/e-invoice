@@ -57,17 +57,16 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 			map = mapList.get(0); // first
 		}
 		
-		this.init(map.get(RegistrationNameType.class)
+		this.init(getBusinessName(party )// map.get(RegistrationNameType.class)
 				, getPostalAddress(party)
 				, getContact(party)
 				, map.get(CompanyIDType.class)
 				, map.get(CompanyLegalFormType.class)
 				);
-		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getRegistrationName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
+		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getBusinessName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
 		
 		// BT-28 ++ 0..1 Seller trading name / UBL: <cac:PartyName><cbc:Name>
-		List<PartyNameType> partyNameList = party.getPartyName();
-		setBusinessName(partyNameList.isEmpty() ? null : partyNameList.get(0).getName().getValue());
+		setRegistrationName(map.get(RegistrationNameType.class));
 		
 		// BT-29 ++ 0..n Seller identifier
 		List<PartyIdentificationType> partyIdentificationList = party.getPartyIdentification();
@@ -90,20 +89,20 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	
 	/**
 	 * 
-	 * @param registrationName BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
+	 * @param name             BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
 	 * @param address          BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
 	 * @param contact          BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
 	 * @param companyId        BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
 	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
 	 */
-	public Party(String registrationName, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+	public Party(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		this();
-		init(registrationName, address, contact, companyId, companyLegalForm);
+		init(name, address, contact, companyId, companyLegalForm);
 	}
 
-	void init(String registrationName, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+	void init(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		partyLegalEntity = new PartyLegalEntityType();
-		setRegistrationName(registrationName);
+		setBusinessName(name);
 		setAddress(address);
 		setIContact(contact);
 		setCompanyId(companyId);
@@ -285,6 +284,10 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	@Override
 	public String getBusinessName() {
 		List<PartyNameType> partyNameList = super.getPartyName();
+		return partyNameList.isEmpty() ? null : partyNameList.get(0).getName().getValue();
+	}
+	static String getBusinessName(PartyType party) {
+		List<PartyNameType> partyNameList = party.getPartyName();
 		return partyNameList.isEmpty() ? null : partyNameList.get(0).getName().getValue();
 	}
 

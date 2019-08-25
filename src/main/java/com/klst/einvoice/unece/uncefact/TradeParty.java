@@ -41,10 +41,10 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 			, legalOrganization==null ? null : legalOrganization.getID()==null ? null : legalOrganization.getID().getValue()
 			, party.getDescription().isEmpty() ? null : party.getDescription().get(0).getValue()
 			);
-//		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getRegistrationName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
+//		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getBusinessName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
 		
 		// BT-28 ++ 0..1 Seller trading name / TradingBusinessName
-		setBusinessName(legalOrganization==null ? null : legalOrganization.getTradingBusinessName()==null ? null : legalOrganization.getTradingBusinessName().getValue());
+		setRegistrationName(legalOrganization==null ? null : legalOrganization.getTradingBusinessName()==null ? null : legalOrganization.getTradingBusinessName().getValue());
 		// BT-29 ++ 0..n Seller identifier
 		List<IDType> iDlist = party.getID();
 		iDlist.forEach(iD -> {
@@ -222,6 +222,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 
 	@Override
 	public void setRegistrationName(String name) {
+		if(name==null) return;
 		legalOrganization.setTradingBusinessName(CrossIndustryInvoice.newTextType(name));
 		super.setSpecifiedLegalOrganization(legalOrganization);
 	}
