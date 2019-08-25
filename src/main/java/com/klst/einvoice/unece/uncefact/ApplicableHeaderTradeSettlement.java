@@ -43,14 +43,14 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		List<TextType> list = null; 
 		if(tspmList.isEmpty()) {
 			list = new ArrayList<TextType>();
+			return null;
 		} else {
 			tspm = tspmList.get(0);
 			pmc = PaymentMeansEnum.valueOf(tspm.getTypeCode());
 			list = tspm.getInformation();  // BT-82 text des ersten tspmList elements!!!!
 			paymentMeansText = list.isEmpty() ? null : list.get(0).getValue();
+			return new TradeSettlementPaymentMeans(tspm); // geht auch, da TradeSettlementPaymentMeans implements PaymentInstructions
 		}
-		return new TradeSettlementPaymentMeans(tspm); // geht auch, da TradeSettlementPaymentMeans implements PaymentInstructions
-//		return this;
 	}
 
 	// copy ctor

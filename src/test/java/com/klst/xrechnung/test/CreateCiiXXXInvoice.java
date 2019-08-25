@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.ApplicableHeaderTradeDelivery;
 import com.klst.einvoice.unece.uncefact.BICId;
@@ -17,8 +18,10 @@ import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.einvoice.unece.uncefact.TradeContact;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
+import com.klst.einvoice.unece.uncefact.TradeSettlementPaymentMeans;
 import com.klst.einvoice.unece.uncefact.VatBreakdown;
 import com.klst.marshaller.CiiTransformer;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
@@ -81,11 +84,11 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
                 </ram:SpecifiedTaxRegistration>
 
 			 */
-		LOG.info("sellerParty.SpecifiedTaxRegistration#:"+testSellerParty.getSpecifiedTaxRegistration().size());
+		LOG.info("sellerParty.d#:"+testSellerParty.getSpecifiedTaxRegistration().size());
 		testSellerParty.getSpecifiedTaxRegistration().forEach(taxRegistration -> {
 			String BT_31 = taxRegistration.getID().getValue();
 			String BT_31_0 = taxRegistration.getID().getSchemeID();
-			LOG.info(" value ID/BT_31:"+BT_31
+			LOG.info("SpecifiedTaxRegistration value ID/BT_31:"+BT_31
 					+" schemeID/BT_31_0:"+BT_31_0
 					);
 //			if(BT_31_0.equals("VA")) {
@@ -135,6 +138,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 					);
 //			buyerParty.setTaxRegistrationId(buyerParty.getSpecifiedTaxRegistration().get(0).getID().getValue(), buyerParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID());
 		}
+		LOG.info("buyerParty:"+buyerParty.getBusinessName() + " Address:"+buyerParty.getAddress());
 		cii.setBuyerParty(buyerParty);
 		
 		TradeParty testPayeeParty = testDoc.getPayeeParty();
@@ -185,12 +189,29 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //					); 
 		}
 		
-		cii.setPaymentInstructions(testDoc.getPaymentMeansCode(), null, testDoc.getRemittanceInformation()); //paymentMeansText, remittanceInformation);
+		LOG.info("testDoc.RemittanceInformation:"+testDoc.getRemittanceInformation());
+		List<TradeSettlementPaymentMeans> testList = testDoc.getTradeSettlementPaymentMeansList();
+		testList.forEach(e -> {
+			LOG.info("testDoc.PaymentMeansEnum:"+e.getPaymentMeansEnum() + " PaymentMeansText()"+e.getPaymentMeansText());
+			cii.setPaymentInstructions(e.getPaymentMeansEnum(), e.getPaymentMeansText(), testDoc.getRemittanceInformation());
+		});
+		
+//		LOG.info("testDoc.getPaymentMeansCode():"+testDoc.getPaymentMeansCode() + " RemittanceInformation:"+testDoc.getRemittanceInformation()); 
+//		cii.setPaymentInstructions(testDoc.getPaymentMeansCode(), null, testDoc.getRemittanceInformation());
+		
+		
 		CreditTransfer testCT = testDoc.getCreditTransfer();
-		LOG.info("testCT.PaymentAccountID:"+testCT.getPaymentAccountID() 
+		if(testCT==null) {
+			// nix da
+		} else {
+			LOG.info("testCT.PaymentAccountID:"+testCT.getPaymentAccountID() 
 			+ ", testCT.PaymentAccountName:"+testCT.getPaymentAccountName()
 			+ ", testCT.getPaymentServiceProviderID:"+testCT.getPaymentServiceProviderID());
-		CreditTransfer ciiCT = cii.createCreditTransfer(new IBANId(testCT.getPaymentAccountID()), testCT.getPaymentAccountName(), testCT.getPaymentServiceProviderID()==null ? null : new BICId(testCT.getPaymentServiceProviderID()));
+			CreditTransfer ciiCT = cii.createCreditTransfer(new IBANId(testCT.getPaymentAccountID())
+					, testCT.getPaymentAccountName()
+					, testCT.getPaymentServiceProviderID()==null ? null : new BICId(testCT.getPaymentServiceProviderID())
+					);
+		}
 		
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");

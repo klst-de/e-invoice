@@ -37,8 +37,8 @@ public class CiiTest {
 			"01.12a-INVOICE_uncefact.xml" ,
 //			"01.13a-INVOICE_uncefact.xml" , // NOK
 			"01.14a-INVOICE_uncefact.xml" ,
-			"01.15a-INVOICE_uncefact.xml" 
-			};
+			"01.15a-INVOICE_uncefact.xml" ,
+			"zugferd2_invoice_pdfa3b.xml" };
 	
 	private static final String XRECHNUNG_12 = "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2";
 

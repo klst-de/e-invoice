@@ -36,6 +36,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
@@ -109,25 +110,17 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 	// copy-ctor
 	public CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
 		this(getCustomization(doc), getProfile(doc), getTypeCode(doc));
+		LOG.info("Customization:"+getCustomization() + ", Profile:"+getProfile() + ", TypeCode:"+getTypeCode());
 		supplyChainTradeTransaction = new SupplyChainTradeTransactionType();
 		
 		Object ahtd = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
-		LOG.info("applicableHeaderTradeDelivery:"+applicableHeaderTradeDelivery);
+		LOG.info("ApplicableHeaderTradeDelivery ahtd:"+ahtd);
 		if(ahtd==null) {
 			LOG.info("ahtd==null");
 		} else {
 			HeaderTradeDeliveryType htd = (HeaderTradeDeliveryType)ahtd;
 			applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery(htd);
 			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
-			
-//			ApplicableHeaderTradeDelivery delivery = (ApplicableHeaderTradeDelivery)getDeliveryInformation(doc);
-//			if(delivery!=null) {
-//				setDeliveryInformation( delivery.getBusinessName() // String businessName
-//						, delivery.getActualDate() // Timestamp ts
-//						, delivery.getAddress() // PostalAddress address
-//						, delivery.getId() // String locationId
-//						); 
-//			}
 		}
 
 		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
@@ -951,8 +944,25 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).setBG16(pi);
 		((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).setRemittanceInformation(remittanceInformation);
 	}
+	public List<TradeSettlementPaymentMeans> getTradeSettlementPaymentMeansList() {
+		List<TradeSettlementPaymentMeansType> tspmList = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans();
+		List<TradeSettlementPaymentMeans> result = new ArrayList<TradeSettlementPaymentMeans>(tspmList.size());
+		tspmList.forEach(tspm -> { // public TradeSettlementPaymentMeans(TradeSettlementPaymentMeansType tspm)
+			result.add(new TradeSettlementPaymentMeans(tspm));
+		});
+		return result;
+	}
+	// BG-16.BT-81 - 0..1/1..1
 	public PaymentMeansEnum getPaymentMeansCode() {
-		return ((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).getPaymentMeansEnum();
+		List<TradeSettlementPaymentMeansType> tspmList = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans();
+		if(tspmList.isEmpty()) return null;
+		TradeSettlementPaymentMeans res = new TradeSettlementPaymentMeans(tspmList.get(0));
+		return res.getPaymentMeansEnum();
+//		List<TradeSettlementPaymentMeans> result = new ArrayList<TradeSettlementPaymentMeans>(tspmList.size());
+//		tspmList.forEach(tspm -> { // public TradeSettlementPaymentMeans(TradeSettlementPaymentMeansType tspm)
+//			result.add(new TradeSettlementPaymentMeans(tspm));
+//		});
+//		return result.isEmpty() ? null : result.get(0).getPaymentMeansEnum();
 	}
 	// BG-16.BT-83 - 0..1/0..1
 	public String getRemittanceInformation() {
