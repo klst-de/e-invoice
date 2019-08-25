@@ -555,18 +555,16 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 */
 	void setProcessControl(String customization, String profile) {
 		ExchangedDocumentContextType exchangedDocumentContext = new ExchangedDocumentContextType();
-		List<DocumentContextParameterType> documentContextParameterList = exchangedDocumentContext.getGuidelineSpecifiedDocumentContextParameter();
 		DocumentContextParameterType documentContextParameter = new DocumentContextParameterType();
-		documentContextParameter.setID(newIDType(customization, "XRECHNUNG"));
+		documentContextParameter.setID(newIDType(customization, null)); // null : No identification scheme
 
-		documentContextParameterList.add(documentContextParameter);
+		exchangedDocumentContext.getGuidelineSpecifiedDocumentContextParameter().add(documentContextParameter);
 		if(profile==null) {
 			// profileIDType ist optional
 		} else { 
-			List<DocumentContextParameterType> dcpList = exchangedDocumentContext.getBusinessProcessSpecifiedDocumentContextParameter();
 			DocumentContextParameterType dcp = new DocumentContextParameterType();
 			dcp.setID(newIDType(profile, null)); // null : No identification scheme
-			dcpList.add(dcp);
+			exchangedDocumentContext.getBusinessProcessSpecifiedDocumentContextParameter().add(dcp);
 		}
 		this.setExchangedDocumentContext(exchangedDocumentContext);
 	}
@@ -577,7 +575,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	}
 	static String getCustomization(CrossIndustryInvoiceType doc) {
 		List<DocumentContextParameterType> documentContextParameterList = doc.getExchangedDocumentContext().getGuidelineSpecifiedDocumentContextParameter();
-		LOG.info("documentContextParameterList.size()="+documentContextParameterList.size());
+//		LOG.info("documentContextParameterList.size()="+documentContextParameterList.size());
 		List<String> res = new ArrayList<String>(documentContextParameterList.size());
 		documentContextParameterList.forEach(documentContextParameter -> {
 			res.add(documentContextParameter.getID().getValue());
