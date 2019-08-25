@@ -233,6 +233,15 @@ http://www.pdflib.com/pdflib-cookbook/</ram:Content>
     <ram:ApplicableHeaderTradeSettlement>
       <ram:PaymentReference>2019-03</ram:PaymentReference>
       <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
+      
+      <!--  EUG wg. https://github.com/klst-de/e-invoice/issues/8 hinzu -->
+            <ram:SpecifiedTradeSettlementPaymentMeans>
+                <ram:TypeCode>30</ram:TypeCode>
+                <ram:PayeePartyCreditorFinancialAccount>
+                    <ram:IBANID>DE12345678912345678912</ram:IBANID>
+                </ram:PayeePartyCreditorFinancialAccount>
+            </ram:SpecifiedTradeSettlementPaymentMeans>
+            
       <ram:ApplicableTradeTax>
         <ram:CalculatedAmount>160.55</ram:CalculatedAmount>
         <ram:TypeCode>VAT</ram:TypeCode>
