@@ -26,7 +26,7 @@ Eine andere mögliche Namensgebung wären die Profilnamen mit Hierarhie
  - CoreInvoiceExtended extends CoreInvoiceEN16931              -- Erweiterung der EN 16931-1
 
  */
-public interface CoreInvoice {
+public interface CoreInvoice extends BG2_ProcessControl {
 
 	/**
 	 * Invoice number   - A unique identification of the Invoice.
@@ -351,35 +351,6 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void setNote(String subjectCode, String content);
 	public void setNote(String content);
 	public List<String> getNotes();
-
-	/**
-	 * PROCESS CONTROL
-	 * <p>
-	 * A group of business terms providing information on the business process and rules applicable to the Invoice document.
-	 * Contains ProfileID (BT-23 0..1) and CustomizationID/Specification identifier (BT-24 1..1)
-	 * <br>
-	 * ProfileID identifies what business process a given message is part of, 
-	 * and CustomizationID identifies the kind of message and the rules applied.
-	 * <p>
-	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BG-2 , BT-23 , BT-24
-	 * <br>Req.ID: R44
-	 * <p>
-	 * ProfileID/Business process type - Identifies the business process context in which the transaction appears, 
-	 * to enable the Buyer to process the Invoice in an appropriate way.
-	 * <p>
-	 * Specification identifier - An identification of the specification containing the total set of rules regarding semantic content,
-	 * cardinalities and business rules to which the data contained in the instance document conforms.
-	 * This identifies compliance or conformance to this document. 
-	 * Compliant invoices specify: urn:cen.eu:en16931:2017. Invoices, compliant to a user specification may identify that user specification here.
-	 * No identification scheme is to be used.
-	 * 
-	 * @param customization, not null
-	 * @param profile (optional)
-	 */
-//	public void setProcessControl(String customization, String profile);
-	public String getCustomization();
-	public String getProfile();
 
 	/**
 	 * PRECEDING INVOICE REFERENCE
