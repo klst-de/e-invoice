@@ -26,7 +26,7 @@ Eine andere mögliche Namensgebung wären die Profilnamen mit Hierarhie
  - CoreInvoiceExtended extends CoreInvoiceEN16931              -- Erweiterung der EN 16931-1
 
  */
-public interface CoreInvoice extends BG2_ProcessControl {
+public interface CoreInvoice extends BG2_ProcessControl, BG22_DocumentTotals {
 
 	/**
 	 * Invoice number   - A unique identification of the Invoice.

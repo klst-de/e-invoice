@@ -10,7 +10,6 @@ import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
 import com.klst.untdid.codelist.DateTimeFormats;
@@ -48,7 +47,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 // @see https://www.unece.org/fileadmin/DAM/cefact/rsm/RSM_CrossIndustryInvoice_v2.0.pdf
 //      https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=2ahUKEwijlav-gPjhAhUGU1AKHSv2CIoQFjAAegQIARAC&url=https%3A%2F%2Fwww.unece.org%2Ffileadmin%2FDAM%2Fcefact%2Frsm%2FRSM_CrossIndustryInvoice_v2.0.pdf&usg=AOvVaw0yPVFpbRqJ50xaDMUaYm62
 // ZUGFeRD 2.0 Spezifikation - Technischer Anhang : ZUGFeRD-2.0-Spezifikation-TA.pdf
-public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements CoreInvoice, DocumentTotals {
+public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements CoreInvoice {
 
 	private static final Logger LOG = Logger.getLogger(CrossIndustryInvoice.class.getName());
 	

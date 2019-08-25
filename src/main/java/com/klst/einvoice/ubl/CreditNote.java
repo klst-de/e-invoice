@@ -11,7 +11,6 @@ import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
-import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -69,7 +68,7 @@ TODO
 
  
  */
-public class CreditNote extends CreditNoteType implements CoreInvoice, DocumentTotals {
+public class CreditNote extends CreditNoteType implements CoreInvoice {
 
 	private static final Logger LOG = Logger.getLogger(CreditNote.class.getName());
 	

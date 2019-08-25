@@ -14,7 +14,6 @@ import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.DirectDebitFactory;
-import com.klst.einvoice.DocumentTotals;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentCardFactory;
@@ -100,7 +99,7 @@ Von der Möglichkeit der Trennung von Rechnung und rechnungsbegründenden Unterl
 oder sensibler Daten Gebrauch gemacht werden.
 INVOICE LINE                                BG-25                       1..*
  */
-public class Invoice extends InvoiceType implements CoreInvoice, DocumentTotals
+public class Invoice extends InvoiceType implements CoreInvoice
 	, CreditTransferFactory, PaymentCardFactory, DirectDebitFactory {
 
 	/*

@@ -2,47 +2,8 @@ package com.klst.einvoice;
 
 import com.klst.einvoice.unece.uncefact.Amount;
 
-/* @see European standard EN 16931-1:2017
- * 
- * 
-ID    | Level | Cardinality | Business Term         | Description | Usage Note | Req.ID   | Semantic data type
-BG-22 | +     | 1..1        | DOCUMENT TOTALS       | A group of business terms providing the monetary totals for the Invoice. 
-                                                                               | R40
-
-BT-106| ++    | 1..1 | Sum of Invoice line net amount      | Sum of all Invoice line net amounts in the Invoice. 
-                                                                               | R40      | Amount
-BT-107| ++    | 0..1 | Sum of allowances on document level | Sum of all allowances on document level in the Invoice.
-                                                                  | Allowances on line level are included in the Invoice line net amount which is summed up into the Sum of Invoice line net amount.
-                                                                               | R19, R40 | Amount
-BT-108| ++    | 0..1 | Sum of charges on document level    | Sum of all charges on document level in the Invoice.
-                                                                  | Charges on line level are included in the Invoice line net amount which is summed up into the Sum of Invoice line net amount.
-                                                                               | R19,R40  | Amount
-BT-109| ++    | 1..1 | Invoice total amount without VAT    | The total amount of the Invoice without VAT.
-                                                                  | The Invoice total amount without VAT is the Sum of Invoice line net amount minus Sum of allowances on document level plus Sum of charges on document level.
-                                                                               | R40      | Amount
-BT-110| ++    | 0..1 | Invoice total VAT amount            | The total VAT amount for the Invoice.
-                                                                  | The Invoice total VAT amount is the sum of all VAT category tax amounts.
-                                                                               | R40, R49 | Amount
-BT-111| ++    | 0..1 | Invoice total VAT amount in accounting currency | The VAT total amount expressed in the accounting currency accepted or required in the country of the Seller.
-                                                                  | To be used when the VAT accounting currency (BT-6) differs from the Invoice currency code (BT-5) in accordance with article 230 of Directive 2006/112 / EC on VAT.
-                                                                    The VAT amount in accounting currency is not used in the calculation of the Invoice totals.
-                                                                               | R54      | Amount
-BT-112| ++    | 1..1 | Invoice total amount with VAT       | The total amount of the Invoice with VAT.
-                                                                  | The Invoice total amount with VAT is the Invoice total amount without VAT plus the Invoice total VAT amount.
-                                                                               | R40, R67 | Amount
-BT-113| ++    | 0..1 | Paid amount                         | The sum of amounts which have been paid in advance.
-                                                                  | This amount is subtracted from the invoice total amount with VAT to calculate the amount due for payment.
-                                                                               | R40, R66 | Amount
-BT-114| ++    | 0..1 | Rounding amount                     | The amount to be added to the invoice total to round the amount to be paid.
-                                                                               | R40      | Amount
-BT-115| ++    | 1..1 | Amount due for payment              | The outstanding amount that is requested to be paid.
-                                                                  | This amount is the Invoice total amount with VAT minus the paid amount that has been paid in advance. 
-                                                                    The amount is zero in case of a fully paid Invoice. The amount may be negative; 
-                                                                    in that case the Seller owes the amount to the Buyer.
-                                                                               | R40, R59, R68 | Amount
- */
 /**
- * BG-22 + 1..1 DOCUMENT TOTALS
+ * BG-22 DOCUMENT TOTALS
  * <p>
  * A group of business terms providing the monetary totals for the Invoice.
  * <p>
@@ -51,7 +12,7 @@ BT-115| ++    | 1..1 | Amount due for payment              | The outstanding amo
  * <br>Rule ID: 	
  * <br>Request ID: 	R40
  * 
- * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for (en)EN_16931_1_2017 rule and request IDs
+ * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
 
 /*  (de) rules / Geschäftsregel:
@@ -74,6 +35,14 @@ BT-115| ++    | 1..1 | Amount due for payment              | The outstanding amo
  * BR-CO-10 : Gesamtsummen auf Dokumentenebene 
  * Summe der Nettobeträge aller Rechnungspositionen (BT-106) = Summe Nettobeträge der Rechnungsposition (BT-131).
  * 
+ * BR-CO-11 : 
+ * Der Inhalt des Elementes „Sum of allowances on document level“ (BT-107) muss der Summe 
+ * aller Inhalte der Elemente „Document level allowance amount“ (BT-92) entsprechen.
+ * 
+ * BR-CO-12 : 
+ * Der Inhalt des Elementes „Sum of charges on document level“ (BT-108) muss der Summe 
+ * aller Inhalte der Elemente „Document level charge amount“ (BT-99) entsprechen.
+ * 
  * BR-CO-13 : Gesamtsummen auf Dokumentenebene 
  * Rechnungsgesamtbetrag ohne Umsatzsteuer (BT-109) = 
  * Summe Nettobeträge der Rechnungsposition (BT-131) - Summe der Abschläge auf Dokumentenebene (BT-107) + Summe der Zuschläge auf Dokumentenebene (BT-108).
@@ -89,7 +58,7 @@ BT-115| ++    | 1..1 | Amount due for payment              | The outstanding amo
  * Fälliger Zahlungsbetrag (BT-115) = 
  * Gesamtbetrag der Rechnungsumsatzsteuer (BT-112) - Vorauszahlungsbetrag (BT-113) + Rundungsbetrag (BT-114).
  */
-public interface DocumentTotals {
+public interface BG22_DocumentTotals {
 
 	/**
 	 * mandatory total amounts of the invoice
