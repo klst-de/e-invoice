@@ -27,7 +27,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 		Timestamp ts = getActualDate(delivery);
 		TradePartyType tradeParty = delivery.getShipToTradeParty();
 		party = tradeParty==null ? null : new TradeParty(tradeParty);
-		LOG.info("party:"+party + " ts:"+ts);
+		LOG.info("ShipToTradeParty:"+party + " delivery.ActualDate ts:"+ts);
 		setActualDate(ts);
 		setParty(party);	
 	}
