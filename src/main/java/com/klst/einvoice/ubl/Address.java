@@ -249,6 +249,7 @@ public class Address extends AddressType implements PostalAddress {
 		return country.getIdentificationCode().getValue();
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("[");

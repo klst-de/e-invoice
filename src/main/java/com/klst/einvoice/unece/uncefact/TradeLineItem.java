@@ -3,7 +3,6 @@ package com.klst.einvoice.unece.uncefact;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.untdid.codelist.TaxCategoryCode;
@@ -43,7 +42,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  */
 public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreInvoiceLine {
 
-	private static final Logger LOG = Logger.getLogger(TradeLineItem.class.getName());
+//	private static final Logger LOG = Logger.getLogger(TradeLineItem.class.getName());
 
 	public TradeLineItem() {
 		super();

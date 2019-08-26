@@ -88,7 +88,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 			bic = creditorFinancialInstitution.getBICID()==null ? null : new BICId(creditorFinancialInstitution.getBICID().getValue());			
 		}
 		
-		LOG.info("iban:"+iban + ", AccountName:"+accountName + ", bic:"+bic);
+		LOG.info("iban:"+iban + ", AccountName:"+accountName + ", bic:"+bic + ", accountId:"+accountId);
 		this.setPaymentAccountID(iban);
 		this.setPaymentAccountName(accountName);
 		this.setPaymentServiceProviderID(bic);

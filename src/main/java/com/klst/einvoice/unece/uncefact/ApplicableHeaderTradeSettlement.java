@@ -1,6 +1,5 @@
 package com.klst.einvoice.unece.uncefact;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -36,21 +35,22 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		List<TradeSettlementPaymentMeansType> tspmList = hts.getSpecifiedTradeSettlementPaymentMeans();
 		LOG.info("do bg16( ... hts.SpecifiedTradeSettlementPaymentMeans, aka BG-16 tspmList#:" + tspmList.size());
 		
-		TradeSettlementPaymentMeansType tspm = null;
-		PaymentMeansEnum pmc = null; // BT-81
-		String paymentMeansText = null;
-		
-		List<TextType> list = null; 
-		if(tspmList.isEmpty()) {
-			list = new ArrayList<TextType>();
-			return null;
-		} else {
-			tspm = tspmList.get(0);
-			pmc = PaymentMeansEnum.valueOf(tspm.getTypeCode());
-			list = tspm.getInformation();  // BT-82 text des ersten tspmList elements!!!!
-			paymentMeansText = list.isEmpty() ? null : list.get(0).getValue();
-			return new TradeSettlementPaymentMeans(tspm); // geht auch, da TradeSettlementPaymentMeans implements PaymentInstructions
-		}
+//		TradeSettlementPaymentMeansType tspm = null;
+//		PaymentMeansEnum pmc = null; // BT-81
+//		String paymentMeansText = null;
+//		
+//		List<TextType> list = null; 
+//		if(tspmList.isEmpty()) {
+//			list = new ArrayList<TextType>();
+//			return null;
+//		} else {
+//			tspm = tspmList.get(0);
+//			pmc = PaymentMeansEnum.valueOf(tspm.getTypeCode());
+//			list = tspm.getInformation();  // BT-82 text des ersten tspmList elements!!!!
+//			paymentMeansText = list.isEmpty() ? null : list.get(0).getValue();
+//			return new TradeSettlementPaymentMeans(tspm); // geht auch, da TradeSettlementPaymentMeans implements PaymentInstructions
+//		}
+		return tspmList.isEmpty() ? null : new TradeSettlementPaymentMeans(tspmList.get(0));
 	}
 
 	// copy ctor

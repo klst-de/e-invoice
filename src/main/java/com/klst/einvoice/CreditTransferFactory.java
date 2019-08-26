@@ -1,7 +1,5 @@
 package com.klst.einvoice;
 
-import java.util.logging.Logger;
-
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
 

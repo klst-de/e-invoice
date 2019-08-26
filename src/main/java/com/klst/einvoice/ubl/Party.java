@@ -13,7 +13,6 @@ import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
-import com.klst.einvoice.PostalAddressFactory;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ContactType;

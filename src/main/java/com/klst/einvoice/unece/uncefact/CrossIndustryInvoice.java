@@ -13,7 +13,6 @@ import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
-import com.klst.einvoice.ubl.Party;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;

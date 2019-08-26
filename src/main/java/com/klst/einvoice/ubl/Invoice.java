@@ -1384,7 +1384,7 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 		if(list.isEmpty()) return null;
 		for(int i=0; i<list.size(); i++) {
 			TaxTotalType taxTotal = list.get(i);
-			TaxAmountType amount = taxTotal.getTaxAmount();
+//			TaxAmountType amount = taxTotal.getTaxAmount();
 			if(sameCurrency && (this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
 //				LOG.info("i:"+i+"/"+list.size() + " sameCurrency "+ this.getDocumentCurrency()+"=?="+this.getTaxCurrency() + " amount:"+amount);
 				return taxTotal;

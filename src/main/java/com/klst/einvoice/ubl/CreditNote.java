@@ -783,11 +783,11 @@ public class CreditNote extends CreditNoteType implements CoreInvoice {
 	public Amount getInvoiceTax() {
 		// der durchlauf nur zur info, eingentlich darf es nur ein el geben
 		List<TaxTotalType> taxTotals = super.getTaxTotal();
-		taxTotals.forEach(taxTotal -> {
-			TaxAmountType amount = taxTotal.getTaxAmount();
-			Amount taxAmount = new Amount(amount.getCurrencyID(), amount.getValue());
+//		taxTotals.forEach(taxTotal -> {
+//			TaxAmountType amount = taxTotal.getTaxAmount();
+//			Amount taxAmount = new Amount(amount.getCurrencyID(), amount.getValue());
 //			LOG.info("taxAmount "+taxAmount);
-		});
+//		});
 		if(taxTotals.size()>1) {
 			LOG.warning("inkonsistent: taxTotals.size="+taxTotals.size() + " darf maximal 1 sein" );
 		}
