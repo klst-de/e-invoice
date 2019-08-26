@@ -13,6 +13,7 @@ import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.PostalAddressFactory;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ContactType;
@@ -117,9 +118,8 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	@Override
 	public void setAddress(PostalAddress address) {
-		this.setPostalAddress((AddressType)address);
+		this.setAddress((AddressType)address);
 	}
-
 	void setAddress(AddressType address) {
 		if(address==null) return; // defensiv
 		super.setPostalAddress(address);
@@ -130,6 +130,17 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		if(address==null) return null; // defensiv, sollte nie null sein
 		return new Address(address);
 	}
+
+	@Override
+	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+		return new Address(countryCode, postalCode, city, null);
+	}
+
+	@Override
+	public PostalAddress createAddress(PostalAddress address) {
+		return new Address((AddressType)address);
+	}
+
 
 	// Contact
 	@Override

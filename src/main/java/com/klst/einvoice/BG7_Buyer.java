@@ -40,7 +40,7 @@ package com.klst.einvoice;
  * Das Element „Buyer post code“ (BT-53) muss übermittelt werden.
  */
 // TODO Idee runter zu ubl und cii und public raus ?!
-public interface BG7_Buyer extends BG_Party, IContactFactory {
+public interface BG7_Buyer extends BG_Party, PostalAddressFactory, IContactFactory {
 	
 /*
 

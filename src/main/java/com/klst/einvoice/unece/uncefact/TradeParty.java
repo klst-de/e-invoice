@@ -9,6 +9,7 @@ import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.ubl.Address;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LegalOrganizationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
@@ -104,20 +105,28 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	public PostalAddress getAddress() {
 		return getPostalAddress(this);
 	}
+	static PostalAddress getPostalAddress(TradePartyType party) {
+		TradeAddressType address = party.getPostalTradeAddress();
+		if(address==null) return null; // defensiv, sollte nie null sein
+		return new TradeAddress(address);
+	}
 
 	@Override
 	public void setAddress(PostalAddress address) {
 		if(address!=null) setAddress((TradeAddressType)address);
 	}
-
 	void setAddress(TradeAddressType address) {
 		super.setPostalTradeAddress(address);
 	}
 	
-	static PostalAddress getPostalAddress(TradePartyType party) {
-		TradeAddressType address = party.getPostalTradeAddress();
-		if(address==null) return null; // defensiv, sollte nie null sein
-		return new TradeAddress(address);
+	@Override
+	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+		return new TradeAddress(countryCode, postalCode, city, null);
+	}
+
+	@Override
+	public PostalAddress createAddress(PostalAddress address) {
+		return new TradeAddress((TradeAddressType)address);
 	}
 
 	// Contact

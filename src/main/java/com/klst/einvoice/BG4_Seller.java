@@ -64,7 +64,7 @@ dto UBL:
  * 
  */
 //TODO Idee runter zu ubl und cii und public raus ?!
-public interface BG4_Seller extends BG_Party, IContactFactory {
+public interface BG4_Seller extends BG_Party, PostalAddressFactory, IContactFactory {
 	
 	// BT-27 ++ 1..1 Seller name / ram:Name / UBL: <cac:PartyName><cbc:Name> 
 

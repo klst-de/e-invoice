@@ -69,11 +69,12 @@ public class Address extends AddressType implements PostalAddress {
 		super.setAdditionalStreetName(address.getAdditionalStreetName());
 	}
 	
+	// [CII-DT-088] - StreetName shall not be used.
 	public Address(String countryCode, String postalCode, String city, String street) {
 		this(countryCode, null, postalCode, city, street, null);
 	}
 	
-	// building nicht in XRechnung-v1-2-0.pdf dokumentiert
+	// building nicht in XRechnung-v1-2-0.pdf dokumentiert, [CII-DT-094] - BuildingNumber shall not be used.
 	public Address(String countryCode, String postalCode, String city, String street, String building) {
 		this(countryCode, null, postalCode, city, street, building);
 	}

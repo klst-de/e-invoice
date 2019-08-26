@@ -145,7 +145,26 @@ public class PartyTest {
     public void ublGetAddress() {
     	PostalAddress address = supplierparty.getAddress();
     	LOG.info("address:"+address);
+//        <cac:PostalAddress>
+//        <cbc:StreetName>[Seller address line 1]</cbc:StreetName>
+//        <cbc:CityName>[Seller city]</cbc:CityName>
+//        <cbc:PostalZone>12345</cbc:PostalZone>
+//        <cac:Country>
+//            <cbc:IdentificationCode>DE</cbc:IdentificationCode>
+//        </cac:Country>
+//        </cac:PostalAddress>
+    	assertEquals("12345", address.getPostCode());
     	assertEquals("[Seller city]", address.getCity());
+    	assertEquals("[Seller address line 1]", address.getStreet());
+    }
+
+    private static final String HESSEN = "Hessen";
+    @Test
+    public void ublCopyAddress() {
+    	PostalAddress address = supplierparty.createAddress(supplierparty.getAddress()); // copy
+    	assertEquals("[Seller address line 1]", address.getStreet());
+    	address.setCountrySubdivision(HESSEN);
+    	assertEquals(HESSEN, address.getCountrySubdivision());
     }
 
     @Test

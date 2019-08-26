@@ -2,7 +2,7 @@ package com.klst.einvoice;
 
 /**
  * abstract-factory, aka Kit for 
- * BG-6 SELLER CONTACT 
+ * BG-6 SELLER CONTACT ,
  * BG-9 BUYER CONTACT 
  * 
  * @see <a href="https://java-design-patterns.com/patterns/abstract-factory/">java-design-patterns</a> for patterns abstract-factory
