@@ -1579,28 +1579,44 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 		return party.getTaxSchemes();
 	}
 
-	// Address
-	public void setSellerPostalAddress(PostalAddress address) {
-		Party party = getSellerParty();
-		party.setAddress(address);
+	// BG-5 , BG-8 : POSTAL ADDRESS
+	@Deprecated
+	public void setSellerAddress(PostalAddress address) {
+		getSellerParty().setAddress(address);
 	}
 	
-	public PostalAddress getSellerPostalAddress() {
-		Party party = getSellerParty();
-		return party.getAddress();
+	@Deprecated
+	public PostalAddress getSellerAddress() {
+		return getSellerParty().getAddress();
 	}
 	
-	public void setBuyerrPostalAddress(PostalAddress address) {
-		Party party = getBuyerParty();
-		party.setAddress(address);
+	@Deprecated
+	public void setBuyerrAddress(PostalAddress address) {
+//		Party party = getBuyerParty();
+//		party.setAddress(address);
+		getBuyerParty().setAddress(address);
 	}
 	
-	public PostalAddress getBuyerPostalAddress() {
-		Party party = getBuyerParty();
-		return party.getAddress();
+	@Deprecated
+	public PostalAddress getBuyerAddress() {
+//		Party party = getBuyerParty();
+//		return party.getAddress();
+		return getBuyerParty().getAddress();
 	}
 		
-	// Contact
+	@Override
+	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+		Party party = new Party();
+		return party.createAddress(countryCode, postalCode, city);
+	}
+
+	@Override
+	public PostalAddress createAddress(PostalAddress address) {
+		Party party = new Party();
+		return party.createAddress(address);
+	}
+
+	// BG-6 , BG-9 CONTACT
 	public void setSellerContact(Contact contact) {
 		Party party = getSellerParty();
 		party.setContact(contact);
@@ -1611,16 +1627,28 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 		return party.getIContact();
 	}
 	
-	public void setBuyerContact(Contact contact) {
-		Party party = getBuyerParty();
-		party.setContact(contact);
-	}
-	
 	public IContact getBuyerContact() {
 		Party party = getBuyerParty();
 		return party.getIContact();
 	}
 	
+	public void setBuyerContact(Contact contact) {
+		Party party = getBuyerParty();
+		party.setContact(contact);
+	}
+	
+	@Override
+	public IContact createContact(String contactName, String contactTel, String contactMail) {
+		Party party = new Party();
+		return party.createContact(contactName, contactTel, contactMail);
+	}
+
+	@Override
+	public IContact createContact(IContact contact) {
+		Party party = new Party();
+		return party.createContact(contact);
+	}
+
 	static IDType newIDType(String value, String schemeID) {
 		IDType ID = new IDType();
 		ID.setValue(value);

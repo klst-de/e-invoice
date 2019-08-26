@@ -11,6 +11,7 @@ import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.IContact;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -883,6 +884,30 @@ public class CreditNote extends CreditNoteType implements CoreInvoice {
 			resultLines.add(new CreditNoteLine(line));
 		});
 		return resultLines;
+	}
+
+	@Override
+	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+		Party party = new Party();
+		return party.createAddress(countryCode, postalCode, city);
+	}
+
+	@Override
+	public PostalAddress createAddress(PostalAddress address) {
+		Party party = new Party();
+		return party.createAddress(address);
+	}
+
+	@Override
+	public IContact createContact(String contactName, String contactTel, String contactMail) {
+		Party party = new Party();
+		return party.createContact(contactName, contactTel, contactMail);
+	}
+
+	@Override
+	public IContact createContact(IContact contact) {
+		Party party = new Party();
+		return party.createContact(contact);
 	}
 
 }

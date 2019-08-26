@@ -424,17 +424,17 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 						" \ninvoice BuyerCompanyLegalForm="+	buyerCompanyLegalForm +					
 						" \ninvoice SellerTaxScheme="+		sellerTaxScheme.get(TaxSchemeType.class) +					
 						" \ninvoice SellerCompanyID="+		sellerTaxScheme.get(CompanyIDType.class) +					
-						" \ninvoice SellerCountryCode="+	cmInvoice.getSellerPostalAddress().getCountryCode() +					
-						" \ninvoice SellerRegion="+			cmInvoice.getSellerPostalAddress().getCountrySubdivision() +					
-						" \ninvoice SellerPostCode City="+	cmInvoice.getSellerPostalAddress().getPostCode()+" "+cmInvoice.getSellerPostalAddress().getCity() + 					
-						" \ninvoice SellerStreet Building="+cmInvoice.getSellerPostalAddress().getStreet()+" "+cmInvoice.getSellerPostalAddress().getBuilding() + 					
+						" \ninvoice SellerCountryCode="+	cmInvoice.getSellerAddress().getCountryCode() +					
+						" \ninvoice SellerRegion="+			cmInvoice.getSellerAddress().getCountrySubdivision() +					
+						" \ninvoice SellerPostCode City="+	cmInvoice.getSellerAddress().getPostCode()+" "+cmInvoice.getSellerAddress().getCity() + 					
+						" \ninvoice SellerStreet Building="+cmInvoice.getSellerAddress().getStreet()+" "+cmInvoice.getSellerAddress().getBuilding() + 					
 						" \ninvoice SellerContactPoint="+		(cmInvoice.getSellerContact()==null ? "null" : cmInvoice.getSellerContact().getContactPoint()) +					
 						" \ninvoice SellerContactTelephone="+	(cmInvoice.getSellerContact()==null ? "null" : cmInvoice.getSellerContact().getContactTelephone()) +					
 						" \ninvoice SellerContactEmail="+		(cmInvoice.getSellerContact()==null ? "null" : cmInvoice.getSellerContact().getContactEmail()) +					
-						" \ninvoice BuyerCountryCode="+		cmInvoice.getBuyerPostalAddress().getCountryCode() +					
-						" \ninvoice BuyerRegion="+			cmInvoice.getBuyerPostalAddress().getCountrySubdivision() +					
-						" \ninvoice BuyerPostCode City="+	cmInvoice.getBuyerPostalAddress().getPostCode()+" "+cmInvoice.getBuyerPostalAddress().getCity() + 					
-						" \ninvoice BuyerStreet Building="+	cmInvoice.getBuyerPostalAddress().getStreet()+" "+cmInvoice.getBuyerPostalAddress().getBuilding() + 					
+						" \ninvoice BuyerCountryCode="+		cmInvoice.getBuyerAddress().getCountryCode() +					
+						" \ninvoice BuyerRegion="+			cmInvoice.getBuyerAddress().getCountrySubdivision() +					
+						" \ninvoice BuyerPostCode City="+	cmInvoice.getBuyerAddress().getPostCode()+" "+cmInvoice.getBuyerAddress().getCity() + 					
+						" \ninvoice BuyerStreet Building="+	cmInvoice.getBuyerAddress().getStreet()+" "+cmInvoice.getBuyerAddress().getBuilding() + 					
 						" \ninvoice BuyerContactPoint="+		buyerContact.getContactPoint() +					
 						" \ninvoice BuyerContactTelephone="+	buyerContact.getContactTelephone() +					
 						" \ninvoice BuyerContactEmail="+		buyerContact.getContactEmail() +					

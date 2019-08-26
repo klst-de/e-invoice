@@ -10,8 +10,10 @@ import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.IContact;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.ubl.Party;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -1314,6 +1316,31 @@ TODO
 		TextType text = new TextType();
 		text.setValue(value);
 		return text;
+	}
+
+	// ----------------- 
+	@Override
+	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+		TradeParty party = new TradeParty();
+		return party.createAddress(countryCode, postalCode, city);
+	}
+
+	@Override
+	public PostalAddress createAddress(PostalAddress address) {
+		TradeParty party = new TradeParty();
+		return party.createAddress(address);
+	}
+
+	@Override
+	public IContact createContact(String contactName, String contactTel, String contactMail) {
+		TradeParty party = new TradeParty();
+		return party.createContact(contactName, contactTel, contactMail);
+	}
+
+	@Override
+	public IContact createContact(IContact contact) {
+		TradeParty party = new TradeParty();
+		return party.createContact(contact);
 	}
 
 }

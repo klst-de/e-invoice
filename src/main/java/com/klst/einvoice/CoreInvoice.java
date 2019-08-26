@@ -26,7 +26,7 @@ Eine andere mögliche Namensgebung wären die Profilnamen mit Hierarhie
  - CoreInvoiceExtended extends CoreInvoiceEN16931              -- Erweiterung der EN 16931-1
 
  */
-public interface CoreInvoice extends BG2_ProcessControl, BG22_DocumentTotals {
+public interface CoreInvoice extends BG2_ProcessControl, BG22_DocumentTotals, PostalAddressFactory, IContactFactory {
 
 	/**
 	 * Invoice number   - A unique identification of the Invoice.
@@ -352,6 +352,8 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void setNote(String content);
 	public List<String> getNotes();
 
+	// BG-2 + 1..1 PROCESS CONTROL @see BG2_ProcessControl
+	
 	/**
 	 * PRECEDING INVOICE REFERENCE
 	 * <p>
@@ -373,7 +375,22 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void setPrecedingInvoiceReference(String docRefId);
 	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts);
 	public String getPrecedingInvoiceReference();
+	
+	// BG-4 + 1..1 SELLER @see BG4_Seller
+	// public void setSellerParty(BG_Party party);
+	// public BG_Party getSellerParty();
+	// BG-5 ++ 1..1 SELLER POSTAL ADDRESS
+	// BG-6 ++ 0..1 SELLER CONTACT
 
+	// BG-7 + 1..1 BUYER
+	// public void setBuyerParty(BG_Party party);
+	// public BG_Party getBuyerParty();
+	// BG-8 ++ 1..1 BUYER POSTAL ADDRESS
+	// BG-9 ++ 0..1 BUYER CONTACT
+	
+	// BG-10 + 0..1 PAYEE
+	// TODO ...
+	
 // CopyIndicator . Datentyp: udt:IndicatorType . Kardinalität: 0 .. 1 , nur EXTENDED
 // LanguageID Sprachkennzeichen . Datentyp: udt:IDType . Kardinalität: 0 .. 1 , nur EXTENDED
 	
