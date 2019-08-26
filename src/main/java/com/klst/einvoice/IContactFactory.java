@@ -23,5 +23,5 @@ public interface IContactFactory {
 	 * copy Contact
 	 * 
 	 */
-	public IContact copyContact(IContact contact);
+	public IContact createContact(IContact contact);
 }

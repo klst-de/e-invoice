@@ -169,6 +169,14 @@ public class PartyTest {
     	assertEquals("contactMail", contact.getContactEmail());
     }
     
+    @Test
+    public void ublCopyContact() {
+    	IContact contact = supplierparty.createContact(supplierparty.getIContact()); // copy
+    	LOG.info("contact:" + contact);
+    	assertEquals("[Seller contact person]", supplierparty.getIContact().getContactPoint());
+    	assertEquals("+49 123456789", supplierparty.getIContact().getContactTelephone());
+    	assertEquals("xxx@schulung.de", supplierparty.getIContact().getContactEmail());
+    }
     
     @Test
     public void ublGetNameOfDelieveryParty() {

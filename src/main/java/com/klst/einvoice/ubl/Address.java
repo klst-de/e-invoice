@@ -15,7 +15,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CountryS
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IdentificationCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PostalZoneType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.RegionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.StreetNameType;
 
 /* Gruppe BUYER POSTAL ADDRESS

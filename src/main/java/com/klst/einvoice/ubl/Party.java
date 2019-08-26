@@ -152,7 +152,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 
 	@Override
-	public IContact copyContact(IContact contact) {
+	public IContact createContact(IContact contact) {
 		return new Contact((ContactType) contact);
 	}
 
