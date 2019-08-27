@@ -422,7 +422,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice {
 	}
 
 	// wie BG-4  SELLER
-	public void setSeller(String sellerRegistrationName, PostalAddress address, Contact contact, String companyId, String companyLegalForm) {
+	public void setSeller(String sellerRegistrationName, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		Party party = new Party(sellerRegistrationName, address, contact, companyId, companyLegalForm);
 		setSellerParty(party);
 	}
@@ -444,7 +444,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice {
 	}
 
 	// wie BG-7  BUYER
-	public void setBuyer(String byuerRegistrationName, PostalAddress address, Contact contact) {
+	public void setBuyer(String byuerRegistrationName, PostalAddress address, IContact contact) {
 		Party party = new Party(byuerRegistrationName, address, contact, null, null); 
 		setBuyerParty(party);
 	}
