@@ -7,9 +7,9 @@ import com.klst.einvoice.BG10_Payee;
 import com.klst.einvoice.BG11_SellerTaxRepresentativeParty;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
+import com.klst.einvoice.BusinessPartyFactory;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
-import com.klst.einvoice.ubl.BusinessPartyFactory;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LegalOrganizationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
