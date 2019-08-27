@@ -802,7 +802,7 @@ SELLER CONTACT                              BG-6                        1
 	 * @param companyId optional / Seller legal registration identifier, BT-30/R52
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
 	 */
-	public void setSeller(String registrationName, PostalAddress address, Contact contact, String companyId, String companyLegalForm) {
+	public void setSeller(String registrationName, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		Party party = new Party(registrationName, address, contact, companyId, companyLegalForm);
 		setSellerParty(party);
 	}
@@ -898,7 +898,7 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * @param BUYER POSTAL ADDRESS mandatory, BG-8, R53
 	 * @param BUYER CONTACT optional, BG-9, R57
 	 */
-	public void setBuyer(String registrationName, PostalAddress address, Contact contact) {
+	public void setBuyer(String registrationName, PostalAddress address, IContact contact) {
 		Party party = new Party(registrationName, address, contact, null, null); 
 		setBuyerParty(party);
 	}
