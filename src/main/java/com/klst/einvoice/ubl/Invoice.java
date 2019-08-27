@@ -794,7 +794,7 @@ SELLER CONTACT                              BG-6                        1
 	 * Seller (AccountingSupplierParty)
 	 * Seller is mandatory information and provided in ubl element cac:AccountingSupplierParty
 	 * 
-	 * @param registrationName mandatory BT-27 : The full formal name by which the Seller is registered 
+	 * @param name mandatory BT-27 : The full formal name by which the Seller is registered 
 	 *        in the national registry of legal entities or as a Taxable person or otherwise trades as a person or persons.
 	 * @param postalAddress mandatory group BG-5/R53 : A group of business terms providing information about the address of the Seller.
               Sufficient components of the address are to be filled to comply with legal requirements.
@@ -802,8 +802,10 @@ SELLER CONTACT                              BG-6                        1
 	 * @param companyId optional / Seller legal registration identifier, BT-30/R52
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
 	 */
-	public void setSeller(String registrationName, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
-		Party party = new Party(registrationName, address, contact, companyId, companyLegalForm);
+	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+		Party party = new Party(name, address, contact);
+		party.setCompanyId(companyId);
+		party.setCompanyLegalForm(companyLegalForm);
 		setSellerParty(party);
 	}
 	
@@ -894,12 +896,12 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 *  Buyer (AccountingCustomerParty)
 	 *  Buyer is mandatory information and provided in element cac:AccountingCustomerParty
 	 * 
-	 * @param registrationName mandatory, BT-44, R57
+	 * @param name mandatory, BT-44, R57
 	 * @param BUYER POSTAL ADDRESS mandatory, BG-8, R53
 	 * @param BUYER CONTACT optional, BG-9, R57
 	 */
-	public void setBuyer(String registrationName, PostalAddress address, IContact contact) {
-		Party party = new Party(registrationName, address, contact, null, null); 
+	public void setBuyer(String name, PostalAddress address, IContact contact) {
+		Party party = new Party(name, address, contact); 
 		setBuyerParty(party);
 	}
 
@@ -933,9 +935,10 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Zahlungsempfänger liefern. 
 	 * Die Gruppe wird genutzt, wenn der Zahlungsempfänger nicht mit dem Verkäufer identisch ist.
 	 */
-	public void setPayee(String businessName, String id, String companyLegalForm) {
-		Party party = new Party(null, null, null, null, companyLegalForm);
-		party.setBusinessName(businessName);
+	public void setPayee(String name, String id, String companyLegalForm) {
+		Party party = new Party(null, null, null);
+		party.setBusinessName(name);  // !!!!!
+		party.setCompanyLegalForm(companyLegalForm);
 		party.setId(id);
 		setPayeeParty(party);
 	}
@@ -956,7 +959,7 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Steuervertreter des Verkäufers liefern.
 	 */
 	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
-		Party party = new Party(registrationName, address, null, null, null);
+		Party party = new Party(registrationName, address, null);
 		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
 		setTaxRepresentativeParty(party);
 	}

@@ -209,7 +209,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		if(party==null) {
 			// nix
 		} else {
-			ublInvoice.setPayee(party.getBusinessName() //String businessName
+			LOG.info("Payee.RegistrationName:"+party.getRegistrationName() + " Payee.Id:"+party.getId() + " Payee.BusinessName:"+party.getBusinessName());
+			ublInvoice.setPayee(party.getBusinessName()
 					, party.getId() // String id
 					, party.getCompanyLegalForm()  // String companyLegalForm
 					);

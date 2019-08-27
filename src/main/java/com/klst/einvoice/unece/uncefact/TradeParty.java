@@ -104,6 +104,11 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	 * 
 	 * @see BusinessPartyFactory
 	 */
+	public TradeParty(String name, PostalAddress address, IContact contact) {
+		this();
+		init(name, address, contact); //, companyId, companyLegalForm);
+	}
+	
 	void init(String name, PostalAddress address, IContact contact) { //, String companyId, String companyLegalForm) {
 		legalOrganization = new LegalOrganizationType();
 		setRegistrationName(name);

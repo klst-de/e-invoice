@@ -66,11 +66,13 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		TradeParty sellerParty = new TradeParty( testSellerParty.getRegistrationName()     // BT-27 String name
 				                               , testSellerParty.getAddress()          // TradeAddress address
 				                               , (TradeContact)(testSellerParty.getIContact())         // TradeContact contact
-				                               , testSellerParty.getCompanyId()        // BT-30 String companyId
-				                               , testSellerParty.getCompanyLegalForm() // BT-33 String companyLegalForm
+//				                               , testSellerParty.getCompanyId()        // BT-30 String companyId
+//				                               , testSellerParty.getCompanyLegalForm() // BT-33 String companyLegalForm
 				                               );
-//		sellerParty.setTradingBusinessName(testSellerParty.getTradingBusinessName()) ; // BT-28
+		sellerParty.setBusinessName(testSellerParty.getBusinessName()) ; // BT-28
 		sellerParty.setId(testSellerParty.getId()); // BT-29
+		sellerParty.setCompanyId(testSellerParty.getCompanyId());
+		sellerParty.setCompanyLegalForm(testSellerParty.getCompanyLegalForm());
 		// BT-31 + BT-32
 		if(testSellerParty.getSpecifiedTaxRegistration().isEmpty()) {
 			LOG.warning("sellerParty.SpecifiedTaxRegistration().isEmpty() !!!!!!!!!!!!!" );
@@ -162,7 +164,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		
 		TradeParty testSellerTaxRepresentativeParty = testDoc.getTaxRepresentativeParty();
 		if(testSellerTaxRepresentativeParty==null) {
-			LOG.warning("testPayeeParty==null" );
+			LOG.warning("testSellerTaxRepresentativeParty==null" );
 		} else {
 			LOG.info("testSellerTaxRepresentativeParty.Name:"+testSellerTaxRepresentativeParty.getRegistrationName()
 					+ " Address:"+testSellerTaxRepresentativeParty.getAddress()

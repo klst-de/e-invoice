@@ -46,10 +46,10 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 		this();
 		PartyType party = delivery.getDeliveryParty();
 		Party deliveryParty = party==null ? null : new Party(party);
-		String businessName = deliveryParty==null ? null : deliveryParty.getBusinessName();
+		String name = deliveryParty==null ? null : deliveryParty.getBusinessName();
 //		LOG.info("businessName:"+businessName);
 		
-		init( businessName
+		init( name
 			, getActualDate(delivery)
 			, getPostalAddress(delivery)
 			, null
@@ -91,15 +91,15 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	// BT-72 ++ 0..1 Actual delivery date
 	// BG-15 ++ 0..1 DELIVER TO ADDRESS
 
-	public Delivery(String businessName, Timestamp ts, PostalAddress address, String locationId) {
+	public Delivery(String name, Timestamp ts, PostalAddress address, String locationId) {
 		this();
-		init(businessName, ts, address, locationId);
+		init(name, ts, address, locationId);
 	}
 
-	void init(String businessName, Timestamp ts, PostalAddress address, String locationId) {
-		LOG.info("BT-70/businessName:"+businessName + " BT-72/Timestamp:"+ts + " BG-15 ++ 0..1 DELIVER TO ADDRESS:"+address + " BT-71/locationId:"+locationId);
-		Party party = new Party(null, null, null, null, null);
-		party.setBusinessName(businessName);
+	void init(String name, Timestamp ts, PostalAddress address, String locationId) {
+		LOG.info("BT-70/name:"+name + " BT-72/Timestamp:"+ts + " BG-15 ++ 0..1 DELIVER TO ADDRESS:"+address + " BT-71/locationId:"+locationId);
+		Party party = new Party(null, null, null);
+		party.setBusinessName(name);  // !!!!!
 		setParty(party);		
 		setActualDate(ts);
 		setAddress(address);

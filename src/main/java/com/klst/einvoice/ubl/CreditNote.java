@@ -422,8 +422,10 @@ public class CreditNote extends CreditNoteType implements CoreInvoice {
 	}
 
 	// wie BG-4  SELLER
-	public void setSeller(String sellerRegistrationName, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
-		Party party = new Party(sellerRegistrationName, address, contact, companyId, companyLegalForm);
+	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+		Party party = new Party(name, address, contact);
+		party.setCompanyId(companyId);
+		party.setCompanyLegalForm(companyLegalForm);
 		setSellerParty(party);
 	}
 	
@@ -445,7 +447,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice {
 
 	// wie BG-7  BUYER
 	public void setBuyer(String byuerRegistrationName, PostalAddress address, IContact contact) {
-		Party party = new Party(byuerRegistrationName, address, contact, null, null); 
+		Party party = new Party(byuerRegistrationName, address, contact); 
 		setBuyerParty(party);
 	}
 
@@ -465,9 +467,10 @@ public class CreditNote extends CreditNoteType implements CoreInvoice {
 	}
 
 	// wie BG-10  PAYEE
-	public void setPayee(String businessName, String id, String companyLegalForm) {
-		Party party = new Party(null, null, null, null, companyLegalForm);
-		party.setBusinessName(businessName);
+	public void setPayee(String name, String id, String companyLegalForm) {
+		Party party = new Party(null, null, null);
+		party.setBusinessName(name);  // !!!!!
+		party.setCompanyLegalForm(companyLegalForm);
 		party.setId(id);
 		setPayeeParty(party);
 	}
@@ -486,7 +489,7 @@ public class CreditNote extends CreditNoteType implements CoreInvoice {
 
 	// wie BG-11  SELLER TAX REPRESENTATIVE PARTY
 	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
-		Party party = new Party(registrationName, address, null, null, null);
+		Party party = new Party(registrationName, address, null);
 		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
 		setTaxRepresentativeParty(party);
 	}

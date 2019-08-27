@@ -666,8 +666,10 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 */
 	public void setSeller(String name, PostalAddress address, TradeContact contact, 
 			String companyId, String companyLegalForm) {
-		                                  // BT-27        , BG-5   , BG-6   , BT-30    , BT-33
-		TradeParty party = new TradeParty(name, address, contact, companyId, companyLegalForm);
+		                               // BT-27 , BG-5   , BG-6          , BT-30    , BT-33
+		TradeParty party = new TradeParty(name, address, contact); //, companyId, companyLegalForm);
+		party.setCompanyId(companyId);
+		party.setCompanyLegalForm(companyLegalForm);
 		setSellerParty(party);
 	}
 	
@@ -715,7 +717,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 * Eine Gruppe von Informationselementen, die Informationen über den Erwerber liefern.
 	 */
 	public void setBuyer(String name, PostalAddress address, TradeContact contact) {
-		TradeParty party = new TradeParty(name, address, contact, null, null); // BT-44, BG-8, BG-9, BT-45 optional, BT-46 optional
+		TradeParty party = new TradeParty(name, address, contact); // BT-44, BG-8, BG-9
 		setBuyerParty(party);
 	}
 	public void setBuyerParty(TradeParty party) {
@@ -759,8 +761,9 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
             </ram:PayeeTradeParty>
  */
 	public void setPayee(String name, String id, String companyLegalForm) {
-		TradeParty party = new TradeParty(name, null, null, null, companyLegalForm);
+		TradeParty party = new TradeParty(name, null, null);
 		party.setId(id);
+		party.setCompanyLegalForm(companyLegalForm);
 		setPayeeParty(party);
 	}
 	public void setPayeeParty(TradeParty party) {
@@ -786,7 +789,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	
 	// BT-63 ++ 1..1 Seller tax representative VAT identifier
 	public void setTaxRepresentative(String name, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
-		TradeParty party = new TradeParty(name, address, null, null, null);
+		TradeParty party = new TradeParty(name, address, null);
 		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
 		setTaxRepresentativeParty(party);
 	}

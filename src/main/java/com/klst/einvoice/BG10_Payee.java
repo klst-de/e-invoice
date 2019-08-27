@@ -36,13 +36,14 @@ UBL:
         <cac:PartyIdentification>
             <cbc:ID>74</cbc:ID>
         </cac:PartyIdentification>
-        <cac:PartyName>                                     -- BT-59 TradingBusinessName
+        <cac:PartyName>                                     -- BT-59 TradingBusinessName ??????????????
             <cbc:Name>[Payee name]</cbc:Name>
         </cac:PartyName>
     </cac:PayeeParty>
 
  */
 	// BT-59 ++ 1..1 Payee name / <ram:Name> / UBL: <cac:PartyName><cbc:Name>
+	// das ist seltsam, dass BusinessName in den Beispielen und auch im Validator verwendet wird
 	// BT-27 ++ 1..1 Seller name / ram:Name / UBL: <cac:PartyLegalEntity><cbc:RegistrationName>
 	// BT-44 ++ 1..1 Buyer name / ram:Name / UBL: <cac:PartyLegalEntity><cbc:RegistrationName>
 	
