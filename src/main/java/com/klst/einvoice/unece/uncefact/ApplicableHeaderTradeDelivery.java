@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.BG_Party;
+import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.PostalAddress;
 import com.klst.untdid.codelist.DateTimeFormats;
 
@@ -48,7 +48,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 	}
 
 	// Party with businessName
-	void setParty(BG_Party party) {
+	void setParty(BusinessParty party) {
 		if(party==null) return;
 		super.setShipToTradeParty((TradePartyType)party);
 	}

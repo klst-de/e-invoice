@@ -42,7 +42,7 @@ package com.klst.einvoice;
  *  „Seller tax registration identifier“ (BT-32) oder „SELLER TAX REPRESENTATIVE PARTY“ (BG-11) übermittelt werden.
  */
 //TODO Idee runter zu ubl und cii und public raus ?!
-public interface BG11_SellerTaxRepresentativeParty extends BG_Party {
+public interface BG11_SellerTaxRepresentativeParty extends BusinessParty {
 	
 	// BT-62 ++ 1..1 Seller tax representative name
 	

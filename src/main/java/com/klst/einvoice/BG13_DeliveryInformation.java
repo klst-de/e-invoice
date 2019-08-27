@@ -29,7 +29,7 @@ import java.sql.Timestamp;
  * Mit dem Element „Deliver to post code“ (BT-78) muss eine Postleitzahl übermittelt werden.
  */
 //TODO Idee runter zu ubl und cii und public raus ?!
-public interface BG13_DeliveryInformation extends BG_Party {
+public interface BG13_DeliveryInformation extends BusinessParty {
 	
 	// BT-70 ++ 0..1 Deliver to party name
 	

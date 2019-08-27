@@ -10,7 +10,7 @@ package com.klst.einvoice;
  * <br> BG-13 + 0..1 DELIVERY INFORMATION / BT-70 BT-71 ShipToTradeParty
  */
 
-public interface BG_Party {
+public interface BusinessParty {
 	
 	public String getRegistrationName();
 	public void setRegistrationName(String name);

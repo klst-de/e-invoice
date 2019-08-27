@@ -23,7 +23,7 @@ package com.klst.einvoice;
  * 
  */
 //TODO Idee runter zu ubl und cii und public raus ?!
-public interface BG10_Payee extends BG_Party {
+public interface BG10_Payee extends BusinessParty {
 	
 /*
 CII:
