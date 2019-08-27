@@ -1,7 +1,5 @@
 package com.klst.einvoice;
 
-import java.util.HashMap;
-
 /**
  * abstract-factory, aka Kit for BusinessParty (BP) 
  * <br> BG-4 + 1..1 SELLER 

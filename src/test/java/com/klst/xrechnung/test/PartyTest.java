@@ -125,8 +125,8 @@ public class PartyTest {
     	String name = "party name";
     	Address address = null;
     	Contact contact = null;
-    	Party party = new Party(name, address, contact, null, null);
-		assertEquals(name, party.getBusinessName());
+    	Party party = new Party(name, address, contact);
+		assertEquals(name, party.getRegistrationName());
 		assertEquals(address, party.getAddress());
 		assertEquals(contact, party.getContact());
    }

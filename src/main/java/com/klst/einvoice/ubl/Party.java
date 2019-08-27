@@ -48,7 +48,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	// copy ctor
 	public Party(PartyType party) {
 		this();
-//		List<PartyLegalEntityType> partyLegalEntityList = party.getPartyLegalEntity();
 		List<Map<Object,String>> mapList = getPartyLegalEntities(party);
 		Map<Object,String> map = new HashMap<Object,String>();
 		if(mapList.isEmpty()) {
@@ -57,24 +56,34 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 			map = mapList.get(0); // first
 		}
 		
-		this.init(getBusinessName(party )// map.get(RegistrationNameType.class)
+//		this.init(getBusinessName(party )// map.get(RegistrationNameType.class)
+//				, getPostalAddress(party)
+//				, getContact(party)
+//				, map.get(CompanyIDType.class)
+//				, map.get(CompanyLegalFormType.class)
+//				);
+		this.init(map.get(RegistrationNameType.class)
 				, getPostalAddress(party)
 				, getContact(party)
-				, map.get(CompanyIDType.class)
-				, map.get(CompanyLegalFormType.class)
 				);
-		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getBusinessName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
+		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getRegistrationName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
 		
 		// BT-28 ++ 0..1 Seller trading name / UBL: <cac:PartyName><cbc:Name>
-		setRegistrationName(map.get(RegistrationNameType.class));
+		setBusinessName(getBusinessName(party ));
 		
 		// BT-29 ++ 0..n Seller identifier
 		List<PartyIdentificationType> partyIdentificationList = party.getPartyIdentification();
 		setId(partyIdentificationList.isEmpty() ? null : partyIdentificationList.get(0).getID().getValue());
 		
+		// BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
+		setCompanyId(map.get(CompanyIDType.class));
+
 		// 0..n wg. BT-31, BT-32, BT-31-0, BT-32-0
 		List<Map<Object,String>> taxSchemesList = getTaxSchemes(party);
 		addTaxSchemes(taxSchemesList);
+		
+		// BT-33 0..1 additional legal info / not used for Buyer
+		setCompanyLegalForm(map.get(CompanyLegalFormType.class));
 		
 		// BT-34 ++ 0..1 Seller electronic address
 		WebsiteURIType websiteURI = party.getWebsiteURI();
@@ -95,19 +104,45 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	 * @param companyId        BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
 	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
 	 */
+	@Deprecated
 	public Party(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		this();
-		init(name, address, contact, companyId, companyLegalForm);
-	}
-
-	void init(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
-		partyLegalEntity = new PartyLegalEntityType();
-		setBusinessName(name);
-		setAddress(address);
-		setIContact(contact);
+		init(name, address, contact);
 		setCompanyId(companyId);
 		setCompanyLegalForm(companyLegalForm);
 	}
+	
+
+	/**
+	 * ctor for BusinessParty - use BusinessPartyFactory method
+	 * 
+	 * @param name             BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
+	 * @param address          BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
+	 * @param contact          BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
+	 * 
+	 * @see BusinessPartyFactory
+	 */
+	public Party(String name, PostalAddress address, IContact contact) {
+		this();
+		init(name, address, contact);
+		
+	}
+	
+	void init(String name, PostalAddress address, IContact contact) {
+		partyLegalEntity = new PartyLegalEntityType();
+		this.setRegistrationName(name);
+		setAddress(address);
+		setIContact(contact);
+	}
+	
+//	void init(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+//		partyLegalEntity = new PartyLegalEntityType();
+//		setBusinessName(name);
+//		setAddress(address);
+//		setIContact(contact);
+//		setCompanyId(companyId);
+//		setCompanyLegalForm(companyLegalForm);
+//	}
 
 	// PostalAddress
 	@Override
