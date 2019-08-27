@@ -63,7 +63,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		
 
 		TradeParty testSellerParty = testDoc.getSellerParty();
-		TradeParty sellerParty = new TradeParty( testSellerParty.getBusinessName()     // BT-27 String name
+		TradeParty sellerParty = new TradeParty( testSellerParty.getRegistrationName()     // BT-27 String name
 				                               , testSellerParty.getAddress()          // TradeAddress address
 				                               , (TradeContact)(testSellerParty.getIContact())         // TradeContact contact
 				                               , testSellerParty.getCompanyId()        // BT-30 String companyId
@@ -145,7 +145,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		if(testPayeeParty==null) {
 			LOG.warning("testPayeeParty==null" );
 		} else {
-			LOG.info("testPayeeParty.RegistrationName:"+testPayeeParty.getBusinessName()
+			LOG.info("testPayeeParty.RegistrationName:"+testPayeeParty.getRegistrationName()
 					+ " Id:"+testPayeeParty.getId()
 					+ " CompanyLegalForm:"+testPayeeParty.getCompanyLegalForm()
 					);
@@ -157,18 +157,18 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //                    );
 //			payeeParty.setId(testPayeeParty.getId());
 //			cii.setPayeeParty(payeeParty); // alternativ:
-			cii.setPayee(testPayeeParty.getBusinessName(), testPayeeParty.getId(), testPayeeParty.getCompanyLegalForm());
+			cii.setPayee(testPayeeParty.getRegistrationName(), testPayeeParty.getId(), testPayeeParty.getCompanyLegalForm());
 		}
 		
 		TradeParty testSellerTaxRepresentativeParty = testDoc.getTaxRepresentativeParty();
 		if(testSellerTaxRepresentativeParty==null) {
 			LOG.warning("testPayeeParty==null" );
 		} else {
-			LOG.info("testSellerTaxRepresentativeParty.Name:"+testSellerTaxRepresentativeParty.getBusinessName()
+			LOG.info("testSellerTaxRepresentativeParty.Name:"+testSellerTaxRepresentativeParty.getRegistrationName()
 					+ " Address:"+testSellerTaxRepresentativeParty.getAddress()
 					+ " TaxRegistrationId:"+testSellerTaxRepresentativeParty.getTaxRegistrationId()
 					);
-			cii.setTaxRepresentative(testSellerTaxRepresentativeParty.getBusinessName()
+			cii.setTaxRepresentative(testSellerTaxRepresentativeParty.getRegistrationName()
 					, testSellerTaxRepresentativeParty.getAddress()
 					, testSellerTaxRepresentativeParty.getTaxRegistrationId()
 //					, CoreInvoiceVatBreakdown.VAT);

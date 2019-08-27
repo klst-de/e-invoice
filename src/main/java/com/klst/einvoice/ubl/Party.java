@@ -130,7 +130,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	
 	void init(String name, PostalAddress address, IContact contact) {
 		partyLegalEntity = new PartyLegalEntityType();
-		this.setRegistrationName(name);
+		setRegistrationName(name);
 		setAddress(address);
 		setIContact(contact);
 	}
