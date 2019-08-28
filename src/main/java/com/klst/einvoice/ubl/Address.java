@@ -51,7 +51,7 @@ public class Address extends AddressType implements PostalAddress {
 	}
 	
 	// copy ctor
-	public Address(AddressType address) {
+	Address(AddressType address) {
 		this();
 		// TODO testen
 		super.setCountry(address.getCountry());
@@ -70,16 +70,16 @@ public class Address extends AddressType implements PostalAddress {
 	}
 	
 	// [CII-DT-088] - StreetName shall not be used.
-	public Address(String countryCode, String postalCode, String city, String street) {
+	Address(String countryCode, String postalCode, String city, String street) {
 		this(countryCode, null, postalCode, city, street, null);
 	}
 	
 	// building nicht in XRechnung-v1-2-0.pdf dokumentiert, [CII-DT-094] - BuildingNumber shall not be used.
-	public Address(String countryCode, String postalCode, String city, String street, String building) {
+	Address(String countryCode, String postalCode, String city, String street, String building) {
 		this(countryCode, null, postalCode, city, street, building);
 	}
 	
-	public Address(String countryCode, String regionCode, String postalCode, String city, String street, String building) {
+	Address(String countryCode, String regionCode, String postalCode, String city, String street, String building) {
 		this();
 		setCountryCode(countryCode);
 
@@ -254,6 +254,7 @@ public class Address extends AddressType implements PostalAddress {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("[");
 		stringBuilder.append(getCountryCode()==null ? "null" : getCountryCode());
+		stringBuilder.append(getCountrySubdivision()==null ? "" : " ("+getCountrySubdivision()+")");
 		stringBuilder.append(", ");
 		stringBuilder.append(getPostCode()==null ? "null" : getPostCode());
 		stringBuilder.append(", ");

@@ -12,6 +12,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.ubl.Address;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.untdid.codelist.DateTimeFormats;
@@ -48,12 +49,12 @@ public class CiiTest {
 	static private final String NOTE_CONTENT = "A textual note that gives unstructured information that is relevant to the Invoice as a whole.";
 	
 	static private KositValidation validation;
-	static private Address testAddress;
+	static private PostalAddress testAddress;
 	
     @BeforeClass
     public static void staticSetup() {
     	validation = new KositValidation();
-    	testAddress = new Address("CC", "9-PC", "String city", "String street");
+    	testAddress = null; //new Address("CC", "9-PC", "String city", "String street");
     }
     
 	CrossIndustryInvoice invoice;

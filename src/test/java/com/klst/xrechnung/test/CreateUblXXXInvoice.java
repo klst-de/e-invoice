@@ -381,7 +381,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				IContact buyerContact = cmInvoice.getBuyerContact();
 				if(buyerContact==null) {
 					LOG.warning("buyerContact is null");
-					buyerContact = new Contact("nix", "0", "nix@nix.nix");
+					buyerContact = cmInvoice.createContact("nix", "0", "nix@nix.nix");
 				}
 				
 //				List<PaymentMeans> paymentInstructions = cmInvoice.getPaymentInstructions();

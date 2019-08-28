@@ -14,7 +14,7 @@ public class TradeContact extends TradeContactType implements IContact {
 	}
 
 	// copy ctor
-	public TradeContact(TradeContactType contact) {
+	TradeContact(TradeContactType contact) {
 		this();
 		this.setContactPoint(contact.getPersonName().getValue());
 		UniversalCommunicationType universalCommunicationType = contact.getTelephoneUniversalCommunication();
@@ -37,7 +37,7 @@ public class TradeContact extends TradeContactType implements IContact {
 	 * @param contactTel mandatory text
 	 * @param contactMail mandatory text
 	 */
-	public TradeContact(String contactName, String contactTel, String contactMail) {
+	TradeContact(String contactName, String contactTel, String contactMail) {
 		setContactPoint(contactName);
 		setContactTelephone(contactTel);
 		setContactEmail(contactMail);

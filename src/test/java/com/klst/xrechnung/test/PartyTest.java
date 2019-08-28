@@ -62,11 +62,11 @@ public class PartyTest {
 	private CustomerPartyType customerParty;
 	private Party customerparty;
 	
-	static private Address testAddress;
+	static private PostalAddress testAddress;
 	
     @BeforeClass
     public static void staticSetup() {
-    	testAddress = new Address("CC", "9-PC", "String city", "String street");
+    	testAddress = null;
     }
     
 	@Before 
@@ -110,6 +110,8 @@ public class PartyTest {
 			supplierparty = new Party(supplierParty.getParty());
 			LOG.info("supplierparty.RegistrationName:"+ (supplierparty.getRegistrationName())
 					+" .BusinessName:"+ (supplierparty.getBusinessName()) );
+			testAddress = supplierparty.createAddress("CC", "9-PC", "String city");
+			testAddress.setCountrySubdivision("subDivision"); // kein Setter für , "String street"
 		}
 		customerparty = null;
 		customerParty = invoice.getAccountingCustomerParty();
@@ -118,6 +120,7 @@ public class PartyTest {
 			LOG.info("customerparty.RegistrationName:"+ (customerparty.getRegistrationName()) 
 					+" .BusinessName:"+ (customerparty.getBusinessName()) );
 		}
+		LOG.info("testAddress:"+ testAddress);
     }
 
     @Test

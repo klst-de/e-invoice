@@ -35,7 +35,7 @@ public class Contact extends ContactType implements IContact {
 	}
 	
 	// copy ctor
-	public Contact(ContactType contact) {
+	Contact(ContactType contact) {
 		this();
 		super.setName(contact.getName());
 		super.setTelephone(contact.getTelephone());
@@ -49,7 +49,7 @@ public class Contact extends ContactType implements IContact {
 	 * @param contactTel mandatory item
 	 * @param contactMail mandatory item
 	 */
-	public Contact(String contactName, String contactTel, String contactMail) {
+	Contact(String contactName, String contactTel, String contactMail) {
 		// Seller contact point                        BT-41 Text                  1 (mandatory)
 		// Buyer contact point                         BT-56 Text                  0..1
 		//  Angaben zu Ansprechpartner oder Kontaktstelle (wie z. B. Name einer Person, Abteilungs- oder Bürobezeichnung):

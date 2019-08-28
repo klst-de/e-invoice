@@ -15,7 +15,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	}
 
 	// copy ctor
-	public TradeAddress(TradeAddressType address) {
+	TradeAddress(TradeAddressType address) {
 		this();
 		this.setCountryCode(address.getCountryID().getValue());
 		
@@ -35,16 +35,16 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 		this.setAddressLine3( address.getLineThree()==null ? null : address.getLineThree().getValue() );
 	}
 	
-	public TradeAddress(String countryCode, String postalCode, String city, String street) {
+	TradeAddress(String countryCode, String postalCode, String city, String street) {
 		this(countryCode, null, postalCode, city, street, null);
 	}
 	
 	// building nicht in XRechnung-v1-2-0.pdf dokumentiert
-	public TradeAddress(String countryCode, String postalCode, String city, String street, String building) {
+	TradeAddress(String countryCode, String postalCode, String city, String street, String building) {
 		this(countryCode, null, postalCode, city, street, building);
 	}
 	
-	public TradeAddress(String countryCode, String regionCode, String postalCode, String city, String street, String building) {
+	TradeAddress(String countryCode, String regionCode, String postalCode, String city, String street, String building) {
 		this();
 		setCountryCode(countryCode);
 		
@@ -174,6 +174,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("[");
 		stringBuilder.append(getCountryCode()==null ? "null" : getCountryCode());
+		stringBuilder.append(getCountrySubdivision()==null ? "" : " ("+getCountrySubdivision()+")");
 		stringBuilder.append(", ");
 		stringBuilder.append(getPostCode()==null ? "null" : getPostCode());
 		stringBuilder.append(", ");

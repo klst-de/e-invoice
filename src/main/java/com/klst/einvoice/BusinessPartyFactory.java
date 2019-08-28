@@ -15,7 +15,7 @@ package com.klst.einvoice;
 public interface BusinessPartyFactory {
 	
 	/**
-	 * ctor for BusinessParty
+	 * ctor for BusinessParty, use this factory method to create SELLER party or BUYER party. Add optional attributes if needed. 
 	 * 
 	 * @param registrationName - full formal name by which the BP is registered in the national registry of legal entities 
 	 *                           or as a Taxable person or otherwise trades as a person or persons
