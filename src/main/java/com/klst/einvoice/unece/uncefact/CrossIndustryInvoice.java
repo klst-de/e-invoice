@@ -664,7 +664,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 * @param companyId optional / Seller legal registration identifier, BT-30/R52
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
 	 */
-	public void setSeller(String name, PostalAddress address, TradeContact contact, 
+	public void setSeller(String name, PostalAddress address, IContact contact, 
 			String companyId, String companyLegalForm) {
 		                               // BT-27 , BG-5   , BG-6          , BT-30    , BT-33
 		TradeParty party = new TradeParty(name, address, contact); //, companyId, companyLegalForm);
@@ -716,7 +716,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	/* BUYER                                       BG-7                        1 (mandatory) 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Erwerber liefern.
 	 */
-	public void setBuyer(String name, PostalAddress address, TradeContact contact) {
+	public void setBuyer(String name, PostalAddress address, IContact contact) {
 		TradeParty party = new TradeParty(name, address, contact); // BT-44, BG-8, BG-9
 		setBuyerParty(party);
 	}
