@@ -15,18 +15,12 @@ import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.ubl.CommercialInvoice;
-import com.klst.einvoice.ubl.Contact;
 import com.klst.einvoice.ubl.CreditNote;
 import com.klst.einvoice.ubl.CreditNoteLine;
-import com.klst.einvoice.ubl.Delivery;
-import com.klst.einvoice.ubl.FinancialAccount;
 import com.klst.einvoice.ubl.Invoice;
 import com.klst.einvoice.ubl.InvoiceLine;
 import com.klst.einvoice.ubl.Party;
-import com.klst.einvoice.ubl.PaymentMeans;
-import com.klst.einvoice.ubl.Percent;
 import com.klst.einvoice.ubl.VatBreakdown;
-import com.klst.einvoice.ubl.VatCategory;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
@@ -37,14 +31,10 @@ import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CommodityClassificationType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ItemClassificationCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
@@ -91,9 +81,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		
 		LOG.info("makeOptionals...");	
 			ublInvoice.setOrderReferenceID(testCreditNote.getOrderReferenceID());
-			List<String> notes = testCreditNote.getNotes();
+			List<Object> notes = testCreditNote.getNotes();
 			notes.forEach(note -> {
-				ublInvoice.setNote(note);
+				ublInvoice.setNote(((NoteType)note).getValue());
 			});
 		LOG.info("finished makeOptionals.");
 		
@@ -199,9 +189,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 
 	void makeOptionals(Invoice ublInvoice) {	
 		ublInvoice.setOrderReferenceID(testDoc.getOrderReferenceID());
-		List<String> notes = testDoc.getNotes();
+		List<Object> notes = testDoc.getNotes();
 		notes.forEach(note -> {
-			ublInvoice.setNote(note);
+			ublInvoice.setNote(((NoteType)note).getValue());
 		});
 		
 //		ublInvoice.setPayeeParty(testDoc.getPayeeParty());
@@ -378,7 +368,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					buyerTaxScheme = buyerTaxSchemes.get(0); // first
 				}
 				
-				IContact buyerContact = cmInvoice.getBuyerContact();
+				IContact buyerContact = cmInvoice.getBuyerParty().getIContact();
 				if(buyerContact==null) {
 					LOG.warning("buyerContact is null");
 					buyerContact = cmInvoice.createContact("nix", "0", "nix@nix.nix");
@@ -425,20 +415,10 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 						" \ninvoice BuyerCompanyLegalForm="+	buyerCompanyLegalForm +					
 						" \ninvoice SellerTaxScheme="+		sellerTaxScheme.get(TaxSchemeType.class) +					
 						" \ninvoice SellerCompanyID="+		sellerTaxScheme.get(CompanyIDType.class) +					
-						" \ninvoice SellerCountryCode="+	cmInvoice.getSellerAddress().getCountryCode() +					
-						" \ninvoice SellerRegion="+			cmInvoice.getSellerAddress().getCountrySubdivision() +					
-						" \ninvoice SellerPostCode City="+	cmInvoice.getSellerAddress().getPostCode()+" "+cmInvoice.getSellerAddress().getCity() + 					
-						" \ninvoice SellerStreet Building="+cmInvoice.getSellerAddress().getStreet()+" "+cmInvoice.getSellerAddress().getBuilding() + 					
-						" \ninvoice SellerContactPoint="+		(cmInvoice.getSellerContact()==null ? "null" : cmInvoice.getSellerContact().getContactPoint()) +					
-						" \ninvoice SellerContactTelephone="+	(cmInvoice.getSellerContact()==null ? "null" : cmInvoice.getSellerContact().getContactTelephone()) +					
-						" \ninvoice SellerContactEmail="+		(cmInvoice.getSellerContact()==null ? "null" : cmInvoice.getSellerContact().getContactEmail()) +					
-						" \ninvoice BuyerCountryCode="+		cmInvoice.getBuyerAddress().getCountryCode() +					
-						" \ninvoice BuyerRegion="+			cmInvoice.getBuyerAddress().getCountrySubdivision() +					
-						" \ninvoice BuyerPostCode City="+	cmInvoice.getBuyerAddress().getPostCode()+" "+cmInvoice.getBuyerAddress().getCity() + 					
-						" \ninvoice BuyerStreet Building="+	cmInvoice.getBuyerAddress().getStreet()+" "+cmInvoice.getBuyerAddress().getBuilding() + 					
-						" \ninvoice BuyerContactPoint="+		buyerContact.getContactPoint() +					
-						" \ninvoice BuyerContactTelephone="+	buyerContact.getContactTelephone() +					
-						" \ninvoice BuyerContactEmail="+		buyerContact.getContactEmail() +					
+						" \ninvoice SellerAddress="+		cmInvoice.getSellerParty().getAddress() +					
+						" \ninvoice SellerContact="+		(cmInvoice.getSellerParty()==null ? "null" : cmInvoice.getSellerParty().getIContact()) +					
+						" \ninvoice BuyerAddress="+			cmInvoice.getBuyerParty().getAddress() +					
+						" \ninvoice BuyerContact="+			buyerContact +				
 						" \ninvoice buyerTaxSchemes#:"+		cmInvoice.getBuyerTaxSchemes().size() +
 						" \ninvoice BuyerTaxScheme="+		buyerTaxScheme.get(TaxSchemeType.class) +					
 						" \ninvoice BuyerCompanyID="+		buyerTaxScheme.get(CompanyIDType.class) +					

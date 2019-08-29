@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
@@ -334,37 +335,37 @@ public class CreditNote extends CreditNoteType implements CoreInvoice {
 	// wie BG-1  INVOICE NOTE
 	@Override
 	public void setNote(String subjectCode, String content) {
-		setNote(content);
+		if(subjectCode!=null) addNote(subjectCode);
+		addNote(content);
 	}
 	@Override
 	public void setNote(String content) {
-		addNote(content);
+		setNote(null, content);
 	}
-	public List<NoteType> addNote(String invoiceNote) {
-		List<NoteType> notes = this.getNote();
+	void addNote(String content) {
 		NoteType note = new NoteType();
-		note.setValue(invoiceNote);
-		notes.add(note);
-		return notes;
+		note.setValue(content);
+		super.getNote().add(note);
 	}
-	public List<String> getNotes() {
+	
+	@Override
+	public List<Object> getNotes() {
 		return getNotes(this);
 	}
-	static List<String> getNotes(CreditNoteType doc) {
+	static List<Object> getNotes(CreditNoteType doc) {
 		List<NoteType> notes = doc.getNote();
-		List<String> res = new ArrayList<String>(notes.size());
-		notes.forEach(note -> res.add(note.getValue()));
+		List<Object> res = new ArrayList<Object>(notes.size());
+		notes.forEach(note -> res.add(note));
 		return res;
 	}
-	List<NoteType> addNotes(CreditNoteType doc) {
+	void addNotes(CreditNoteType doc) {
 		List<NoteType> notes = doc.getNote();
 		List<NoteType> n = this.getNote();
 		notes.forEach(note -> {
 			n.add(note);
-//			LOG.fine(note.getValue() +" "+n.size());
-			});
-//		LOG.fine(this.getNote().size() +" "+n.size());
-		return n;
+			LOG.fine(note.getValue() +" "+n.size());
+		});
+		LOG.fine(this.getNote().size() +" "+n.size());
 	}
 
 	// wie BG-2  PROCESS CONTROL
@@ -887,6 +888,16 @@ public class CreditNote extends CreditNoteType implements CoreInvoice {
 			resultLines.add(new CreditNoteLine(line));
 		});
 		return resultLines;
+	}
+
+	@Override
+	public BusinessParty createParty(String name, PostalAddress address, IContact contact) {
+		return new Party(name, address, contact); 
+	}
+
+	@Override
+	public BusinessParty createParty(BusinessParty party) {
+		return new Party((PartyType)party);
 	}
 
 	@Override

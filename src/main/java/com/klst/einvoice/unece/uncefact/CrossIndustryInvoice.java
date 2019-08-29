@@ -175,7 +175,6 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	 */
 	@Override
 	public void setId(String id) {
-//		ExchangedDocumentType ed = this.getExchangedDocument();
 		exchangedDocument.setID(newIDType(id, null)); // null : No identification scheme is to be used.
 	}
 	
@@ -212,7 +211,6 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 
 	@Override
 	public void setTypeCode(DocumentNameCode code) {
-//		ExchangedDocumentType ed = this.getExchangedDocument();
 		DocumentCodeType documentCode = new DocumentCodeType();
 		documentCode.setValue(code.getValueAsString());
 		exchangedDocument.setTypeCode(documentCode);
@@ -469,21 +467,6 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	/* INVOICE NOTE                                BG-1                        0..*
 	 * Eine Gruppe von Informationselementen für rechnungsrelevante Erläuterungen mit Hinweisen auf den Rechnungsbetreff.
 	 * 
-
-1 .. 1 ExchangedDocument Gruppierung der Eigenschaften, die das gesamte Dokument betreffen. xs:sequence 
-1 .. 1 ID Rechnungsnummer                        BT-1 
-0 .. 1 Name Dokumentenart (Freitext) 
-1 .. 1 TypeCode Code für den Rechnungstyp        BT-3 
-1 .. 1 IssueDateTime Rechnungsdatum xs:choice 
-1 .. 1 DateTimeString Rechnungsdatum             BT-2 required format Datum, Format BT-2-0 
-0 .. 1 CopyIndicator xs:choice 
-1 .. 1 Indicator 
-0 .. 1 LanguageID Sprachkennzeichen 
-0 .. n IncludedNote Freitext zur Rechnung        BG-1 xs:sequence
-0 .. 1 ContentCode Freitext auf Dokumentenebene 
-1 .. 1 Content Freitext zur Rechnung             BT-22 
-0 .. 1 SubjectCode Code zur Qualifizierung des Freitextes zur Rechnung BT-21 
-
 	 */
 	@Override
 	public List<Object> getNotes() {
@@ -520,12 +503,10 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		addNote(note);
 	}
 	public void addNote(Object note) {
-//		ExchangedDocumentType ed = this.getExchangedDocument();
 		exchangedDocument.getIncludedNote().add((NoteType)note);
 		super.setExchangedDocument(exchangedDocument);
 	}
 	void addNotes(CrossIndustryInvoiceType doc) {
-//		ExchangedDocumentType ed = doc.getExchangedDocument();
 		List<Object> noteList = getNotes(doc);
 		noteList.forEach(note -> {
 			exchangedDocument.getIncludedNote().add((NoteType)note);

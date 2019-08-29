@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BG4_Seller;
+import com.klst.einvoice.BG7_Buyer;
+import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
@@ -467,6 +470,20 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		return doc.getBuyerReference()==null ? null : doc.getBuyerReference().getValue();
 	}
 
+/*
+test daten in 05 13 15
+CII:
+            </ram:BuyerTradeParty>
+            <ram:SpecifiedProcuringProject>
+                <ram:ID>PR456789</ram:ID>
+                <ram:Name>Project reference</ram:Name>
+            </ram:SpecifiedProcuringProject>
+UBL:
+    <cac:ProjectReference>
+        <cbc:ID>PR456789</cbc:ID>
+    </cac:ProjectReference>
+
+ */
 	@Override
 	public void setProjectReference(String reference, String schemeID) {
 		LOG.warning(NOT_IMPEMENTED);
@@ -602,44 +619,33 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 	/* INVOICE NOTE                                BG-1                        0..*
 	 * Eine Gruppe von Informationselementen für rechnungsrelevante Erläuterungen mit Hinweisen auf den Rechnungsbetreff.
 	 * 
-
-Invoice note subject code BT-21 Code 0..1 56  ???? finde ich nicht in UBL
-Der Betreff für den nachfolgenden Textvermerk zur Rechnung.
-Anmerkung: Die Auswahl erfolgt aus UNTDID 4451a.
-
-Invoice note BT-22 Text 1 58
-Ein Textvermerk, der unstrukturierte Informationen enthält, die für die Rechnung als Ganzes maßgeblich sind. 
-Erforderlichenfalls können Angaben zur Aufbewahrungspflicht gem. § 14 Abs. 4 UStG hier aufgenommen werden.
-Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grund der Korrektur angegeben werden
-
 	 */
 	@Override
 	public void setNote(String subjectCode, String content) {
-		setNote(content);
+		if(subjectCode!=null) addNote(subjectCode);
+		addNote(content);
 	}
 	@Override
 	public void setNote(String content) {
-		addNote(content);
+		setNote(null, content);
 	}
-	List<NoteType> addNote(String invoiceNote) {
-		List<NoteType> notes = this.getNote();
+	void addNote(String content) {
 		NoteType note = new NoteType();
-		note.setValue(invoiceNote);
-		notes.add(note);
-		return notes;
+		note.setValue(content);
+		super.getNote().add(note);
 	}
 	
 	@Override
-	public List<String> getNotes() {
+	public List<Object> getNotes() {
 		return getNotes(this);
 	}
-	static List<String> getNotes(InvoiceType doc) {
+	static List<Object> getNotes(InvoiceType doc) {
 		List<NoteType> notes = doc.getNote();
-		List<String> res = new ArrayList<String>(notes.size());
-		notes.forEach(note -> res.add(note.getValue()));
+		List<Object> res = new ArrayList<Object>(notes.size());
+		notes.forEach(note -> res.add(note));
 		return res;
 	}
-	List<NoteType> addNotes(InvoiceType doc) {
+	void addNotes(InvoiceType doc) {
 		List<NoteType> notes = doc.getNote();
 		List<NoteType> n = this.getNote();
 		notes.forEach(note -> {
@@ -647,7 +653,6 @@ Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grun
 			LOG.fine(note.getValue() +" "+n.size());
 		});
 		LOG.fine(this.getNote().size() +" "+n.size());
-		return n;
 	}
 	
 	/* PROCESS CONTROL                             BG-2                        1 (mandatory) 
@@ -734,6 +739,12 @@ Anmerkung: Im Falle einer bereits fakturierten Rechnung kann hier z. B. der Grun
 	
 	@Override
 	public String getPrecedingInvoiceReference() {
+		// es fehlen testdaten
+		List<DocumentReferenceType> originatorDocumentReferenceList = super.getOriginatorDocumentReference();
+		originatorDocumentReferenceList.forEach(documentReference -> {
+			documentReference.getID(); // ??????????????
+			documentReference.getIssueDate(); // ???
+		});
 		LOG.warning(NOT_IMPEMENTED);
 		return null;
 	}
@@ -803,7 +814,7 @@ SELLER CONTACT                              BG-6                        1
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
 	 */
 	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
-		Party party = new Party(name, address, contact);
+		BusinessParty party = createParty(name, address, contact); 
 		party.setCompanyId(companyId);
 		party.setCompanyLegalForm(companyLegalForm);
 		setSellerParty(party);
@@ -820,14 +831,14 @@ SELLER CONTACT                              BG-6                        1
 	 * 
 	 * @param SELLER party
 	 */
-	public void setSellerParty(Party party) {
+	public void setSellerParty(BusinessParty party) {
 		SupplierPartyType supplierParty = new SupplierPartyType();
-		supplierParty.setParty(party);
-		this.sellerParty = party;
+		supplierParty.setParty((PartyType) party);
+		this.sellerParty = (Party) party;
 		super.setAccountingSupplierParty(supplierParty);
 	}
 	
-	public Party getSellerParty() {
+	public BG4_Seller getSellerParty() {
 		return this.sellerParty==null ? getSellerParty(this) : sellerParty;
 	}
 	
@@ -901,7 +912,7 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * @param BUYER CONTACT optional, BG-9, R57
 	 */
 	public void setBuyer(String name, PostalAddress address, IContact contact) {
-		Party party = new Party(name, address, contact); 
+		BusinessParty party = createParty(name, address, contact); 
 		setBuyerParty(party);
 	}
 
@@ -916,14 +927,14 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * 
 	 * @param BUYER party
 	 */
-	public void setBuyerParty(Party party) {
+	public void setBuyerParty(BusinessParty party) {
 		CustomerPartyType customerparty = new CustomerPartyType();
-		customerparty.setParty(party);
-		this.buyerParty = party;
+		customerparty.setParty((PartyType) party);
+		this.buyerParty = (Party) party;
 		setAccountingCustomerParty(customerparty);
 	}
 	
-	public Party getBuyerParty() {
+	public BG7_Buyer getBuyerParty() {
 		return this.buyerParty==null ? getBuyerParty(this) : buyerParty;
 	}
 	static Party getBuyerParty(InvoiceType doc) {
@@ -1573,40 +1584,27 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 
 // ----------------------------------
 	public List<Map<Object,String>> getSellerTaxSchemes() {
-		Party party = getSellerParty();
+		Party party = this.sellerParty==null ? getSellerParty(this) : sellerParty; // ==getSellerParty();
 		return party.getTaxSchemes();
 	}
 
 	public List<Map<Object,String>> getBuyerTaxSchemes() { 
-		Party party = getBuyerParty();
+		Party party = buyerParty==null ? getBuyerParty(this) : buyerParty; // == getBuyerParty();
 		return party.getTaxSchemes();
 	}
 
+	// BG-4 , BG-7 , BG-10 , BG-11 , BG-13 : SELLER, BUYER, ...
+	@Override
+	public BusinessParty createParty(String name, PostalAddress address, IContact contact) {
+		return new Party(name, address, contact); 
+	}
+
+	@Override
+	public BusinessParty createParty(BusinessParty party) {
+		return new Party((PartyType)party);
+	}
+
 	// BG-5 , BG-8 : POSTAL ADDRESS
-	@Deprecated
-	public void setSellerAddress(PostalAddress address) {
-		getSellerParty().setAddress(address);
-	}
-	
-	@Deprecated
-	public PostalAddress getSellerAddress() {
-		return getSellerParty().getAddress();
-	}
-	
-	@Deprecated
-	public void setBuyerrAddress(PostalAddress address) {
-//		Party party = getBuyerParty();
-//		party.setAddress(address);
-		getBuyerParty().setAddress(address);
-	}
-	
-	@Deprecated
-	public PostalAddress getBuyerAddress() {
-//		Party party = getBuyerParty();
-//		return party.getAddress();
-		return getBuyerParty().getAddress();
-	}
-		
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
 		Party party = new Party();
@@ -1620,24 +1618,27 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 	}
 
 	// BG-6 , BG-9 CONTACT
-	public void setSellerContact(Contact contact) {
-		Party party = getSellerParty();
-		party.setContact(contact);
+	@Deprecated
+	public void setSellerContact(IContact contact) {
+		BG4_Seller party = getSellerParty();
+		party.setIContact(contact);
 	}
 	
+	@Deprecated // use getSellerParty().getIContact()
 	public IContact getSellerContact() {
-		Party party = getSellerParty();
+		BG4_Seller party = getSellerParty();
 		return party.getIContact();
 	}
 	
+	@Deprecated // getBuyerParty().getIContact()
 	public IContact getBuyerContact() {
-		Party party = getBuyerParty();
-		return party.getIContact();
+		return getBuyerParty().getIContact();
 	}
 	
-	public void setBuyerContact(Contact contact) {
-		Party party = getBuyerParty();
-		party.setContact(contact);
+	@Deprecated
+	public void setBuyerContact(IContact contact) {
+		BG7_Buyer party = getBuyerParty();
+		party.setIContact(contact);
 	}
 	
 	@Override

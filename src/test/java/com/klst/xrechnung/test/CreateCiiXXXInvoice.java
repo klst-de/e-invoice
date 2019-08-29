@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.ApplicableHeaderTradeDelivery;
 import com.klst.einvoice.unece.uncefact.BICId;
@@ -21,7 +20,6 @@ import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.einvoice.unece.uncefact.TradeSettlementPaymentMeans;
 import com.klst.einvoice.unece.uncefact.VatBreakdown;
 import com.klst.marshaller.CiiTransformer;
-import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;

@@ -256,7 +256,7 @@ public class PartyTest {
     	LOG.info("??????????????? invoice.getSellerTaxSchemes().size() "+invoice.getSellerTaxSchemes().size()); // Seller wurde überschrieben!
     	assertEquals(0, invoice.getSellerTaxSchemes().size());
 //    	invoice.setSellerTaxCompanyId("Umsatzsteuer-Identifikationsnummer des Verkäufers");
-    	invoice.getSellerParty().setTaxRegistrationId("Umsatzsteuer-Identifikationsnummer des Verkäufers");
+    	invoice.getSellerParty().setTaxRegistrationId("Umsatzsteuer-Identifikationsnummer des Verkäufers", "VAT");
     	taxSchemes = invoice.getSellerTaxSchemes();
     	assertEquals(1, taxSchemes.size());
     	LOG.info("seller taxScheme:" + taxSchemes.get(0).get(CompanyIDType.class) + "/" + taxSchemes.get(0).get(TaxSchemeType.class));
