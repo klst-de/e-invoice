@@ -46,7 +46,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 	
 	// copy ctor
-	public Party(PartyType party) {
+	Party(PartyType party) {
 		this();
 		List<Map<Object,String>> mapList = getPartyLegalEntities(party);
 		Map<Object,String> map = new HashMap<Object,String>();
@@ -105,7 +105,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
 	 */
 	@Deprecated
-	public Party(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+	Party(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		this();
 		init(name, address, contact);
 		setCompanyId(companyId);
@@ -122,7 +122,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	 * 
 	 * @see BusinessPartyFactory
 	 */
-	public Party(String name, PostalAddress address, IContact contact) {
+	Party(String name, PostalAddress address, IContact contact) {
 		this();
 		init(name, address, contact);
 		
@@ -397,26 +397,44 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		} else if(mapList.size()==1) {
 			Map<Object,String> map = mapList.get(0);
 			String [] val1 = map.values().toArray(new String[0]);
+			LOG.info("mapList.size()==1" + " key#:"+map.keySet().size() + " value.0:"+val1[0]);
 			if(map.keySet().size()==1) {
 				return val1[0];
 			} else {
-				return map.get(schemeID)==null ? val1[0] : map.get(schemeID);
+				LOG.info(map.get(TaxSchemeType.class)+"=="+schemeID + " ? "+map.get(CompanyIDType.class) + " : "+val1[0]);
+				return map.get(TaxSchemeType.class).equals(schemeID) ? map.get(CompanyIDType.class) : val1[0];
 			}
+// so wurde is in map eingetragen:
+//			map.put(TaxSchemeType.class, taxSchemeID.getValue());
+//			map.put(CompanyIDType.class, companyID.getValue());
 		} else {
+			LOG.info("TODO    mapList.size()="+mapList.size());
 			for(int i=0; i<mapList.size(); i++) {
 				Map<Object,String> map = mapList.get(i);
-				if(map.get(schemeID)!=null) {
-					return map.get(schemeID);
+				if(map.get(TaxSchemeType.class).equals(schemeID)) {
+					map.get(CompanyIDType.class);  // ????????????????????????????
 				}
 			}
 			Map<Object,String> map = mapList.get(0);
 			String [] val1 = map.values().toArray(new String[0]);
+			LOG.info("return val1[0]:"+val1[0]);
 			return val1[0];
 		}
 	}
 
 	@Override
 	public void setTaxRegistrationId(String name, String schemeID) { 
+/*
+
+            <cac:PartyTaxScheme>
+                <cbc:CompanyID>DE123456789</cbc:CompanyID>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:PartyTaxScheme>
+
+
+ */
 		if(name==null) return;
 		CompanyIDType companyID = new CompanyIDType();
 		companyID.setValue(name);
@@ -427,7 +445,10 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		taxScheme.setID(Invoice.newIDType(schemeID, null));
 		partyTaxScheme.setTaxScheme(taxScheme);
 		
-		super.getPartyTaxScheme().add(partyTaxScheme);
+		List<PartyTaxSchemeType> list = super.getPartyTaxScheme();
+		LOG.info("List<PartyTaxSchemeType>#:"+list.size() + " vor add:"+name+"/"+schemeID);
+		list.add(partyTaxScheme);
+		LOG.info("List<PartyTaxSchemeType>#:"+list.size() + " nach add:"+name+"/"+schemeID);
 	}
 
 	@Override

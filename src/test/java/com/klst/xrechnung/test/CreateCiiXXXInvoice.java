@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
@@ -14,7 +15,6 @@ import com.klst.einvoice.unece.uncefact.ApplicableHeaderTradeDelivery;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.IBANId;
-import com.klst.einvoice.unece.uncefact.TradeContact;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.einvoice.unece.uncefact.TradeSettlementPaymentMeans;
@@ -61,12 +61,14 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		
 
 		TradeParty testSellerParty = testDoc.getSellerParty();
-		TradeParty sellerParty = new TradeParty( testSellerParty.getRegistrationName()     // BT-27 String name
-				                               , testSellerParty.getAddress()          // TradeAddress address
-				                               , (TradeContact)(testSellerParty.getIContact())         // TradeContact contact
-//				                               , testSellerParty.getCompanyId()        // BT-30 String companyId
-//				                               , testSellerParty.getCompanyLegalForm() // BT-33 String companyLegalForm
-				                               );
+		BusinessParty sellerParty = cii.createParty( testSellerParty.getRegistrationName()     // BT-27 String name
+				                          , testSellerParty.getAddress()              // TradeAddress address
+				                          , testSellerParty.getIContact()             // TradeContact contact
+				                          );
+//		TradeParty sellerParty = new TradeParty( testSellerParty.getRegistrationName()     // BT-27 String name
+//				                               , testSellerParty.getAddress()          // TradeAddress address
+//				                               , (TradeContact)(testSellerParty.getIContact())         // TradeContact contact
+//				                               );
 		sellerParty.setBusinessName(testSellerParty.getBusinessName()) ; // BT-28
 		sellerParty.setId(testSellerParty.getId()); // BT-29
 		sellerParty.setCompanyId(testSellerParty.getCompanyId());
@@ -126,7 +128,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				+" VAT identifier (BT-31):"+sellerParty.getTaxRegistrationId()
 				);
 //		sellerParty.setUriUniversalCommunication(testSellerParty.getUriUniversalCommunication()); // BT-34
-		cii.setSellerParty(sellerParty);
+		cii.setSellerParty((TradeParty)sellerParty);
 		
 		TradeParty buyerParty = testDoc.getBuyerParty();
 		if(buyerParty.getSpecifiedTaxRegistration().isEmpty()) {

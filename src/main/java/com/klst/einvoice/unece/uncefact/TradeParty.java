@@ -33,7 +33,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 	
 	// copy ctor
-	public TradeParty(TradePartyType party) {
+	TradeParty(TradePartyType party) {
 		this();
 		LegalOrganizationType legalOrganization = party.getSpecifiedLegalOrganization();
 		init( party.getName().getValue()
@@ -88,7 +88,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
 	 */
 	@Deprecated
-	public TradeParty(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+	TradeParty(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		this();
 		init(name, address, contact); //, companyId, companyLegalForm);
 		setCompanyId(companyId);
@@ -104,7 +104,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	 * 
 	 * @see BusinessPartyFactory
 	 */
-	public TradeParty(String name, PostalAddress address, IContact contact) {
+	TradeParty(String name, PostalAddress address, IContact contact) {
 		this();
 		init(name, address, contact); //, companyId, companyLegalForm);
 	}

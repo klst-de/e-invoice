@@ -15,6 +15,9 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.klst.einvoice.BG4_Seller;
+import com.klst.einvoice.BG7_Buyer;
+import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.ubl.Address;
@@ -58,9 +61,9 @@ public class PartyTest {
 
 	Invoice invoice;
 	private SupplierPartyType supplierParty;
-	private Party supplierparty;
+	private BG4_Seller supplierparty; // BG4_Seller extends BusinessParty
 	private CustomerPartyType customerParty;
-	private Party customerparty;
+	private BG7_Buyer customerparty;
 	
 	static private PostalAddress testAddress;
 	
@@ -107,16 +110,16 @@ public class PartyTest {
     	supplierparty = null;
 		supplierParty = invoice.getAccountingSupplierParty();
 		if(supplierParty!=null) {
-			supplierparty = new Party(supplierParty.getParty());
+			supplierparty = invoice.getSellerParty();
 			LOG.info("supplierparty.RegistrationName:"+ (supplierparty.getRegistrationName())
 					+" .BusinessName:"+ (supplierparty.getBusinessName()) );
-			testAddress = supplierparty.createAddress("CC", "9-PC", "String city");
+			testAddress = invoice.createAddress("CC", "9-PC", "String city");
 			testAddress.setCountrySubdivision("subDivision"); // kein Setter für , "String street"
 		}
 		customerparty = null;
 		customerParty = invoice.getAccountingCustomerParty();
 		if(customerParty!=null) {
-			customerparty = new Party(customerParty.getParty());
+			customerparty = invoice.getBuyerParty();
 			LOG.info("customerparty.RegistrationName:"+ (customerparty.getRegistrationName()) 
 					+" .BusinessName:"+ (customerparty.getBusinessName()) );
 		}
@@ -128,19 +131,18 @@ public class PartyTest {
     	String name = "party name";
     	Address address = null;
     	Contact contact = null;
-    	Party party = new Party(name, address, contact);
+    	invoice.setBuyer(name, address, contact);
+    	BG7_Buyer party = invoice.getBuyerParty();
 		assertEquals(name, party.getRegistrationName());
 		assertEquals(address, party.getAddress());
-		assertEquals(contact, party.getContact());
+		assertEquals(contact, party.getIContact());
    }
 
     @Test
     public void ublBusinessName() {
     	String name = "party name";
-		assertTrue(supplierparty.getPartyName().isEmpty());
+		assertNull(supplierparty.getBusinessName());
 		supplierparty.setBusinessName(name);
-		assertTrue(supplierparty.getPartyName().size()==1);
-		assertEquals(name, supplierparty.getPartyName().get(0).getName().getValue());
 		assertEquals(name, supplierparty.getBusinessName());
    }
 
@@ -218,13 +220,10 @@ public class PartyTest {
     
     @Test
     public void ublParty0Create() {
-    	Party party = new Party("customer", null, null, null, null);
-    	
-    	List<Map<Object,String>> taxSchemes = party.getTaxSchemes();
-    	LOG.info("TaxSchemes #:"+ taxSchemes.size());
-    	assertTrue(taxSchemes.isEmpty());
-    	party.setTaxRegistrationId("DE123456789");
-    	LOG.info("TaxSchemes #:"+ taxSchemes.size());
+    	BusinessParty party = invoice.createParty("customer", null, null);
+    	assertNull(party.getTaxRegistrationId());
+    	party.setTaxRegistrationId("DE123456789", "VAT");
+    	assertNotNull(party.getTaxRegistrationId("VAT"));
     }
     
     @Test
@@ -235,31 +234,33 @@ public class PartyTest {
     	IContact contact = supplierparty.getIContact();
     	assertNotNull(address);
     	assertNotNull(contact);
+    	
     	LOG.info("supplierparty address:" + address + " contact:"+contact + 
-    			" TaxSchemes #:"+supplierparty.getTaxSchemes().size());
-    	assertEquals(1, supplierparty.getTaxSchemes().size());
-    	List<Map<Object,String>> taxSchemes = supplierparty.getTaxSchemes();
-    	assertEquals("DE123456789", taxSchemes.get(0).get(CompanyIDType.class));
-    	LOG.info("supplierparty taxScheme:" + taxSchemes.get(0).get(CompanyIDType.class) + "/" + taxSchemes.get(0).get(TaxSchemeType.class));
-    	supplierparty.setTaxRegistrationId("Umsatzsteuer-Identifikationsnummer des Verkäufers");
-    	LOG.info("TaxSchemes #:"+supplierparty.getTaxSchemes().size());
-    	LOG.info("supplierparty taxScheme:" + supplierparty.getTaxSchemes().get(1).get(CompanyIDType.class) + "/" + supplierparty.getTaxSchemes().get(1).get(TaxSchemeType.class));
+    			" TaxRegistrationId:"+supplierparty.getTaxRegistrationId() +
+    			" VATRegistrationId:"+supplierparty.getTaxRegistrationId("VAT")
+    			);
+    	assertEquals("VAT", supplierparty.getTaxRegistrationId());
+    	assertEquals("DE123456789", supplierparty.getTaxRegistrationId("VAT"));
+    	
+    	supplierparty.setTaxRegistrationId("Umsatzsteuer-Identifikationsnummer des Verkäufers","XXX");
+    	LOG.info("XXX TaxRegistrationId:"+supplierparty.getTaxRegistrationId("XXX"));
   	
     	// Seller überschreiben: 
     	invoice.setSeller("sellerRegistrationName", testAddress, null, null, null); //contact, companyId, companyLegalForm);
     	LOG.info("testAddress:" + testAddress);
-    	SupplierPartyType sp = invoice.getAccountingSupplierParty();
-    	Party sellerparty = new Party(sp.getParty());
+//    	SupplierPartyType sp = invoice.getAccountingSupplierParty();
+//    	Party sellerparty = new Party(sp.getParty());
+    	BG4_Seller sellerparty = invoice.getSellerParty();
     	LOG.info("seller address:" + sellerparty.getAddress() + " contact:"+sellerparty.getIContact());
     	assertEquals(testAddress.getCountryCode(), sellerparty.getAddress().getCountryCode());	
     	assertNull(sellerparty.getIContact());
     	LOG.info("??????????????? invoice.getSellerTaxSchemes().size() "+invoice.getSellerTaxSchemes().size()); // Seller wurde überschrieben!
     	assertEquals(0, invoice.getSellerTaxSchemes().size());
 //    	invoice.setSellerTaxCompanyId("Umsatzsteuer-Identifikationsnummer des Verkäufers");
-    	invoice.getSellerParty().setTaxRegistrationId("Umsatzsteuer-Identifikationsnummer des Verkäufers", "VAT");
-    	taxSchemes = invoice.getSellerTaxSchemes();
-    	assertEquals(1, taxSchemes.size());
-    	LOG.info("seller taxScheme:" + taxSchemes.get(0).get(CompanyIDType.class) + "/" + taxSchemes.get(0).get(TaxSchemeType.class));
+//    	invoice.getSellerParty().setTaxRegistrationId("Umsatzsteuer-Identifikationsnummer des Verkäufers", "VAT");
+//    	taxSchemes = invoice.getSellerTaxSchemes();
+//    	assertEquals(1, taxSchemes.size());
+//    	LOG.info("seller taxScheme:" + taxSchemes.get(0).get(CompanyIDType.class) + "/" + taxSchemes.get(0).get(TaxSchemeType.class));
     }
     
     @Test
@@ -272,9 +273,8 @@ public class PartyTest {
     	assertNull(customerparty.getIContact());
     	invoice.setBuyer("buyerName", testAddress, null); //contact);
     	LOG.info("testAddress:" + testAddress);
-    	CustomerPartyType cp = invoice.getAccountingCustomerParty();
-    	Party buyerparty = new Party(cp.getParty());
-    	LOG.info("buyer address:" + buyerparty.getAddress() + " contact:"+buyerparty.getIContact());
+    	BG7_Buyer buyerparty = (BG7_Buyer)invoice.getBuyerParty();
+    	LOG.info("testAddress:" + testAddress +", buyer address:" + buyerparty.getAddress() + " contact:"+buyerparty.getIContact());
     	assertEquals(testAddress.getCountryCode(), buyerparty.getAddress().getCountryCode());	
     	assertNull(buyerparty.getIContact());
     }
