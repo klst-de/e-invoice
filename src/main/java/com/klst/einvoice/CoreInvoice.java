@@ -26,7 +26,8 @@ Eine andere mögliche Namensgebung wären die Profilnamen mit Hierarhie
  - CoreInvoiceExtended extends CoreInvoiceEN16931              -- Erweiterung der EN 16931-1
 
  */
-public interface CoreInvoice extends BG2_ProcessControl, BG22_DocumentTotals, PostalAddressFactory, IContactFactory {
+public interface CoreInvoice extends BG1_InvoiceNote, BG2_ProcessControl, BG22_DocumentTotals, 
+	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
 
 	/**
 	 * Invoice number   - A unique identification of the Invoice.
@@ -332,25 +333,26 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 
 	// BT-20 @see setPaymentTermsAndDate
 	
-	/**
-	 * INVOICE NOTE
-	 * <p>
-	 * A group of business terms providing textual notes that are relevant for the invoice, 
-	 * together with an indication of the note subject.
-	 * <p>
-	 * Cardinality: 	0..n (optional)
-	 * <br>EN16931-ID: 	BG-1 , BT-21,BT-22
-	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R56
-	 * 
-	 * @param SubjectCode - To be chosen from the entries in UNTDID 4451, BT-21 / 0..1
-	 * @param Invoice note Content - BT-22 / 1..1
-	 * A textual note that gives unstructured information that is relevant to the Invoice as a whole.
-	 * Such as the reason for any correction or assignment note in case the invoice has been factored.
-	 */
-	public void setNote(String subjectCode, String content);
-	public void setNote(String content);
-	public List<String> getNotes();
+	// BG-1 + 0..n INVOICE NOTE @see BG1_InvoiceNote
+//	/**
+//	 * INVOICE NOTE
+//	 * <p>
+//	 * A group of business terms providing textual notes that are relevant for the invoice, 
+//	 * together with an indication of the note subject.
+//	 * <p>
+//	 * Cardinality: 	0..n (optional)
+//	 * <br>EN16931-ID: 	BG-1 , BT-21,BT-22
+//	 * <br>Rule ID: 	
+//	 * <br>Request ID: 	R56
+//	 * 
+//	 * @param SubjectCode - To be chosen from the entries in UNTDID 4451, BT-21 / 0..1
+//	 * @param Invoice note Content - BT-22 / 1..1
+//	 * A textual note that gives unstructured information that is relevant to the Invoice as a whole.
+//	 * Such as the reason for any correction or assignment note in case the invoice has been factored.
+//	 */
+//	public void setNote(String subjectCode, String content);
+//	public void setNote(String content);
+//	public List<String> getNotes();
 
 	// BG-2 + 1..1 PROCESS CONTROL @see BG2_ProcessControl
 	
