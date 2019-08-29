@@ -39,7 +39,7 @@ public interface BG1_InvoiceNote {
 	// BT-22 ++ 1..1 Invoice note
 //	public String getNote();
 	
-	public List<Object> getNotes(); // Object == NoteType/CII ist mächtiger als  NoteType/UBL
+	public List<Object> getNotes(); // Object == NoteType/CII ist mächtiger als  NoteType/UBL TODO UBL -> CII NoteType mappen
 	
 	/**
 	 * 

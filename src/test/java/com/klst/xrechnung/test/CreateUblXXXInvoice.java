@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
@@ -195,7 +196,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		});
 		
 //		ublInvoice.setPayeeParty(testDoc.getPayeeParty());
-		Party party = testDoc.getPayeeParty();
+		BusinessParty party = testDoc.getPayee();
 		if(party==null) {
 			// nix
 		} else {
@@ -205,7 +206,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					, party.getCompanyLegalForm()  // String companyLegalForm
 					);
 		}
-		ublInvoice.setTaxRepresentativeParty(testDoc.getTaxRepresentativeParty());
+//		ublInvoice.setTaxRepresentativeParty(testDoc.getTaxRepresentativeParty());
+		ublInvoice.setTaxRepresentative(testDoc.getTaxRepresentative());
 		
 		ublInvoice.addDelivery(testDoc.getDeliveries());
 		

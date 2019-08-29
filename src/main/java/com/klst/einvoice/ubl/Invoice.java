@@ -159,8 +159,14 @@ ProfileID: BT-23 Geschäfts¬prozesstyp
 		addNotes(doc);	
 		setSellerParty(getSellerParty(doc));
 		setBuyerParty(getBuyerParty(doc));
-		setPayeeParty(getPayeeParty(doc));
-		setTaxRepresentativeParty(getTaxRepresentativeParty(doc));
+		
+		PartyType payeeParty = doc.getPayeeParty();
+//		Party payeeParty = getPayeeParty(doc);
+		super.setPayeeParty(payeeParty);
+		
+		PartyType taxRepresentativeParty = doc.getTaxRepresentativeParty();
+		super.setTaxRepresentativeParty(taxRepresentativeParty);
+		
 		addDeliveries(doc);
 		
 		List<PaymentMeansType> pmList = doc.getPaymentMeans();
@@ -929,7 +935,7 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 */
 	public void setBuyerParty(BusinessParty party) {
 		CustomerPartyType customerparty = new CustomerPartyType();
-		customerparty.setParty((PartyType) party);
+		customerparty.setParty((PartyType)party);
 		this.buyerParty = (Party) party;
 		setAccountingCustomerParty(customerparty);
 	}
@@ -947,21 +953,21 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * Die Gruppe wird genutzt, wenn der Zahlungsempfänger nicht mit dem Verkäufer identisch ist.
 	 */
 	public void setPayee(String name, String id, String companyLegalForm) {
-		Party party = new Party(null, null, null);
+		BusinessParty party = createParty(null, null, null);
 		party.setBusinessName(name);  // !!!!!
 		party.setCompanyLegalForm(companyLegalForm);
 		party.setId(id);
-		setPayeeParty(party);
+		setPayee(party);
 	}
-	public void setPayeeParty(Party party) {
-		super.setPayeeParty(party);
+	public void setPayee(BusinessParty party) {
+		super.setPayeeParty((PartyType)party);
 	}
 	
-	public Party getPayeeParty() {
-		PartyType party = super.getPayeeParty();
-		return party==null ? null : new Party(party);
+	public BusinessParty getPayee() {
+		Party party = getPayee(this);
+		return party==null ? null : createParty(party);
 	}
-	static Party getPayeeParty(InvoiceType doc) {
+	static Party getPayee(InvoiceType doc) {
 		PartyType party = doc.getPayeeParty();
 		return party==null ? null : new Party(party);
 	}
@@ -970,19 +976,19 @@ Eine Gruppe von Informationselementen, die Angaben zum Ansprechpartner oder der 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Steuervertreter des Verkäufers liefern.
 	 */
 	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
-		Party party = new Party(registrationName, address, null);
+		BusinessParty party = createParty(registrationName, address, null);
 		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
-		setTaxRepresentativeParty(party);
+		setTaxRepresentative(party);
 	}
-	public void setTaxRepresentativeParty(Party party) {
-		super.setTaxRepresentativeParty(party);
+	public void setTaxRepresentative(BusinessParty party) {
+		super.setTaxRepresentativeParty((PartyType)party);
 	}
 	
-	public Party getTaxRepresentativeParty() {
-		PartyType party = super.getTaxRepresentativeParty();
-		return party==null ? null : new Party(party);
+	public BusinessParty getTaxRepresentative() { // Kollision mit name in super
+		Party party = getTaxRepresentative(this);
+		return party==null ? null : createParty(party);
 	}
-	static Party getTaxRepresentativeParty(InvoiceType doc) {
+	static Party getTaxRepresentative(InvoiceType doc) {
 		PartyType party = doc.getTaxRepresentativeParty();
 		return party==null ? null : new Party(party);
 	}
