@@ -18,6 +18,8 @@ import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
+
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CiiTest {
 
@@ -72,15 +74,15 @@ public class CiiTest {
 		invoice.setIssueDate(ISSUE_DATE);
     	assertEquals(DateTimeFormats.ymdToTs(ISSUE_DATE), invoice.getIssueDateAsTimestamp());
     	
-		invoice.setNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden.", SUBJECT_CODE); // 0..n (optional)
+		invoice.setNote(SUBJECT_CODE, "Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // 0..n (optional)
 		invoice.setNote(SUBJECT_CODE);
 		invoice.setNote(SUBJECT_CODE, NOTE_CONTENT);
 		invoice.setNote(NOTE_CONTENT);
-		List<String> notes = invoice.getNotes();
+		List<Object> notes = invoice.getNotes();
 		assertEquals(4, notes.size());
 		notes.forEach(note -> {
-			LOG.info(note);
-			});
+			LOG.info(""+((NoteType)note).getContent().get(0).getValue());
+		});
 		
     	assertEquals(ID, invoice.getId());
     	assertEquals(DateTimeFormats.ymdToTs(ISSUE_DATE), invoice.getIssueDateAsTimestamp());

@@ -271,9 +271,9 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		
 		cii.setOrderReferenceID(testDoc.getOrderReferenceID()); // BT-14 + 0..1
 		
-		List<String> notes = testDoc.getNotes();
-		notes.forEach(note -> {
-			cii.setNote(note);
+		List<Object> noteList = testDoc.getNotes();
+		noteList.forEach(note -> {
+			cii.addNote(note);
 		});
 		LOG.info("finished.");
 	}

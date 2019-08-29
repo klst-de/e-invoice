@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
@@ -39,7 +40,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
@@ -84,6 +84,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 
 	HeaderTradeSettlementType applicableHeaderTradeSettlement;
 	HeaderTradeDeliveryType applicableHeaderTradeDelivery;
+	ExchangedDocumentType exchangedDocument;
 	
 	public CrossIndustryInvoice(String customization, DocumentNameCode documentNameCode) {
 		this(customization, null, documentNameCode);
@@ -100,18 +101,18 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(); // class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
 		
-		ExchangedDocumentType ed = new ExchangedDocumentType();
+		exchangedDocument = new ExchangedDocumentType();
 		DocumentCodeType documentCode = new DocumentCodeType();
 		documentCode.setValue(documentNameCode.getValueAsString());
-		ed.setTypeCode(documentCode);
-		super.setExchangedDocument(ed);
+		exchangedDocument.setTypeCode(documentCode);
+		super.setExchangedDocument(exchangedDocument);
 	}
 
 	// copy-ctor
 	public CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
 		this(getCustomization(doc), getProfile(doc), getTypeCode(doc));
 		LOG.info("Customization:"+getCustomization() + ", Profile:"+getProfile() + ", TypeCode:"+getTypeCode());
-		supplyChainTradeTransaction = new SupplyChainTradeTransactionType();
+//		supplyChainTradeTransaction = new SupplyChainTradeTransactionType();
 		
 		Object ahtd = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
 		LOG.info("ApplicableHeaderTradeDelivery ahtd:"+ahtd);
@@ -174,8 +175,8 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	 */
 	@Override
 	public void setId(String id) {
-		ExchangedDocumentType ed = this.getExchangedDocument();
-		ed.setID(newIDType(id, null)); // null : No identification scheme is to be used.
+//		ExchangedDocumentType ed = this.getExchangedDocument();
+		exchangedDocument.setID(newIDType(id, null)); // null : No identification scheme is to be used.
 	}
 	
 	@Override
@@ -211,10 +212,10 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 
 	@Override
 	public void setTypeCode(DocumentNameCode code) {
-		ExchangedDocumentType ed = this.getExchangedDocument();
+//		ExchangedDocumentType ed = this.getExchangedDocument();
 		DocumentCodeType documentCode = new DocumentCodeType();
 		documentCode.setValue(code.getValueAsString());
-		ed.setTypeCode(documentCode);
+		exchangedDocument.setTypeCode(documentCode);
 	}
 
 	@Override
@@ -485,6 +486,20 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 
 	 */
 	@Override
+	public List<Object> getNotes() {
+		return getNotes(this);
+	}
+	static List<Object> getNotes(CrossIndustryInvoiceType doc) {
+		ExchangedDocumentType ed = doc.getExchangedDocument();
+		List<NoteType> noteList = ed.getIncludedNote();
+		List<Object> res = new ArrayList<Object>(noteList.size());
+		noteList.forEach(note -> {
+			res.add(note);
+		});
+		return res;
+	}
+
+	@Override
 	public void setNote(String subjectCode, String content) {
 		addNote(subjectCode, content);
 	}
@@ -492,51 +507,29 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public void setNote(String content) {
 		setNote(null, content);
 	}
-	List<NoteType> addNote(String subjectCode, String noteContent) {
-		ExchangedDocumentType ed = this.getExchangedDocument();
-		List<NoteType> noteList = ed.getIncludedNote();
+	public void addNote(String subjectCode, String noteContent) {
 		NoteType note = new NoteType();
+		TextType content = new TextType();
+		content.setValue(noteContent);
+		note.getContent().add(content);
 		if(subjectCode!=null) {
-			CodeType code = new CodeType();
-			code.setValue(subjectCode);
-			note.setSubjectCode(code); //  z.B ADU
+			TextType subject = new TextType();
+			subject.setValue(subjectCode);
+			note.setSubject(subject); //  z.B ADU
 		}
-		List<TextType> textList = note.getContent();
-		textList.add(newTextType(noteContent));
-		noteList.add(note);
-		return noteList;
+		addNote(note);
 	}
-	/*
-
-        <ram:IncludedNote>
-            <ram:Content>[Invoice note]</ram:Content>
-            <ram:SubjectCode>ADU</ram:SubjectCode>                  <============ wird weggelassen bei get
-        </ram:IncludedNote>
-
-
-	 */
-	List<NoteType> addNotes(CrossIndustryInvoiceType doc) {
-		List<String> noteContentList = getNotes(doc);
-		noteContentList.forEach(noteContent -> {
-			this.addNote(null, noteContent);
-		});
-		return this.getExchangedDocument().getIncludedNote();
+	public void addNote(Object note) {
+//		ExchangedDocumentType ed = this.getExchangedDocument();
+		exchangedDocument.getIncludedNote().add((NoteType)note);
+		super.setExchangedDocument(exchangedDocument);
 	}
-
-	@Override
-	public List<String> getNotes() {
-		return getNotes(this);
-	}
-	static List<String> getNotes(CrossIndustryInvoiceType doc) {
-		ExchangedDocumentType ed = doc.getExchangedDocument();
-		List<NoteType> noteList = ed.getIncludedNote();
-		List<String> res = new ArrayList<String>(noteList.size());
+	void addNotes(CrossIndustryInvoiceType doc) {
+//		ExchangedDocumentType ed = doc.getExchangedDocument();
+		List<Object> noteList = getNotes(doc);
 		noteList.forEach(note -> {
-			CodeType code = note.getSubjectCode();
-			if(code!=null) LOG.warning("---SubjectCode:"+code.getValue() + "(wird weggelassen), Content:"+note.getContent().get(0).getValue());
-			res.add(note.getContent().get(0).getValue());
+			exchangedDocument.getIncludedNote().add((NoteType)note);
 		});
-		return res;
 	}
 
 	/* PROCESS CONTROL                             BG-2                        1 (mandatory) 
@@ -1321,6 +1314,16 @@ TODO
 	}
 
 	// ----------------- 
+	@Override
+	public BusinessParty createParty(String name, PostalAddress address, IContact contact) {
+		return new TradeParty(name, address, contact); 
+	}
+
+	@Override
+	public BusinessParty createParty(BusinessParty party) {
+		return new TradeParty((TradePartyType)party); 
+	}
+
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
 		TradeParty party = new TradeParty();
