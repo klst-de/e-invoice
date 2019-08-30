@@ -49,8 +49,8 @@ public interface CoreInvoiceLine {
 	 * 
 	 * @param text Text
 	 */
-	public void setNoteText(String text);
-	public String getNoteText();
+	public void setNote(String text);
+	public String getNote();
 
 	/*
 	 * Eine vom Verkäufer angegebene Kennung für einen Gegenstand, auf dem die Rechnungsposition basiert

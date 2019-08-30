@@ -116,7 +116,6 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return stringBuilder.toString();
 	}
 	
-// -------------- implements
 	// BT-126 ++ 1..1 Invoice line identifier
 	void setId(String id) {
 //		LOG.info("isInvoiceLineType:"+isInvoiceLineType + " id:"+id);
@@ -135,7 +134,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 
 	// BT-127 ++ 0..1 Invoice line note
 	@Override // TODO umbenennen in setNote
-	public void setNoteText(String text) {
+	public void setNote(String text) {
 		if(text==null) return;
 		NoteType note = new NoteType();
 		note.setValue(text);
@@ -147,7 +146,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	}
 
 	@Override // TODO umbenennen in getNote
-	public String getNoteText() {
+	public String getNote() {
 		List<NoteType> noteList = isInvoiceLineType ? iLine.getNote() : cnLine.getNote();
 		return noteList.isEmpty() ? null : noteList.get(0).getValue(); // wg. 0..1
 	}

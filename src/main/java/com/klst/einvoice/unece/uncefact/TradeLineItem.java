@@ -117,7 +117,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	@Override // 0 .. n IncludedNote.Content BT-127
-	public void setNoteText(String text) {
+	public void setNote(String text) {
 		if(text==null) return;
 		NoteType note = new NoteType();
 		note.getContent().add(CrossIndustryInvoice.newTextType(text)); // Kardinalität: 1 .. 1 TODO test
@@ -126,7 +126,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	@Override 
-	public String getNoteText() {
+	public String getNote() {
 		if(associatedDocumentLineDocument.getIncludedNote().isEmpty()) return null;
 		List<TextType> textList = associatedDocumentLineDocument.getIncludedNote().get(0).getContent();
 		return textList.isEmpty() ? null : textList.get(0).getValue();
