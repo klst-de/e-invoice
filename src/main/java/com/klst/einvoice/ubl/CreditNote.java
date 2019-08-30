@@ -24,6 +24,7 @@ import com.klst.untdid.codelist.TaxCategoryCode;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.MonetaryTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyType;
@@ -864,8 +865,11 @@ public class CreditNote extends CreditNoteType implements CoreInvoice {
 	 */
 	@Override
 	public void addLine(CoreInvoiceLine line) {
-		List<CreditNoteLineType> lines = this.getCreditNoteLine();
-		lines.add((CreditNoteLineType)line);
+//		List<CreditNoteLineType> lines = this.getCreditNoteLine();
+//		lines.add((CreditNoteLineType)line);
+		List<CreditNoteLineType> lines = super.getCreditNoteLine();
+		GenericLine<CreditNoteLineType> l = (GenericLine<CreditNoteLineType>)line;
+		lines.add(l.get());
 	}
 	
 	public List<CreditNoteLineType> addLines(CreditNoteType doc) {
@@ -877,15 +881,24 @@ public class CreditNote extends CreditNoteType implements CoreInvoice {
 		return resultLines;
 	}
 	
-	public List<CreditNoteLine> getLines() {
+	public List<GenericLine<CreditNoteLineType>> getLines() {
 		return getLines(this);
 	}
 
-	static List<CreditNoteLine> getLines(CreditNoteType doc) {
+//	static List<CreditNoteLine> getLines(CreditNoteType doc) {
+//		List<CreditNoteLineType> lines = doc.getCreditNoteLine();
+//		List<CreditNoteLine> resultLines = new ArrayList<CreditNoteLine>(lines.size());
+//		lines.forEach(line -> {
+//			resultLines.add(new CreditNoteLine(line));
+//		});
+//		return resultLines;
+//	}
+	static List<GenericLine<CreditNoteLineType>> getLines(CreditNoteType doc) {
 		List<CreditNoteLineType> lines = doc.getCreditNoteLine();
-		List<CreditNoteLine> resultLines = new ArrayList<CreditNoteLine>(lines.size());
+		List<GenericLine<CreditNoteLineType>> resultLines = new ArrayList<GenericLine<CreditNoteLineType>>(lines.size());
 		lines.forEach(line -> {
-			resultLines.add(new CreditNoteLine(line));
+			GenericLine<CreditNoteLineType> gil = new GenericLine<CreditNoteLineType>(line);
+			resultLines.add(gil);
 		});
 		return resultLines;
 	}

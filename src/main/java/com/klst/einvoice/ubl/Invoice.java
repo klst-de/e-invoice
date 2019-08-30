@@ -1562,8 +1562,9 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 	 */
 	@Override
 	public void addLine(CoreInvoiceLine line) {
-		List<InvoiceLineType> lines = this.getInvoiceLine();
-		lines.add((InvoiceLineType)line);
+		List<InvoiceLineType> lines = super.getInvoiceLine();
+		GenericLine<InvoiceLineType> l = (GenericLine<InvoiceLineType>)line;
+		lines.add(l.get());
 	}
 
 	public List<InvoiceLineType> addLines(InvoiceType doc) {
@@ -1575,15 +1576,25 @@ der gezahlte Betrag größer als der Rechnungsgesamtbetrag einschließlich Umsat
 		return resultLines;
 	}
 	
-	public List<InvoiceLine> getLines() {
+	public List<GenericLine<InvoiceLineType>> getLines() {
 		return getLines(this);
 	}
 
-	static List<InvoiceLine> getLines(InvoiceType doc) {
+//	static List<InvoiceLine> XXXgetLines(InvoiceType doc) {
+//		List<InvoiceLineType> lines = doc.getInvoiceLine();
+//		List<InvoiceLine> resultLines = new ArrayList<InvoiceLine>(lines.size());
+//		lines.forEach(line -> {
+//			GenericLine<InvoiceLineType> gil = new GenericLine<InvoiceLineType>(line);
+//			resultLines.add(new InvoiceLine(line));
+//		});
+//		return resultLines;
+//	}
+	static List<GenericLine<InvoiceLineType>> getLines(InvoiceType doc) {
 		List<InvoiceLineType> lines = doc.getInvoiceLine();
-		List<InvoiceLine> resultLines = new ArrayList<InvoiceLine>(lines.size());
+		List<GenericLine<InvoiceLineType>> resultLines = new ArrayList<GenericLine<InvoiceLineType>>(lines.size());
 		lines.forEach(line -> {
-			resultLines.add(new InvoiceLine(line));
+			GenericLine<InvoiceLineType> gil = new GenericLine<InvoiceLineType>(line);
+			resultLines.add(gil);
 		});
 		return resultLines;
 	}
