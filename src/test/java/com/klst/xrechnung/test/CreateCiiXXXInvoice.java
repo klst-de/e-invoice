@@ -247,7 +247,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         			, testLine.getTaxCategory(), testLine.getTaxRate() // mandatory, rate can be null
         			);
         	
-        	line.setNoteText(testLine.getNoteText()); // opt
+        	line.setNote(testLine.getNote()); // opt
         	line.setDescription(testLine.getDescription());
         	line.setSellerAssignedID(testLine.getSellerAssignedID()); // 0..1 BT-128 ram:SellerAssignedID
         	List<Object> cl = testLine.getClassificationList();

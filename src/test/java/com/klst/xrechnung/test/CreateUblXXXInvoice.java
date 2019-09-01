@@ -140,7 +140,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 //			testLine.getNotes().forEach(note -> {
 //				targetLine.setNoteText(note);
 //			});
-			targetLine.setNoteText(testLine.getNoteText());
+			targetLine.setNote(testLine.getNote());
 			
 //			testLine.getOrderLineIDs().forEach(lineRef -> {
 //				targetLine.setOrderLineID(lineRef);
@@ -318,7 +318,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 //			testLine.getNotes().forEach(note -> {
 //				targetLine.setNoteText(note);
 //			});
-        	targetLine.setNoteText(testLine.getNoteText());
+        	targetLine.setNote(testLine.getNote());
         	
 //			testLine.getOrderLineIDs().forEach(lineRef -> {
 //				targetLine.setOrderLineID(lineRef);

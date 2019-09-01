@@ -1,6 +1,7 @@
 package com.klst.einvoice.ubl;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -9,6 +10,7 @@ import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
+import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CommodityClassificationType;
@@ -17,14 +19,17 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Invo
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemIdentificationType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderLineReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PeriodType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PriceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.AccountingCostType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BaseQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditedQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DescriptionType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EndDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InvoicedQuantityType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ItemClassificationCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineIDType;
@@ -32,6 +37,8 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PercentType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PriceAmountType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.StartDateType;
+import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.DateType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.QuantityType;
 
 //ohne von T abzuleiten habe ich keinen Zugtiff auf die protected Member:
@@ -145,7 +152,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		}	
 	}
 
-	@Override // TODO umbenennen in getNote
+	@Override
 	public String getNote() {
 		List<NoteType> noteList = isInvoiceLineType ? iLine.getNote() : cnLine.getNote();
 		return noteList.isEmpty() ? null : noteList.get(0).getValue(); // wg. 0..1
@@ -155,12 +162,28 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	 * (non-Javadoc)
 	 * @see com.klst.einvoice.CoreInvoiceLine#getIssuerAssignedID()
 	 */
-	public String getIssuerAssignedID() {
-		LOG.warning(NOT_IMPEMENTED); // TODO
-		return null;
-	}
 	public void setIssuerAssignedID(String id, String schemeID) {
 		LOG.warning(NOT_IMPEMENTED); // TODO
+ 		if(id==null) return;
+		ItemIdentificationType itemIdentification = new ItemIdentificationType();
+		itemIdentification.setID(Invoice.newIDType(id, schemeID));
+		
+		if(isInvoiceLineType) {
+			ItemType item = iLine.getItem();
+			item.getAdditionalItemIdentification().add(itemIdentification);
+			iLine.setItem(item);
+		} else {
+			ItemType item = cnLine.getItem();
+			item.getAdditionalItemIdentification().add(itemIdentification);
+			cnLine.setItem(item);
+		}	
+	}
+	public String getIssuerAssignedID() {
+		LOG.warning(NOT_IMPEMENTED); // TODO keine Beispiele              ManufacturersItemIdentification ???????????????????
+		// oder                                                           AdditionalItemIdentification   ????????????????
+		ItemType item = isInvoiceLineType ? iLine.getItem() : cnLine.getItem();
+		List<ItemIdentificationType> list = item.getAdditionalItemIdentification();
+		return list.isEmpty() ? null : list.get(0).getID().getValue(); // wg. 0..1
 	}
 
 	// BT-129 ++ 1..1 Invoiced quantity
@@ -247,7 +270,59 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return accountingCost==null ? null : accountingCost.getValue();
 	}
 
-	// BG-26 ++ 0..1 INVOICE LINE PERIOD      TODO
+	// BG-26 ++ 0..1 INVOICE LINE PERIOD
+	// BG-26.BT-134 +++ 0..1 Invoice line period start date / Das Datum, an dem der Rechnungszeitraum der betreffenden Rechnungsposition beginnt.
+//	@Override
+	public void setStartDate(String ymd) {	
+		setStartDate(DateTimeFormats.ymdToTs(ymd));
+	}
+//	@Override
+	public void setStartDate(Timestamp ts) {
+		StartDateType date = new StartDateType();
+		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
+		PeriodType period = new PeriodType();
+		period.setStartDate(date);
+		if(isInvoiceLineType) {
+			iLine.getInvoicePeriod().add(period);
+		} else {
+			cnLine.getInvoicePeriod().add(period);
+		}	
+	}
+	
+//	@Override
+	public Timestamp getStartDateAsTimestamp() {
+		List<PeriodType> list = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
+		if(list.isEmpty()) return null;
+		DateType date = (DateType)list.get(0).getStartDate();
+		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
+	}
+	
+	// BG-26.BT-135 +++ 0..1 Invoice line period end date
+//	@Override
+	public void setEndDate(String ymd) {	
+		setEndDate(DateTimeFormats.ymdToTs(ymd));
+	}
+//	@Override
+	public void setEndDate(Timestamp ts) {
+		EndDateType date = new EndDateType();
+		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
+		PeriodType period = new PeriodType();
+		period.setEndDate(date);
+		if(isInvoiceLineType) {
+			iLine.getInvoicePeriod().add(period);
+		} else {
+			cnLine.getInvoicePeriod().add(period);
+		}	
+	}
+	
+//	@Override
+	public Timestamp getEndDate() {
+		List<PeriodType> list = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
+		if(list.isEmpty()) return null;
+		DateType date = (DateType)list.get(0).getEndDate();
+		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
+	}
+	
 	// BG-27 ++ 0..n INVOICE LINE ALLOWANCES  TODO
 	
 	/*
