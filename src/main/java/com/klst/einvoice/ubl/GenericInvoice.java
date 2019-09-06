@@ -1057,13 +1057,14 @@ UBL:
 	}
 
 	// BG-25 + 1..n INVOICE LINE
-	@Override           // TODO raus 
+	@Override
 	public void addLine(CoreInvoiceLine line) {
-		// TODO Auto-generated method stub
-		
+		if(line instanceof GenericLine<?>) {
+			addLine((GenericLine<?>)line);
+		}
 	}
-//	@Override
-	public void addLine(GenericLine<?> line) {
+
+	void addLine(GenericLine<?> line) {
 		if(isInvoiceType) {
 			InvoiceLineType l = (InvoiceLineType)line.get();
 			invoice.getInvoiceLine().add(l);
