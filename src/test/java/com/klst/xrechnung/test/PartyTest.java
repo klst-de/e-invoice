@@ -113,7 +113,7 @@ public class PartyTest {
     	supplierparty = null;
 		supplierParty = invoice.get().getAccountingSupplierParty();
 		if(supplierParty!=null) {
-			supplierparty = invoice.getSellerParty();
+			supplierparty = invoice.getSeller();
 			LOG.info("supplierparty.RegistrationName:"+ (supplierparty.getRegistrationName())
 					+" .BusinessName:"+ (supplierparty.getBusinessName()) );
 			testAddress = invoice.createAddress("CC", "9-PC", "String city");
@@ -122,7 +122,7 @@ public class PartyTest {
 		customerparty = null;
 		customerParty = invoice.get().getAccountingCustomerParty();
 		if(customerParty!=null) {
-			customerparty = invoice.getBuyerParty();
+			customerparty = invoice.getBuyer();
 			LOG.info("customerparty.RegistrationName:"+ (customerparty.getRegistrationName()) 
 					+" .BusinessName:"+ (customerparty.getBusinessName()) );
 		}
@@ -135,7 +135,7 @@ public class PartyTest {
     	Address address = null;
     	Contact contact = null;
     	invoice.setBuyer(name, address, contact);
-    	BG7_Buyer party = invoice.getBuyerParty();
+    	BG7_Buyer party = invoice.getBuyer();
 		assertEquals(name, party.getRegistrationName());
 		assertEquals(address, party.getAddress());
 		assertEquals(contact, party.getIContact());
@@ -253,7 +253,7 @@ public class PartyTest {
     	LOG.info("testAddress:" + testAddress);
 //    	SupplierPartyType sp = invoice.getAccountingSupplierParty();
 //    	Party sellerparty = new Party(sp.getParty());
-    	BG4_Seller sellerparty = invoice.getSellerParty();
+    	BG4_Seller sellerparty = invoice.getSeller();
     	LOG.info("seller address:" + sellerparty.getAddress() + " contact:"+sellerparty.getIContact());
     	assertEquals(testAddress.getCountryCode(), sellerparty.getAddress().getCountryCode());	
     	assertNull(sellerparty.getIContact());
@@ -276,7 +276,7 @@ public class PartyTest {
     	assertNull(customerparty.getIContact());
     	invoice.setBuyer("buyerName", testAddress, null); //contact);
     	LOG.info("testAddress:" + testAddress);
-    	BG7_Buyer buyerparty = (BG7_Buyer)invoice.getBuyerParty();
+    	BG7_Buyer buyerparty = (BG7_Buyer)invoice.getBuyer();
     	LOG.info("testAddress:" + testAddress +", buyer address:" + buyerparty.getAddress() + " contact:"+buyerparty.getIContact());
     	assertEquals(testAddress.getCountryCode(), buyerparty.getAddress().getCountryCode());	
     	assertNull(buyerparty.getIContact());

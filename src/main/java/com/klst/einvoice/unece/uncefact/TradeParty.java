@@ -79,21 +79,21 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	
 	LegalOrganizationType legalOrganization;
 	
-	/**
-	 * 
-	 * @param name             BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
-	 * @param address          BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
-	 * @param contact          BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
-	 * @param companyId        BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
-	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
-	 */
-	@Deprecated
-	TradeParty(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
-		this();
-		init(name, address, contact); //, companyId, companyLegalForm);
-		setCompanyId(companyId);
-		setCompanyLegalForm(companyLegalForm);
-	}
+//	/**
+//	 * 
+//	 * @param name             BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
+//	 * @param address          BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
+//	 * @param contact          BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
+//	 * @param companyId        BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
+//	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
+//	 */
+//	@Deprecated
+//	TradeParty(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+//		this();
+//		init(name, address, contact); //, companyId, companyLegalForm);
+//		setCompanyId(companyId);
+//		setCompanyLegalForm(companyLegalForm);
+//	}
 	
 	/**
 	 * ctor for BusinessParty - use BusinessPartyFactory method

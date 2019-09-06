@@ -83,8 +83,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			});
 		LOG.info("finished makeOptionals.");
 		
-		ublInvoice.setSellerParty(testCN.getSellerParty());
-		ublInvoice.setBuyerParty(testCN.getBuyerParty());
+		ublInvoice.setSeller(testCN.getSeller());
+		ublInvoice.setBuyer(testCN.getBuyer());
 		ublInvoice.setPayee(testCN.getPayee());
 		ublInvoice.setTaxRepresentative(testCN.getTaxRepresentative());
 
@@ -175,10 +175,10 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setBuyerReference(testDoc.getBuyerReferenceValue());
 		LOG.info("ublInvoice "+ublInvoice);
 		
-		ublInvoice.setSellerParty(testDoc.getSellerParty());
-		LOG.info("Seller Address and Contact "+ublInvoice.getSellerParty().getAddress() + " "+ublInvoice.getSellerParty().getIContact());
-		ublInvoice.setBuyerParty(testDoc.getBuyerParty());
-		LOG.info("Buyer Address and Contact "+ublInvoice.getBuyerParty().getAddress() + " "+ublInvoice.getBuyerParty().getIContact());
+		ublInvoice.setSeller(testDoc.getSeller());
+		LOG.info("Seller Address and Contact "+ublInvoice.getSeller().getAddress() + " "+ublInvoice.getSeller().getIContact());
+		ublInvoice.setBuyer(testDoc.getBuyer());
+		LOG.info("Buyer Address and Contact "+ublInvoice.getBuyer().getAddress() + " "+ublInvoice.getBuyer().getIContact());
 		
 		makeOptionals(ublInvoice);
 		

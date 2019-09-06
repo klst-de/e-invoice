@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BG4_Seller;
+import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
@@ -137,13 +139,13 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 //		addPaymentTerms(doc);
 		addNotes(doc);	
 		LOG.info("\n SellerParty:");;
-		setSellerParty(getSellerParty(doc));
+		setSeller(getSellerParty(doc));
 		LOG.info("\n BuyerParty:");;
-		setBuyerParty(getBuyerParty(doc));
+		setBuyer(getBuyerParty(doc));
 		LOG.info("\n PayeeParty:");;
-		setPayeeParty(getPayeeParty(doc));
+		setPayee(getPayeeParty(doc));
 		LOG.info("\n SellerTaxRepresentativeParty:");;
-		setTaxRepresentativeParty(getTaxRepresentativeParty(doc)); // optional
+		setTaxRepresentative(getTaxRepresentativeParty(doc)); // optional
 		LOG.info("\n ...");
 		
 //		addPaymentInstructions(doc);		
@@ -638,25 +640,24 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 * @param companyId optional / Seller legal registration identifier, BT-30/R52
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
 	 */
-	public void setSeller(String name, PostalAddress address, IContact contact, 
-			String companyId, String companyLegalForm) {
+	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		                               // BT-27 , BG-5   , BG-6          , BT-30    , BT-33
 		TradeParty party = new TradeParty(name, address, contact); //, companyId, companyLegalForm);
 		party.setCompanyId(companyId);
 		party.setCompanyLegalForm(companyLegalForm);
-		setSellerParty(party);
+		setSeller(party);
 	}
 	
-	public void setSellerParty(TradeParty party) {
+	public void setSeller(BusinessParty party) {
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setSellerTradeParty(party);
+		headerTradeAgreement.setSellerTradeParty((TradePartyType)party);
 		
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
 		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
 	}
 
-	public TradeParty getSellerParty() {
+	public BG4_Seller getSeller() {
 		return getSellerParty(this);
 	}
 	static TradeParty getSellerParty(CrossIndustryInvoiceType doc) {
@@ -665,45 +666,23 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		return sellerParty==null ? null : new TradeParty(sellerParty);
 	}
 
-//	/**
-//	 * set optional taxCompanyId  / Seller VAT identifier, BG-4.BT-31, R52
-//	 * 
-//	 * @param taxCompany Identifier
-//	 */
-//	@Deprecated // use Party
-//	public void setSellerTaxCompanyId(String taxCompanyId) {
-//		if(taxCompanyId==null) return;
-//		TaxRegistrationType taxRegistration = new TaxRegistrationType();
-//		taxRegistration.setID(newIDType(taxCompanyId, null));
-//		TradeParty party = getSellerParty();
-////		party.getSpecifiedTaxRegistration().add(taxRegistration);
-//		party.addPartyTaxID(taxCompanyId); //, schemeID); 
-//	}
-//	@Deprecated // use Party
-//	public String getSellerTaxCompanyId() { // ohne Schema!
-//		TradeParty party = getSellerParty();
-//		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration();
-//		if(taxRegistrationList.isEmpty()) return null;
-//		return taxRegistrationList.get(0).getID().getValue();
-//	}
-
 	/* BUYER                                       BG-7                        1 (mandatory) 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Erwerber liefern.
 	 */
 	public void setBuyer(String name, PostalAddress address, IContact contact) {
 		TradeParty party = new TradeParty(name, address, contact); // BT-44, BG-8, BG-9
-		setBuyerParty(party);
+		setBuyer(party);
 	}
-	public void setBuyerParty(TradeParty party) {
+	public void setBuyer(BusinessParty party) {
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setBuyerTradeParty(party);
+		headerTradeAgreement.setBuyerTradeParty((TradePartyType) party);
 		
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
 		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
 	}
 
-	public TradeParty getBuyerParty() {
+	public BG7_Buyer getBuyer() {
 		return getBuyerParty(this);
 	}
 	static TradeParty getBuyerParty(CrossIndustryInvoiceType doc) {
@@ -738,13 +717,13 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		TradeParty party = new TradeParty(name, null, null);
 		party.setId(id);
 		party.setCompanyLegalForm(companyLegalForm);
-		setPayeeParty(party);
+		setPayee(party);
 	}
-	public void setPayeeParty(TradeParty party) {
-		applicableHeaderTradeSettlement.setPayeeTradeParty(party);
+	public void setPayee(BusinessParty party) {
+		applicableHeaderTradeSettlement.setPayeeTradeParty((TradePartyType) party);
 	}
 
-	public TradeParty getPayeeParty() {
+	public BusinessParty getPayee() {
 		TradePartyType payeeParty = applicableHeaderTradeSettlement.getPayeeTradeParty();
 		return payeeParty==null ? null : new TradeParty(payeeParty);
 	}
@@ -765,18 +744,18 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public void setTaxRepresentative(String name, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
 		TradeParty party = new TradeParty(name, address, null);
 		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
-		setTaxRepresentativeParty(party);
+		setTaxRepresentative(party);
 	}
-	public void setTaxRepresentativeParty(TradeParty party) {
+	public void setTaxRepresentative(BusinessParty party) {
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setSellerTaxRepresentativeTradeParty(party);
+		headerTradeAgreement.setSellerTaxRepresentativeTradeParty((TradePartyType) party);
 		
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
 		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
 	}
 
-	public TradeParty getTaxRepresentativeParty() {
+	public BusinessParty getTaxRepresentativeParty() {
 		return getTaxRepresentativeParty(this);
 	}
 	static TradeParty getTaxRepresentativeParty(CrossIndustryInvoiceType doc) {

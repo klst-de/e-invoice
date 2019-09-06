@@ -112,12 +112,8 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 	}
 
 	void init(String customization, String profile, DocumentNameCode code) {
-//		taxTotalFirst = new TaxTotalType();
-//		super.getTaxTotal().add(taxTotalFirst); // garantiert ein elem in List<TaxTotalType> 
 		setProcessControl(customization, profile); // BG-2
 		setTypeCode(code); // BT-3	
-//		sellerParty = null;
-//		buyerParty = null;		
 		LOG.info("ctor "+this);
 	}
 	
@@ -530,9 +526,9 @@ UBL:
 		BusinessParty party = createParty(name, address, contact); 
 		party.setCompanyId(companyId);
 		party.setCompanyLegalForm(companyLegalForm);
-		setSellerParty(party);
+		setSeller(party);
 	}
-	public void setSellerParty(BusinessParty party) { // TODO umbenennen in setSeller 
+	public void setSeller(BusinessParty party) {
 		SupplierPartyType supplierParty = new SupplierPartyType();
 		supplierParty.setParty((PartyType) party);
 		if(isInvoiceType) {
@@ -542,7 +538,7 @@ UBL:
 		}
 	}
 	
-	public BG4_Seller getSellerParty() { // TODO umbenennen in getSeller 
+	public BG4_Seller getSeller() {
 		SupplierPartyType supplierParty = isInvoiceType ? invoice.getAccountingSupplierParty() : creditNote.getAccountingSupplierParty();
 		return supplierParty==null ? null : new Party(supplierParty.getParty());
 	}
@@ -550,9 +546,9 @@ UBL:
 	// BG-7 + 1..1 BUYER
 	public void setBuyer(String name, PostalAddress address, IContact contact) {
 		BusinessParty party = createParty(name, address, contact); 
-		setBuyerParty(party);
+		setBuyer(party);
 	}
-	public void setBuyerParty(BusinessParty party) {  // TODO umbenennen in setBuyer 
+	public void setBuyer(BusinessParty party) {
 		CustomerPartyType customerparty = new CustomerPartyType();
 		customerparty.setParty((PartyType)party);
 		if(isInvoiceType) {
@@ -562,7 +558,7 @@ UBL:
 		}
 	}
 	
-	public BG7_Buyer getBuyerParty() {   // TODO umbenennen in getBuyer 
+	public BG7_Buyer getBuyer() {
 		CustomerPartyType customerparty = isInvoiceType ? invoice.getAccountingCustomerParty() : creditNote.getAccountingCustomerParty();
 		return customerparty==null ? null : new Party(customerparty.getParty());
 	}
