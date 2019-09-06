@@ -1,7 +1,6 @@
 package com.klst.einvoice;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 import com.klst.untdid.codelist.DocumentNameCode;
 
