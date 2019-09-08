@@ -314,12 +314,54 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void setBuyerReference(String reference);
 	public String getBuyerReferenceValue();
 
-	// BT-11 Project reference
-	public void setProjectReference(String reference, String schemeID);
-	public String getProjectReferenceValue();
+	/**
+	 * Project reference
+	 * <p>
+	 * The identification of the project the invoice refers to
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-11
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R44
+	 * 
+	 * @param Document reference
+	 */
+	public void setProjectReference(String id);
+	public void setProjectReference(String id, String name); // name nur in CII Beispielen 05 13 15
+	public String getProjectReference();
 	
-	// BT-12 Contract reference                                        TODO
-	// BT-13 Purchase order reference                                  TODO
+	/**
+	 * Contract reference
+	 * <p>
+	 * The identification of a contract. 
+	 * The contract identifier should be unique in the context of the specific trading relationship and for a defined time period.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-12
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R7
+	 * 
+	 * @param Document reference
+	 */
+	// Eine eindeutige Bezeichnung des Vertrages (z. B. Vertragsnummer).
+	public void setContractReference(String id);
+	public String getContractReference();
+	
+	/**
+	 * Purchase order reference
+	 * <p>
+	 * An identifier of a referenced purchase order, issued by the Buyer. 
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-13
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R5, R56
+	 * 
+	 * @param Document reference
+	 */
+	// Eine vom Erwerber ausgegebene Kennung für eine referenzierte Bestellung.
+	public void setPurchaseOrderReference(String id);
+	public String getPurchaseOrderReference();
 	
 	/**
 	 * Sales order reference
@@ -333,8 +375,8 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * 
 	 * @param Document reference
 	 */
-	public void setOrderReferenceID(String docRefId);
-	public String getOrderReferenceID();
+	public void setOrderReference(String docRefId);
+	public String getOrderReference();
 
 	// BT-15 Receiving advice reference                                TODO 
 	// BT-16 Despatch advice reference                                 TODO
@@ -409,6 +451,8 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	
 	// VAT BREAKDOWN BG-23 1..* (mandatory)
 	public void addVATBreakDown(CoreInvoiceVatBreakdown vatBreakdown);
+	
+	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	
 	// INVOICE LINE  BG-25 1..* (mandatory)
 	public void addLine(CoreInvoiceLine line);

@@ -138,7 +138,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setTaxCurrency(getTaxCurrency(doc)); // optional
 		setTaxPointDate(getTaxPointDateAsTimestamp(doc)); // optional
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional
-		setOrderReferenceID(getOrderReferenceID(doc)); // optional
+		setOrderReference(getOrderReferenceID(doc)); // optional
 //		addPaymentTerms(doc);
 		addNotes(doc);	
 		LOG.info("\n SellerParty:");;
@@ -445,6 +445,11 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		return text==null ? null : text.getValue();
 	}
 	
+	// BT-11 + 0..1 Project reference
+	@Override
+	public void setProjectReference(String docRefId) {
+		setProjectReference(docRefId, null);
+	}
 	@Override
 	public void setProjectReference(String docRefId, String name) {
 		if(docRefId==null) return; // optional
@@ -461,20 +466,47 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	}
 
 	@Override
-	public String getProjectReferenceValue() {
+	public String getProjectReference() {
+		LOG.warning(NOT_IMPEMENTED); // TODO
+		return null;
+	}
+
+	// BT-12 + 0..1 Contract reference
+	@Override
+	public void setContractReference(String id) {
+		// TODO test daten in 03 06 08 15
+		
+	}
+
+	@Override
+	public String getContractReference() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	// BT-13 + 0..1 Purchase order reference
+	@Override
+	public void setPurchaseOrderReference(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getPurchaseOrderReference() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// BT-14 + 0..1 Sales order reference
 /* IssuerAssignedID Verkaufsauftragsreferenz
 	1 .. 1 ApplicableHeaderTradeAgreement Gruppierung der Vertragsangaben
 	0 .. 1 SellerOrderReferencedDocument Detailangaben zur zugehörigen Auftragsbestätigung xs:sequence 
-	1 .. 1 IssuerAssignedID Verkaufsauftragsreferenz BT-14 
+	1 .. 1 IssuerAssignedID Verkaufsauftragsreferenz                                                     BT-14 
 	0 .. 1 FormattedIssueDateTime Details zum Auftragsbestätigungsdatum xs:sequence 
 	1 .. 1 DateTimeString Auftragsbestätigungsdatum, Wert required format Datum, Format
  */
 	@Override
-	public void setOrderReferenceID(String docRefId) {
+	public void setOrderReference(String docRefId) {
 		if(docRefId==null) return; // optional
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
 		referencedDocument.setIssuerAssignedID(newIDType(docRefId, null)); // null : No identification scheme
@@ -487,7 +519,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
 	}
 	@Override
-	public String getOrderReferenceID() {
+	public String getOrderReference() {
 		return getOrderReferenceID(this);
 	}
 	static String getOrderReferenceID(CrossIndustryInvoiceType doc) {

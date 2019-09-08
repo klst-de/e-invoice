@@ -335,10 +335,14 @@ UBL:
 
  */
 	@Override
-	public void setProjectReference(String id, String schemeID) {
+	public void setProjectReference(String id) {
+		setProjectReference(id, null);
+	}
+	@Override
+	public void setProjectReference(String id, String name) {
 		if(id==null) return; // optional
 		ProjectReferenceType projectReference = new ProjectReferenceType();
-		projectReference.setID(Invoice.newIDType(id, schemeID));
+		projectReference.setID(Invoice.newIDType(id, null));
 		if(isInvoiceType) {
 			invoice.getProjectReference().add(projectReference);
 		} else {
@@ -347,8 +351,8 @@ UBL:
 	}
 
 	@Override
-	public String getProjectReferenceValue() { // ohne schemeID     TODO umbennenen in ProjectReferenceId
-		// creditNore.getProjectReference() undefined
+	public String getProjectReference() {
+		// creditNote.getProjectReference() undefined
 		List<ProjectReferenceType> list = isInvoiceType ? invoice.getProjectReference() : new ArrayList<ProjectReferenceType>();
 		return list.isEmpty() ? null : list.get(0).getID().getValue(); // wg. 0..1
 	}
@@ -365,11 +369,11 @@ UBL:
         <cbc:ID>CR987654</cbc:ID>
     </cac:ContractDocumentReference>
  */
-//	@Override
-	public void setContractReference(String id, String schemeID) {
+	@Override
+	public void setContractReference(String id) {
 		if(id==null) return; // optional
 		DocumentReferenceType reference = new DocumentReferenceType();
-		reference.setID(Invoice.newIDType(id, schemeID));
+		reference.setID(Invoice.newIDType(id, null));
 		if(isInvoiceType) {
 			invoice.getContractDocumentReference().add(reference);
 		} else {
@@ -377,16 +381,26 @@ UBL:
 		}
 	}
 
-//	@Override
-	public String getContractReferenceId() {
+	@Override
+	public String getContractReference() {
 		List<DocumentReferenceType> list = isInvoiceType ? invoice.getContractDocumentReference() : creditNote.getContractDocumentReference();
 		return list.isEmpty() ? null : list.get(0).getID().getValue(); // wg. 0..1
 	}
 
 	// BT-13 + 0..1 Purchase order reference
+	@Override
+	public void setPurchaseOrderReference(String id) {
+		LOG.warning(NOT_IMPEMENTED); // TODO
+	}
+	@Override
+	public String getPurchaseOrderReference() {
+		LOG.warning(NOT_IMPEMENTED); // TODO
+		return null;	
+	}
+	
 	// BT-14 + 0..1 Sales order reference
 	@Override
-	public void setOrderReferenceID(String docRefId) {
+	public void setOrderReference(String docRefId) {
 		if(docRefId==null) return; // optional
 		OrderReferenceType orderReference = new OrderReferenceType();
 		orderReference.setID(Invoice.newIDType(docRefId, null)); // null : No identification scheme
@@ -399,7 +413,7 @@ UBL:
 	}
 
 	@Override
-	public String getOrderReferenceID() {
+	public String getOrderReference() {
 		OrderReferenceType orderRef = isInvoiceType ? invoice.getOrderReference() : creditNote.getOrderReference();
 		if(orderRef==null) return null;
 		return orderRef.getID().getValue();
