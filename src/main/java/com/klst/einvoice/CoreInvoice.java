@@ -238,28 +238,40 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * 
 	 * @param code
 	 */
+	/* Folgende Codes aus der Codeliste UNTDID 2005 werden verwendet:
+	 *   3 (Invoice document issue date time)
+	 *  35 (Delivery date/time, actual)
+	 * 432 (Paid to date)
+	 * Das Informationselement „Value added tax point date code“ (BT-8) wird verwendet, 
+	 * wenn das Informationselement „Value added tax point date“ (BT-7) zum Zeitpunkt der Rechnungsstellung noch nicht bekannt ist.
+	 * Die Anwendung von BT-7 und 8 schließen sich gegenseitig aus.
+	 * 
+0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung BG-23
+0 .. 1 DueDateTypeCode Code für das Datum der Steuerfälligkeit BT-8
+	 */
 	// BT-8 Value added tax point date code - in ubl nicht definiert ???
 	// In Deutschland ist das Liefer- und Leistungsdatum maßgebend (BT-72)
-//	public void setTaxPointDateCode(String code);
-//	public String getTaxPointDateCode();
+	public void setTaxPointDateCode(String code);
+	public String getTaxPointDateCode();
 
-//	/**
-//	 * Payment due date 
-//	 * <p>
-//	 * The date when the payment is due.
-//	 * <br>
-//	 * The payment due date reflects the due date of the net payment. 
-//	 * For partial payments it states the first net due date. 
-//	 * <p>
-//	 * Cardinality: 0..1 (optional)
-//	 * <br>EN16931-ID: 	BT-9
-//	 * <br>Rule ID: 	BR-CO-25
-//	 * <br>Request ID: 	R60
-//	 * 
-//	 * @param ymd Date, optional: can be null
-//	 */
-//	public void setDueDate(String ymd);
-//	public void setDueDate(Timestamp ts);
+	/**
+	 * Payment due date 
+	 * <p>
+	 * The date when the payment is due.
+	 * <br>
+	 * The payment due date reflects the due date of the net payment. 
+	 * For partial payments it states the first net due date. 
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-9
+	 * <br>Rule ID: 	BR-CO-25
+	 * <br>Request ID: 	R60
+	 * 
+	 * @param ymd Date, optional: can be null
+	 */
+	// CII: SpecifiedTradePaymentTerms.DueDateDateTime.DateTimeString
+	public void setDueDate(String ymd);
+	public void setDueDate(Timestamp ts);
 	public Timestamp getDueDateAsTimestamp();
 
 	/**
