@@ -818,7 +818,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
 	}
 
-	public BusinessParty getTaxRepresentativeParty() {
+	public BusinessParty getTaxRepresentative() {
 		return getTaxRepresentativeParty(this);
 	}
 	static TradeParty getTaxRepresentativeParty(CrossIndustryInvoiceType doc) {

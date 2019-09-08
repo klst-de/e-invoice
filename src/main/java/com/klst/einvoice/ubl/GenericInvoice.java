@@ -547,12 +547,14 @@ UBL:
 	}
 	
 	// BG-4 + 1..1 SELLER
+	@Override
 	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		BusinessParty party = createParty(name, address, contact); 
 		party.setCompanyId(companyId);
 		party.setCompanyLegalForm(companyLegalForm);
 		setSeller(party);
 	}
+	@Override
 	public void setSeller(BusinessParty party) {
 		SupplierPartyType supplierParty = new SupplierPartyType();
 		supplierParty.setParty((PartyType) party);
@@ -563,16 +565,19 @@ UBL:
 		}
 	}
 	
+	@Override
 	public BG4_Seller getSeller() {
 		SupplierPartyType supplierParty = isInvoiceType ? invoice.getAccountingSupplierParty() : creditNote.getAccountingSupplierParty();
 		return supplierParty==null ? null : new Party(supplierParty.getParty());
 	}
 	
 	// BG-7 + 1..1 BUYER
+	@Override
 	public void setBuyer(String name, PostalAddress address, IContact contact) {
 		BusinessParty party = createParty(name, address, contact); 
 		setBuyer(party);
 	}
+	@Override
 	public void setBuyer(BusinessParty party) {
 		CustomerPartyType customerparty = new CustomerPartyType();
 		customerparty.setParty((PartyType)party);
@@ -583,12 +588,14 @@ UBL:
 		}
 	}
 	
+	@Override
 	public BG7_Buyer getBuyer() {
 		CustomerPartyType customerparty = isInvoiceType ? invoice.getAccountingCustomerParty() : creditNote.getAccountingCustomerParty();
 		return customerparty==null ? null : new Party(customerparty.getParty());
 	}
 	
 	// BG-10 + 0..1 PAYEE
+	@Override
 	public void setPayee(String name, String id, String companyLegalForm) {
 		BusinessParty party = createParty(null, null, null);
 		party.setBusinessName(name);  // !!!!!
@@ -596,6 +603,7 @@ UBL:
 		party.setId(id);
 		setPayee(party);
 	}
+	@Override
 	public void setPayee(BusinessParty party) {
 		if(isInvoiceType) {
 			invoice.setPayeeParty((PartyType)party);
@@ -604,17 +612,20 @@ UBL:
 		}
 	}
 	
+	@Override
 	public BusinessParty getPayee() {
 		PartyType party = isInvoiceType ? invoice.getPayeeParty() : creditNote.getPayeeParty();
 		return party==null ? null : new Party(party);
 	}
 
 	// BG-11 + 0..1 SELLER TAX REPRESENTATIVE PARTY
+	@Override
 	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
 		BusinessParty party = createParty(registrationName, address, null);
 		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
 		setTaxRepresentative(party);
 	}
+	@Override
 	public void setTaxRepresentative(BusinessParty party) {
 		if(isInvoiceType) {
 			invoice.setTaxRepresentativeParty((PartyType)party);
@@ -623,6 +634,7 @@ UBL:
 		}
 	}
 	
+	@Override
 	public BusinessParty getTaxRepresentative() {
 		PartyType party = isInvoiceType ? invoice.getTaxRepresentativeParty() : creditNote.getTaxRepresentativeParty();
 		return party==null ? null : new Party(party);

@@ -165,7 +165,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			cii.setPayee(testPayeeParty.getRegistrationName(), testPayeeParty.getId(), testPayeeParty.getCompanyLegalForm());
 		}
 		
-		BusinessParty testSellerTaxRepresentativeParty = testDoc.getTaxRepresentativeParty();
+		BusinessParty testSellerTaxRepresentativeParty = testDoc.getTaxRepresentative();
 		if(testSellerTaxRepresentativeParty==null) {
 			LOG.warning("testSellerTaxRepresentativeParty==null" );
 		} else {
@@ -272,7 +272,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		
 //		cii.setProjectReference("PR12345678", "Project reference");
 		
-		cii.setOrderReferenceID(testDoc.getOrderReferenceID()); // BT-14 + 0..1
+		cii.setOrderReference(testDoc.getOrderReference()); // BT-14 + 0..1
 		
 		List<Object> noteList = testDoc.getNotes();
 		noteList.forEach(note -> {

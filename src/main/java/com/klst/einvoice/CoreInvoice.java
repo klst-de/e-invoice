@@ -25,7 +25,7 @@ Eine andere mögliche Namensgebung wären die Profilnamen mit Hierarhie
  - CoreInvoiceExtended extends CoreInvoiceEN16931              -- Erweiterung der EN 16931-1
 
  */
-public interface CoreInvoice extends BG1_InvoiceNote, BG2_ProcessControl, BG22_DocumentTotals, 
+public interface CoreInvoice extends BG1_InvoiceNote, BG2_ProcessControl, BG3_PrecedingInvoiceReference, BG22_DocumentTotals, 
 	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
 
 	/**
@@ -387,64 +387,41 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	// BT-20 @see setPaymentTermsAndDate
 	
 	// BG-1 + 0..n INVOICE NOTE @see BG1_InvoiceNote
-//	/**
-//	 * INVOICE NOTE
-//	 * <p>
-//	 * A group of business terms providing textual notes that are relevant for the invoice, 
-//	 * together with an indication of the note subject.
-//	 * <p>
-//	 * Cardinality: 	0..n (optional)
-//	 * <br>EN16931-ID: 	BG-1 , BT-21,BT-22
-//	 * <br>Rule ID: 	
-//	 * <br>Request ID: 	R56
-//	 * 
-//	 * @param SubjectCode - To be chosen from the entries in UNTDID 4451, BT-21 / 0..1
-//	 * @param Invoice note Content - BT-22 / 1..1
-//	 * A textual note that gives unstructured information that is relevant to the Invoice as a whole.
-//	 * Such as the reason for any correction or assignment note in case the invoice has been factored.
-//	 */
-//	public void setNote(String subjectCode, String content);
-//	public void setNote(String content);
-//	public List<String> getNotes();
 
 	// BG-2 + 1..1 PROCESS CONTROL @see BG2_ProcessControl
-	
-	/**
-	 * PRECEDING INVOICE REFERENCE
-	 * <p>
-	 * A group of business terms providing information on one or more preceding Invoices.
-	 * To be used in case:
-	 * <br>- a preceding invoice is corrected
-	 * <br>- preceding partial invoices are referred to from a final invoice
-	 * <br>- preceding pre-payment invoices are referred to from a final invoice
-	 * <p>
-	 * Cardinality: 	0..n (optional)
-	 * <br>EN16931-ID: 	BG-3 , BT-25,BT-26,BT-26-0
-	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R11, R12
-	 * 
-	 * @param docRefId - Preceding Invoice reference, BT-25 / 1..1
-	 * @param date ymd - Preceding Invoice issue date, BT-26 / 0..1
-	 */
-	public void setPrecedingInvoiceReference(String docRefId, String ymd);
-	public void setPrecedingInvoiceReference(String docRefId);
-	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts);
-	public String getPrecedingInvoiceReference();
-	
-	// BG-4 + 1..1 SELLER @see BG4_Seller
-	// public void setSellerParty(BG_Party party);
-	// public BG_Party getSellerParty();
-	// BG-5 ++ 1..1 SELLER POSTAL ADDRESS
-	// BG-6 ++ 0..1 SELLER CONTACT
 
-	// BG-7 + 1..1 BUYER
-	// public void setBuyerParty(BG_Party party);
-	// public BG_Party getBuyerParty();
-	// BG-8 ++ 1..1 BUYER POSTAL ADDRESS
-	// BG-9 ++ 0..1 BUYER CONTACT
+	// BG-3 + 0..n PRECEDING INVOICE REFERENCE @see BG3_PrecedingInvoiceReference
+
+	// BG-4 + 1..1 SELLER @see BG4_Seller
+	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm);
+	public void setSeller(BusinessParty party);
+	public BG4_Seller getSeller();
+	
+	// BG-5 ++ 1..1 SELLER POSTAL ADDRESS @see PostalAddress
+	// BG-6 ++ 0..1 SELLER CONTACT @see IContact
+
+	// BG-7 + 1..1 BUYER @see BG7_Buyer
+	public void setBuyer(String name, PostalAddress address, IContact contact);
+	public void setBuyer(BusinessParty party);
+	public BG7_Buyer getBuyer();
+	
+	// BG-8 ++ 1..1 BUYER POSTAL ADDRESS @see PostalAddress
+	// BG-9 ++ 0..1 BUYER CONTACT @see IContact
 	
 	// BG-10 + 0..1 PAYEE
-	// TODO ...
+	public void setPayee(String name, String id, String companyLegalForm);
+	public void setPayee(BusinessParty party);
+	public BusinessParty getPayee();
+	
+	// BG-11 + 0..1 SELLER TAX REPRESENTATIVE PARTY @see BG11_SellerTaxRepresentativeParty
+	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID);
+	public void setTaxRepresentative(BusinessParty party);
+	public BusinessParty getTaxRepresentative();
+	
+	// BG-12 ++ 1..1 SELLER TAX REPRESENTATIVE POSTAL ADDRESS @see PostalAddress
+	
+	// BG-13 + 0..1 DELIVERY INFORMATION
+	// TODO IF spezifizieren
 	
 // CopyIndicator . Datentyp: udt:IndicatorType . Kardinalität: 0 .. 1 , nur EXTENDED
 // LanguageID Sprachkennzeichen . Datentyp: udt:IDType . Kardinalität: 0 .. 1 , nur EXTENDED

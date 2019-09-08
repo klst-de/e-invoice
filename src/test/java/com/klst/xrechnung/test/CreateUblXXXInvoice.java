@@ -76,7 +76,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setBuyerReference(testCN.getBuyerReferenceValue());
 		
 		LOG.info("makeOptionals...");	
-			ublInvoice.setOrderReferenceID(testCN.getOrderReferenceID());
+			ublInvoice.setOrderReference(testCN.getOrderReference());
 			List<Object> notes = testCN.getNotes();
 			notes.forEach(note -> {
 				ublInvoice.setNote(((NoteType)note).getValue());
@@ -201,7 +201,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 
 	void makeOptionals(GenericInvoice ublInvoice) {	
-		ublInvoice.setOrderReferenceID(testDoc.getOrderReferenceID());
+		ublInvoice.setOrderReference(testDoc.getOrderReference());
 		List<Object> notes = testDoc.getNotes();
 		notes.forEach(note -> {
 			ublInvoice.setNote(((NoteType)note).getValue());
