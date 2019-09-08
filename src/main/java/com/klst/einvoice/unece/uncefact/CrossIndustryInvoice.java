@@ -25,6 +25,7 @@ import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryIn
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CurrencyCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._100.TimeReferenceCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentContextParameterType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
@@ -53,6 +54,8 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements CoreInvoice {
 
 	private static final Logger LOG = Logger.getLogger(CrossIndustryInvoice.class.getName());
+	
+	private static final String NOT_IMPEMENTED = "NOT IMPEMENTED";
 	
 /*
 1 .. 1 ExchangedDocumentContext Prozesssteuerung BG-2 xs:sequence 
@@ -263,11 +266,12 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 
 	/*
 1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
-0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung BG-23
+0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung          BG-23
 
 0 .. 1 TaxPointDate Datum der Steuerfälligkeit xs:choice 
-1 .. 1 DateString Datum der Steuerfälligkeit, Wert BT-7 
-required format Datum, Format BT-7-0
+1 .. 1 DateString Datum der Steuerfälligkeit, Wert             BT-7 
+required format Datum, Format                                  BT-7-0
+0 .. 1 DueDateTypeCode Code für das Datum der Steuerfälligkeit BT-8
 
 Anwendung: In Deutschland wird dieses nicht verwendet. 
 Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
@@ -326,8 +330,35 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		HeaderTradeSettlementType applicableHeaderTradeSettlement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement();
 		return getTaxPointDateAsTimestamp(applicableHeaderTradeSettlement);
 	}
+	
+	// BT-8 + 0..1 Value added tax point date code
+	@Override
+	public void setTaxPointDateCode(String code) {
+		if(code==null) return;  // optional
+		TimeReferenceCodeType timeReferenceCode = new TimeReferenceCodeType();
+		timeReferenceCode.setValue(code);
+		TradeTaxType tradeTax = new TradeTaxType();
+		tradeTax.setDueDateTypeCode(timeReferenceCode);
+		applicableHeaderTradeSettlement.getApplicableTradeTax().add(tradeTax);
+	}
+
+	@Override
+	public String getTaxPointDateCode() {
+		LOG.warning(NOT_IMPEMENTED); // TODO
+		return null;
+	}
 
 	// BT-9 0..1 DueDateDateTime Fälligkeitsdatum
+	@Override
+	public void setDueDate(String ymd) {
+		setDueDate(DateTimeFormats.ymdToTs(ymd));
+	}
+
+	@Override
+	public void setDueDate(Timestamp ts) {
+		setPaymentTermsAndDate(null, ts);
+	}
+
 	@Override
 	public Timestamp getDueDateAsTimestamp() {
 		return getDueDateAsTimestamp(applicableHeaderTradeSettlement);

@@ -230,6 +230,7 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 	 * 
 	 * Anwendung: In Deutschland wird dieses nicht verwendet. 
 	 *            Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
+	 *       Bsp: ubl-tc434-example2.xml ==> <cbc:TaxPointDate>2013-06-30</cbc:TaxPointDate>
 	 */
 	@Override
 	public void setTaxPointDate(String ymd) {	
@@ -254,25 +255,35 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 	}
 
 	// BT-8 + 0..1 Value added tax point date code
+	/* Folgende Codes aus der Codeliste UNTDID 2005 werden verwendet:
+	 *   3 (Invoice document issue date time)
+	 *  35 (Delivery date/time, actual)
+	 * 432 (Paid to date)
+	 * Das Informationselement „Value added tax point date code“ (BT-8) wird verwendet, 
+	 * wenn das Informationselement „Value added tax point date“ (BT-7) zum Zeitpunkt der Rechnungsstellung noch nicht bekannt ist.
+	 * Die Anwendung von BT-7 und 8 schließen sich gegenseitig aus.
+	 * 
+0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung BG-23
+0 .. 1 DueDateTypeCode Code für das Datum der Steuerfälligkeit BT-8
+	 */
 	// In Deutschland ist das Liefer- und Leistungsdatum maßgebend (BT-72)
-//	public void setTaxPointDateCode(String code);
-//	public String getTaxPointDateCode();
-	// keine Beispiele
-	// CII: 0 .. 1 DueDateTypeCode Code für das Datum der Steuerfälligkeit BT-8
+	// keine Beispiele 
+	@Override
 	public void setTaxPointDateCode(String code) {
-		LOG.warning(NOT_IMPEMENTED); // TODO
+		LOG.warning(NOT_IMPEMENTED); // TODO in ubl nicht definiert ???
 	}
+	@Override
 	public String getTaxPointDateCode() {
 		LOG.warning(NOT_IMPEMENTED); // TODO
 		return null;	
 	}
 	
 	// BT-9 + 0..1 Payment due date
-//	@Override
+	@Override
 	public void setDueDate(String ymd) {
 		setDueDate(DateTimeFormats.ymdToTs(ymd));
 	}
-//	@Override
+	@Override
 	public void setDueDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		DueDateType dueDate = new DueDateType();
