@@ -25,13 +25,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
  * Actual delivery date                        BT-72                  Date 0..1
  * INVOICING PERIOD                            BG-14                       0..1
  * DELIVER TO ADDRESS                          BG-15                       0..1
-
-1 .. 1 SupplyChainTradeTransaction Gruppierung der Informationen zum Geschäftsvorfall
-0 .. 1 ShipToTradeParty Lieferinfomationen                        BG-13 xs:sequence 
-0 .. 1 ID Kennung des Lieferorts                                  BT-71 
-0 .. n GlobalID Globaler Identifier der Kennung für den Lieferort BT-71-0 
-       required schemeID Kennung des Schemas                      BT-71-1 
-0 .. 1 Name Name des Waren- oder Dienstleistungsempfängers        BT-70
  */
 public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 
@@ -60,37 +53,10 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 		setId(iD);
 	}
 
-/*
-
-    <cac:Delivery>
-        <cbc:ActualDeliveryDate>2018-04-13+01:00</cbc:ActualDeliveryDate>
-        <cac:DeliveryLocation>
-            <cbc:ID>68</cbc:ID>
-            <cac:Address>
-                <cbc:StreetName>[Deliver to street]</cbc:StreetName>
-                <cbc:AdditionalStreetName>4. OG</cbc:AdditionalStreetName>
-                <cbc:CityName>[Deliver to city]</cbc:CityName>
-                <cbc:PostalZone>98765</cbc:PostalZone>
-                <cbc:CountrySubentity>Bayern</cbc:CountrySubentity>
-                <cac:Country>
-                    <cbc:IdentificationCode>DE</cbc:IdentificationCode>
-                </cac:Country>
-            </cac:Address>
-        </cac:DeliveryLocation>
-        <cac:DeliveryParty>
-            <cac:PartyName>
-                <cbc:Name>[Deliver to party name]</cbc:Name>
-            </cac:PartyName>
-        </cac:DeliveryParty>
-    </cac:Delivery>
-
-
- */
 	// BT-70 ++ 0..1 Deliver to party name
 	// BT-71 ++ 0..1 Deliver to location + 0..1 Scheme identifier
 	// BT-72 ++ 0..1 Actual delivery date
 	// BG-15 ++ 0..1 DELIVER TO ADDRESS
-
 	public Delivery(String name, Timestamp ts, PostalAddress address, String locationId) {
 		this();
 		init(name, ts, address, locationId);
@@ -107,11 +73,11 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	}
 	
 	// Party with businessName
-	public void setParty(Party party) {
+	void setParty(Party party) {
 		super.setDeliveryParty((PartyType)party);
 	}
 	
-	public Party getParty() {
+	Party getParty() {
 		return getParty(this);
 	}
 	
@@ -143,27 +109,13 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	}
 
 	@Override
-	public String getRegistrationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setRegistrationName(String name) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public String getBusinessName() {
-		// TODO Auto-generated method stub
-		return null;
+		return getParty().getBusinessName();
 	}
 
 	@Override
 	public void setBusinessName(String name) {
-		// TODO Auto-generated method stub
-		
+		getParty().setBusinessName(name);
 	}
 
 	@Override
@@ -175,18 +127,12 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 
 	@Override
 	public void setId(String name) {
-//		setId(name, null);
 		setId(Invoice.newIDType(name, null));
 	}
 	
 	@Override
 	public void setId(String name, String schemeID) {
 		setId(Invoice.newIDType(name, schemeID));
-//		if(name==null) return;
-//		LocationType location = super.getDeliveryLocation();
-//		if(location==null) location = new LocationType();
-//		location.setID(Invoice.newIDType(name, schemeID));
-//		super.setDeliveryLocation(location);
 	}
 	
 	void setId(IDType iD) {
@@ -195,66 +141,6 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 		if(location==null) location = new LocationType();
 		location.setID(iD);
 		super.setDeliveryLocation(location);
-	}
-
-	@Override
-	public String getCompanyId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setCompanyId(String name) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setCompanyId(String name, String schemeID) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getTaxRegistrationId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getTaxRegistrationId(String schemeID) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setTaxRegistrationId(String name, String schemeID) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getCompanyLegalForm() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setCompanyLegalForm(String name) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getUriUniversalCommunication() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setUriUniversalCommunication(String name, String schemeID) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

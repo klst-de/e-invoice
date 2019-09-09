@@ -219,7 +219,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					);
 		}
 		ublInvoice.setTaxRepresentative(testDoc.getTaxRepresentative());
-		ublInvoice.addDelivery(testDoc.getDeliveries());
+		ublInvoice.setStartDate(testDoc.getStartDateAsTimestamp());
+		ublInvoice.setEndDate(testDoc.getEndDateAsTimestamp());
+		ublInvoice.setDelivery(testDoc.getDelivery());
 		
 		LOG.info("finished.");
 	}

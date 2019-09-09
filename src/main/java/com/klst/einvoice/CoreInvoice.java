@@ -2,6 +2,7 @@ package com.klst.einvoice;
 
 import java.sql.Timestamp;
 
+import com.klst.einvoice.ubl.Delivery;
 import com.klst.untdid.codelist.DocumentNameCode;
 
 /*
@@ -25,7 +26,7 @@ Eine andere mögliche Namensgebung wären die Profilnamen mit Hierarhie
  - CoreInvoiceExtended extends CoreInvoiceEN16931              -- Erweiterung der EN 16931-1
 
  */
-public interface CoreInvoice extends BG1_InvoiceNote, BG2_ProcessControl, BG3_PrecedingInvoiceReference, BG22_DocumentTotals, 
+public interface CoreInvoice extends BG1_InvoiceNote, BG2_ProcessControl, BG3_PrecedingInvoiceReference, BG14_InvoicingPeriod, BG22_DocumentTotals, 
 	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
 
 	/**
@@ -420,8 +421,21 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	
 	// BG-12 ++ 1..1 SELLER TAX REPRESENTATIVE POSTAL ADDRESS @see PostalAddress
 	
-	// BG-13 + 0..1 DELIVERY INFORMATION
-	// TODO IF spezifizieren
+	// BG-13 + 0..1 DELIVERY INFORMATION @see BG13_DeliveryInformation
+	/**
+	 * set DELIVERY INFORMATION
+	 * 
+	 * @param name - BT-70 (optional) Deliver to party name
+	 * @param ts - BT-72 (optional) Actual delivery date
+	 * @param address - BG-15 (optional) DELIVER TO ADDRESS
+	 * @param locationId - BT-71 (optional) Deliver to location
+	 * @param scheme - BT-71-0 (optional) Deliver to location Scheme identifier
+	 */
+	public void setDelivery(String name, Timestamp ts, PostalAddress address, String locationId, String schemeId);
+	public void setDelivery(Delivery delivery);
+	public Delivery getDelivery();
+	
+	// BG-14 ++ 0..1 INVOICING PERIOD @see BG14_InvoicingPeriod
 	
 // CopyIndicator . Datentyp: udt:IndicatorType . Kardinalität: 0 .. 1 , nur EXTENDED
 // LanguageID Sprachkennzeichen . Datentyp: udt:IDType . Kardinalität: 0 .. 1 , nur EXTENDED

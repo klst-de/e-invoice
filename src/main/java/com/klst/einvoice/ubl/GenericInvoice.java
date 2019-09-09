@@ -641,29 +641,12 @@ UBL:
 	}
 	
 	// BG-13 + 0..1 DELIVERY INFORMATION
-/* Testdaten                                  01.02a-INVOICE_ubl.xml - nur cbc:ActualDeliveryDate
- *                                            01.05a-INVOICE_ubl.xml - cac:DeliveryLocation + DeliveryParty
- *                                            01.06a-INVOICE_ubl.xml 
- *                                            01.10a-INVOICE_ubl.xml
- *                                            01.14a-INVOICE_ubl.xml
-  <cac:Delivery>
-    <!-- Details zur Lieferung -->
-    <!-- Delivery details -->
-    <cbc:ActualDeliveryDate>2012-11-18</cbc:ActualDeliveryDate>
-    <cac:DeliveryLocation>
-      <cac:Address>
-        <cbc:StreetName>Hintere Zollamtsstraße</cbc:StreetName>
-        <cbc:BuildingNumber>4</cbc:BuildingNumber>
-        <cbc:CityName>Wien</cbc:CityName>
-        <cbc:PostalZone>1030</cbc:PostalZone>
-        <cac:Country>
-          <cbc:IdentificationCode>AT</cbc:IdentificationCode>
-        </cac:Country>
-      </cac:Address>
-    </cac:DeliveryLocation>
-  </cac:Delivery>
-*/
-	public List<DeliveryType> addDelivery(Delivery delivery) {
+	public void setDelivery(String name, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
+		Delivery delivery = new Delivery(name, ts, address, locationId); // TODO für schemeId fehlen Beispiele
+		setDelivery(delivery);
+	}
+	@Override
+	public void setDelivery(Delivery delivery) {
 		List<DeliveryType> deliveryList;
 		if(isInvoiceType) {
 			deliveryList = invoice.getDelivery();
@@ -671,78 +654,71 @@ UBL:
 			deliveryList = creditNote.getDelivery();
 		}
 		deliveryList.add(delivery);
-		return deliveryList;
-	}
-	public List<DeliveryType> addDelivery(List<Delivery> deliveryList) {
-		deliveryList.forEach(delivery -> {
-			this.addDelivery(delivery);
-		});
-		if(isInvoiceType) {
-			return invoice.getDelivery();
-		} else {
-			return creditNote.getDelivery();
-		}
 	}
 
-	public List<Delivery> getDeliveries() {
+	@Override
+	public Delivery getDelivery() {
 		List<DeliveryType> deliveryList = isInvoiceType ? invoice.getDelivery() : creditNote.getDelivery();
-		List<Delivery> result = new ArrayList<Delivery>(deliveryList.size());
-		deliveryList.forEach(delivery -> {
-			result.add(new Delivery(delivery));
-		});
-		return result;
+		if(deliveryList.isEmpty()) return null;
+		return new Delivery(deliveryList.get(0));
 	}
-	
+
 	// BG-14 ++ 0..1 INVOICING PERIOD
+	List<PeriodType> periodList = null;
+	PeriodType getPeriod0() {
+		if(periodList==null) {
+			periodList = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
+			if(periodList.isEmpty()) {
+				LOG.info("periodList.isEmpty()");
+				PeriodType period = new PeriodType();
+				periodList.add(period);
+			}
+		} 
+		return periodList.get(0);
+	}
 	// BG-14.BT-73 +++ 0..1 Invoicing period start date
-//	@Override
+	@Override
 	public void setStartDate(String ymd) {	
 		setStartDate(DateTimeFormats.ymdToTs(ymd));
 	}
-//	@Override
+	@Override
 	public void setStartDate(Timestamp ts) {
+		if(ts==null) return; // optional
 		StartDateType date = new StartDateType();
 		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
-		PeriodType period = new PeriodType();
+		PeriodType period = getPeriod0();
 		period.setStartDate(date);
-		if(isInvoiceType) {
-			invoice.getInvoicePeriod().add(period);
-		} else {
-			creditNote.getInvoicePeriod().add(period);
-		}
 	}
 	
-//	@Override
+	@Override
 	public Timestamp getStartDateAsTimestamp() {
 		List<PeriodType> list = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
 		if(list.isEmpty()) return null;
 		DateType date = (DateType)list.get(0).getStartDate();
+		if(date==null) return null;
 		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
 	}
 	
 	// BG-14.BT-74 +++ 0..1 Invoicing period end date
-//	@Override
+	@Override
 	public void setEndDate(String ymd) {	
 		setEndDate(DateTimeFormats.ymdToTs(ymd));
 	}
-//	@Override
+	@Override
 	public void setEndDate(Timestamp ts) {
+		if(ts==null) return; // optional
 		EndDateType date = new EndDateType();
 		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
-		PeriodType period = new PeriodType();
+		PeriodType period = getPeriod0();
 		period.setEndDate(date);
-		if(isInvoiceType) {
-			invoice.getInvoicePeriod().add(period);
-		} else {
-			creditNote.getInvoicePeriod().add(period);
-		}
 	}
 	
-//	@Override
+	@Override
 	public Timestamp getEndDateAsTimestamp() {
 		List<PeriodType> list = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
 		if(list.isEmpty()) return null;
 		DateType date = (DateType)list.get(0).getEndDate();
+		if(date==null) return null;
 		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
 	}
 	

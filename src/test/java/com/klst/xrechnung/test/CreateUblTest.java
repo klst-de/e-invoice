@@ -1,13 +1,20 @@
 package com.klst.xrechnung.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.sql.Timestamp;
 import java.util.logging.Logger;
 
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import com.klst.einvoice.ubl.Delivery;
+import com.klst.einvoice.ubl.GenericInvoice;
+
+import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CreateUblTest {
@@ -82,6 +89,21 @@ public class CreateUblTest {
         	assertTrue(validation.check(bytes));
     	}
    }
+
+	@Test
+    public void ubl14_Delivery() {
+    	InvoiceFactory factory = new CreateUblXXXInvoice("01.14a-INVOICE_ubl.xml");
+    	Object o = factory.makeInvoice();
+    	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>((InvoiceType)o);
+    	Delivery delivery = ublInvoice.getDelivery();
+    	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), delivery.getActualDate());    // 2018-04-13+01:00 "yyyy-[m]m-[d]d hh:mm:ss[.f...]"
+    	assertEquals("68", delivery.getId()); 
+    	assertEquals("[DE (Bayern), 98765, [Deliver to city]]", delivery.getAddress().toString());
+    	assertEquals("[Deliver to party name]", delivery.getBusinessName()); 
+    	
+    	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getStartDateAsTimestamp()); 
+    	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getEndDateAsTimestamp()); 
+	}
 
 	@Test
     public void ublZZZ() {
