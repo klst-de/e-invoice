@@ -1,11 +1,12 @@
 package com.klst.einvoice.unece.uncefact;
 
+import java.util.List;
+
 import com.klst.einvoice.PostalAddress;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CountryIDType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class TradeAddress extends TradeAddressType implements PostalAddress {
@@ -19,8 +20,12 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 		this();
 		this.setCountryCode(address.getCountryID().getValue());
 		
-		IDType region = address.getCountrySubDivisionID();
-		if(region!=null) this.setCountrySubdivision(region.getValue());
+		List<TextType> regions = address.getCountrySubDivisionName();
+		if(regions.isEmpty()) {
+			// no region
+		} else {
+			this.setCountrySubdivision(regions.get(0).getValue());
+		}
 		
 		this.setPostCode(address.getPostcodeCode()==null ? null : address.getPostcodeCode().getValue());
 		
@@ -108,9 +113,9 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 
 	@Override
 	public void setCountrySubdivision(String countrySubdivision) {
-		IDType region = new IDType();
+		TextType region = new TextType();
 		region.setValue(countrySubdivision);
-		this.setCountrySubDivisionID(region);
+		this.getCountrySubDivisionName().add(region);
 	}
 
 	@Override
@@ -151,8 +156,8 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	
 	@Override
 	public String getCountrySubdivision() {
-		IDType region = super.getCountrySubDivisionID();
-		return region==null ? null : region.getValue();
+		List<TextType> regions = super.getCountrySubDivisionName();
+		return regions.isEmpty() ? null : regions.get(0).getValue();
 	}
 
 	@Override
