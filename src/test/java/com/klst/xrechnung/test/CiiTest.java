@@ -3,6 +3,7 @@ package com.klst.xrechnung.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -12,8 +13,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.PostalAddress;
-import com.klst.einvoice.ubl.Address;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
@@ -115,6 +116,21 @@ public class CiiTest {
     	assertTrue(validation.check(bytes));
    }
 
+	@Test
+    public void ciixml14_Delivery() {
+    	InvoiceFactory factory = new CreateCiiXXXInvoice("01.14a-INVOICE_uncefact.xml");
+    	Object o = factory.makeInvoice();
+    	CrossIndustryInvoice cii = (CrossIndustryInvoice)o;
+    	BG13_DeliveryInformation delivery = cii.getDelivery();
+    	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), delivery.getActualDate());    // 2018-04-13+01:00 "yyyy-[m]m-[d]d hh:mm:ss[.f...]"
+    	assertEquals("68", delivery.getId()); 
+    	assertEquals("[DE (Bayern), 98765, [Deliver to city]]", delivery.getAddress().toString());
+    	assertEquals("[Deliver to party name]", delivery.getBusinessName()); 
+    	
+    	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), cii.getStartDateAsTimestamp()); 
+    	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), cii.getEndDateAsTimestamp()); 
+	}
+	
     @Test
     public void ciiAll() {
     	for(int i=0; i<CII_XML.length; i++) {

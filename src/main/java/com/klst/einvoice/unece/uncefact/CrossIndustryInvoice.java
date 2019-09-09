@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
@@ -35,6 +36,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProcuringProjectType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
@@ -128,6 +130,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 			applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery(htd);
 			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 		}
+		// in ApplicableHeaderTradeSettlement copy ctor
+//		doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getBillingSpecifiedPeriod();
 
 		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
 		setPaymentTermsAndDate(getPaymentTerm(applicableHeaderTradeSettlement), getDueDateAsTimestamp(applicableHeaderTradeSettlement)); // optional
@@ -840,31 +844,109 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 * <br>ID: BG-13
 	 * <br>Req.ID: R31, R32, R57
 	 */
-	public void setDeliveryInformation(String businessName, Timestamp ts, PostalAddress address, String locationId) {
-		applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery(businessName, ts, address, locationId);
+	@Override
+	public void setDelivery(String name, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
+		applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery(name, ts, address, locationId, schemeId);
 		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 	}
 	
-	public void setDeliveryInformation(HeaderTradeDeliveryType headerTradeDelivery) {
-		applicableHeaderTradeDelivery = headerTradeDelivery;
-		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
+	@Override
+	public void setDelivery(BG13_DeliveryInformation delivery) {
+		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery((HeaderTradeDeliveryType) delivery);
 	}
 	
-	public HeaderTradeDeliveryType getDeliveryInformation() {
-//		return getDeliveryInformation(this);
+	@Override
+	public BG13_DeliveryInformation getDelivery() {
 		HeaderTradeDeliveryType headerTradeDelivery = supplyChainTradeTransaction.getApplicableHeaderTradeDelivery();
 		if(headerTradeDelivery==null) return null;
-		return headerTradeDelivery;
+		return new ApplicableHeaderTradeDelivery(headerTradeDelivery);
 	}
-//	static HeaderTradeDeliveryType getDeliveryInformation(CrossIndustryInvoiceType doc) {
-//		HeaderTradeDeliveryType headerTradeDelivery = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
-//		LOG.info("HeaderTradeDeliveryType headerTradeDelivery:"+headerTradeDelivery);
-//		if(headerTradeDelivery==null) return null;
-//		LOG.info("HeaderTradeDeliveryType headerTradeDelivery.getShipToTradeParty():"+headerTradeDelivery.getShipToTradeParty());
-//		return new ApplicableHeaderTradeDelivery(headerTradeDelivery);
-////		return headerTradeDelivery==null ? null : new ApplicableHeaderTradeDelivery(headerTradeDelivery);
-//	}
+
+	// BG-14 ++ 0..1 INVOICING PERIOD
+	SpecifiedPeriodType billingSpecifiedPeriod = null;
+	// TODO vll in ApplicableHeaderTradeSettlement implementieren?
+	SpecifiedPeriodType getBillingSpecifiedPeriod() {
+		if(billingSpecifiedPeriod==null) {
+			billingSpecifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
+			if(billingSpecifiedPeriod==null) {
+				billingSpecifiedPeriod = new SpecifiedPeriodType();
+				applicableHeaderTradeSettlement.setBillingSpecifiedPeriod(billingSpecifiedPeriod);
+			}
+		}
+		return billingSpecifiedPeriod;
+	}
 	
+	// BG-14.BT-73 +++ 0..1 Invoicing period start date
+	/*
+	 * BillingSpecifiedPeriod Detailinformationen zur Rechnungsperiode
+
+             <ram:BillingSpecifiedPeriod>
+                <ram:StartDateTime>
+                    <udt:DateTimeString format="102">20180413</udt:DateTimeString>
+                </ram:StartDateTime>
+                <ram:EndDateTime>
+                    <udt:DateTimeString format="102">20180413</udt:DateTimeString>
+                </ram:EndDateTime>
+            </ram:BillingSpecifiedPeriod>
+            
+            
+       BT-72:     
+           <ram:ActualDeliverySupplyChainEvent>
+                <ram:OccurrenceDateTime>
+                    <udt:DateTimeString format="102">20180413</udt:DateTimeString>
+                </ram:OccurrenceDateTime>
+            </ram:ActualDeliverySupplyChainEvent>
+
+
+
+	 */
+	@Override
+	public void setStartDate(String ymd) {
+		setStartDate(DateTimeFormats.ymdToTs(ymd));
+	}
+
+	@Override
+	public void setStartDate(Timestamp ts) {
+		if(ts==null) return;
+		DateTimeType dateTime = newDateTime(ts);
+		SpecifiedPeriodType specifiedPeriod = getBillingSpecifiedPeriod();
+		specifiedPeriod.setStartDateTime(dateTime);
+	}
+
+	@Override
+	public Timestamp getStartDateAsTimestamp() {
+		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
+		if(specifiedPeriod==null) return null;
+		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
+		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
+//	static String getPaymentTerm(HeaderTradeSettlementType headerTradeSettlement) {
+//	static Timestamp getStartDateAsTimestamp(CrossIndustryInvoiceType doc) {
+//		DateTimeType dateTime = doc. .dateTime..dateTime...dateTime.
+//		return DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+//	}
+
+	@Override
+	public void setEndDate(String ymd) {
+		setEndDate(DateTimeFormats.ymdToTs(ymd));		
+	}
+
+	@Override
+	public void setEndDate(Timestamp ts) {
+		if(ts==null) return;
+		DateTimeType dateTime = newDateTime(ts);
+		SpecifiedPeriodType specifiedPeriod = getBillingSpecifiedPeriod();
+		specifiedPeriod.setEndDateTime(dateTime);
+	}
+
+	@Override
+	public Timestamp getEndDateAsTimestamp() {
+		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
+		if(specifiedPeriod==null) return null;
+		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
+		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
+
 // --------------------------------
 	/** 
 	 * mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER

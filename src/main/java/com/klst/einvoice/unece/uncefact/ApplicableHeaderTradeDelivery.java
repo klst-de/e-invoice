@@ -34,15 +34,16 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 
 	TradeParty party;
 	
-	public ApplicableHeaderTradeDelivery(String businessName, Timestamp ts, PostalAddress address, String locationId) {
+	public ApplicableHeaderTradeDelivery(String businessName, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
 		this();
 	}
 	
-	void init(String businessName, Timestamp ts, PostalAddress address, String locationId) {
+	void init(String businessName, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
 		LOG.info("BT-70/businessName:"+businessName + " BT-72/Timestamp:"+ts + " BG-15 ++ 0..1 DELIVER TO ADDRESS:"+address + " BT-71/locationId:"+locationId);
 		party = new TradeParty(null, address, null);
 		party.setBusinessName(businessName);
 		party.setId(locationId);
+		if(schemeId!=null) party.getGlobalID().add(CrossIndustryInvoice.newIDType(schemeId, null));
 		setParty(party);		
 		setActualDate(ts);
 	}
@@ -64,6 +65,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 
 	@Override
 	public PostalAddress getAddress() {
+		if(party==null) return null;
 		return party.getAddress();
 	}
 
@@ -73,18 +75,9 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 	}
 
 	@Override
-	public String getRegistrationName() {
-		return party.getRegistrationName();
-	}
-
-	@Override
-	public void setRegistrationName(String name) {
-		party.setRegistrationName(name);	
-	}
-
-	@Override
 	public String getBusinessName() {
-		return party.getBusinessName();
+		if(party==null) return null;
+		return party.getPartyName();
 	}
 
 	@Override
@@ -94,6 +87,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 
 	@Override
 	public String getId() {
+		if(party==null) return null;
 		return party.getId();
 	}
 
@@ -105,56 +99,6 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 	@Override
 	public void setId(String name, String schemeID) {
 		party.setId(name, schemeID);		
-	}
-
-	@Override
-	public String getCompanyId() {
-		return party.getCompanyId();
-	}
-
-	@Override
-	public void setCompanyId(String name) {
-		party.setCompanyId(name);	
-	}
-
-	@Override
-	public void setCompanyId(String name, String schemeID) {
-		party.setCompanyId(name, schemeID);		
-	}
-
-	@Override
-	public String getTaxRegistrationId() {
-		return party.getTaxRegistrationId();
-	}
-
-	@Override
-	public String getTaxRegistrationId(String schemeID) {
-		return party.getTaxRegistrationId(schemeID);
-	}
-
-	@Override
-	public void setTaxRegistrationId(String name, String schemeID) {
-		party.setTaxRegistrationId(name, schemeID);		
-	}
-
-	@Override
-	public String getCompanyLegalForm() {
-		return party.getCompanyLegalForm();
-	}
-
-	@Override
-	public void setCompanyLegalForm(String name) {
-		party.setCompanyLegalForm(name);	
-	}
-
-	@Override
-	public String getUriUniversalCommunication() {
-		return party.getUriUniversalCommunication();
-	}
-
-	@Override
-	public void setUriUniversalCommunication(String name, String schemeID) {
-		party.setUriUniversalCommunication(name, schemeID);			
 	}
 
 	@Override
@@ -185,7 +129,18 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 		return DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
 	}
 
-	public String asString() {
-		return getBusinessName()==null ? "null" : getBusinessName();
+	@Override
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[Deliver to party name=");
+		stringBuilder.append(getBusinessName()==null ? "null" : getBusinessName());
+		stringBuilder.append(", Location identifier=");
+		stringBuilder.append(getId()==null ? "null" : getId());
+		stringBuilder.append(", Actual delivery date=");
+		stringBuilder.append(getActualDate()==null ? "null" : getActualDate());
+		stringBuilder.append(", Address=");
+		stringBuilder.append(getAddress()==null ? "null" : getAddress());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
 	}
 }

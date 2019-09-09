@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
@@ -183,16 +184,18 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		LOG.info("testDoc.getPaymentTerm():"+testDoc.getPaymentTerm() + " testDoc.getDueDateAsTimestamp():"+testDoc.getDueDateAsTimestamp());
 		cii.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp()); // BT-9 & BT-20 (optional)
 		
-		ApplicableHeaderTradeDelivery delivery = (ApplicableHeaderTradeDelivery)testDoc.getDeliveryInformation();
+		BG13_DeliveryInformation delivery = testDoc.getDelivery();
 		if(delivery!=null) {
 			LOG.info("delivery:"+delivery);
-			cii.setDeliveryInformation(delivery);
+			cii.setDelivery(delivery);
 //			cii.setDeliveryInformation(delivery.getBusinessName() // String businessName
 //					, delivery.getActualDate() // Timestamp ts
 //					, delivery.getAddress() // PostalAddress address
 //					, delivery.getId() // String locationId
 //					); 
 		}
+		cii.setStartDate(testDoc.getStartDateAsTimestamp());
+		cii.setEndDate(testDoc.getEndDateAsTimestamp());
 		
 		LOG.info("testDoc.RemittanceInformation:"+testDoc.getRemittanceInformation());
 		List<TradeSettlementPaymentMeans> testList = testDoc.getTradeSettlementPaymentMeansList();

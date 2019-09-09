@@ -10,6 +10,7 @@ import com.klst.einvoice.PaymentInstructionsFactory;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
@@ -96,6 +97,8 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 
 		setRemittanceInformation(prList.isEmpty() ? null : prList.get(0).getValue());
 		
+		SpecifiedPeriodType specifiedPeriodType = hts.getBillingSpecifiedPeriod(); // wg. BG14
+		if(specifiedPeriodType!=null) super.setBillingSpecifiedPeriod(specifiedPeriodType);
 	}
 
 	public ApplicableHeaderTradeSettlement(PaymentMeansEnum pmc, String paymentMeansText, String remittanceInformation) {

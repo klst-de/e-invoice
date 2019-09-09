@@ -432,8 +432,8 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * @param scheme - BT-71-0 (optional) Deliver to location Scheme identifier
 	 */
 	public void setDelivery(String name, Timestamp ts, PostalAddress address, String locationId, String schemeId);
-	public void setDelivery(Delivery delivery);
-	public Delivery getDelivery();
+	public void setDelivery(BG13_DeliveryInformation delivery);
+	public BG13_DeliveryInformation getDelivery();
 	
 	// BG-14 ++ 0..1 INVOICING PERIOD @see BG14_InvoicingPeriod
 	

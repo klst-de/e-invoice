@@ -11,6 +11,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.ubl.Delivery;
 import com.klst.einvoice.ubl.GenericInvoice;
 
@@ -95,7 +96,7 @@ public class CreateUblTest {
     	InvoiceFactory factory = new CreateUblXXXInvoice("01.14a-INVOICE_ubl.xml");
     	Object o = factory.makeInvoice();
     	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>((InvoiceType)o);
-    	Delivery delivery = ublInvoice.getDelivery();
+    	BG13_DeliveryInformation delivery = ublInvoice.getDelivery();
     	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), delivery.getActualDate());    // 2018-04-13+01:00 "yyyy-[m]m-[d]d hh:mm:ss[.f...]"
     	assertEquals("68", delivery.getId()); 
     	assertEquals("[DE (Bayern), 98765, [Deliver to city]]", delivery.getAddress().toString());

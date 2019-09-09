@@ -15,6 +15,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
@@ -215,7 +216,7 @@ public class PartyTest {
 //		List<PartyNameType> names = deliveryParty.getPartyName();
 //		assertTrue(names.size()==1);
 //    	assertEquals("Schulungsanbieter", names.get(0).getName().getValue());
-    	Delivery delivery = invoice.getDelivery();
+    	BG13_DeliveryInformation delivery = invoice.getDelivery();
     	assertEquals("Schulungsanbieter", delivery.getBusinessName());
     	
     	PostalAddress address = delivery.getAddress();

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
@@ -646,18 +647,18 @@ UBL:
 		setDelivery(delivery);
 	}
 	@Override
-	public void setDelivery(Delivery delivery) {
+	public void setDelivery(BG13_DeliveryInformation delivery) {
 		List<DeliveryType> deliveryList;
 		if(isInvoiceType) {
 			deliveryList = invoice.getDelivery();
 		} else {
 			deliveryList = creditNote.getDelivery();
 		}
-		deliveryList.add(delivery);
+		deliveryList.add((DeliveryType) delivery);
 	}
 
 	@Override
-	public Delivery getDelivery() {
+	public BG13_DeliveryInformation getDelivery() {
 		List<DeliveryType> deliveryList = isInvoiceType ? invoice.getDelivery() : creditNote.getDelivery();
 		if(deliveryList.isEmpty()) return null;
 		return new Delivery(deliveryList.get(0));
