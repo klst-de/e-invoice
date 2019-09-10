@@ -1,6 +1,7 @@
 package com.klst.einvoice;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import com.klst.untdid.codelist.DocumentNameCode;
 
@@ -447,6 +448,27 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void addVATBreakDown(CoreInvoiceVatBreakdown vatBreakdown);
 	
 	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
+	/**
+	 * use this to add an attached document
+	 * 
+	 * @param docRefId
+	 * @param description
+	 * @param content - the document content
+	 * @param mimeCode
+	 * @param filename
+	 */
+	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename);
+	
+	/**
+	 * use this to add an Eexternal document
+	 * 
+	 * @param docRefId
+	 * @param description
+	 * @param url
+	 */
+	public void addSupportigDocument(String docRefId, String description, String url);
+	
+	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments();
 	
 	// INVOICE LINE  BG-25 1..* (mandatory)
 	public void addLine(CoreInvoiceLine line);

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
@@ -1269,59 +1270,45 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	}
 	
 	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
-	/**
-	 * 
-	 * @param docRefId - BG-24.BT-122 1..1 Supporting document reference
-	 * @param code - BG-24.BT-122-0 / nicht dokumentiert, aber im Bsp. 15
-	 * @param description - BG-24.BT-123 ++ 0..1 Supporting document description
-	 * @param url - BG-24 BT-124 ++ 0..1 External document location
-	 */
-	public void addSupportigDocument(String docRefId, String code, String description, String url) {
+	@Override
+	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
 		referencedDocument.setIssuerAssignedID(CrossIndustryInvoice.newIDType(docRefId, null));
-		if(code!=null) {
-			DocumentCodeType documentCode = new DocumentCodeType();
-			documentCode.setValue(code);
-			referencedDocument.setTypeCode(documentCode);
+		if(description!=null) {
+			referencedDocument.getName().add(CrossIndustryInvoice.newTextType(description));
 		}
+		
+		BinaryObjectType binaryObject = new BinaryObjectType();
+		binaryObject.setValue(content);
+		binaryObject.setMimeCode(mimeCode);
+		binaryObject.setFilename(filename);
+		referencedDocument.getAttachmentBinaryObject().add(binaryObject);
+				
+		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
+		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
+	}
+
+	@Override
+	public void addSupportigDocument(String docRefId, String description, String url) {
+		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
+		referencedDocument.setIssuerAssignedID(CrossIndustryInvoice.newIDType(docRefId, null));
 		if(description!=null) {
 			referencedDocument.getName().add(CrossIndustryInvoice.newTextType(description));
 		}
 		if(url!=null) {
 			referencedDocument.setURIID(CrossIndustryInvoice.newIDType(url, null));
 		}
-//		if()
-		List<BinaryObjectType> boList = referencedDocument.getAttachmentBinaryObject();
-//		List<SpecifiedBinaryFileType> sbfList = referencedDocument.getAttachedSpecifiedBinaryFile()
 				
 		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
 		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
 	}
-	public void addSupportigDocument(String docRefId, String code, String description, Object bo) {
-		
-	}
-/*
-CII: ApplicableHeaderTradeAgreement ...
-            <ram:AdditionalReferencedDocument>
-                <ram:IssuerAssignedID>01_15_Anhang_01.pdf</ram:IssuerAssignedID>
-                <ram:TypeCode>916</ram:TypeCode>
-                <ram:Name>Aufschlüsselung der einzelnen Leistungspositionen</ram:Name>
-                <ram:AttachmentBinaryObject mimeCode="application/pdf" filename="01_15_Anhang_01.pdf"> ... </ram:AttachmentBinaryObject>
-            </ram:AdditionalReferencedDocument>
-            
-0 .. n AdditionalReferencedDocument Rechnungsbegründende Unterlagen BG-24 
-xs:sequence 
-1 .. 1 IssuerAssignedID Dokumentenkennung                           BT-17, BT-18, BT-122
-1 .. 1 TypeCode Typ des referenzierten Dokuments                    BT-17-0, BT-18-0, BT-122-0
-0 .. 1 Name Beschreibung der rechnungsbegründenden Unterlage        BT-123
-0 .. 1 AttachmentBinaryObject Anhangsdokument                       BT-125 
-required mimeCode MIME-Code des Anhangsdokuments                    BT-125-1 
-required filename Dateiname des Anhangsdokuments                    BT-125-2
 
- */
-//	------------------
-//	ApplicableHeaderTradeAgreement
-	
+	@Override
+	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments() {
+		LOG.warning(NOT_IMPEMENTED); // TODO
+		return null;
+	}
+
 	/* INVOICE LINE                                BG-25                       1..* (mandatory)
 	 * Eine Gruppe von Informationselementen, die Informationen über einzelne Rechnungspositionen liefern.
 	 * 
@@ -1334,35 +1321,8 @@ required filename Dateiname des Anhangsdokuments                    BT-125-2
 	 */
 	@Override
 	public void addLine(CoreInvoiceLine line) {
-		LOG.info("CoreInvoiceLine line:"+line + " - Class:"+line.getClass() + " - TaxCategory:"+line.getTaxCategory());
+//		LOG.info("CoreInvoiceLine line:"+line + " - Class:"+line.getClass() + " - TaxCategory:"+line.getTaxCategory());
 		supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem().add((TradeLineItem)line);
-		/*
-TODO
-    <rsm:SupplyChainTradeTransaction>
-        <ram:IncludedSupplyChainTradeLineItem>
-        ...
-            <ram:SpecifiedLineTradeSettlement>
-                <ram:ApplicableTradeTax>
-                    <ram:TypeCode>VAT</ram:TypeCode>
-                    <ram:CategoryCode>S</ram:CategoryCode>                       <============= fehlt/gelöst OK
-                    <ram:RateApplicablePercent>7</ram:RateApplicablePercent>
-                </ram:ApplicableTradeTax>
-                <ram:BillingSpecifiedPeriod>                                     <============= Block fehlt TODO
-                    <ram:StartDateTime>
-                        <udt:DateTimeString format="102">20160101</udt:DateTimeString>
-                    </ram:StartDateTime>
-                    <ram:EndDateTime>
-                        <udt:DateTimeString format="102">20161231</udt:DateTimeString>
-                    </ram:EndDateTime>
-                </ram:BillingSpecifiedPeriod>
-                <ram:SpecifiedTradeSettlementLineMonetarySummation>
-                    <ram:LineTotalAmount>288.79</ram:LineTotalAmount>
-                </ram:SpecifiedTradeSettlementLineMonetarySummation>
-            </ram:SpecifiedLineTradeSettlement>
-
-
-
-		 */
 	}
 	
 	public void addLine(SupplyChainTradeLineItemType line) {
@@ -1372,7 +1332,6 @@ TODO
 
 	public void addLines(CrossIndustryInvoiceType doc) {
 		List<TradeLineItem> tradeLineItemList = getLines(doc);
-//		LOG.info(">>>>>>>>>>>>>> tradeLineItemList#:"+tradeLineItemList.size());
 		tradeLineItemList.forEach(line -> {
 			CoreInvoiceLine invoiceLine = new TradeLineItem(line); // TradeLineItem implements CoreInvoiceLine
 			addLine(invoiceLine);

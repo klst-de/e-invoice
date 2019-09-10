@@ -1,9 +1,11 @@
 package com.klst.xrechnung.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.junit.BeforeClass;
@@ -12,7 +14,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.ubl.Delivery;
+import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.ubl.GenericInvoice;
 
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
@@ -104,6 +106,21 @@ public class UblTest {
     	
     	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getStartDateAsTimestamp()); 
     	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getEndDateAsTimestamp()); 
+	}
+
+	@Test
+    public void ubl15_AdditionalDocs() {
+    	InvoiceFactory factory = new CreateUblXXXInvoice("01.15a-INVOICE_ubl.xml");
+    	Object o = factory.makeInvoice();
+    	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>((InvoiceType)o);
+    	List<BG24_AdditionalSupportingDocs> asdList = ublInvoice.getAdditionalSupportingDocuments();
+    	assertEquals(1, asdList.size());
+    	BG24_AdditionalSupportingDocs asDoc = asdList.get(0);
+    	assertEquals("01_15_Anhang_01.pdf", asDoc.getSupportingDocumentReference());
+    	assertEquals("Aufschlüsselung der einzelnen Leistungspositionen", asDoc.getSupportingDocumentDescription());
+    	assertEquals("application/pdf", asDoc.getAttachedDocumentMimeCode());
+    	assertEquals("01_15_Anhang_01.pdf", asDoc.getAttachedDocumentFilename());
+    	assertNull(asDoc.getExternalDocumentLocation());
 	}
 
 	@Test

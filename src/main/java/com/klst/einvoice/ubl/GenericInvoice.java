@@ -1051,22 +1051,22 @@ UBL:
 	}
 
 	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
+	@Override
 	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
-		AdditionalSupportingDocument asDoc = new AdditionalSupportingDocument(docRefId, description, content, mimeCode, filename);
-		if(isInvoiceType) {
-			invoice.getAdditionalDocumentReference().add(asDoc);
-		} else {
-			creditNote.getAdditionalDocumentReference().add(asDoc);
-		}
+		addSupportigDocument(new AdditionalSupportingDocument(docRefId, description, content, mimeCode, filename));
 	}
+	@Override
 	public void addSupportigDocument(String docRefId, String description, String url) {
-		AdditionalSupportingDocument asDoc = new AdditionalSupportingDocument(docRefId, description, url);
+		addSupportigDocument(new AdditionalSupportingDocument(docRefId, description, url));
+	}
+	void addSupportigDocument(AdditionalSupportingDocument asDoc) {
 		if(isInvoiceType) {
 			invoice.getAdditionalDocumentReference().add(asDoc);
 		} else {
 			creditNote.getAdditionalDocumentReference().add(asDoc);
 		}
 	}
+	@Override
 	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments() {
 		List<DocumentReferenceType> documentReferenceList;
 		if(isInvoiceType) {
