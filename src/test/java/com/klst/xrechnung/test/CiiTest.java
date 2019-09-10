@@ -39,7 +39,7 @@ public class CiiTest {
 			"01.10a-INVOICE_uncefact.xml" , // OK
 			"01.11a-INVOICE_uncefact.xml" ,
 			"01.12a-INVOICE_uncefact.xml" ,
-//			"01.13a-INVOICE_uncefact.xml" , // NOK
+			"01.13a-INVOICE_uncefact.xml" , // NOK
 			"01.14a-INVOICE_uncefact.xml" ,
 			"01.15a-INVOICE_uncefact.xml" ,
 			"zugferd2_invoice_pdfa3b.xml" };

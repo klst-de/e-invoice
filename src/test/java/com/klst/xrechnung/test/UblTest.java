@@ -18,9 +18,9 @@ import com.klst.einvoice.ubl.GenericInvoice;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class CreateUblTest {
+public class UblTest {
 
-	private static final Logger LOG = Logger.getLogger(CreateUblTest.class.getName());
+	private static final Logger LOG = Logger.getLogger(UblTest.class.getName());
 	
 	private static final String[] UBL_XML = {
 			"ubl001.xml" ,

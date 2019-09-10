@@ -68,10 +68,6 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				                          , testSellerParty.getAddress()              // TradeAddress address
 				                          , testSellerParty.getIContact()             // TradeContact contact
 				                          );
-//		TradeParty sellerParty = new TradeParty( testSellerParty.getRegistrationName()     // BT-27 String name
-//				                               , testSellerParty.getAddress()          // TradeAddress address
-//				                               , (TradeContact)(testSellerParty.getIContact())         // TradeContact contact
-//				                               );
 		sellerParty.setBusinessName(testSellerParty.getBusinessName()) ; // BT-28
 		sellerParty.setId(testSellerParty.getId()); // BT-29
 		sellerParty.setCompanyId(testSellerParty.getCompanyId());
@@ -131,7 +127,6 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				+" legal registration identifier (BT-30):"+sellerParty.getCompanyLegalForm()
 				+" VAT identifier (BT-31):"+sellerParty.getTaxRegistrationId()
 				);
-//		sellerParty.setUriUniversalCommunication(testSellerParty.getUriUniversalCommunication()); // BT-34
 		cii.setSeller((TradeParty)sellerParty);
 		
 		BG7_Buyer buyerParty = testDoc.getBuyer();
@@ -155,14 +150,6 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 					+ " Id:"+testPayeeParty.getId()
 					+ " CompanyLegalForm:"+testPayeeParty.getCompanyLegalForm()
 					);
-//			TradeParty payeeParty = new TradeParty( testPayeeParty.getRegistrationName()
-//                    , null         // TradeAddress address
-//                    , null         // TradeContact contact
-//                    , testPayeeParty.getCompanyId()
-//                    , testPayeeParty.getCompanyLegalForm()
-//                    );
-//			payeeParty.setId(testPayeeParty.getId());
-//			cii.setPayeeParty(payeeParty); // alternativ:
 			cii.setPayee(testPayeeParty.getRegistrationName(), testPayeeParty.getId(), testPayeeParty.getCompanyLegalForm());
 		}
 		
@@ -188,11 +175,6 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		if(delivery!=null) {
 			LOG.info("delivery:"+delivery);
 			cii.setDelivery(delivery);
-//			cii.setDeliveryInformation(delivery.getBusinessName() // String businessName
-//					, delivery.getActualDate() // Timestamp ts
-//					, delivery.getAddress() // PostalAddress address
-//					, delivery.getId() // String locationId
-//					); 
 		}
 		cii.setStartDate(testDoc.getStartDateAsTimestamp());
 		cii.setEndDate(testDoc.getEndDateAsTimestamp());

@@ -2,7 +2,6 @@ package com.klst.einvoice;
 
 import java.sql.Timestamp;
 
-import com.klst.einvoice.ubl.Delivery;
 import com.klst.untdid.codelist.DocumentNameCode;
 
 /*
@@ -436,6 +435,10 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public BG13_DeliveryInformation getDelivery();
 	
 	// BG-14 ++ 0..1 INVOICING PERIOD @see BG14_InvoicingPeriod
+	
+	// BG-15 ++ 0..1 DELIVER TO ADDRESS @see PostalAddress
+	
+	// BG-16 + 0..1 PAYMENT INSTRUCTIONS
 	
 // CopyIndicator . Datentyp: udt:IndicatorType . Kardinalität: 0 .. 1 , nur EXTENDED
 // LanguageID Sprachkennzeichen . Datentyp: udt:IDType . Kardinalität: 0 .. 1 , nur EXTENDED
