@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
@@ -29,10 +30,12 @@ import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AttachmentType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ExternalReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.MonetaryTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderReferenceType;
@@ -48,6 +51,8 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BuyerRef
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditNoteTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CustomizationIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentCurrencyCodeType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentDescriptionType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EndDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
@@ -64,6 +69,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmoun
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxInclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPointDateType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.URIType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.DateType;
@@ -1049,21 +1055,35 @@ UBL:
 		return result;
 	}
 
-	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS                     TODO
-	public List<DocumentReferenceType> addAdditionalSupportingDocument(DocumentReferenceType asd) {
-		List<DocumentReferenceType> documentReferenceList = getAdditionalSupportingDocuments();
-		documentReferenceList.add(asd);
-		return documentReferenceList;
+	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
+	public void addSupportigDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename) {
+		AdditionalSupportingDocument asDoc = new AdditionalSupportingDocument(docRefId, code, description, content, mimeCode, filename);
+		if(isInvoiceType) {
+			invoice.getAdditionalDocumentReference().add(asDoc);
+		} else {
+			creditNote.getAdditionalDocumentReference().add(asDoc);
+		}
 	}
-	
-	public List<DocumentReferenceType> getAdditionalSupportingDocuments() {
+	public void addSupportigDocument(String docRefId, String code, String description, String url) {
+		AdditionalSupportingDocument asDoc = new AdditionalSupportingDocument(docRefId, code, description, url);
+		if(isInvoiceType) {
+			invoice.getAdditionalDocumentReference().add(asDoc);
+		} else {
+			creditNote.getAdditionalDocumentReference().add(asDoc);
+		}
+	}
+	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments() {
 		List<DocumentReferenceType> documentReferenceList;
 		if(isInvoiceType) {
 			documentReferenceList = invoice.getAdditionalDocumentReference();
 		} else {
 			documentReferenceList = creditNote.getAdditionalDocumentReference();
 		}
-		return documentReferenceList;
+		List<BG24_AdditionalSupportingDocs> resList = new ArrayList<BG24_AdditionalSupportingDocs>(documentReferenceList.size());
+		documentReferenceList.forEach(doc -> {
+			resList.add(new AdditionalSupportingDocument(doc));
+		});
+		return resList;
 	}
 
 	// BG-25 + 1..n INVOICE LINE

@@ -1,16 +1,14 @@
 package com.klst.einvoice.ubl;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AttachmentType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ExternalReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentDescriptionType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EmbeddedDocumentBinaryObjectType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.URIType;
-import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.BinaryObjectType;
 
 /* ADDITIONAL SUPPORTING DOCUMENTS             BG-24                       0..*  
  * 
@@ -31,79 +29,94 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Bin
  * Attached document/Attached document Filename                            1
  * 
  */
-public class AdditionalSupportingDocument extends DocumentReferenceType { // TODO implements ...
+public class AdditionalSupportingDocument extends DocumentReferenceType implements BG24_AdditionalSupportingDocs {
 
 	AdditionalSupportingDocument() {
 		super();
 	}
 	
 	// copy ctor
-	public AdditionalSupportingDocument(DocumentReferenceType documentReference) {
+	public AdditionalSupportingDocument(DocumentReferenceType doc) {
 		this();
-		setID(documentReference.getID());
-		addDocumentDescription(documentReference);
-		setAttachment(documentReference.getAttachment());
+		EmbeddedDocumentBinaryObjectType embeddedDocumentBinaryObject = getEmbeddedDocumentBinaryObject(doc);
+		if(embeddedDocumentBinaryObject==null) {
+			init(getId(doc), getSupportingDocumentCode(doc), getSupportingDocumentDescription(doc), getExternalDocumentLocation(doc));
+		} else {
+			init(getId(doc), getSupportingDocumentCode(doc), getSupportingDocumentDescription(doc), null);
+			setAttachedDocument(embeddedDocumentBinaryObject.getValue(), embeddedDocumentBinaryObject.getMimeCode(), embeddedDocumentBinaryObject.getFilename());
+		}
 	}
 
-	/*
+	public AdditionalSupportingDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename) {
+		this();
+		init(docRefId, code, description, null);
+		setAttachedDocument(content, mimeCode, filename);
+	}
+	
+	/**
 	 * 
 	 * @param Supporting document reference id, madatory
+	 * @param code, optional
 	 * @param description, optional
+	 * @param url, optional
 	 */
-	public AdditionalSupportingDocument(String id, String description) {
+	public AdditionalSupportingDocument(String docRefId, String code, String description, String url) {
 		this();
-		IDType mID = new IDType();
-		mID.setValue(id);
-		setID(mID);
-		addDocumentDescription(description);
+		init(docRefId, code, description, url);
+	}
+	
+	void init(String docRefId, String code, String description, String url) {
+		setSupportingDocumentReference(docRefId);
+		setSupportingDocumentCode(code);
+		setSupportingDocumentDescription(description);
+		setExternalDocumentLocation(url);
 	}
 
-	public String getId() {
+	@Override
+	public void setSupportingDocumentReference(String id) {
+		super.setID(Invoice.newIDType(id, null));
+	}
+
+	@Override
+	public String getSupportingDocumentReference() {
 		return getId(this);
 	}
 	static String getId(DocumentReferenceType documentReference) {
 		return documentReference.getID().getValue();
 	}
 
-	List<DocumentDescriptionType> addDocumentDescription(DocumentReferenceType documentReference) {
-		List<DocumentDescriptionType> documentDescription = documentReference.getDocumentDescription();
-		List<DocumentDescriptionType> dd = this.getDocumentDescription();
-		documentDescription.forEach(description -> {
-			dd.add(description);
-		});
-		return dd;
-	}
-	
-	List<DocumentDescriptionType> addDocumentDescription(List<String> descriptions) {
-		descriptions.forEach(description -> {
-			addDocumentDescription(description);
-		});
-		return addDocumentDescription((String)null);
-	}
-
-	List<DocumentDescriptionType> addDocumentDescription(String description) {
-		List<DocumentDescriptionType> documentDescription = super.getDocumentDescription();
-		DocumentDescriptionType dd = new DocumentDescriptionType();
-		dd.setValue(description);
-		documentDescription.add(dd);
-		return documentDescription;
-	}
-
-	public List<String> getDescriptions() {
-		List<DocumentDescriptionType> documentDescription = super.getDocumentDescription();
-		List<String> result = new ArrayList<String>(documentDescription.size());
-		documentDescription.forEach(description -> {
-			result.add(description.getValue());
-		});
-		return result;
-	}
-	
-	public String getFirstDescription() {
-		List<DocumentDescriptionType> documentDescription = super.getDocumentDescription();
-		if(documentDescription.isEmpty()) {
-			return null;
+	@Override
+	public void setSupportingDocumentCode(String code) {
+		if(code!=null) {
+			DocumentTypeCodeType documentTypeCode = new DocumentTypeCodeType();
+			documentTypeCode.setValue(code);
+			super.setDocumentTypeCode(documentTypeCode);
 		}
-		return documentDescription.get(0).getValue();
+	}
+
+	@Override
+	public String getSupportingDocumentCode() {
+		return getSupportingDocumentCode(this);
+	}
+	static String getSupportingDocumentCode(DocumentReferenceType documentReference) {
+		return documentReference.getDocumentTypeCode()==null ? null : documentReference.getDocumentTypeCode().getValue();
+	}
+
+	@Override
+	public void setSupportingDocumentDescription(String text) {
+		if(text!=null) {
+			DocumentDescriptionType documentDescription = new DocumentDescriptionType();
+			documentDescription.setValue(text);
+			super.getDocumentDescription().add(documentDescription);
+		}
+	}
+
+	@Override
+	public String getSupportingDocumentDescription() {
+		return getSupportingDocumentDescription(this);
+	}
+	static String getSupportingDocumentDescription(DocumentReferenceType documentReference) {
+		return documentReference.getDocumentDescription().isEmpty() ? null : documentReference.getDocumentDescription().get(0).getValue();
 	}
 
 	/**
@@ -121,7 +134,9 @@ public class AdditionalSupportingDocument extends DocumentReferenceType { // TOD
 	 * 
 	 * @param url
 	 */
+	@Override
 	public void setExternalDocumentLocation(String url) {
+		if(url==null) return;
 		URIType uri = new URIType();
 		uri.setValue(url);
 		ExternalReferenceType externalReference = new ExternalReferenceType();
@@ -131,8 +146,12 @@ public class AdditionalSupportingDocument extends DocumentReferenceType { // TOD
 		super.setAttachment(attachment);
 	}
 	
+	@Override
 	public String getExternalDocumentLocation() {
-		AttachmentType attachment = super.getAttachment();
+		return getExternalDocumentLocation(this);
+	}
+	static String getExternalDocumentLocation(DocumentReferenceType documentReference) {
+		AttachmentType attachment = documentReference.getAttachment();
 		if(attachment==null) return null;
 		
 		ExternalReferenceType externalReference = attachment.getExternalReference();
@@ -155,23 +174,40 @@ public class AdditionalSupportingDocument extends DocumentReferenceType { // TOD
 	 * <br>ID: BT-125
 	 * <br>Req.ID: R35
 	 * 
-	 * @param uncefact binaryObject
+	 * @param content BT-125
 	 */
-	public void setAttachedDocument(BinaryObjectType binaryObject) {
-		String mimeCode = binaryObject.getMimeCode(); // mandatory
-		String filename = binaryObject.getFilename(); // mandatory
-		byte[] value = binaryObject.getValue(); // content
+	@Override
+	public void setAttachedDocument(byte[] content, String mimeCode, String filename) {
 		EmbeddedDocumentBinaryObjectType embeddedDocumentBinaryObject = new EmbeddedDocumentBinaryObjectType();
 		embeddedDocumentBinaryObject.setMimeCode(mimeCode);
 		embeddedDocumentBinaryObject.setFilename(filename);
-		embeddedDocumentBinaryObject.setValue(value);
+		embeddedDocumentBinaryObject.setValue(content);
 		AttachmentType attachment = new AttachmentType();
 		attachment.setEmbeddedDocumentBinaryObject(embeddedDocumentBinaryObject);
 		super.setAttachment(attachment);
 	}
 	
-	public BinaryObjectType getAttachedDocument() {
-		AttachmentType attachment = super.getAttachment();
+	@Override
+	public byte[] getAttachedDocument() {
+		EmbeddedDocumentBinaryObjectType embeddedDocumentBinaryObject = getEmbeddedDocumentBinaryObject();
+		return embeddedDocumentBinaryObject==null ? null : embeddedDocumentBinaryObject.getValue();
+	}
+	@Override
+	public String getAttachedDocumentMimeCode() {
+		EmbeddedDocumentBinaryObjectType embeddedDocumentBinaryObject = getEmbeddedDocumentBinaryObject();
+		return embeddedDocumentBinaryObject==null ? null : embeddedDocumentBinaryObject.getMimeCode();
+	}
+	@Override
+	public String getAttachedDocumentFilename() {
+		EmbeddedDocumentBinaryObjectType embeddedDocumentBinaryObject = getEmbeddedDocumentBinaryObject();
+		return embeddedDocumentBinaryObject==null ? null : embeddedDocumentBinaryObject.getFilename();
+	}
+	
+	EmbeddedDocumentBinaryObjectType getEmbeddedDocumentBinaryObject() {
+		return getEmbeddedDocumentBinaryObject(this);
+	}
+	static EmbeddedDocumentBinaryObjectType getEmbeddedDocumentBinaryObject(DocumentReferenceType documentReference) {
+		AttachmentType attachment = documentReference.getAttachment();
 		if(attachment==null) return null;
 
 		return attachment.getEmbeddedDocumentBinaryObject();

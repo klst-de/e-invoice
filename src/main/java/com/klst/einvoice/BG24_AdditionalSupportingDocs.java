@@ -28,7 +28,8 @@ UBL:
             <cbc:EmbeddedDocumentBinaryObject mimeCode="application/pdf" filename="01_15_Anhang_01.pdf"> ... </cbc:EmbeddedDocumentBinaryObject>
         </cac:Attachment>
     </cac:AdditionalDocumentReference>
-CII:
+    
+CII: ApplicableHeaderTradeAgreement ...
             <ram:AdditionalReferencedDocument>
                 <ram:IssuerAssignedID>01_15_Anhang_01.pdf</ram:IssuerAssignedID>
                 <ram:TypeCode>916</ram:TypeCode>
@@ -49,21 +50,25 @@ required filename Dateiname des Anhangsdokuments                    BT-125-2
 public interface BG24_AdditionalSupportingDocs {
 	
 	// BT-122 ++ 1..1 Supporting document reference
-//	public void setSupportingDocumentReference(String id);
-//	public String getSupportingDocumentReference();
+	public void setSupportingDocumentReference(String id);
+	public String getSupportingDocumentReference();
+	
+	// BT-122-0 ++ 0..1 undocumented
+	public void setSupportingDocumentCode(String code);
+	public String getSupportingDocumentCode();
 	
 	// BT-123 ++ 0..1 Supporting document description
-//	public void setSupportingDocumentDescription(String text);
-//	public String getSupportingDocumentDescription();
+	public void setSupportingDocumentDescription(String text);
+	public String getSupportingDocumentDescription();
 	
 	// BT-124 ++ 0..1 External document location
-//	public void setExternalDocumentLocation(String location);
-//	public String getExternalDocumentLocation();
+	public void setExternalDocumentLocation(String location);
+	public String getExternalDocumentLocation();
 	
 	// BT-125 ++ 0..1 Attached document
-//	public void setAttachedDocument(byte[] doc, String mimeCode, String filename);
-//	public byte[] getAttachedDocument();
-//	public String getAttachedDocumentMimeCode();
-//	public String getAttachedDocumentFilename();
+	public void setAttachedDocument(byte[] doc, String mimeCode, String filename);
+	public byte[] getAttachedDocument();
+	public String getAttachedDocumentMimeCode();
+	public String getAttachedDocumentFilename();
 	
 }

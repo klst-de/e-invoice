@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
@@ -182,8 +183,6 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		
 		makeOptionals(ublInvoice);
 		
-//		makeSellerGroup(ublInvoice);
-//		makeBuyerGroup(ublInvoice);
 		makePaymentGroup(ublInvoice);
 		
 		ublInvoice.setDocumentTotals(testDoc.getInvoiceLineNetTotal(), 
@@ -192,7 +191,6 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				testDoc.getDuePayable());
 		ublInvoice.setInvoiceTax(testDoc.getInvoiceTax());
 		LOG.info("finished DocumentTotalsGroup.");
-//		makesDocumentTotalsGroup(ublInvoice);
 		
 		makeVatBreakDownGroup(ublInvoice);
 		makeLineGroup(ublInvoice);
@@ -222,6 +220,20 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setStartDate(testDoc.getStartDateAsTimestamp());
 		ublInvoice.setEndDate(testDoc.getEndDateAsTimestamp());
 		ublInvoice.setDelivery(testDoc.getDelivery());
+		
+		List<BG24_AdditionalSupportingDocs> asDocList = testDoc.getAdditionalSupportingDocuments();
+		asDocList.forEach(asDoc -> {
+			LOG.info("SupportingDocumentReference:"+asDoc.getSupportingDocumentReference() + " MimeCode:"+asDoc.getAttachedDocumentMimeCode());
+			byte[] content = asDoc.getAttachedDocument();
+			if(content==null) { // TODO
+				ublInvoice.addSupportigDocument(asDoc.getSupportingDocumentReference(), null, asDoc.getSupportingDocumentDescription(), null);
+			} else {
+				ublInvoice.addSupportigDocument(asDoc.getSupportingDocumentReference(), asDoc.getSupportingDocumentCode()
+						, asDoc.getSupportingDocumentDescription()
+						, content, asDoc.getAttachedDocumentMimeCode(), asDoc.getAttachedDocumentFilename()
+						);
+			}
+		});
 		
 		LOG.info("finished.");
 	}
