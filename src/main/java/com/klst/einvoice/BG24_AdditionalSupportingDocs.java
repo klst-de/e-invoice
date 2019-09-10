@@ -53,9 +53,9 @@ public interface BG24_AdditionalSupportingDocs {
 	public void setSupportingDocumentReference(String id);
 	public String getSupportingDocumentReference();
 	
-	// BT-122-0 ++ 0..1 undocumented
-	public void setSupportingDocumentCode(String code);
-	public String getSupportingDocumentCode();
+	// BT-122-0 ++ 0..1 undocumented , see https://github.com/klst-de/e-invoice/issues/10
+//	public void setSupportingDocumentCode(String code);
+//	public String getSupportingDocumentCode();
 	
 	// BT-123 ++ 0..1 Supporting document description
 	public void setSupportingDocumentDescription(String text);

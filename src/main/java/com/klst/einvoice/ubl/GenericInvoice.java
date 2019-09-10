@@ -30,12 +30,10 @@ import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AttachmentType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ExternalReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.MonetaryTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderReferenceType;
@@ -51,8 +49,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BuyerRef
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditNoteTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CustomizationIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentCurrencyCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentDescriptionType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EndDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
@@ -69,7 +65,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmoun
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxInclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPointDateType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.URIType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.DateType;
@@ -1056,16 +1051,16 @@ UBL:
 	}
 
 	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
-	public void addSupportigDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename) {
-		AdditionalSupportingDocument asDoc = new AdditionalSupportingDocument(docRefId, code, description, content, mimeCode, filename);
+	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
+		AdditionalSupportingDocument asDoc = new AdditionalSupportingDocument(docRefId, description, content, mimeCode, filename);
 		if(isInvoiceType) {
 			invoice.getAdditionalDocumentReference().add(asDoc);
 		} else {
 			creditNote.getAdditionalDocumentReference().add(asDoc);
 		}
 	}
-	public void addSupportigDocument(String docRefId, String code, String description, String url) {
-		AdditionalSupportingDocument asDoc = new AdditionalSupportingDocument(docRefId, code, description, url);
+	public void addSupportigDocument(String docRefId, String description, String url) {
+		AdditionalSupportingDocument asDoc = new AdditionalSupportingDocument(docRefId, description, url);
 		if(isInvoiceType) {
 			invoice.getAdditionalDocumentReference().add(asDoc);
 		} else {

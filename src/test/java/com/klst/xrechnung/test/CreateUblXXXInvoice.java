@@ -226,9 +226,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			LOG.info("SupportingDocumentReference:"+asDoc.getSupportingDocumentReference() + " MimeCode:"+asDoc.getAttachedDocumentMimeCode());
 			byte[] content = asDoc.getAttachedDocument();
 			if(content==null) { // TODO
-				ublInvoice.addSupportigDocument(asDoc.getSupportingDocumentReference(), null, asDoc.getSupportingDocumentDescription(), null);
+				ublInvoice.addSupportigDocument(asDoc.getSupportingDocumentReference(), asDoc.getSupportingDocumentDescription(), null);
 			} else {
-				ublInvoice.addSupportigDocument(asDoc.getSupportingDocumentReference(), asDoc.getSupportingDocumentCode()
+				ublInvoice.addSupportigDocument(asDoc.getSupportingDocumentReference()
 						, asDoc.getSupportingDocumentDescription()
 						, content, asDoc.getAttachedDocumentMimeCode(), asDoc.getAttachedDocumentFilename()
 						);

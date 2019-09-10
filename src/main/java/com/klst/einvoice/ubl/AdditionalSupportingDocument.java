@@ -40,34 +40,34 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		this();
 		EmbeddedDocumentBinaryObjectType embeddedDocumentBinaryObject = getEmbeddedDocumentBinaryObject(doc);
 		if(embeddedDocumentBinaryObject==null) {
-			init(getId(doc), getSupportingDocumentCode(doc), getSupportingDocumentDescription(doc), getExternalDocumentLocation(doc));
+			init(getId(doc), getSupportingDocumentDescription(doc), getExternalDocumentLocation(doc));
 		} else {
-			init(getId(doc), getSupportingDocumentCode(doc), getSupportingDocumentDescription(doc), null);
+			init(getId(doc), getSupportingDocumentDescription(doc), null);
 			setAttachedDocument(embeddedDocumentBinaryObject.getValue(), embeddedDocumentBinaryObject.getMimeCode(), embeddedDocumentBinaryObject.getFilename());
 		}
 	}
 
-	public AdditionalSupportingDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename) {
+	public AdditionalSupportingDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
 		this();
-		init(docRefId, code, description, null);
+		init(docRefId, description, null);
 		setAttachedDocument(content, mimeCode, filename);
 	}
 	
 	/**
 	 * 
 	 * @param Supporting document reference id, madatory
-	 * @param code, optional
+//	 * @param code, optional , @see https://github.com/klst-de/e-invoice/issues/10
 	 * @param description, optional
 	 * @param url, optional
 	 */
-	public AdditionalSupportingDocument(String docRefId, String code, String description, String url) {
+	public AdditionalSupportingDocument(String docRefId, String description, String url) {
 		this();
-		init(docRefId, code, description, url);
+		init(docRefId, description, url);
 	}
 	
-	void init(String docRefId, String code, String description, String url) {
+	void init(String docRefId, String description, String url) {
 		setSupportingDocumentReference(docRefId);
-		setSupportingDocumentCode(code);
+//		setSupportingDocumentCode(code);
 		setSupportingDocumentDescription(description);
 		setExternalDocumentLocation(url);
 	}
@@ -85,22 +85,22 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		return documentReference.getID().getValue();
 	}
 
-	@Override
-	public void setSupportingDocumentCode(String code) {
-		if(code!=null) {
-			DocumentTypeCodeType documentTypeCode = new DocumentTypeCodeType();
-			documentTypeCode.setValue(code);
-			super.setDocumentTypeCode(documentTypeCode);
-		}
-	}
-
-	@Override
-	public String getSupportingDocumentCode() {
-		return getSupportingDocumentCode(this);
-	}
-	static String getSupportingDocumentCode(DocumentReferenceType documentReference) {
-		return documentReference.getDocumentTypeCode()==null ? null : documentReference.getDocumentTypeCode().getValue();
-	}
+//	@Override
+//	public void setSupportingDocumentCode(String code) {
+//		if(code!=null) {
+//			DocumentTypeCodeType documentTypeCode = new DocumentTypeCodeType();
+//			documentTypeCode.setValue(code);
+//			super.setDocumentTypeCode(documentTypeCode);
+//		}
+//	}
+//
+//	@Override
+//	public String getSupportingDocumentCode() {
+//		return getSupportingDocumentCode(this);
+//	}
+//	static String getSupportingDocumentCode(DocumentReferenceType documentReference) {
+//		return documentReference.getDocumentTypeCode()==null ? null : documentReference.getDocumentTypeCode().getValue();
+//	}
 
 	@Override
 	public void setSupportingDocumentDescription(String text) {
