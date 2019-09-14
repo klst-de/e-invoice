@@ -15,7 +15,9 @@ import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
 import com.klst.untdid.codelist.DateTimeFormats;
@@ -27,6 +29,7 @@ import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryIn
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CurrencyCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TimeReferenceCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentContextParameterType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
@@ -107,7 +110,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery();
 		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 		
-		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(); // class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
+		applicableHeaderTradeSettlement = new PaymentMeans(); // class PaymentMeans extends HeaderTradeSettlementType
 		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
 		
 		exchangedDocument = new ExchangedDocumentType();
@@ -132,10 +135,13 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 			applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery(htd);
 			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 		}
-		// in ApplicableHeaderTradeSettlement copy ctor
+		// in ApplicableHeaderTradeSettlement/PaymentMeans copy ctor
 //		doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getBillingSpecifiedPeriod();
-
-		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
+//---
+		HeaderTradeSettlementType hts = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement();
+		hts.getPaymentReference().size();
+//---
+		applicableHeaderTradeSettlement = new PaymentMeans(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
 		setPaymentTermsAndDate(getPaymentTerm(applicableHeaderTradeSettlement), getDueDateAsTimestamp(applicableHeaderTradeSettlement)); // optional
 		
 		setId(getId(doc));
@@ -922,132 +928,90 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	}
 
 // --------------------------------
-	/** 
-	 * mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER
-	 * 
-	 * @param enum paymentMeansCode, BT-81 use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
-	 * @param String iban to create ibanlAccount element
-	 * TODO BT-82 ++ 0..1 Payment means text
-	 * @param String remittanceInformation BT-83 optional
-//	 * @return paymentMeansList with minimum 1 element
-	 */
+//	/** 
+//	 * mandatory Group BG-16 PAYMENT INSTRUCTIONS with ibanlAccount as BG-17 CREDIT TRANSFER
+//	 * 
+//	 * @param enum paymentMeansCode, BT-81 use PaymentMeansCode.CreditTransfer or PaymentMeansCode.SEPACreditTransfer
+//	 * @param String iban to create ibanlAccount element
+//	 * TODO BT-82 ++ 0..1 Payment means text
+//	 * @param String remittanceInformation BT-83 optional
+//	 */
 /*
-0 .. n SpecifiedTradeSettlementPaymentMeans Zahlungsanweisungen               BG-16 xs:sequence 
-1 .. 1 TypeCode Code für die Zahlungsart                                      BT-81 
-0 .. 1 Information Text zur Zahlungsart                                       BT-82 
-0 .. 1 ApplicableTradeSettlementFinancialCard Informationen zur Zahlungskarte BG-18 xs:sequence 
-1 .. 1 ID Zahlungskartennummer                                                BT-87 
-0 .. 1 CardholderName Name des Zahlungskarteninhabers                         BT-88 
-0 .. 1 PayerPartyDebtorFinancialAccount Bankinstitut des Käufers xs:sequence 
-1 .. 1 IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos         BG-19/ BT-91 
-0 .. 1 PayeePartyCreditorFinancialAccount Überweisung                         BG-17 xs:sequence 
-0 .. 1 IBANID Kennung des Zahlungskontos                                      BT-84 
-0 .. 1 AccountName Name des Zahlungskontos                                    BT-85 
-0 .. 1 ProprietaryID Nationale Kontonummer (nicht für SEPA)                   BT-84-0 
-0 .. 1 PayeeSpecifiedCreditorFinancialInstitution Bankinstitut des Verkäufers xs:sequence 
-1 .. 1 BICID Kennung des Zahlungsdienstleisters                               BT-86
-
-0 .. 1 SupplyChainTradeTransaction Gruppierung der Informationen zum Geschäftsvorfall
-1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich xs:sequence 
-0 .. 1 CreditorReferenceID Kennung des Gläubigers                             BG-19/ BT-90 
-0 .. 1 PaymentReference Verwendungszweck                                      BT-83   <============== nicht unter SpecifiedTradeSettlementPaymentMeans
-
-    <ram:ApplicableHeaderTradeSettlement>
-        <ram:TaxCurrencyCode>EUR</ram:TaxCurrencyCode>
-        <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>  <<======== setPaymentCurrencyCode
-        <ram:SpecifiedTradeSettlementPaymentMeans>              <<======== addPaymentInstructions SpecifiedTradeSettlementPaymentMeans
-            <ram:TypeCode>30</ram:TypeCode>
-            <ram:PayeePartyCreditorFinancialAccount>
-                <ram:IBANID>DE12345678912345678912</ram:IBANID>
-            </ram:PayeePartyCreditorFinancialAccount>
-        </ram:SpecifiedTradeSettlementPaymentMeans>
-        <ram:ApplicableTradeTax>
-            <ram:CalculatedAmount>22.04</ram:CalculatedAmount>
-            <ram:TypeCode>VAT</ram:TypeCode>
-            <ram:BasisAmount>314.86</ram:BasisAmount>
-            <ram:CategoryCode>S</ram:CategoryCode>
-            <ram:RateApplicablePercent>7</ram:RateApplicablePercent>
-        </ram:ApplicableTradeTax>
-        <ram:SpecifiedTradePaymentTerms>                                        TDO
-            <ram:Description>Zahlbar sofort ohne Abzug.</ram:Description>
-        </ram:SpecifiedTradePaymentTerms>
-        <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
-            <ram:LineTotalAmount>314.86</ram:LineTotalAmount>
-            <ram:TaxBasisTotalAmount>314.86</ram:TaxBasisTotalAmount>
-            <ram:TaxTotalAmount currencyID="EUR">22.04</ram:TaxTotalAmount>
-            <ram:GrandTotalAmount>336.9</ram:GrandTotalAmount>
-            <ram:DuePayableAmount>336.9</ram:DuePayableAmount>
-        </ram:SpecifiedTradeSettlementHeaderMonetarySummation>
-    </ram:ApplicableHeaderTradeSettlement>
-*/
-
-//	CreditorFinancialAccountType makeCreditTransfer(IBANId iban) {
-//		CreditorFinancialAccountType financialAccount = new CreditorFinancialAccountType();
-//		financialAccount.setIBANID(newIDType(iban.getValue(), iban.getSchemeID()));
-//		return financialAccount;
-//	}
-//	public CreditorFinancialAccountType makeCreditTransfer(String account, String accountName, BICId bic) {
-//			CreditorFinancialAccountType financialAccount = new CreditorFinancialAccountType();
-//			financialAccount.setIBANID(newIDType(account, null)); // null : No identification scheme
-//			financialAccount.setAccountName(newTextType(accountName));
-//			financialAccount.setProprietaryID(newIDType(bic.getValue(), bic.getSchemeID()));
-//			return financialAccount;
-//		}
-	
-		/*
 
 EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	die Kardinalität ist 0..1, wg. BR-DE-1 (1..1 this cius rule makes it mandatory)
 	ich implemetierte setXXX so, dass PaymentInstructions null sein darf
 
-		 */
-	PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
-		// ohne remittanceInformation:
-		return ((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).createPaymentInstructions(code, paymentMeansText);
+ */
+	@Override // wg. interface PaymentInstructionsFactory
+	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText) {
+		return null; // TODO
+//		return ((PaymentMeans)applicableHeaderTradeSettlement).createPaymentInstructions(code, paymentMeansText);
 	}
-	/**
-	 * group PAYMENT INSTRUCTIONS, BG-16 Cardinality 0..1
-	 * 
-	 * @param code                   mandatory BT-81
-	 * @param paymentMeansText       optional  BT-82 (can be null)
-	 * @param remittanceInformation  optional  BT-83
-	 */
-	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
-		PaymentInstructions pi = createPaymentInstructions(code, paymentMeansText, remittanceInformation);
-		((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).setBG16(pi);
-		((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).setRemittanceInformation(remittanceInformation);
+
+	@Override
+	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, CreditTransfer creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		List<CreditTransfer> ctList = new ArrayList<CreditTransfer>();
+		if(creditTransfer!=null) ctList.add(creditTransfer);
+		setPaymentInstructions(code, paymentMeansText, remittanceInformation, ctList, paymentCard, directDebit);		
 	}
-	public List<TradeSettlementPaymentMeans> getTradeSettlementPaymentMeansList() {
-		List<TradeSettlementPaymentMeansType> tspmList = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans();
-		List<TradeSettlementPaymentMeans> result = new ArrayList<TradeSettlementPaymentMeans>(tspmList.size());
-		tspmList.forEach(tspm -> { // public TradeSettlementPaymentMeans(TradeSettlementPaymentMeansType tspm)
-			result.add(new TradeSettlementPaymentMeans(tspm));
-		});
-		return result;
+	@Override
+	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		applicableHeaderTradeSettlement = new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
-	// BG-16.BT-81 - 0..1/1..1
-	public PaymentMeansEnum getPaymentMeansCode() {
-		List<TradeSettlementPaymentMeansType> tspmList = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans();
-		if(tspmList.isEmpty()) return null;
-		TradeSettlementPaymentMeans res = new TradeSettlementPaymentMeans(tspmList.get(0));
-		return res.getPaymentMeansEnum();
+
+	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
+		// TODO ?brauche ich es? im ctor: applicableHeaderTradeSettlement = new PaymentMeans()
+	}
+	public PaymentInstructions getPaymentInstructions() {
+		return new PaymentMeans(applicableHeaderTradeSettlement); // das implementiert PaymentInstructions!
+	}
+
+//	PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
+//		// ohne remittanceInformation:
+//		return ((PaymentMeans)applicableHeaderTradeSettlement).createPaymentInstructions(code, paymentMeansText);
+//	}
+//	/**
+//	 * group PAYMENT INSTRUCTIONS, BG-16 Cardinality 0..1
+//	 * 
+//	 * @param code                   mandatory BT-81
+//	 * @param paymentMeansText       optional  BT-82 (can be null)
+//	 * @param remittanceInformation  optional  BT-83
+//	 */
+//	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
+//		PaymentInstructions pi = createPaymentInstructions(code, paymentMeansText);
+//		((PaymentMeans)applicableHeaderTradeSettlement).setBG16(pi);
+//		((PaymentMeans)applicableHeaderTradeSettlement).setRemittanceInformation(remittanceInformation);
+//	}
+//	public List<TradeSettlementPaymentMeans> getTradeSettlementPaymentMeansList() {
+//		List<TradeSettlementPaymentMeansType> tspmList = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans();
 //		List<TradeSettlementPaymentMeans> result = new ArrayList<TradeSettlementPaymentMeans>(tspmList.size());
 //		tspmList.forEach(tspm -> { // public TradeSettlementPaymentMeans(TradeSettlementPaymentMeansType tspm)
 //			result.add(new TradeSettlementPaymentMeans(tspm));
 //		});
-//		return result.isEmpty() ? null : result.get(0).getPaymentMeansEnum();
+//		return result;
+//	}
+	// BG-16.BT-81 - 0..1/1..1
+	public PaymentMeansEnum getPaymentMeansCode() {
+		List<TradeSettlementPaymentMeansType> tspmList = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans();
+		if(tspmList.isEmpty()) return null;
+		
+		PaymentMeansCodeType pmc = tspmList.get(0).getTypeCode();
+		return PaymentMeansEnum.valueOf(pmc);
 	}
-	// BG-16.BT-83 - 0..1/0..1
-	public String getRemittanceInformation() {
-		return ((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).getRemittanceInformation();
-	}
-	
-	public CreditTransfer getCreditTransfer() {
-		return ((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).getCreditTransfer();
-	}
-	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
-		return ((ApplicableHeaderTradeSettlement)applicableHeaderTradeSettlement).createCreditTransfer(iban, accountName, bic);
-	}
+//	// BG-16.BT-83 - 0..1/0..1
+//	public String getRemittanceInformation() {
+//		return ((PaymentMeans)applicableHeaderTradeSettlement).getRemittanceInformation();
+//	}
+//	
+//	public CreditTransfer getCreditTransfer() {
+//		return ((PaymentMeans)applicableHeaderTradeSettlement).getCreditTransfer();
+//	}
+//	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
+//		return ((PaymentMeans)applicableHeaderTradeSettlement).createCreditTransfer(iban, accountName, bic);
+//	}
 
 	// BG-22.BT-106 - 1..1/1..1
 	@Override

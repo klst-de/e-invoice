@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import com.klst.untdid.codelist.DocumentNameCode;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 
 /*
 
@@ -26,7 +27,8 @@ Eine andere mögliche Namensgebung wären die Profilnamen mit Hierarhie
  - CoreInvoiceExtended extends CoreInvoiceEN16931              -- Erweiterung der EN 16931-1
 
  */
-public interface CoreInvoice extends BG1_InvoiceNote, BG2_ProcessControl, BG3_PrecedingInvoiceReference, BG14_InvoicingPeriod, BG22_DocumentTotals, 
+public interface CoreInvoice extends BG1_InvoiceNote, BG2_ProcessControl, BG3_PrecedingInvoiceReference, BG14_InvoicingPeriod, 
+	PaymentInstructionsFactory, BG22_DocumentTotals, 
 	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
 
 	/**
@@ -439,7 +441,22 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	
 	// BG-15 ++ 0..1 DELIVER TO ADDRESS @see PostalAddress
 	
-	// BG-16 + 0..1 PAYMENT INSTRUCTIONS
+	// BG-16 + 0..1 PAYMENT INSTRUCTIONS @see PaymentInstructions and PaymentInstructionsFactory
+	/**
+	 * 
+	 * @param code - BT-81 mandatory Payment means type code
+	 * @param paymentMeansText - BT-82 optional Payment means text
+	 * @param remittanceInformation - BT-83 optional Remittance information
+	 * @param creditTransfer - BG-17 0..n CREDIT TRANSFER
+	 * @param paymentCard - BG-18 optional PAYMENT CARD INFORMATION
+	 * @param directDebit - BG-19 optional DIRECT DEBIT
+	 */
+	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit);
+	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, CreditTransfer creditTransfer, PaymentCard paymentCard, DirectDebit directDebit);
+	public void setPaymentInstructions(PaymentInstructions paymentInstructions);
+	public PaymentInstructions getPaymentInstructions();
 	
 // CopyIndicator . Datentyp: udt:IndicatorType . Kardinalität: 0 .. 1 , nur EXTENDED
 // LanguageID Sprachkennzeichen . Datentyp: udt:IDType . Kardinalität: 0 .. 1 , nur EXTENDED

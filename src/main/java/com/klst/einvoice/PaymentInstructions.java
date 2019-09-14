@@ -1,5 +1,7 @@
 package com.klst.einvoice;
 
+import java.util.List;
+
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
 /**
@@ -22,6 +24,8 @@ import com.klst.untdid.codelist.PaymentMeansEnum;
  * BR-49 Zahlungsanweisungen :
  * Eine Zahlungsanweisung (BG-16) muss den Code der Zahlungsmittelart (BT-81) angeben.
  */
+// implemented in PaymentMeans extends PaymentMeansType (UBL)
+//                PaymentMeans extends TradeSettlementPaymentMeansType (CII)
 public interface PaymentInstructions {
 
 	/**
@@ -75,7 +79,7 @@ public interface PaymentInstructions {
  	 */
 	// Information Text zur Zahlungsart
 	public String getPaymentMeansText();
-//	public void setPaymentMeansText(String text); // use setPaymentMeans
+//	public void setPaymentMeansText(String text); // use setPaymentMeans to set BT-81 + BT-82
 	
 	/**
 	 * setter Payment means code + text
@@ -126,4 +130,16 @@ public interface PaymentInstructions {
 	public void setRemittanceInformation(String text);
 	public String getRemittanceInformation();
 
+	// zu Gruppe PAYMENT INSTRUCTIONS gehören die Untergruppen
+	// BG-17 ++ 0..n CREDIT TRANSFER
+	// BG-18 ++ 0..1 PAYMENT CARD INFORMATION
+	// BG-19 ++ 0..1 DIRECT DEBIT
+	// demnach werden setter/getter definiert:
+	public void addCreditTransfer(CreditTransfer creditTransfer);
+	public List<CreditTransfer> getCreditTransfer();
+	
+	// ... TODO PAYMENT CARD INFORMATION
+	
+	public void setDirectDebit(DirectDebit directDebit);
+	public DirectDebit getDirectDebit();
 }

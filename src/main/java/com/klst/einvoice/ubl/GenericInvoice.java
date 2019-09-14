@@ -21,6 +21,7 @@ import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentCardFactory;
+import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
@@ -52,7 +53,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Document
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EndDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InstructionNoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InvoiceTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
@@ -724,13 +724,18 @@ UBL:
 		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
 	}
 	
-	// BG-16 + 0..1 PAYMENT INSTRUCTIONS
+	// BG-16 + 0..1 PAYMENT INSTRUCTIONS / Zahlungsanweisungen
+	// factory
+	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText) {
+		return new PaymentMeans(code, paymentMeansText, null, null, null, null);
+	}
 	// BG-16.BT-81 ++ 1..1 Payment means type code
 	// BG-16.BT-82 ++ 0..1 Payment means text
 	// BG-16.BT-83 ++ 0..1 Remittance information
 	// BG-16.BG-17 ++ 0..n CREDIT TRANSFER
 	// BG-16.BG-18 ++ 0..1 PAYMENT CARD INFORMATION
 	// BG-16.BG-19 ++ 0..1 DIRECT DEBIT
+	@Override
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, CreditTransfer creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		List<CreditTransfer> ctList = new ArrayList<CreditTransfer>();
@@ -739,13 +744,44 @@ UBL:
 	}
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
-		// TODO in ubl gibt ex keine List<CreditTransfer> !!! ABER mehrere PaymentMeans , siehe pepol
+// TODO in ubl gibt es keine List<CreditTransfer> !!! ABER mehrere PaymentMeans 
+/* siehe ubl-tc434-example1.xml :
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+        <cbc:PaymentID>Deb. 10202 / Fact. 12115118</cbc:PaymentID>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID>NL57 RABO 0107307510</cbc:ID>
+        </cac:PayeeFinancialAccount>
+    </cac:PaymentMeans>
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID>NL03 INGB 0004489902</cbc:ID>
+        </cac:PayeeFinancialAccount>
+    </cac:PaymentMeans>
+
+ */
 		PaymentMeansType paymentMeans = new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransferList, paymentCard, directDebit);
 		if(isInvoiceType) {
 			invoice.getPaymentMeans().add(paymentMeans);
 		} else {
 			creditNote.getPaymentMeans().add(paymentMeans);
 		}
+	}
+
+	@Override
+	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
+		if(isInvoiceType) {
+			invoice.getPaymentMeans().add((PaymentMeansType) paymentInstructions);
+		} else {
+			creditNote.getPaymentMeans().add((PaymentMeansType) paymentInstructions);
+		}
+	}
+
+	@Override
+	public PaymentInstructions getPaymentInstructions() {
+		PaymentMeansType paymentMeans = getPaymentMeans0();
+		return paymentMeans==null ? null : new PaymentMeans(paymentMeans);
 	}
 
 	PaymentMeansType getPaymentMeans0() {
@@ -755,43 +791,41 @@ UBL:
 		return list.get(0);
 	}
 	
-	// TODO umbenennen in getPaymentMeansCode, bzw PaymentMeans.getPaymentMeansEnum()
-	public PaymentMeansEnum getPaymentMeansEnum() {
-		PaymentMeansType pm = getPaymentMeans0();
-		if(pm==null) return null;
-		return PaymentMeans.getPaymentMeansEnum(pm);
-	}
-	
-	// BG-16.BT-82 ++ 0..1 Payment means text , TODO PaymentMeans.getPaymentMeansText()
-	public String getPaymentMeansText() {
-		PaymentMeansType pm = getPaymentMeans0();
-		if(pm==null) return null;
-//		return pm.getID()==null ? null : pm.getID().getValue(); // nein, siehe Bsp: ubl-tc434-example5.xml
-		List<InstructionNoteType> inList = pm.getInstructionNote();
-		if(inList.isEmpty()) return null;
-		return inList.get(0).getValue();
-	}
-	
-	// BG-16.BT-83 ++ 0..1 Remittance information , siehe PaymentMeans.getPaymentRemittanceInformation()
-	public String getPaymentRemittanceInformation() {
-		PaymentMeansType pm = getPaymentMeans0();
-		if(pm==null) return null;
-		return pm.getPaymentID().isEmpty() ? null : pm.getPaymentID().get(0).getValue();
-	}
-	
-	public List<CreditTransfer> getCreditTransfer() {
-//		List<PaymentMeansType> list = isInvoiceType ? invoice.getPaymentMeans() : creditNote.getPaymentMeans();
-//		if(list.isEmpty()) return null;
-//		LOG.info("PaymentMeans.Class:"+list.get(0).getClass());
-		PaymentMeansType pm = getPaymentMeans0();
-		if(pm==null) return null;
-		PaymentMeans paymentMeans = new PaymentMeans(pm);
-		return paymentMeans.getCreditTransfer();
-	}
+//	// TODO umbenennen in getPaymentMeansCode, bzw PaymentMeans.getPaymentMeansEnum()
+//	public PaymentMeansEnum getPaymentMeansEnum() {
+//		PaymentMeansType pm = getPaymentMeans0();
+//		if(pm==null) return null;
+//		return PaymentMeans.getPaymentMeansEnum(pm);
+//	}
+//	
+//	// BG-16.BT-82 ++ 0..1 Payment means text , TODO PaymentMeans.getPaymentMeansText()
+//	public String getPaymentMeansText() {
+//		PaymentMeansType pm = getPaymentMeans0();
+//		if(pm==null) return null;
+////		return pm.getID()==null ? null : pm.getID().getValue(); // nein, siehe Bsp: ubl-tc434-example5.xml
+//		List<InstructionNoteType> inList = pm.getInstructionNote();
+//		if(inList.isEmpty()) return null;
+//		return inList.get(0).getValue();
+//	}
+//	
+//	// BG-16.BT-83 ++ 0..1 Remittance information , siehe PaymentMeans.getPaymentRemittanceInformation()
+//	public String getPaymentRemittanceInformation() {
+//		PaymentMeansType pm = getPaymentMeans0();
+//		if(pm==null) return null;
+//		return pm.getPaymentID().isEmpty() ? null : pm.getPaymentID().get(0).getValue();
+//	}
+//	
+//	public List<CreditTransfer> getCreditTransfer() {
+////		List<PaymentMeansType> list = isInvoiceType ? invoice.getPaymentMeans() : creditNote.getPaymentMeans();
+////		if(list.isEmpty()) return null;
+////		LOG.info("PaymentMeans.Class:"+list.get(0).getClass());
+//		PaymentMeansType pm = getPaymentMeans0();
+//		if(pm==null) return null;
+//		PaymentMeans paymentMeans = new PaymentMeans(pm);
+//		return paymentMeans.getCreditTransfer();
+//	}
 
-	// TODO getPaymentCard
-	/*  die factories hier und nicht in class FinancialAccount
-	 */
+	//  die factories hier und nicht in class FinancialAccount
 	@Override
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
 		return new FinancialAccount(iban, accountName, bic);

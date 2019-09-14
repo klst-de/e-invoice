@@ -13,6 +13,7 @@ import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.PaymentCard;
+import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.ubl.GenericLine;
 import com.klst.einvoice.ubl.VatBreakdown;
@@ -89,14 +90,16 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setPayee(testCN.getPayee());
 		ublInvoice.setTaxRepresentative(testCN.getTaxRepresentative());
 
-		PaymentMeansEnum code = testCN.getPaymentMeansEnum();
-		String paymentMeansText = testCN.getPaymentMeansText();
-		String remittanceInformation = testCN.getPaymentRemittanceInformation();
-		LOG.info("PaymentMeansEnum code:"+code + " paymentMeansText:"+paymentMeansText + " remittanceInformation:"+remittanceInformation);
-		List<CreditTransfer> creditTransfer = testCN.getCreditTransfer();
+		PaymentInstructions paymentInstructions = testCN.getPaymentInstructions();
+		LOG.info("PaymentInstructions "+paymentInstructions);
+//		PaymentMeansEnum code = testCN.getPaymentMeansEnum();
+//		String paymentMeansText = testCN.getPaymentMeansText();
+//		String remittanceInformation = testCN.getPaymentRemittanceInformation();
+//		LOG.info("PaymentMeansEnum code:"+code + " paymentMeansText:"+paymentMeansText + " remittanceInformation:"+remittanceInformation);
+		List<CreditTransfer> creditTransfer = paymentInstructions.getCreditTransfer();
 		PaymentCard paymentCard = null;
 		DirectDebit directDebit = null;
-		ublInvoice.setPaymentInstructions(code, paymentMeansText, remittanceInformation
+		ublInvoice.setPaymentInstructions(paymentInstructions.getPaymentMeansEnum(), paymentInstructions.getPaymentMeansText(), paymentInstructions.getRemittanceInformation()
 				, creditTransfer, paymentCard, directDebit);
 		
 		ublInvoice.setPaymentTermsAndDate(testCN.getPaymentTerm(), testCN.getDueDateAsTimestamp());
@@ -239,12 +242,15 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makePaymentGroup(GenericInvoice ublInvoice) {
-		PaymentMeansEnum code = testDoc.getPaymentMeansEnum(); // TODO besser testDoc.getPaymentMeans().getPaymentMeansEnum()
-		String paymentMeansText = testDoc.getPaymentMeansText();
-		String remittanceInformation = testDoc.getPaymentRemittanceInformation();
-		LOG.info("PaymentMeans code:"+code + " paymentMeansText:"+paymentMeansText + " remittanceInformation:"+remittanceInformation);
+		PaymentInstructions paymentInstructions = testDoc.getPaymentInstructions();
+		LOG.info("PaymentInstructions "+paymentInstructions);
 		
-		List<CreditTransfer> creditTransfer = testDoc.getCreditTransfer();
+//		PaymentMeansEnum code = testDoc.getPaymentMeansEnum(); // TODO besser testDoc.getPaymentMeans().getPaymentMeansEnum()
+//		String paymentMeansText = testDoc.getPaymentMeansText();
+//		String remittanceInformation = testDoc.getPaymentRemittanceInformation();
+//		LOG.info("PaymentMeans code:"+code + " paymentMeansText:"+paymentMeansText + " remittanceInformation:"+remittanceInformation);
+		
+		List<CreditTransfer> creditTransfer = paymentInstructions.getCreditTransfer();
 		if(creditTransfer.isEmpty()) {
 			LOG.warning("creditTransfer.isEmpty");
 		} else {
@@ -266,7 +272,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			directDebit = ublInvoice.createDirectDebit(dd.getMandateReferencetID(), dd.getBankAssignedCreditorID(), dd.getDebitedAccountID());
 		}
 		
-		ublInvoice.setPaymentInstructions(code, paymentMeansText, remittanceInformation
+		ublInvoice.setPaymentInstructions(paymentInstructions.getPaymentMeansEnum(), paymentInstructions.getPaymentMeansText(), paymentInstructions.getRemittanceInformation()
 				, creditTransfer, paymentCard, directDebit); // dd statt directDebit geht auch
 		
 		ublInvoice.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp());

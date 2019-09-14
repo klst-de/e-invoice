@@ -17,14 +17,6 @@ import com.klst.einvoice.unece.uncefact.IBANId;
 
 public interface CreditTransferFactory {
 	
-//	static final Logger LOG = Logger.getLogger(CreditTransferFactory.class.getName());
-//
-//	static final String NOT_IMPEMENTED = "NOT IMPEMENTED";
-//
-//	public static CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) { // SEPA Überweisung
-//		LOG.warning(NOT_IMPEMENTED);
-//		return null;
-//	}
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic); // SEPA Überweisung
 	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic); // non SEPA
 }

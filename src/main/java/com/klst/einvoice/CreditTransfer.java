@@ -54,7 +54,7 @@ public interface CreditTransfer {
 	// BT-84   IBANID        Kennung des Zahlungskontos
 	public void setPaymentAccountID(IBANId iban);
 	// BT-84-0 ProprietaryID Nationale Kontonummer (nicht für SEPA)
-	public void setPaymentAccountID(String id);
+	public void setPaymentAccountID(String accountId);
 
 // BT-85 +++ 0..1 Payment account name
 // AccountName Name des Zahlungskontos

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
@@ -15,15 +16,22 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 /* wg BT-83 ist PaymentInstructions in ApplicableHeaderTradeSettlement implementiert
 
-Bsp:
-
+Bsp: 01.15a:
+        <ram:ApplicableHeaderTradeSettlement>
+            <ram:PaymentReference>0000123456</ram:PaymentReference>
+            ...
             <ram:SpecifiedTradeSettlementPaymentMeans>
-                <ram:TypeCode>30</ram:TypeCode>
-                <ram:PayeePartyCreditorFinancialAccount>
-                    <ram:IBANID>DE12345678912345678912</ram:IBANID>
+                <ram:TypeCode>30</ram:TypeCode>                                        <!-- BT-81
+                <ram:PayeePartyCreditorFinancialAccount>                               <!-- BG-17 0..n CREDIT TRANSFER
+                    <ram:IBANID>DE12123000001234567890</ram:IBANID>
+                    <ram:AccountName>[Payment account name]</ram:AccountName>
                 </ram:PayeePartyCreditorFinancialAccount>
-                
-SpecifiedTradeSettlementPaymentMeans Zahlungsanweisungen TODO ? umbenennen in SpecifiedTradeSettlementPaymentMeans
+                <ram:PayeeSpecifiedCreditorFinancialInstitution>
+                    <ram:BICID>[BIC]</ram:BICID>
+                </ram:PayeeSpecifiedCreditorFinancialInstitution>                                   bis hierhin -->
+            </ram:SpecifiedTradeSettlementPaymentMeans>
+
+SpecifiedTradeSettlementPaymentMeans Zahlungsanweisungen umbenannt in TradeSettlementPaymentMeans
 Datentyp: ram:TradeSettlementPaymentMeansType
 
 1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
@@ -49,9 +57,9 @@ Datentyp: ram:TradeSettlementPaymentMeansType
     1..1 BICID Kennung des Zahlungsdienstleisters                                 BT-86
 
 
- */                                              
+ */   
+@ Deprecated
 public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType implements PaymentInstructions, CreditTransfer
-// TODO , PAYMENT CARD INFORMATION, DIRECT DEBIT
 // PaymentInstructions IF wird ohne BT-83 implementiert
 {
 	private static final Logger LOG = Logger.getLogger(TradeSettlementPaymentMeans.class.getName());
@@ -132,7 +140,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		return super.getPayeeSpecifiedCreditorFinancialInstitution()==null ? new CreditorFinancialInstitutionType() : super.getPayeeSpecifiedCreditorFinancialInstitution();
 	}
 	
-	@Override
+	@Override // wg. implements interface CreditTransfer
 	public String getPaymentAccountID() { // IBAN (in case of a SEPA payment) or a national account number.
 		CreditorFinancialAccountType payeePartyCreditorFinancialAccount = super.getPayeePartyCreditorFinancialAccount();
 		if(payeePartyCreditorFinancialAccount==null) return null;
@@ -141,27 +149,27 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 			: payeePartyCreditorFinancialAccount.getIBANID().getValue();
 	}
 
-	@Override
+	@Override // wg. implements interface CreditTransfer
 	public void setPaymentAccountID(IBANId iban) { // use ctor
 		CreditorFinancialAccountType payeePartyCreditorFinancialAccount = getCreditorFinancialAccountType();
 		payeePartyCreditorFinancialAccount.setIBANID(CrossIndustryInvoice.newIDType(iban));		
 		super.setPayeePartyCreditorFinancialAccount(payeePartyCreditorFinancialAccount);
 	}
-	@Override
+	@Override // wg. implements interface CreditTransfer
 	public void setPaymentAccountID(String accountId) {
 		CreditorFinancialAccountType payeePartyCreditorFinancialAccount = getCreditorFinancialAccountType();
 		payeePartyCreditorFinancialAccount.setProprietaryID(CrossIndustryInvoice.newIDType(accountId, null));		
 		super.setPayeePartyCreditorFinancialAccount(payeePartyCreditorFinancialAccount);
 	}
 
-	@Override
+	@Override // wg. implements interface CreditTransfer
 	public String getPaymentAccountName() {
 		CreditorFinancialAccountType payeePartyCreditorFinancialAccount = super.getPayeePartyCreditorFinancialAccount();
 		if(payeePartyCreditorFinancialAccount==null) return null;
 		return payeePartyCreditorFinancialAccount.getAccountName()==null ? null : payeePartyCreditorFinancialAccount.getAccountName().getValue();
 	}
 
-	@Override
+	@Override // wg. implements interface CreditTransfer
 	public void setPaymentAccountName(String name) {
 		LOG.info(", AccountName:"+name);
 		CreditorFinancialAccountType payeePartyCreditorFinancialAccount = getCreditorFinancialAccountType();
@@ -169,14 +177,14 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		super.setPayeePartyCreditorFinancialAccount(payeePartyCreditorFinancialAccount);
 	}
 
-	@Override
+	@Override // wg. implements interface CreditTransfer
 	public String getPaymentServiceProviderID() {
 		CreditorFinancialInstitutionType payeeSpecifiedCreditorFinancialInstitution = super.getPayeeSpecifiedCreditorFinancialInstitution();
 		if(payeeSpecifiedCreditorFinancialInstitution==null) return null;
 		return payeeSpecifiedCreditorFinancialInstitution.getBICID()==null ? null : payeeSpecifiedCreditorFinancialInstitution.getBICID().getValue();
 	}
 
-	@Override
+	@Override // wg. implements interface CreditTransfer
 	public void setPaymentServiceProviderID(BICId bic) {
 		LOG.info(", bic:"+bic);
 		if(bic==null) return;
@@ -184,7 +192,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		payeeSpecifiedCreditorFinancialInstitution.setBICID(CrossIndustryInvoice.newIDType(bic));
 		super.setPayeeSpecifiedCreditorFinancialInstitution(payeeSpecifiedCreditorFinancialInstitution);
 	}
-	@Override
+	@Override  // wg. implements interface CreditTransfer
 	public void setPaymentServiceProviderID(String id) {
 		if(id==null) return;
 		CreditorFinancialInstitutionType payeeSpecifiedCreditorFinancialInstitution = getCreditorFinancialInstitutionType();
@@ -223,6 +231,32 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 
 	@Override
 	public String getRemittanceInformation() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// TODO , PAYMENT CARD INFORMATION, DIRECT DEBIT
+
+	@Override
+	public void addCreditTransfer(CreditTransfer creditTransfer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<CreditTransfer> getCreditTransfer() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setDirectDebit(DirectDebit directDebit) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public DirectDebit getDirectDebit() {
 		// TODO Auto-generated method stub
 		return null;
 	}

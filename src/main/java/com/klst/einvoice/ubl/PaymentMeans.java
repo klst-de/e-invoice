@@ -14,7 +14,6 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Fina
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMandateType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InstructionNoteType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentChannelCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentMeansCodeType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.CodeType;
@@ -170,14 +169,15 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	}
 	
 	public String toString() {
-		List<PaymentIDType> paymentIDList = super.getPaymentID();
-		String paymentIDs = paymentIDList.isEmpty() ? null : ("#="+paymentIDList.size() + ","+paymentIDList.get(0).getValue()+",...");
-		PaymentChannelCodeType paymentChannelCode = super.getPaymentChannelCode();
-		String channelCode = paymentChannelCode==null ? null : paymentChannelCode.getValue();
-		FinancialAccountType fa = super.getPayerFinancialAccount();
-		String financialAccount = fa==null ? null : (fa.getID()==null ? null : fa.getID().getValue());
-		return "Code:"+getPaymentMeansEnum().getValueAsString() + ", paymentIDs:"+paymentIDs + 
-				", paymentChannelCode:"+channelCode + ", financialAccount:"+financialAccount;
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[");
+		stringBuilder.append(getPaymentMeansEnum()==null ? "null" : getPaymentMeansEnum().getValueAsString());
+		stringBuilder.append(", PaymentMeansText:");
+		stringBuilder.append(getPaymentMeansText()==null ? "null" : getPaymentMeansText());
+		stringBuilder.append(", RemittanceInformation:");
+		stringBuilder.append(getRemittanceInformation()==null ? "null" : getRemittanceInformation());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
 	}
 
 //	----------------------------- implements PaymentInstructions:
@@ -255,7 +255,15 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		return doc.getPaymentID().isEmpty() ? null : doc.getPaymentID().get(0).getValue();
 	}
 	
-	public List<CreditTransfer> getCreditTransfer() { // CreditTransfer ist Interface, List da BG-17 CREDIT TRANSFER die Kardinalität 0..n hat
+	// CreditTransfer ist Interface, List da BG-17 CREDIT TRANSFER die Kardinalität 0..n hat
+	@Override
+	public void addCreditTransfer(CreditTransfer creditTransfer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<CreditTransfer> getCreditTransfer() { 
 		List<CreditTransfer> result = new ArrayList<CreditTransfer>();
 		if(payeeFinancialAccount==null) {
 			// LOG
@@ -265,16 +273,15 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		return result;
 	}
 	
-//	public List<DirectDebit> getDirectDebit() { // DirectDebit ist Interface, kein List da BG-19 die Kardinalität 0..1 hat
-	public DirectDebit getDirectDebit() { // DirectDebit ist Interface, kein List da BG-19 die Kardinalität 0..1 hat
+	// DirectDebit ist Interface, kein List da BG-19 die Kardinalität 0..1 hat
+	@Override
+	public void setDirectDebit(DirectDebit directDebit) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public DirectDebit getDirectDebit() { 
 		return paymentMandate==null ? null : (DirectDebit)paymentMandate;
-//		List<DirectDebit> result = new ArrayList<DirectDebit>(); // ?????? doch List für alle ?????????
-//		if(paymentMandate==null) {
-//			// LOG
-//		} else {
-//			result.add((DirectDebit)paymentMandate);
-//		}
-//		return result;
 	}
 
 }
