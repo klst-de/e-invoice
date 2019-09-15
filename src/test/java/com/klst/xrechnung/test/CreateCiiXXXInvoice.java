@@ -195,10 +195,6 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		// es ist entscheidend, dass die setter nach cii.setPaymentInstructions ausgeführt werden!!!!!!!!!!!!!!!
 		cii.setStartDate(testDoc.getStartDateAsTimestamp());
 		cii.setEndDate(testDoc.getEndDateAsTimestamp());
-//		Timestamp start = testDoc.getStartDateAsTimestamp();
-//		if(start!=null) cii.setStartDate(start);
-//		Timestamp end = testDoc.getEndDateAsTimestamp();
-//		if(end!=null) cii.setEndDate(end);
 		
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");

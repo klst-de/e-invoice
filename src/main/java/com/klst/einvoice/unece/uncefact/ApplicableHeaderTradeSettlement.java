@@ -28,10 +28,9 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 // 1 .. 1 ApplicableHeaderTradeSettlement     Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
 /* 
 in ram:ApplicableHeaderTradeSettlement stecken auch BT-5, BT-6
-//- ram:ShipToTradeParty                                ==> DELIVERY INFORMATION BG-13 0..1
-- ram:ActualDeliverySupplyChainEvent                  ==>
 - ram:PayeeTradeParty                                 ==>
 - ram:ApplicableTradeTax                              ==> VatBreakdown 0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung  
+- ram:BillingSpecifiedPeriod                          ==> BG-14 ++ 0..1 INVOICING PERIOD
 - ram:SpecifiedTradePaymentTerms                      ==> BT-9 & BT-20 : Payment terms & Payment due date
 - ram:SpecifiedTradeSettlementHeaderMonetarySummation ==> BG-22.BT-106 - 1..1/1..1 in
 
