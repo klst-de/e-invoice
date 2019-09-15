@@ -4,6 +4,7 @@ import com.klst.einvoice.CreditTransfer;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.CreditorFinancialAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.CreditorFinancialInstitutionType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
 
 //Gruppe CREDIT TRANSFER                   BG-17
 /*
@@ -23,8 +24,14 @@ Bsp: 01.15a:
  */
 public class FinancialAccount implements CreditTransfer {
 
-	CreditorFinancialAccountType payeePartyCreditorFinancialAccount;
-	CreditorFinancialInstitutionType payeeSpecifiedCreditorFinancialInstitution;
+	CreditorFinancialAccountType payeePartyCreditorFinancialAccount = null;
+	CreditorFinancialInstitutionType payeeSpecifiedCreditorFinancialInstitution = null;
+	
+	FinancialAccount(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
+		super();
+		payeePartyCreditorFinancialAccount = tradeSettlementPaymentMeans.getPayeePartyCreditorFinancialAccount();
+		payeeSpecifiedCreditorFinancialInstitution = tradeSettlementPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution();
+	}
 	
 	FinancialAccount() {
 		super();
@@ -48,8 +55,11 @@ public class FinancialAccount implements CreditTransfer {
 
 	@Override
 	public String getPaymentAccountID() {
-		// TODO Auto-generated method stub
-		return null;
+		if(payeePartyCreditorFinancialAccount==null) return null;
+		if(payeePartyCreditorFinancialAccount.getIBANID()!=null) {
+			return payeePartyCreditorFinancialAccount.getIBANID().getValue();
+		}
+		return payeePartyCreditorFinancialAccount.getProprietaryID()==null ? null : payeePartyCreditorFinancialAccount.getProprietaryID().getValue();
 	}
 
 	@Override
@@ -64,8 +74,8 @@ public class FinancialAccount implements CreditTransfer {
 
 	@Override
 	public String getPaymentAccountName() {
-		// TODO Auto-generated method stub
-		return null;
+		if(payeePartyCreditorFinancialAccount==null) return null;
+		return payeePartyCreditorFinancialAccount.getAccountName()==null ? null : payeePartyCreditorFinancialAccount.getAccountName().getValue();
 	}
 
 	@Override
@@ -76,8 +86,8 @@ public class FinancialAccount implements CreditTransfer {
 
 	@Override
 	public String getPaymentServiceProviderID() {
-		// TODO Auto-generated method stub
-		return null;
+		if(payeeSpecifiedCreditorFinancialInstitution==null) return null;
+		return payeeSpecifiedCreditorFinancialInstitution.getBICID()==null ? null : payeeSpecifiedCreditorFinancialInstitution.getBICID().getValue();
 	}
 
 	@Override
@@ -90,6 +100,18 @@ public class FinancialAccount implements CreditTransfer {
 	public void setPaymentServiceProviderID(String id) {
 		if(id==null) return;
 		payeeSpecifiedCreditorFinancialInstitution.setBICID(CrossIndustryInvoice.newIDType(id, null));	
+	}
+
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[");
+		stringBuilder.append(getPaymentAccountID()==null ? "null" : getPaymentAccountID());
+		stringBuilder.append(", PaymentAccountName:");
+		stringBuilder.append(getPaymentAccountName()==null ? "null" : getPaymentAccountName());
+		stringBuilder.append(", PaymentServiceProviderID:");
+		stringBuilder.append(getPaymentServiceProviderID()==null ? "null" : getPaymentServiceProviderID());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
 	}
 
 }
