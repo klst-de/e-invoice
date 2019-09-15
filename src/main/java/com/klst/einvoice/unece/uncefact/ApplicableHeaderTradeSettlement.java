@@ -15,6 +15,7 @@ import com.klst.untdid.codelist.PaymentMeansEnum;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CurrencyCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
@@ -27,6 +28,8 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 // 1 .. 1 ApplicableHeaderTradeSettlement     Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
 /* 
 in ram:ApplicableHeaderTradeSettlement stecken auch BT-5, BT-6
+//- ram:ShipToTradeParty                                ==> DELIVERY INFORMATION BG-13 0..1
+- ram:ActualDeliverySupplyChainEvent                  ==>
 - ram:PayeeTradeParty                                 ==>
 - ram:ApplicableTradeTax                              ==> VatBreakdown 0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung  
 - ram:SpecifiedTradePaymentTerms                      ==> BT-9 & BT-20 : Payment terms & Payment due date
@@ -94,6 +97,7 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 	HeaderTradeSettlementType applicableHeaderTradeSettlement = null;
 	TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummation = null;
 	TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = null; // 1st elem in SpecifiedTradeSettlementPaymentMeans List
+	SpecifiedPeriodType billingSpecifiedPeriod = null; // BG-14 ++ 0..1 INVOICING PERIOD
 	
 	static ApplicableHeaderTradeSettlement getApplicableHeaderTradeSettlement(SupplyChainTradeTransactionType supplyChainTradeTransaction) {
 		if(supplyChainTradeTransaction==null) return null;
@@ -301,4 +305,17 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 	List<TradeTaxType> getApplicableTradeTax() {
 		return applicableHeaderTradeSettlement.getApplicableTradeTax();
 	}
+	
+	// BG-14 ++ 0..1 INVOICING PERIOD
+	SpecifiedPeriodType getBillingSpecifiedPeriod() {
+		if(billingSpecifiedPeriod==null) {
+			billingSpecifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
+			if(billingSpecifiedPeriod==null) {
+				billingSpecifiedPeriod = new SpecifiedPeriodType();
+				applicableHeaderTradeSettlement.setBillingSpecifiedPeriod(billingSpecifiedPeriod);
+			}
+		}
+		return billingSpecifiedPeriod;
+	}
+
 }

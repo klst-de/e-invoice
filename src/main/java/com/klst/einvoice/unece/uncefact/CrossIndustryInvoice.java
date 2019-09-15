@@ -690,7 +690,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 
 	@Override
 	public String getPrecedingInvoiceReference() {
-		ReferencedDocumentType referencedDocument =  applicableHeaderTradeSettlement.get().getInvoiceReferencedDocument();
+		ReferencedDocumentType referencedDocument = applicableHeaderTradeSettlement.get().getInvoiceReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
 	}
 	static String getPrecedingInvoiceReference(CrossIndustryInvoiceType doc) {
@@ -882,18 +882,18 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	}
 
 	// BG-14 ++ 0..1 INVOICING PERIOD
-	SpecifiedPeriodType billingSpecifiedPeriod = null;
-	// TODO vll in ApplicableHeaderTradeSettlement implementieren?
-	SpecifiedPeriodType getBillingSpecifiedPeriod() {
-		if(billingSpecifiedPeriod==null) {
-			billingSpecifiedPeriod = applicableHeaderTradeSettlement.get().getBillingSpecifiedPeriod();
-			if(billingSpecifiedPeriod==null) {
-				billingSpecifiedPeriod = new SpecifiedPeriodType();
-				applicableHeaderTradeSettlement.get().setBillingSpecifiedPeriod(billingSpecifiedPeriod);
-			}
-		}
-		return billingSpecifiedPeriod;
-	}
+//	SpecifiedPeriodType billingSpecifiedPeriod = null;
+//	// TODO vll in ApplicableHeaderTradeSettlement implementieren?
+//	SpecifiedPeriodType getBillingSpecifiedPeriod() {
+//		if(billingSpecifiedPeriod==null) {
+//			billingSpecifiedPeriod = applicableHeaderTradeSettlement.get().getBillingSpecifiedPeriod();
+//			if(billingSpecifiedPeriod==null) {
+//				billingSpecifiedPeriod = new SpecifiedPeriodType();
+//				applicableHeaderTradeSettlement.get().setBillingSpecifiedPeriod(billingSpecifiedPeriod);
+//			}
+//		}
+//		return billingSpecifiedPeriod;
+//	}
 	
 	// BG-14.BT-73 +++ 0..1 Invoicing period start date
 	@Override
@@ -905,13 +905,12 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public void setStartDate(Timestamp ts) {
 		if(ts==null) return;
 		DateTimeType dateTime = newDateTime(ts);
-		SpecifiedPeriodType specifiedPeriod = getBillingSpecifiedPeriod();
-		specifiedPeriod.setStartDateTime(dateTime);
+		applicableHeaderTradeSettlement.getBillingSpecifiedPeriod().setStartDateTime(dateTime);
 	}
 
 	@Override
 	public Timestamp getStartDateAsTimestamp() {
-		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.get().getBillingSpecifiedPeriod();
+		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
@@ -926,13 +925,12 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public void setEndDate(Timestamp ts) {
 		if(ts==null) return;
 		DateTimeType dateTime = newDateTime(ts);
-		SpecifiedPeriodType specifiedPeriod = getBillingSpecifiedPeriod();
-		specifiedPeriod.setEndDateTime(dateTime);
+		applicableHeaderTradeSettlement.getBillingSpecifiedPeriod().setEndDateTime(dateTime);
 	}
 
 	@Override
 	public Timestamp getEndDateAsTimestamp() {
-		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.get().getBillingSpecifiedPeriod();
+		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());

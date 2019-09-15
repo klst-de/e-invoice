@@ -15,13 +15,9 @@ import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.unece.uncefact.Amount;
-import com.klst.einvoice.unece.uncefact.ApplicableHeaderTradeDelivery;
-import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
-import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
-import com.klst.einvoice.unece.uncefact.TradeSettlementPaymentMeans;
 import com.klst.einvoice.unece.uncefact.VatBreakdown;
 import com.klst.marshaller.CiiTransformer;
 import com.klst.untdid.codelist.TaxCategoryCode;
@@ -177,47 +173,32 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			LOG.info("delivery:"+delivery);
 			cii.setDelivery(delivery);
 		}
-		cii.setStartDate(testDoc.getStartDateAsTimestamp());
-		cii.setEndDate(testDoc.getEndDateAsTimestamp());
 		
 		PaymentInstructions pi = testDoc.getPaymentInstructions();
-		LOG.info("testDoc.PaymentInstructions pi.RemittanceInformation:"+pi.getRemittanceInformation());
-		LOG.info("testDoc.PaymentInstructions pi.PaymentMeansEnum:"+pi.getPaymentMeansEnum() + " PaymentMeansText:"+pi.getPaymentMeansText());
-//		LOG.info("testDoc.RemittanceInformation:"+testDoc.getRemittanceInformation());
-//		List<TradeSettlementPaymentMeans> testList = testDoc.getTradeSettlementPaymentMeansList();
-//		testList.forEach(e -> {
-//			LOG.info("testDoc.PaymentMeansEnum:"+e.getPaymentMeansEnum() + " PaymentMeansText()"+e.getPaymentMeansText());
-//			cii.setPaymentInstructions(e.getPaymentMeansEnum(), e.getPaymentMeansText(), testDoc.getRemittanceInformation());
-//		});
-//		
-//		LOG.info("testDoc.getPaymentMeansCode():"+testDoc.getPaymentMeansCode() + " RemittanceInformation:"+testDoc.getRemittanceInformation()); 
-//		cii.setPaymentInstructions(testDoc.getPaymentMeansCode(), null, testDoc.getRemittanceInformation());
-		
+		LOG.info("testDoc.PaymentInstructions pi.RemittanceInformation:"+pi.getRemittanceInformation() + 
+				" PaymentMeansEnum:"+pi.getPaymentMeansEnum() + " PaymentMeansText:"+pi.getPaymentMeansText());
 		List<CreditTransfer> testCtList = pi.getCreditTransfer();
 		CreditTransfer testCt = null;
 		if(testCtList.isEmpty()) {
 			// no CreditTransfer
 		} else {
 			testCtList.forEach(testCT -> {
-				LOG.info("testCT.PaymentAccountID:"+testCT.getPaymentAccountID() 
-					+ " PaymentAccountName:"+testCT.getPaymentAccountName()
-					+ " PaymentServiceProviderID:"+testCT.getPaymentServiceProviderID() );
+				LOG.info("CreditTransfer "+testCT);
+//				LOG.info("testCT.PaymentAccountID:"+testCT.getPaymentAccountID() 
+//					+ " PaymentAccountName:"+testCT.getPaymentAccountName()
+//					+ " PaymentServiceProviderID:"+testCT.getPaymentServiceProviderID() );
 			});
 			testCt = testCtList.get(0);
 		}
-//		CreditTransfer testCT = testDoc.getCreditTransfer();
-//		if(testCT==null) {
-//			// nix da
-//		} else {
-//			LOG.info("testCT.PaymentAccountID:"+testCT.getPaymentAccountID() 
-//			+ ", testCT.PaymentAccountName:"+testCT.getPaymentAccountName()
-//			+ ", testCT.getPaymentServiceProviderID:"+testCT.getPaymentServiceProviderID());
-//			CreditTransfer ciiCT = cii.createCreditTransfer(new IBANId(testCT.getPaymentAccountID())
-//					, testCT.getPaymentAccountName()
-//					, testCT.getPaymentServiceProviderID()==null ? null : new BICId(testCT.getPaymentServiceProviderID())
-//					);
-//		}
 		cii.setPaymentInstructions(pi.getPaymentMeansEnum(), pi.getPaymentMeansText(), pi.getRemittanceInformation(), testCt, null, null);
+		
+		// es ist entscheidend, dass die setter nach cii.setPaymentInstructions ausgeführt werden!!!!!!!!!!!!!!!
+		cii.setStartDate(testDoc.getStartDateAsTimestamp());
+		cii.setEndDate(testDoc.getEndDateAsTimestamp());
+//		Timestamp start = testDoc.getStartDateAsTimestamp();
+//		if(start!=null) cii.setStartDate(start);
+//		Timestamp end = testDoc.getEndDateAsTimestamp();
+//		if(end!=null) cii.setEndDate(end);
 		
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
