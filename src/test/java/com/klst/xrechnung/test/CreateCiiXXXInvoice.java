@@ -182,6 +182,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		
 		PaymentInstructions pi = testDoc.getPaymentInstructions();
 		LOG.info("testDoc.PaymentInstructions pi.RemittanceInformation:"+pi.getRemittanceInformation());
+		LOG.info("testDoc.PaymentInstructions pi.PaymentMeansEnum:"+pi.getPaymentMeansEnum() + " PaymentMeansText:"+pi.getPaymentMeansText());
 //		LOG.info("testDoc.RemittanceInformation:"+testDoc.getRemittanceInformation());
 //		List<TradeSettlementPaymentMeans> testList = testDoc.getTradeSettlementPaymentMeansList();
 //		testList.forEach(e -> {
@@ -189,10 +190,21 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //			cii.setPaymentInstructions(e.getPaymentMeansEnum(), e.getPaymentMeansText(), testDoc.getRemittanceInformation());
 //		});
 //		
-////		LOG.info("testDoc.getPaymentMeansCode():"+testDoc.getPaymentMeansCode() + " RemittanceInformation:"+testDoc.getRemittanceInformation()); 
-////		cii.setPaymentInstructions(testDoc.getPaymentMeansCode(), null, testDoc.getRemittanceInformation());
-//		
-//		
+//		LOG.info("testDoc.getPaymentMeansCode():"+testDoc.getPaymentMeansCode() + " RemittanceInformation:"+testDoc.getRemittanceInformation()); 
+//		cii.setPaymentInstructions(testDoc.getPaymentMeansCode(), null, testDoc.getRemittanceInformation());
+		
+		List<CreditTransfer> testCtList = pi.getCreditTransfer();
+		CreditTransfer testCt = null;
+		if(testCtList.isEmpty()) {
+			// no CreditTransfer
+		} else {
+			testCtList.forEach(testCT -> {
+				LOG.info("testCT.PaymentAccountID:"+testCT.getPaymentAccountID() 
+					+ " PaymentAccountName:"+testCT.getPaymentAccountName()
+					+ " PaymentServiceProviderID:"+testCT.getPaymentServiceProviderID() );
+			});
+			testCt = testCtList.get(0);
+		}
 //		CreditTransfer testCT = testDoc.getCreditTransfer();
 //		if(testCT==null) {
 //			// nix da
@@ -205,6 +217,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //					, testCT.getPaymentServiceProviderID()==null ? null : new BICId(testCT.getPaymentServiceProviderID())
 //					);
 //		}
+		cii.setPaymentInstructions(pi.getPaymentMeansEnum(), pi.getPaymentMeansText(), pi.getRemittanceInformation(), testCt, null, null);
 		
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");

@@ -94,7 +94,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		super();
 	}
 
-	HeaderTradeSettlementType applicableHeaderTradeSettlement;
+//	HeaderTradeSettlementType applicableHeaderTradeSettlement;
+	ApplicableHeaderTradeSettlement applicableHeaderTradeSettlement;
 	HeaderTradeDeliveryType applicableHeaderTradeDelivery;
 	ExchangedDocumentType exchangedDocument;
 	
@@ -110,8 +111,9 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery();
 		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 		
-		applicableHeaderTradeSettlement = new PaymentMeans(); // class PaymentMeans extends HeaderTradeSettlementType
-		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
+//		applicableHeaderTradeSettlement = new PaymentMeans(); // class PaymentMeans extends HeaderTradeSettlementType  TODO ist ApplicableHeaderTradeSettlement
+		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement();
+		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement.get());
 		
 		exchangedDocument = new ExchangedDocumentType();
 		DocumentCodeType documentCode = new DocumentCodeType();
@@ -137,12 +139,9 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		}
 		// in ApplicableHeaderTradeSettlement/PaymentMeans copy ctor
 //		doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getBillingSpecifiedPeriod();
-//---
-		HeaderTradeSettlementType hts = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement();
-		hts.getPaymentReference().size();
-//---
-		applicableHeaderTradeSettlement = new PaymentMeans(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
-		setPaymentTermsAndDate(getPaymentTerm(applicableHeaderTradeSettlement), getDueDateAsTimestamp(applicableHeaderTradeSettlement)); // optional
+//		applicableHeaderTradeSettlement = new PaymentMeans(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
+		applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.getApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction());
+		setPaymentTermsAndDate(getPaymentTerm(applicableHeaderTradeSettlement.get()), getDueDateAsTimestamp(applicableHeaderTradeSettlement.get())); // optional
 		
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));
@@ -244,36 +243,43 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	// 1 .. 1 InvoiceCurrencyCode Code für die Rechnungswährung BT-5
 	@Override
 	public void setDocumentCurrency(String isoCurrencyCode) {
-		CurrencyCodeType currencyCode = new CurrencyCodeType();
-		currencyCode.setValue(isoCurrencyCode);
-		applicableHeaderTradeSettlement.setInvoiceCurrencyCode(currencyCode);
+//		CurrencyCodeType currencyCode = new CurrencyCodeType();
+//		currencyCode.setValue(isoCurrencyCode);
+//		applicableHeaderTradeSettlement.setInvoiceCurrencyCode(currencyCode);
+		applicableHeaderTradeSettlement.setDocumentCurrency(isoCurrencyCode);
 	}
 
 	@Override
 	public String getDocumentCurrency() {
-		return applicableHeaderTradeSettlement.getInvoiceCurrencyCode().getValue();
+		return applicableHeaderTradeSettlement.getDocumentCurrency();
 	}
 	static String getDocumentCurrency(CrossIndustryInvoiceType doc) {
-		return doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getInvoiceCurrencyCode().getValue();
+//		return doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getInvoiceCurrencyCode().getValue();
+		ApplicableHeaderTradeSettlement ahts = ApplicableHeaderTradeSettlement.getApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction());
+		return ahts.getDocumentCurrency();
 	}
 
 	// 0..1 (optional) BT-6
 	@Override
 	public void setTaxCurrency(String isoCurrencyCode) {
-		if(isoCurrencyCode==null) return;  // optional
-		CurrencyCodeType currencyCode = new CurrencyCodeType();
-		currencyCode.setValue(isoCurrencyCode);
-		applicableHeaderTradeSettlement.setTaxCurrencyCode(currencyCode);
+//		if(isoCurrencyCode==null) return;  // optional
+//		CurrencyCodeType currencyCode = new CurrencyCodeType();
+//		currencyCode.setValue(isoCurrencyCode);
+//		applicableHeaderTradeSettlement.setTaxCurrencyCode(currencyCode);
+		applicableHeaderTradeSettlement.setTaxCurrency(isoCurrencyCode);
 	}
 
 	@Override
 	public String getTaxCurrency() {
-		CurrencyCodeType currencyCode = applicableHeaderTradeSettlement.getTaxCurrencyCode();
-		return currencyCode==null ? null : currencyCode.getValue();
+//		CurrencyCodeType currencyCode = applicableHeaderTradeSettlement.getTaxCurrencyCode();
+//		return currencyCode==null ? null : currencyCode.getValue();
+		return applicableHeaderTradeSettlement.getTaxCurrency();
 	}
 	static String getTaxCurrency(CrossIndustryInvoiceType doc) {
-		CurrencyCodeType currencyCode = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getTaxCurrencyCode();
-		return currencyCode==null ? null : currencyCode.getValue();
+//		CurrencyCodeType currencyCode = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getTaxCurrencyCode();
+//		return currencyCode==null ? null : currencyCode.getValue();
+		ApplicableHeaderTradeSettlement ahts = ApplicableHeaderTradeSettlement.getApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction());
+		return ahts.getTaxCurrency();
 	}
 
 	/*
@@ -296,10 +302,11 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	// 0..1 (optional) BT-7 BT-7-0
 	@Override
 	public void setTaxPointDate(Timestamp ts) {
-		if(ts==null) return;  // optional
-		TradeTaxType tradeTax = new TradeTaxType();
-		tradeTax.setTaxPointDate(newDateType(ts));
-		applicableHeaderTradeSettlement.getApplicableTradeTax().add(tradeTax);
+//		if(ts==null) return;  // optional
+//		TradeTaxType tradeTax = new TradeTaxType();
+//		tradeTax.setTaxPointDate(newDateType(ts));
+//		applicableHeaderTradeSettlement.getApplicableTradeTax().add(tradeTax);
+		applicableHeaderTradeSettlement.setTaxPointDate(ts);
 	}
 
 	DateType newDateType(Timestamp ts) {
@@ -315,7 +322,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 
 	@Override
 	public Timestamp getTaxPointDateAsTimestamp() {
-		return getTaxPointDateAsTimestamp(applicableHeaderTradeSettlement);
+		return getTaxPointDateAsTimestamp(applicableHeaderTradeSettlement.get());
 	}
 	static Timestamp getTaxPointDateAsTimestamp(HeaderTradeSettlementType headerTradeSettlement) {
 		List<TradeTaxType> tradeTaxList = headerTradeSettlement.getApplicableTradeTax();
@@ -339,8 +346,10 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		return results.get(0);
 	}
 	static Timestamp getTaxPointDateAsTimestamp(CrossIndustryInvoiceType doc) {
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement();
-		return getTaxPointDateAsTimestamp(applicableHeaderTradeSettlement);
+//		HeaderTradeSettlementType applicableHeaderTradeSettlement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement();
+//		return getTaxPointDateAsTimestamp(applicableHeaderTradeSettlement);
+		ApplicableHeaderTradeSettlement ahts = ApplicableHeaderTradeSettlement.getApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction());
+		return getTaxPointDateAsTimestamp(ahts.get());
 	}
 	
 	// BT-8 + 0..1 Value added tax point date code
@@ -373,7 +382,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 
 	@Override
 	public Timestamp getDueDateAsTimestamp() {
-		return getDueDateAsTimestamp(applicableHeaderTradeSettlement);
+		return getDueDateAsTimestamp(applicableHeaderTradeSettlement.get());
 	}
 	static Timestamp getDueDateAsTimestamp(HeaderTradeSettlementType headerTradeSettlement) {
 		if(headerTradeSettlement==null) return null;
@@ -406,7 +415,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 			tradePaymentTerms.setDueDateDateTime(newDateTime(ts));
 		}
 		
-		applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
+		applicableHeaderTradeSettlement.get().getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
 	}
 	
 	static DateTimeType newDateTime(Timestamp ts) {
@@ -422,7 +431,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 
 	@Override
 	public String getPaymentTerm() {
-		return getPaymentTerm(applicableHeaderTradeSettlement);
+		return getPaymentTerm(applicableHeaderTradeSettlement.get());
 	}
 	static String getPaymentTerm(HeaderTradeSettlementType headerTradeSettlement) {
 		List<TradePaymentTermsType> tradePaymentTermsList = headerTradeSettlement.getSpecifiedTradePaymentTerms();
@@ -676,12 +685,12 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		FormattedDateTimeType dateTime = newFormattedDateTimeType(ts);
 		if(dateTime!=null) referencedDocument.setFormattedIssueDateTime(dateTime);
 
-		applicableHeaderTradeSettlement.setInvoiceReferencedDocument(referencedDocument);
+		applicableHeaderTradeSettlement.get().setInvoiceReferencedDocument(referencedDocument);
 	}
 
 	@Override
 	public String getPrecedingInvoiceReference() {
-		ReferencedDocumentType referencedDocument =  applicableHeaderTradeSettlement.getInvoiceReferencedDocument();
+		ReferencedDocumentType referencedDocument =  applicableHeaderTradeSettlement.get().getInvoiceReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
 	}
 	static String getPrecedingInvoiceReference(CrossIndustryInvoiceType doc) {
@@ -795,19 +804,21 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		setPayee(party);
 	}
 	public void setPayee(BusinessParty party) {
-		applicableHeaderTradeSettlement.setPayeeTradeParty((TradePartyType) party);
+		applicableHeaderTradeSettlement.get().setPayeeTradeParty((TradePartyType) party);
 	}
 
 	public BusinessParty getPayee() {
-		TradePartyType payeeParty = applicableHeaderTradeSettlement.getPayeeTradeParty();
+		TradePartyType payeeParty = applicableHeaderTradeSettlement.get().getPayeeTradeParty();
 		return payeeParty==null ? null : new TradeParty(payeeParty);
 	}
 
 	static TradeParty getPayeeParty(CrossIndustryInvoiceType doc) {
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
-		if(applicableHeaderTradeSettlement==null) return null; // 1..1 : darf nicht null sein
-		TradePartyType party = applicableHeaderTradeSettlement.getPayeeTradeParty();
-		return party==null ? null : new TradeParty(party);
+		ApplicableHeaderTradeSettlement ahts = ApplicableHeaderTradeSettlement.getApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction());
+		return ahts.getPayeeTradeParty();
+//		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
+//		if(applicableHeaderTradeSettlement==null) return null; // 1..1 : darf nicht null sein
+//		TradePartyType party = applicableHeaderTradeSettlement.getPayeeTradeParty();
+//		return party==null ? null : new TradeParty(party);
 	}
 	
 	/* SELLER TAX REPRESENTATIVE PARTY             BG-11                       0..1
@@ -875,10 +886,10 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	// TODO vll in ApplicableHeaderTradeSettlement implementieren?
 	SpecifiedPeriodType getBillingSpecifiedPeriod() {
 		if(billingSpecifiedPeriod==null) {
-			billingSpecifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
+			billingSpecifiedPeriod = applicableHeaderTradeSettlement.get().getBillingSpecifiedPeriod();
 			if(billingSpecifiedPeriod==null) {
 				billingSpecifiedPeriod = new SpecifiedPeriodType();
-				applicableHeaderTradeSettlement.setBillingSpecifiedPeriod(billingSpecifiedPeriod);
+				applicableHeaderTradeSettlement.get().setBillingSpecifiedPeriod(billingSpecifiedPeriod);
 			}
 		}
 		return billingSpecifiedPeriod;
@@ -900,7 +911,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 
 	@Override
 	public Timestamp getStartDateAsTimestamp() {
-		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
+		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.get().getBillingSpecifiedPeriod();
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
@@ -921,7 +932,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 
 	@Override
 	public Timestamp getEndDateAsTimestamp() {
-		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
+		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.get().getBillingSpecifiedPeriod();
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
@@ -959,14 +970,16 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	@Override
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		applicableHeaderTradeSettlement = new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+		setPaymentInstructions(applicableHeaderTradeSettlement);
 	}
 
 	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
-		// TODO ?brauche ich es? im ctor: applicableHeaderTradeSettlement = new PaymentMeans()
+		// TODO ?brauche ich es? im ctor: applicableHeaderTradeSettlement = new ...
+		// und : supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement.get());
 	}
 	public PaymentInstructions getPaymentInstructions() {
-		return new PaymentMeans(applicableHeaderTradeSettlement); // das implementiert PaymentInstructions!
+		return applicableHeaderTradeSettlement; // das implementiert PaymentInstructions!
 	}
 
 //	PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
@@ -995,7 +1008,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 //	}
 	// BG-16.BT-81 - 0..1/1..1
 	public PaymentMeansEnum getPaymentMeansCode() {
-		List<TradeSettlementPaymentMeansType> tspmList = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans();
+		List<TradeSettlementPaymentMeansType> tspmList = applicableHeaderTradeSettlement.get().getSpecifiedTradeSettlementPaymentMeans();
 		if(tspmList.isEmpty()) return null;
 		
 		PaymentMeansCodeType pmc = tspmList.get(0).getTypeCode();
@@ -1060,7 +1073,8 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 */
 	@Override
 	public void setDocumentTotals(Amount lineExtension, Amount taxExclusive, Amount taxInclusive, Amount payable) {
-		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = getTradeSettlementHeaderMonetarySummation(applicableHeaderTradeSettlement);
+		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = applicableHeaderTradeSettlement.getTradeSettlementHeaderMonetarySummation();
+//		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = getTradeSettlementHeaderMonetarySummation(applicableHeaderTradeSettlement);
 
 		AmountType lineTotalAmt = new AmountType();
 		lineExtension.copyTo(lineTotalAmt);
@@ -1080,7 +1094,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		payable.copyTo(payableAmt);
 		tradeSettlementHeaderMonetarySummationType.getDuePayableAmount().add(payableAmt); // add to list
 		
-		applicableHeaderTradeSettlement.setSpecifiedTradeSettlementHeaderMonetarySummation(tradeSettlementHeaderMonetarySummationType);
+//		applicableHeaderTradeSettlement.setSpecifiedTradeSettlementHeaderMonetarySummation(tradeSettlementHeaderMonetarySummationType);
 	}
 
 	private Amount getInvoiceTax(boolean sameCurrency) {
@@ -1110,20 +1124,24 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		return getInvoiceTax(false);
 	}
 
-	static HeaderTradeSettlementType getApplicableHeaderTradeSettlement(CrossIndustryInvoiceType doc) {
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = doc.getSupplyChainTradeTransaction();
-		if(supplyChainTradeTransaction==null) return null;
-		return supplyChainTradeTransaction.getApplicableHeaderTradeSettlement(); // 1..1 : darf nicht null sein
-	}
+//	static HeaderTradeSettlementType getApplicableHeaderTradeSettlement(CrossIndustryInvoiceType doc) {
+//		SupplyChainTradeTransactionType supplyChainTradeTransaction = doc.getSupplyChainTradeTransaction();
+//		if(supplyChainTradeTransaction==null) return null;
+//		return supplyChainTradeTransaction.getApplicableHeaderTradeSettlement(); // 1..1 : darf nicht null sein
+//	}
 	static TradeSettlementHeaderMonetarySummationType getSpecifiedTradeSettlementHeaderMonetarySummation(CrossIndustryInvoiceType doc) {
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
-		if(applicableHeaderTradeSettlement==null) return null; // 1..1 : darf nicht null sein
-		return applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation(); // 1..1 : darf nicht null sein
+		ApplicableHeaderTradeSettlement ahts = ApplicableHeaderTradeSettlement.getApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction());
+		return ahts.getSpecifiedTradeSettlementHeaderMonetarySummation();
+//		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
+//		if(applicableHeaderTradeSettlement==null) return null; // 1..1 : darf nicht null sein
+//		return applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation(); // 1..1 : darf nicht null sein
 	}
 	static Amount getInvoiceTax(CrossIndustryInvoiceType doc) {
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
-		if(applicableHeaderTradeSettlement==null) return null;
-		List<AmountType> list = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxTotalAmount();
+		ApplicableHeaderTradeSettlement ahts = ApplicableHeaderTradeSettlement.getApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction());
+		List<AmountType> list = ahts.getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxTotalAmount();
+//		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
+//		if(applicableHeaderTradeSettlement==null) return null;
+//		List<AmountType> list = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxTotalAmount();
 		if(list.isEmpty()) return null;
 		for(int i=0; i<list.size(); i++) {
 			if(getTaxCurrency(doc)==null || getDocumentCurrency(doc).equals(getTaxCurrency(doc))) {
@@ -1141,12 +1159,13 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 */
 	@Override
 	public void setInvoiceTax(Amount taxTotalAmount) {
-		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = getTradeSettlementHeaderMonetarySummation(applicableHeaderTradeSettlement);
+		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = applicableHeaderTradeSettlement.getTradeSettlementHeaderMonetarySummation();
+//		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = getTradeSettlementHeaderMonetarySummation(applicableHeaderTradeSettlement);
 		AmountType taxTotalAmt = new AmountType();
 		taxTotalAmount.copyTo(taxTotalAmt);
 		tradeSettlementHeaderMonetarySummationType.getTaxTotalAmount().add(taxTotalAmt); // add to list
 				
-		applicableHeaderTradeSettlement.setSpecifiedTradeSettlementHeaderMonetarySummation(tradeSettlementHeaderMonetarySummationType);
+//		applicableHeaderTradeSettlement.setSpecifiedTradeSettlementHeaderMonetarySummation(tradeSettlementHeaderMonetarySummationType);
 	}
 	
 	@Override
@@ -1222,9 +1241,11 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		return result;
 	}
 	static List<VatBreakdown> getVATBreakDowns(CrossIndustryInvoiceType doc) {
-		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
-		if(applicableHeaderTradeSettlement==null) return null; // 1..1 : darf nicht null sein
-		List<TradeTaxType> list = applicableHeaderTradeSettlement.getApplicableTradeTax();
+		ApplicableHeaderTradeSettlement ahts = ApplicableHeaderTradeSettlement.getApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction());
+		List<TradeTaxType> list = ahts.getApplicableTradeTax();
+//		HeaderTradeSettlementType applicableHeaderTradeSettlement = getApplicableHeaderTradeSettlement(doc);
+//		if(applicableHeaderTradeSettlement==null) return null; // 1..1 : darf nicht null sein
+//		List<TradeTaxType> list = applicableHeaderTradeSettlement.getApplicableTradeTax();
 		List<VatBreakdown> result = new ArrayList<VatBreakdown>(list.size()); // VatBreakdown extends TradeTaxType
 		list.forEach(vbd -> {
 			result.add(new VatBreakdown(vbd));
@@ -1321,14 +1342,14 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 
 // -----------------------------------------------------------
 	
-	private TradeSettlementHeaderMonetarySummationType getTradeSettlementHeaderMonetarySummation(HeaderTradeSettlementType applicableHeaderTradeSettlement) {
-		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation();
-		if(tradeSettlementHeaderMonetarySummationType==null) {
-			tradeSettlementHeaderMonetarySummationType = new TradeSettlementHeaderMonetarySummationType();
-			LOG.info("new TradeSettlementHeaderMonetarySummationType:"+tradeSettlementHeaderMonetarySummationType);
-		}
-		return tradeSettlementHeaderMonetarySummationType;
-	}
+//	private TradeSettlementHeaderMonetarySummationType getTradeSettlementHeaderMonetarySummation(HeaderTradeSettlementType applicableHeaderTradeSettlement) {
+//		TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummationType = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation();
+//		if(tradeSettlementHeaderMonetarySummationType==null) {
+//			tradeSettlementHeaderMonetarySummationType = new TradeSettlementHeaderMonetarySummationType();
+//			LOG.info("new TradeSettlementHeaderMonetarySummationType:"+tradeSettlementHeaderMonetarySummationType);
+//		}
+//		return tradeSettlementHeaderMonetarySummationType;
+//	}
 
 	private HeaderTradeAgreementType getApplicableHeaderTradeAgreement() {
 		return getApplicableHeaderTradeAgreement(this.getSupplyChainTradeTransaction());
