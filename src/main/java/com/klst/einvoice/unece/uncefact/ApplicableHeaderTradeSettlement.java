@@ -3,6 +3,7 @@ package com.klst.einvoice.unece.uncefact;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.CreditTransferFactory;
@@ -18,15 +19,39 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 // kapselt          HeaderTradeSettlementType
-// 1 .. 1 ApplicableHeaderTradeSettlement     Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
 /* 
+1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
+0 .. 1 PaymentReference Verwendungszweck                                        BT-83 
+
+0 .. n SpecifiedTradeSettlementPaymentMeans Zahlungsanweisungen                 BG-16 xs:sequence   ! BG-16 Cardinality: 0..1
+  1..1 TypeCode Code für die Zahlungsart                                        BT-81 
+  0..1 Information Text zur Zahlungsart                                         BT-82 
+
+  0..1 ApplicableTradeSettlementFinancialCard Informationen zur Zahlungskarte   BG-18 xs:sequence 
+    1..1 ID Zahlungskartennummer                                                  BT-87 
+    0..1 CardholderName Name des Zahlungskarteninhabers                           BT-88 
+
+  0..1 PayerPartyDebtorFinancialAccount Bankinstitut des Käufers xs:sequence 
+    1..1 IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos           BG-19/ BT-91 
+
+  0..1 PayeePartyCreditorFinancialAccount Überweisung                           BG-17 xs:sequence 
+    0..1 IBANID Kennung des Zahlungskontos                                        BT-84 
+    0..1 AccountName Name des Zahlungskontos                                      BT-85 
+    0..1 ProprietaryID Nationale Kontonummer (nicht für SEPA)                     BT-84-0 
+
+  0..1 PayeeSpecifiedCreditorFinancialInstitution Bankinstitut des Verkäufers xs:sequence 
+    1..1 BICID Kennung des Zahlungsdienstleisters                                 BT-86
+ 
+
 in ram:ApplicableHeaderTradeSettlement stecken auch BT-5, BT-6
 - ram:PayeeTradeParty                                 ==>
 - ram:ApplicableTradeTax                              ==> VatBreakdown 0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung  
@@ -75,7 +100,7 @@ in ram:ApplicableHeaderTradeSettlement stecken auch BT-5, BT-6
                 <ram:CategoryCode>S</ram:CategoryCode>
                 <ram:RateApplicablePercent>19</ram:RateApplicablePercent>
             </ram:ApplicableTradeTax>
-            <ram:SpecifiedTradePaymentTerms>
+            <ram:SpecifiedTradePaymentTerms>                             <!-- 0 .. n SpecifiedTradePaymentTerms Detailinformationen zu Zahlungsbedingungen
                 <ram:Description>Bei Zahlungen binnen 14 Tagen, 2% Skonto</ram:Description>
                 <ram:DueDateDateTime>
                     <udt:DateTimeString format="102">20180110</udt:DateTimeString>
@@ -93,6 +118,8 @@ in ram:ApplicableHeaderTradeSettlement stecken auch BT-5, BT-6
  */
 public class ApplicableHeaderTradeSettlement implements PaymentInstructions, CreditTransferFactory {
 
+	private static final Logger LOG = Logger.getLogger(ApplicableHeaderTradeSettlement.class.getName());
+	
 	HeaderTradeSettlementType applicableHeaderTradeSettlement = null;
 	TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummation = null;
 	TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = null; // 1st elem in SpecifiedTradeSettlementPaymentMeans List
@@ -288,6 +315,32 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 
 // ----------------
 	// 1 .. 1 SpecifiedTradeSettlementHeaderMonetarySummation Gesamtsummen auf Dokumentenebene BG-22
+	void setDocumentTotals(Amount lineExtension, Amount taxExclusive, Amount taxInclusive, Amount payable) {
+		LOG.info("lineExtension:"+lineExtension + " taxExclusive:"+taxExclusive + " taxInclusive:"+taxInclusive + " payable:"+payable);
+		AmountType lineTotalAmt = new AmountType();
+		lineExtension.copyTo(lineTotalAmt);
+		tradeSettlementHeaderMonetarySummation.getLineTotalAmount().add(lineTotalAmt); // add to list
+		
+		AmountType taxBasisTotalAmt = new AmountType();
+		taxExclusive.copyTo(taxBasisTotalAmt);
+		tradeSettlementHeaderMonetarySummation.getTaxBasisTotalAmount().add(taxBasisTotalAmt); // add to list
+		
+		AmountType taxTotalAmt = new AmountType();
+		taxInclusive.copyTo(taxTotalAmt);
+
+		taxTotalAmt.setCurrencyID(taxInclusive.getCurrencyID()); // wg. validation 
+		tradeSettlementHeaderMonetarySummation.getGrandTotalAmount().add(taxTotalAmt); // add to list
+		
+		AmountType payableAmt = new AmountType();
+		payable.copyTo(payableAmt);
+		tradeSettlementHeaderMonetarySummation.getDuePayableAmount().add(payableAmt); // add to list
+	}
+	void setInvoiceTax(Amount taxTotalAmount) {
+		AmountType taxTotalAmt = new AmountType();
+		taxTotalAmount.copyTo(taxTotalAmt);
+		tradeSettlementHeaderMonetarySummation.getTaxTotalAmount().add(taxTotalAmt); // add to list
+	}
+	
 	TradeSettlementHeaderMonetarySummationType getTradeSettlementHeaderMonetarySummation() {
 		return tradeSettlementHeaderMonetarySummation;
 	}
@@ -296,10 +349,6 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 		TradePartyType party = applicableHeaderTradeSettlement.getPayeeTradeParty();
 		return party==null ? null : new TradeParty(party);
 	}
-	
-	TradeSettlementHeaderMonetarySummationType getSpecifiedTradeSettlementHeaderMonetarySummation() {
-		 return applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation();
-	 }
 	
 	List<TradeTaxType> getApplicableTradeTax() {
 		return applicableHeaderTradeSettlement.getApplicableTradeTax();
@@ -317,4 +366,7 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 		return billingSpecifiedPeriod;
 	}
 
+	void addPaymentTerms(TradePaymentTermsType tradePaymentTerms) {
+		applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
+	}
 }

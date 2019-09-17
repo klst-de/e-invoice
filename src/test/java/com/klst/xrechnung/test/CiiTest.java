@@ -1,6 +1,7 @@
 package com.klst.xrechnung.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Timestamp;
@@ -14,10 +15,12 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 
@@ -110,6 +113,13 @@ public class CiiTest {
 	@Test
     public void ciixml13() { // wg. <ram:ID schemeID="FC">123/456/789</ram:ID>
     	InvoiceFactory factory = new CreateCiiXXXInvoice("01.13a-INVOICE_uncefact.xml");
+    	Object o = factory.makeInvoice();
+    	CrossIndustryInvoice cii = (CrossIndustryInvoice)o;
+    	PaymentInstructions pi = cii.getPaymentInstructions();
+    	assertNull(pi.getRemittanceInformation());
+    	assertEquals(PaymentMeansEnum.CreditTransfer, pi.getPaymentMeansEnum());  // <ram:TypeCode>30</ram:TypeCode>
+    	assertEquals(1, pi.getCreditTransfer().size());
+    	assertEquals("DE12345678912345678912", pi.getCreditTransfer().get(0).getPaymentAccountID());  // <ram:IBANID>DE12345678912345678912</ram:IBANID>
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
@@ -129,6 +139,30 @@ public class CiiTest {
     	
     	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), cii.getStartDateAsTimestamp()); 
     	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), cii.getEndDateAsTimestamp()); 
+    	
+    	LOG.info("------------------------------------------- toCii:");
+    	byte[] bytes = factory.toCii(); // the xml
+    	String xml = new String(bytes);
+    	LOG.info("xml=\n"+xml);
+    	assertTrue(validation.check(bytes));
+	}
+	
+	@Test
+    public void ciixml15_PaymentInstructions() {
+    	InvoiceFactory factory = new CreateCiiXXXInvoice("01.15a-INVOICE_uncefact.xml");
+    	Object o = factory.makeInvoice();
+    	CrossIndustryInvoice cii = (CrossIndustryInvoice)o;
+    	PaymentInstructions pi = cii.getPaymentInstructions();
+    	assertEquals("0000123456", pi.getRemittanceInformation());  // <ram:PaymentReference>0000123456</ram:PaymentReference> 
+    	assertEquals(PaymentMeansEnum.CreditTransfer, pi.getPaymentMeansEnum());  // <ram:TypeCode>30</ram:TypeCode>
+    	assertEquals(1, pi.getCreditTransfer().size());
+    	assertEquals("DE12123000001234567890", pi.getCreditTransfer().get(0).getPaymentAccountID());  // <ram:IBANID>DE12123000001234567890</ram:IBANID>
+    	
+    	LOG.info("------------------------------------------- toCii:");
+    	byte[] bytes = factory.toCii(); // the xml
+    	String xml = new String(bytes);
+    	LOG.info("xml=\n"+xml);
+    	assertTrue(validation.check(bytes));
 	}
 	
     @Test
