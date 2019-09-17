@@ -334,4 +334,16 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		super.getURIUniversalCommunication().add(universalCommunicationType);
 	}
 
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[RegistrationName:");
+		stringBuilder.append(getRegistrationName()==null ? "null" : getRegistrationName());
+		stringBuilder.append(", BusinessName:");
+		stringBuilder.append(getBusinessName()==null ? "null" : getBusinessName());
+		stringBuilder.append(", Id:");
+		stringBuilder.append(getId()==null ? "null" : getId());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
+	}
+
 }

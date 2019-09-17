@@ -172,4 +172,18 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 		return super.getExemptionReasonCode()==null ? null : super.getExemptionReasonCode().getValue();
 	}
 
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[TaxBaseAmount:");
+		stringBuilder.append(getTaxBaseAmount()==null ? "null" : getTaxBaseAmount());
+		stringBuilder.append(", CalculatedTaxAmount:");
+		stringBuilder.append(getCalculatedTaxAmount()==null ? "null" : getCalculatedTaxAmount());
+		stringBuilder.append(", TaxCategoryCode:");
+		stringBuilder.append(getTaxCategoryCode()==null ? "null" : getTaxCategoryCode());
+		stringBuilder.append(", TaxCategoryRate:");
+		stringBuilder.append(getTaxCategoryRate()==null ? "null" : getTaxCategoryRate());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
+	}
+
 }
