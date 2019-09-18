@@ -164,9 +164,10 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 		
 		setPaymentMeans(code, paymentMeansText); // BT-81, BT-82
 		setRemittanceInformation(remittanceInformation); // BT-83
-		creditTransfer.forEach(ct -> {
+		creditTransfer.forEach(ct -> { // BG-17
 			addCreditTransfer(ct);
 		});
+		setDirectDebit(directDebit); // BG-19
 	}
 	
 	private TradeSettlementPaymentMeansType getTradeSettlementPaymentMeans() {
@@ -301,6 +302,7 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 	// BG-19 ++ 0..1 DIRECT DEBIT
 	@Override
 	public void setDirectDebit(DirectDebit directDebit) {
+		if(directDebit==null) return;
 		// FinancialAccount implements DirectDebit
 		// in FinancialAccount payerPartyDebtorFinancialAccount
 		FinancialAccount financialAccount = (FinancialAccount)directDebit;
