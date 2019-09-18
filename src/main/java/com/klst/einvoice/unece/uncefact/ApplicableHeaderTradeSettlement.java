@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.untdid.codelist.DateTimeFormats;
@@ -116,7 +117,7 @@ in ram:ApplicableHeaderTradeSettlement stecken auch BT-5, BT-6
         </ram:ApplicableHeaderTradeSettlement>
 
  */
-public class ApplicableHeaderTradeSettlement implements PaymentInstructions, CreditTransferFactory {
+public class ApplicableHeaderTradeSettlement implements PaymentInstructions, CreditTransferFactory, DirectDebitFactory {
 
 	private static final Logger LOG = Logger.getLogger(ApplicableHeaderTradeSettlement.class.getName());
 	
@@ -277,11 +278,19 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 		tradeSettlementPaymentMeans.setPayeeSpecifiedCreditorFinancialInstitution(financialAccount.payeeSpecifiedCreditorFinancialInstitution);
 	}
 
+	FinancialAccount financialAccount = null;
+	FinancialAccount getFinancialAccount() {
+		if(financialAccount==null) {
+			financialAccount = new FinancialAccount(tradeSettlementPaymentMeans);
+		}
+		return financialAccount;
+	}
+	
 	// BG-17 Kardinalität ist 0..n, aber in CII kann es nur 0..1 sein
 	@Override
 	public List<CreditTransfer> getCreditTransfer() {
 		List<CreditTransfer> ret = new ArrayList<CreditTransfer>();
-		CreditTransfer ct = new FinancialAccount(tradeSettlementPaymentMeans);
+		CreditTransfer ct = getFinancialAccount(); //new FinancialAccount(tradeSettlementPaymentMeans);
 		if(ct.getPaymentAccountID()==null) {
 			return ret; // empty List
 		}
@@ -292,25 +301,47 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 	// BG-19 ++ 0..1 DIRECT DEBIT
 	@Override
 	public void setDirectDebit(DirectDebit directDebit) {
-		// TODO Auto-generated method stub
-		
+		// FinancialAccount implements DirectDebit
+		// in FinancialAccount payerPartyDebtorFinancialAccount
+		FinancialAccount financialAccount = (FinancialAccount)directDebit;
+		tradeSettlementPaymentMeans.setPayerPartyDebtorFinancialAccount(financialAccount.payerPartyDebtorFinancialAccount);
 	}
 
 	@Override
 	public DirectDebit getDirectDebit() {
-		// TODO Auto-generated method stub
-		return null;
+		return getFinancialAccount();
 	}
 
 // ---------------- implements CreditTransferFactory:
 	@Override
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
-		return new FinancialAccount(iban, accountName, bic);
+		if(financialAccount==null) {
+			financialAccount = new FinancialAccount(iban, accountName, bic); //new FinancialAccount(tradeSettlementPaymentMeans);
+		}
+		return financialAccount;
 	}
 
 	@Override
 	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic) {
-		return new FinancialAccount(accountId, accountName, bic);
+		if(financialAccount==null) {
+			financialAccount = new FinancialAccount(accountId, accountName, bic); //new FinancialAccount(tradeSettlementPaymentMeans);
+		}
+		return financialAccount;
+	}
+	
+// ---------------- implements DirectDebitFactory:
+	@Override
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
+		if(financialAccount==null) {
+			financialAccount = new FinancialAccount(iban);
+		}
+		return financialAccount;
+	}
+
+	@Override
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 // ----------------
@@ -369,4 +400,5 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 	void addPaymentTerms(TradePaymentTermsType tradePaymentTerms) {
 		applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
 	}
+
 }

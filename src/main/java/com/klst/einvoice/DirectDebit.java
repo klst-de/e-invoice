@@ -59,7 +59,7 @@ public interface DirectDebit {
 	// BT-91 +++ 0..1 Debited account identifier
 	// IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos
 	public String getDebitedAccountID();
-	public void setDebitedAccountID(String id);
+	public void setDebitedAccountID(String id); // non iban ist nicht vorgesehen, oder doch? "SEPA or other direct debit"
 	public void setDebitedAccountID(IBANId iban);
 	
 }
