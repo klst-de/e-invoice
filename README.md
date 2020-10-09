@@ -46,7 +46,7 @@ this snippet creates a valid ubl invoice [see (xrechnung-testsuite)](https://git
     , TaxCategoryCode.StandardRate, new BigDecimal(7));     // VAT category code, rate 7%
   ublInvoice.addLine(line);
 ...
-  transformer.fromModel(ublInvoice);
+  transformer.fromModel(ublInvoice.get());  // returns byte[] xml
 ```
 - in [AD-e-invoice](https://github.com/klst-de/AD-e-invoice) the jar is used to create "€-invoices" within an ERP-System.
 
