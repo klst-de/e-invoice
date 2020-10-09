@@ -23,26 +23,30 @@ _A “Core Invoice Usage Specification” (CIUS) is a specification that provide
 - the french counterpart is called [Factur-X(en)](http://fnfe-mpe.org/factur-x/factur-x_en/) [(fr)](http://fnfe-mpe.org/factur-x/)
 
 ## Example 
-this snippet creates a valid ubl invoice [see (xrechnung-testsuite)](https://github.com/itplr-kosit/xrechnung-testsuite/blob/master/instances/01.01a-INVOICE_ubl.xml)
+this snippet creates a valid ubl invoice [see (xrechnung-testsuite)](https://github.com/itplr-kosit/xrechnung-testsuite/blob/master/src/test/business-cases/standard/01.01a-INVOICE_ubl.xml)
+
 ```java
-  CoreInvoice ublInvoice = new CommercialInvoice(XRECHNUNG_12);
+  static final String XRECHNUNG_12 = CoreInvoice.PROFILE_XRECHNUNG;
+  static final String EUR = "EUR"; 
+...
+  GenericInvoice<InvoiceType> ublInvoice =
+    GenericInvoice.createInvoice(XRECHNUNG_12, null, DocumentNameCode.CommercialInvoice);
   ublInvoice.setId("123456XX");
   ublInvoice.setIssueDate("2016-04-04");
-  ublInvoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
-  ublInvoice.setDocumentCurrencyCode(EUR);
+  ublInvoice.setNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
+  ublInvoice.setDocumentCurrency(EUR);
   ublInvoice.setOrderReference("1234567890");           // optional
   ublInvoice.setBuyerReference("04011000-12345-34");
 ...
-  CoreInvoiceLine line = new InvoiceLine("1"            // invoice line number
+  CoreInvoiceLine line = GenericLine.createInvoiceLine("1"  // invoice line number
     , new Quantity("XPP", new BigDecimal(1))
-    , new Amount(EUR, new BigDecimal(288.79))           // line net amount
-    , new UnitPriceAmount(EUR, new BigDecimal(288.79))  // price
-    , "Zeitschrift [...]"                               // itemName
-    , TaxCategoryCode.StandardRate, new BigDecimal(7)); // VAT category code, rate 7%
-    );
+    , new Amount(EUR, new BigDecimal(288.79))               // line net amount
+    , new UnitPriceAmount(EUR, new BigDecimal(288.79))      // price
+    , "Zeitschrift [...]"                                   // itemName
+    , TaxCategoryCode.StandardRate, new BigDecimal(7));     // VAT category code, rate 7%
   ublInvoice.addLine(line);
 ...
-  transformer.toXML(ublInvoice);
+  transformer.fromModel(ublInvoice);
 ```
 - in [AD-e-invoice](https://github.com/klst-de/AD-e-invoice) the jar is used to create "€-invoices" within an ERP-System.
 
