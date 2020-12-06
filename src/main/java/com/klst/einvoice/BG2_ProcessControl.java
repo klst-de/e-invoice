@@ -15,10 +15,14 @@ package com.klst.einvoice;
 
 // Anwendung: 
 // Profil EXTENDED: urn:cen.eu:EN16931:2017#conformant#urn:zugferd.de:2p0:extended 
+//                  urn:cen.eu:en16931:2017#conformant#urn:factur-x.eu:1p0:extended
 // Profil EN 16931 (COMFORT): urn:cen.eu:EN16931:2017     - konform zu EN16931
+//                            urn:cen.eu:en16931:2017 
 // Profil BASIC: urn:cen.eu:EN16931:2017#compliant#urn:zugferd.de:2p0:basic
+//               urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic
 // Besonderheit der XRechnung Spezifikationskennung 
-// Einschränkung: urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2  - ZUGFeRD 2.0
+// Einschränkung: urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.0  - ZUGFeRD 2.1
+//                urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2  - ZUGFeRD 2.0
 //                urn:cen.eu:en16931:2017:xoev-de:kosit:standard:xrechnung_1.1                - ZUGFeRD 1.0 ?
 
 /*  (de) rules / Geschäftsregel:
@@ -30,11 +34,13 @@ package com.klst.einvoice;
 // TODO Idee runter zu ubl und cii und public raus ?!
 public interface BG2_ProcessControl {
 	
-	public static final String PROFILE_EXTENDED  = "urn:cen.eu:EN16931:2017#conformant#urn:zugferd.de:2p0:extended";
-	public static final String PROFILE_EN_16931  = "urn:cen.eu:EN16931:2017";
+	public static final String PROFILE_EXTENDED  = "urn:cen.eu:en16931:2017#conformant#urn:factur-x.eu:1p0:extended";
+	public static final String PROFILE_EN_16931  = "urn:cen.eu:en16931:2017 ";
 	public static final String PROFILE_COMFORT   = PROFILE_EN_16931;
-	public static final String PROFILE_BASIC     = "urn:cen.eu:EN16931:2017#compliant#urn:zugferd.de:2p0:basic";
-	public static final String PROFILE_XRECHNUNG = "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2";	                                                
+	public static final String PROFILE_BASIC     = "urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic";
+	public static final String PROFILE_XRECHNUNG     = "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.0";
+	@Deprecated
+	public static final String PROFILE_XRECHNUNG_2p0 = "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2";	                                                
 	
 	// BT-23 ++ 0..1 Business process type
 	public String getProfile();
