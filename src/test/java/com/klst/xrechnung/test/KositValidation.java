@@ -28,8 +28,8 @@ public class KositValidation {
 		if(check==null) {
 	        LOG.info("startup - creating kosit validator");
 	        String userDir = System.getProperty("user.dir").replace('\\', '/');
-//			String so = "file:"+userDir.substring(2, userDir.length())+"/src/test/kositresources/1.2.0_2018-12-19/scenarios.xml";
-			String so = "file:"+userDir.substring(2, userDir.length())+"/src/test/kositresources/1.2.1_2019-06-24/scenarios.xml";		
+//			String so = "file:"+userDir.substring(2, userDir.length())+"/src/test/kositresources/1.2.1_2019-06-24/scenarios.xml";		
+			String so = "file:"+userDir.substring(2, userDir.length())+"/src/test/kositresources/2.0.0_2020-17-31/scenarios.xml";		
 			URI scenarios =  URI.create(so); // so == ablsolte path
 			CheckConfiguration config = new CheckConfiguration(scenarios);
 			LOG.info("config.ScenarioDefinition:"+config.getScenarioDefinition() +
