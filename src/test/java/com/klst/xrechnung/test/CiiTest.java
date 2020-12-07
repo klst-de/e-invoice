@@ -43,10 +43,10 @@ public class CiiTest {
 			"01.10a-INVOICE_uncefact.xml" , // OK
 			"01.11a-INVOICE_uncefact.xml" ,
 			"01.12a-INVOICE_uncefact.xml" ,
-			"01.13a-INVOICE_uncefact.xml" , // NOK
+			"01.13a-INVOICE_uncefact.xml" , // OK
 			"01.14a-INVOICE_uncefact.xml" ,
-			"01.15a-INVOICE_uncefact.xml" ,
-			"zugferd2_invoice_pdfa3b.xml" // ist Profile BASE
+			"01.15a-INVOICE_uncefact.xml" 
+//			"zugferd2_invoice_pdfa3b.xml" // ist PROFILE_BASIC
 			};
 	
 	private static final String XRECHNUNG_2p0 = BG2_ProcessControl.PROFILE_XRECHNUNG;
@@ -119,9 +119,9 @@ public class CiiTest {
     	CrossIndustryInvoice cii = (CrossIndustryInvoice)o;
     	PaymentInstructions pi = cii.getPaymentInstructions();
     	assertNull(pi.getRemittanceInformation());
-    	assertEquals(PaymentMeansEnum.CreditTransfer, pi.getPaymentMeansEnum());  // <ram:TypeCode>30</ram:TypeCode>
+    	assertEquals(PaymentMeansEnum.SEPACreditTransfer, pi.getPaymentMeansEnum());  // <ram:TypeCode>58</ram:TypeCode>
     	assertEquals(1, pi.getCreditTransfer().size());
-    	assertEquals("DE12345678912345678912", pi.getCreditTransfer().get(0).getPaymentAccountID());  // <ram:IBANID>DE12345678912345678912</ram:IBANID>
+    	assertEquals("DE75512108001245126199", pi.getCreditTransfer().get(0).getPaymentAccountID());  // <ram:IBANID>DE12345678912345678912</ram:IBANID>
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
@@ -156,9 +156,9 @@ public class CiiTest {
     	CrossIndustryInvoice cii = (CrossIndustryInvoice)o;
     	PaymentInstructions pi = cii.getPaymentInstructions();
     	assertEquals("0000123456", pi.getRemittanceInformation());  // <ram:PaymentReference>0000123456</ram:PaymentReference> 
-    	assertEquals(PaymentMeansEnum.CreditTransfer, pi.getPaymentMeansEnum());  // <ram:TypeCode>30</ram:TypeCode>
+    	assertEquals(PaymentMeansEnum.SEPACreditTransfer, pi.getPaymentMeansEnum());  // <ram:TypeCode>58</ram:TypeCode>
     	assertEquals(1, pi.getCreditTransfer().size());
-    	assertEquals("DE12123000001234567890", pi.getCreditTransfer().get(0).getPaymentAccountID());  // <ram:IBANID>DE12123000001234567890</ram:IBANID>
+    	assertEquals("DE75512108001245126199", pi.getCreditTransfer().get(0).getPaymentAccountID());  // <ram:IBANID>DE12123000001234567890</ram:IBANID>
     	
     	LOG.info("------------------------------------------- toCii:");
     	byte[] bytes = factory.toCii(); // the xml
