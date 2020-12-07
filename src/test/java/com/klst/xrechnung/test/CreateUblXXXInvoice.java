@@ -14,6 +14,7 @@ import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
+import com.klst.einvoice.ubl.FinancialAccount;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.ubl.GenericLine;
 import com.klst.einvoice.ubl.VatBreakdown;
@@ -51,7 +52,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		if(transformer.isValid(testFile)) {
 			testDoc = toModel(testFile);
 		} else {
-			LOG.warning(ublXml + "ist nicht UblInvoice!!!!!!!!!!!!!!!");
+			LOG.warning(ublXml + "ist nicht UblInvoice!!!!!!!!!!!!!!! versuche UblCreditNote:");
 			this.transformer = UblCreditNoteTransformer.getInstance();
 			if(transformer.isValid(testFile)) {
 				testDoc = null;
@@ -243,22 +244,24 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	
 	void makePaymentGroup(GenericInvoice ublInvoice) {
 		PaymentInstructions paymentInstructions = testDoc.getPaymentInstructions();
-		LOG.info("PaymentInstructions "+paymentInstructions);
-		
-//		PaymentMeansEnum code = testDoc.getPaymentMeansEnum(); // TODO besser testDoc.getPaymentMeans().getPaymentMeansEnum()
-//		String paymentMeansText = testDoc.getPaymentMeansText();
-//		String remittanceInformation = testDoc.getPaymentRemittanceInformation();
-//		LOG.info("PaymentMeans code:"+code + " paymentMeansText:"+paymentMeansText + " remittanceInformation:"+remittanceInformation);
+		LOG.info("PaymentInstructions "+paymentInstructions + " PaymentMeans="+paymentInstructions.getPaymentMeansEnum());
 		
 		List<CreditTransfer> creditTransfer = paymentInstructions.getCreditTransfer();
 		if(creditTransfer.isEmpty()) {
 			LOG.warning("creditTransfer.isEmpty");
-		} else {
-			IBANId iban = new IBANId(creditTransfer.get(0).getPaymentAccountID());
+		} else if(creditTransfer.size()==1){
+			String accountId = creditTransfer.get(0).getPaymentAccountID();
 			String accountName = creditTransfer.get(0).getPaymentAccountName();
 			BICId bic = new BICId(creditTransfer.get(0).getPaymentServiceProviderID());
-			LOG.info("iban:"+iban + " accountName:"+accountName + " bic:"+bic);
-//			CreditTransfer ct = FinancialAccount.createCreditTransfer(iban, accountName, bic);
+			if(paymentInstructions.getPaymentMeansEnum()==PaymentMeansEnum.SEPACreditTransfer) {
+				IBANId iban = new IBANId(accountId);
+				LOG.info("SEPACreditTransfer iban:"+iban + " accountName:"+accountName + " bic:"+bic);
+			} else if(paymentInstructions.getPaymentMeansEnum()==PaymentMeansEnum.CreditTransfer) {
+				FinancialAccount account = new FinancialAccount(accountId, accountName, bic);
+				LOG.info("NON SEPA Überweisung kto:"+account + "// accountName:"+accountName + " bic:"+bic);
+			}
+		} else {
+			LOG.warning("!!!!!!!!! mehrere "+creditTransfer.size()+" creditTransfer Einträge");
 		}
 		
 		PaymentCard paymentCard = ublInvoice.createPaymentCard(null, null);
