@@ -6,7 +6,7 @@
     xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
     xmlns:ccts="urn:un:unece:uncefact:documentation:2"
     xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">
-    <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2</cbc:CustomizationID>
+    <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.0</cbc:CustomizationID>
     <cbc:ID>12115118</cbc:ID>
     <cbc:IssueDate>2015-01-09</cbc:IssueDate>
     <cbc:DueDate>2015-01-09</cbc:DueDate>
@@ -66,6 +66,8 @@
             </cac:Contact>
         </cac:Party>
     </cac:AccountingCustomerParty>
+    
+    <!-- zwei mal CreditTransfer (30): eigentlich sollte es SEPACreditTransfer (58) sein -->
     <cac:PaymentMeans>
         <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
         <cbc:PaymentID>Deb. 10202 / Fact. 12115118</cbc:PaymentID>
@@ -80,6 +82,7 @@
             <cbc:ID>NL03 INGB 0004489902</cbc:ID>
         </cac:PayeeFinancialAccount>
     </cac:PaymentMeans>
+    
     <cac:TaxTotal>
         <cbc:TaxAmount currencyID="EUR">20.73</cbc:TaxAmount>
         <cac:TaxSubtotal>
