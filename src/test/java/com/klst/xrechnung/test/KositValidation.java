@@ -67,7 +67,10 @@ Die für die maschinelle Auswertung des Prüfberichts wesentlichsten Angaben sin
 			return ret; // isValid
 		}
 		// warum not valid?
+//		logNodeListAndFirstChild(repReport);
+//		LOG.info("----------------------------\n"+repDoc);
 		NodeList repReject = repDoc.getElementsByTagName("rep:reject");
+//		LOG.info("---------------------------- repReject.getLength()="+repReject.getLength());
 		if(repReject.getLength()>0) {
 			NodeList repExplanation = logNodeListAndFirstChild(repReject.item(0).getChildNodes(), "rep:explanation");
 			NodeList html = logNodeListAndFirstChild(repExplanation, "html");

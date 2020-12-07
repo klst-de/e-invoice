@@ -55,7 +55,7 @@ public class UblTest {
 
 	@Test
     public void ubl0() {
-    	InvoiceFactory factory = new CreateUblXXXInvoice(UBL_XML[1]);
+    	InvoiceFactory factory = new CreateUblXXXInvoice(UBL_XML[0]);
     	byte[] bytes = factory.toUbl(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
