@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.BG2_ProcessControl;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
@@ -47,7 +48,7 @@ public class CiiTest {
 			"01.15a-INVOICE_uncefact.xml" ,
 			"zugferd2_invoice_pdfa3b.xml" };
 	
-	private static final String XRECHNUNG_12 = "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2";
+	private static final String XRECHNUNG_12 = BG2_ProcessControl.PROFILE_XRECHNUNG_2p0;
 
 	static private final String ID = "123456XX";
 	static private final String ISSUE_DATE = "2018-01-01";
