@@ -30,9 +30,9 @@ THE SOFTWARE.
   <!--
   <cbc:CustomizationID schemeID="PEPPOL">urn:www.cenbii.eu:transaction:biicoretrdm010:ver1.0:#urn:www.peppol.eu:bis:peppol4a:ver1.0</cbc:CustomizationID>
   <cbc:ProfileID>urn:www.cenbii.eu:profile:bii04:ver1.0</cbc:ProfileID>
-    Versuch mit kosit -->
-    <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2</cbc:CustomizationID>
-    
+    Versuch mit PROFILE_COMFORT : -->
+    <cbc:CustomizationID>urn:cen.eu:en16931:2017</cbc:CustomizationID>
+
   <!-- Die Rechnungsnummer: -->
   <!-- The invoice number: -->
   <cbc:ID>ERB_UBL_CREDITNOTE_001</cbc:ID>
