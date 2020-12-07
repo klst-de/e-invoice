@@ -46,9 +46,10 @@ public class CiiTest {
 			"01.13a-INVOICE_uncefact.xml" , // NOK
 			"01.14a-INVOICE_uncefact.xml" ,
 			"01.15a-INVOICE_uncefact.xml" ,
-			"zugferd2_invoice_pdfa3b.xml" };
+			"zugferd2_invoice_pdfa3b.xml" // ist Profile BASE
+			};
 	
-	private static final String XRECHNUNG_12 = BG2_ProcessControl.PROFILE_XRECHNUNG_2p0;
+	private static final String XRECHNUNG_2p0 = BG2_ProcessControl.PROFILE_XRECHNUNG;
 
 	static private final String ID = "123456XX";
 	static private final String ISSUE_DATE = "2018-01-01";
@@ -72,7 +73,7 @@ public class CiiTest {
 
     @Test
     public void cii0ctor() {
-    	invoice = new CrossIndustryInvoice(XRECHNUNG_12, DocumentNameCode.CommercialInvoice);
+    	invoice = new CrossIndustryInvoice(XRECHNUNG_2p0, DocumentNameCode.CommercialInvoice);
     	invoice.setId(ID);
     	assertEquals(ID, invoice.getId());
     	
