@@ -194,6 +194,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				testDoc.getInvoiceTotalTaxInclusive(), 
 				testDoc.getDuePayable());
 		ublInvoice.setInvoiceTax(testDoc.getInvoiceTax());
+		LOG.info("(optional) getPrepaid="+testDoc.getPrepaid());	
+		ublInvoice.setPrepaid(testDoc.getPrepaid());
 		LOG.info("finished DocumentTotalsGroup.");
 		
 		makeVatBreakDownGroup(ublInvoice);
@@ -271,7 +273,21 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		if(dd==null) {
 			LOG.warning("dd.isEmpty");
 		} else {
-			LOG.info("MandateReferencetID:"+dd.getMandateReferencetID() + " BankAssignedCreditorID:"+dd.getBankAssignedCreditorID() + " DebitedAccountID:"+dd.getDebitedAccountID());
+/* 03.01a-INVOICE_ubl.xml :
+...
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>59</cbc:PaymentMeansCode>
+  
+    <cac:PaymentMandate>
+      <cbc:ID>[Mandate reference identifier]</cbc:ID>
+      <cac:PayerFinancialAccount>
+        <cbc:ID>DE75512108001245126199</cbc:ID>
+      </cac:PayerFinancialAccount>
+    </cac:PaymentMandate>
+  </cac:PaymentMeans>
+
+ */
+			LOG.info("DirectDebit/Lastschrift MandateReferencetID:"+dd.getMandateReferencetID() + " BankAssignedCreditorID:"+dd.getBankAssignedCreditorID() + " DebitedAccountID:"+dd.getDebitedAccountID());
 			directDebit = ublInvoice.createDirectDebit(dd.getMandateReferencetID(), dd.getBankAssignedCreditorID(), dd.getDebitedAccountID());
 		}
 		
