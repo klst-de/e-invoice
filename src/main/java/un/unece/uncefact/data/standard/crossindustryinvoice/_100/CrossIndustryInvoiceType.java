@@ -1,7 +1,7 @@
 //
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.3.1 generiert 
 // Siehe <a href="https://javaee.github.io/jaxb-v2/">https://javaee.github.io/jaxb-v2/</a> 
-// Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
+// ï¿½nderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
 // Generiert: 2019.05.22 um 04:29:27 PM CEST 
 //
 
@@ -11,6 +11,7 @@ package un.unece.uncefact.data.standard.crossindustryinvoice._100;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
@@ -19,7 +20,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 
 
 /**
- * <p>Java-Klasse für CrossIndustryInvoiceType complex type.
+ * <p>Java-Klasse fï¿½r CrossIndustryInvoiceType complex type.
  * 
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
@@ -47,6 +48,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
     "supplyChainTradeTransaction",
     "valuationBreakdownStatement"
 })
+@XmlRootElement(name = "CrossIndustryInvoice")
 public class CrossIndustryInvoiceType {
 
     @XmlElement(name = "ExchangedDocumentContext", required = true)
