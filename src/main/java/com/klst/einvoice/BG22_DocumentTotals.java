@@ -204,7 +204,8 @@ public interface BG22_DocumentTotals {
 	 * 
 	 * @param amount , This amount is subtracted from the invoice total amount with VAT to calculate the amount due for payment.                                                                
 	 */
-	public void setPaid(Amount amount);
+	public void setPrepaid(Amount amount);
+	public Amount getPrepaid(); 
 	
 	/**
 	 * Rounding amount  
