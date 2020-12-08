@@ -59,6 +59,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExte
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PayableAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentCurrencyCodeType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PrepaidAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ProfileIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.StartDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
@@ -1007,9 +1008,28 @@ UBL:
 		return new Amount(amount.getCurrencyID(), amount.getValue());		
 	}
 	
+	// BG-22.BT-113 0..1 (optional) The sum of amounts which have been paid in advance.
+	// Summe bereits gezahlter Beträge.
 	@Override
-	public void setPaid(Amount taxTotalAmount) {
-		// TODO Summe bereits gezahlter Beträge.
+	public Amount getPrepaid() {
+		if(isInvoiceType) {
+			MonetaryTotalType monetaryTotal = invoice.getLegalMonetaryTotal();
+			return getPrepaidAmount(monetaryTotal);
+		}
+		return null;
+	}
+	private static Amount getPrepaidAmount(MonetaryTotalType monetaryTotal) {
+		PrepaidAmountType amount = monetaryTotal.getPrepaidAmount();
+		return new Amount(amount.getCurrencyID(), amount.getValue());		
+	}
+
+	@Override
+	public void setPrepaid(Amount amount) {
+		if(amount==null) return;
+		MonetaryTotalType monetaryTotal = invoice.getLegalMonetaryTotal();
+		PrepaidAmountType prepaidAmount = new PrepaidAmountType();
+		amount.copyTo(prepaidAmount);
+		monetaryTotal.setPrepaidAmount(prepaidAmount);
 	}
 	
 	@Override
