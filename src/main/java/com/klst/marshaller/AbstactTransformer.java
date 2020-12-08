@@ -3,6 +3,7 @@ package com.klst.marshaller;
 import static javax.xml.bind.JAXBContext.newInstance;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.logging.Logger;
@@ -14,6 +15,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -21,6 +23,8 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
+// TODO in jaxb-ri com.sun.xml.bind.marshaller.NamespacePrefixMapper ohne internal
+// Discouraged access: The type 'NamespacePrefixMapper' is not API (restriction on required library ... jdk1.8.0_241\jre\lib\rt.jar')
 import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 
 @Named
@@ -59,6 +63,22 @@ public abstract class AbstactTransformer {
 		LOG.fine("ctor >>>>>>>>>>>>>>>>>>"+instance.toString());
 	}
 
+	public boolean isValid(File xmlfile) {
+		String resource = getResource();
+		try {
+			Source xmlFile = new StreamSource(xmlfile);
+			Validator validator = this.getSchemaValidator(); // throws SAXException, Exception
+			validator.validate(xmlFile);
+			LOG.info("validate against "+resource+" passed.");
+		} catch (SAXException ex) {
+			LOG.warning("validate against "+resource+" failed, SAXException: "+ex.getMessage());
+			return false;
+		} catch (Exception ex) {
+			LOG.severe("validate "+ex.getMessage());
+		}
+		return true;
+	}
+	
 	public Validator getSchemaValidator() throws SAXException {
 		return getSchemaValidator(getResource());
 	}
@@ -78,6 +98,7 @@ public abstract class AbstactTransformer {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(16000);
 		try {
 			Marshaller marshaller = createMarshaller();
+			// TODO : siehe 5.3.3. Marshalling a non-element in file:///C:/proj/jaxb-ri/docs/ch03.html#marshalling
 			marshaller.marshal(document, outputStream);
 		} catch (JAXBException ex) {
 			throw new TransformationException(TransformationException.MARSHALLING_ERROR, ex);
