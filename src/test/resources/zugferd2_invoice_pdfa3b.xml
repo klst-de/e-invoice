@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="UTF-8"?><rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:a="urn:un:unece:uncefact:data:standard:QualifiedDataType:100" xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:10" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<?xml version="1.0" encoding="UTF-8"?><rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:a="urn:un:unece:uncefact:data:standard:QualifiedDataType:100" xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:10" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <!--Created by PDFlib Cookbook program zugferd2_invoice_pdfa3b.java
 http://www.pdflib.com/pdflib-cookbook/-->
   <rsm:ExchangedDocumentContext>
     <ram:GuidelineSpecifiedDocumentContextParameter>
-      <ram:ID>urn:cen.eu:EN16931:2017#compliant#urn:zugferd.de:2p0:basic</ram:ID>
+      <ram:ID>urn:cen.eu:en16931:2017</ram:ID>
     </ram:GuidelineSpecifiedDocumentContextParameter>
   </rsm:ExchangedDocumentContext>
   <rsm:ExchangedDocument>
@@ -233,15 +233,6 @@ http://www.pdflib.com/pdflib-cookbook/</ram:Content>
     <ram:ApplicableHeaderTradeSettlement>
       <ram:PaymentReference>2019-03</ram:PaymentReference>
       <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
-      
-      <!--  EUG wg. https://github.com/klst-de/e-invoice/issues/8 hinzu -->
-            <ram:SpecifiedTradeSettlementPaymentMeans>
-                <ram:TypeCode>30</ram:TypeCode>
-                <ram:PayeePartyCreditorFinancialAccount>
-                    <ram:IBANID>DE12345678912345678912</ram:IBANID>
-                </ram:PayeePartyCreditorFinancialAccount>
-            </ram:SpecifiedTradeSettlementPaymentMeans>
-            
       <ram:ApplicableTradeTax>
         <ram:CalculatedAmount>160.55</ram:CalculatedAmount>
         <ram:TypeCode>VAT</ram:TypeCode>
