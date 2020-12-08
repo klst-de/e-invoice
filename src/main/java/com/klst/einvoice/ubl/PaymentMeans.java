@@ -268,6 +268,9 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		if(payeeFinancialAccount==null) {
 			// LOG
 		} else {
+			// add interface CreditTransfer
+			// FinancialAccount extends FinancialAccountType implements CreditTransfer
+//			LOG.info("PaymentMeansCode:"+getPaymentMeansCode() + " ID:"+payeeFinancialAccount.getID());
 			result.add((FinancialAccount)payeeFinancialAccount);
 		}
 		return result;
