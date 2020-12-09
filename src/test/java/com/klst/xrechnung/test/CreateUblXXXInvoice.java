@@ -17,6 +17,7 @@ import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.ubl.FinancialAccount;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.ubl.GenericLine;
+import com.klst.einvoice.ubl.PaymentMeans;
 import com.klst.einvoice.ubl.VatBreakdown;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
@@ -178,6 +179,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setDocumentCurrency(testDoc.getDocumentCurrency());
 		ublInvoice.setTaxCurrency(testDoc.getTaxCurrency());
 		ublInvoice.setBuyerReference(testDoc.getBuyerReferenceValue());
+		ublInvoice.setContractReference(testDoc.getContractReference());
 		LOG.info("ublInvoice "+ublInvoice);
 		
 		ublInvoice.setSeller(testDoc.getSeller());
@@ -273,6 +275,16 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		if(dd==null) {
 			LOG.warning("dd.isEmpty");
 		} else {
+			// nur test:
+			// ctor () not visible : gut
+			// (interne) public copy ctor mit PaymentMeansType 
+			// public PaymentMeans(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation,
+			//		List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
+			PaymentInstructions zahlungsanweisungen = new PaymentMeans(PaymentMeansEnum.DirectDebit,
+					"paymentMeansText", "remittanceInformation", null, null, dd
+					);
+			zahlungsanweisungen.setDirectDebit(dd);
+			LOG.info(""+zahlungsanweisungen.getDirectDebit());
 /* 03.01a-INVOICE_ubl.xml :
 ...
   <cac:PaymentMeans>
@@ -287,7 +299,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
   </cac:PaymentMeans>
 
  */
-			LOG.info("DirectDebit/Lastschrift MandateReferencetID:"+dd.getMandateReferencetID() + " BankAssignedCreditorID:"+dd.getBankAssignedCreditorID() + " DebitedAccountID:"+dd.getDebitedAccountID());
+			LOG.info("DirectDebit/Lastschrift MandateReferencetID:"+dd.getMandateReferencetID() 
+			+ " BankAssignedCreditorID:"+dd.getBankAssignedCreditorID() + " DebitedAccountID:"+dd.getDebitedAccountID());
 			directDebit = ublInvoice.createDirectDebit(dd.getMandateReferencetID(), dd.getBankAssignedCreditorID(), dd.getDebitedAccountID());
 		}
 		
