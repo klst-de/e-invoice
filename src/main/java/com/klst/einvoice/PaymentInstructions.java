@@ -130,10 +130,14 @@ public interface PaymentInstructions {
 	public void setRemittanceInformation(String text);
 	public String getRemittanceInformation();
 
-	// zu Gruppe PAYMENT INSTRUCTIONS gehören die Untergruppen
-	// BG-17 ++ 0..n CREDIT TRANSFER
-	// BG-18 ++ 0..1 PAYMENT CARD INFORMATION
-	// BG-19 ++ 0..1 DIRECT DEBIT
+	/* zu Gruppe PAYMENT INSTRUCTIONS gehören Untergruppen.
+	 * Die Untergruppen sind alternativ
+	 * BG-17 0..n CREDIT TRANSFER ist anzugeben, wenn eine Zahlung per Überweisung erfolgen soll
+	 * BG-18 0..1 PAYMENT CARD INFORMATION ist anzugeben, wenn eine Zahlung per Zahlungskarte/Kreditkarte erfolgte
+	 * BG-19 0..1 DIRECT DEBIT ist anzugeben, n, wenn ein Mandat erteilt wurde und der Rechnungsbetrag per Lastschrift beglichen werden soll
+	 * 
+	 * Eine der Untergruppen muss angegeben werden!
+	 */
 	// demnach werden setter/getter definiert:
 	public void addCreditTransfer(CreditTransfer creditTransfer);
 	public List<CreditTransfer> getCreditTransfer();

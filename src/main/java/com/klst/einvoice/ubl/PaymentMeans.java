@@ -146,11 +146,17 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
 		this();
 		init(code, paymentMeansText, remittanceInformation);
-		if(creditTransferList.isEmpty() && paymentCard==null && directDebit==null) return;
+		
+		// Eine der Untergruppen BG-17, BG-18, BG-19 muss angegeben werden!
+		if((creditTransferList==null || creditTransferList.isEmpty()) 
+			&& paymentCard==null && directDebit==null) {
+			LOG.warning("No Group specified. Specify a creditTransferList/BG-17 or paymentCard/BG-18 or directDebit/BG-19.");
+			return;
+		}
 		
 		payeeFinancialAccount = new FinancialAccount();
 		paymentMandate = new PaymentMandate();
-		creditTransferList.forEach(creditTransfer -> {
+		if(creditTransferList!=null) creditTransferList.forEach(creditTransfer -> {
 			payeeFinancialAccount = (FinancialAccount)creditTransfer;
 			super.setPayeeFinancialAccount(payeeFinancialAccount);
 		});
@@ -158,8 +164,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			// TODO
 		}
 		if(directDebit!=null) {
-			paymentMandate = (PaymentMandate)directDebit;
-			super.setPaymentMandate(paymentMandate);
+			setDirectDebit(directDebit);
 		}
 	}
 
@@ -279,12 +284,15 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	// DirectDebit ist Interface, kein List da BG-19 die Kardinalität 0..1 hat
 	@Override
 	public void setDirectDebit(DirectDebit directDebit) {
-		// TODO Auto-generated method stub
-		
+		paymentMandate = (PaymentMandate)directDebit;
+		super.setPaymentMandate(paymentMandate);
 	}
 
-	public DirectDebit getDirectDebit() { 
-		return paymentMandate==null ? null : (DirectDebit)paymentMandate;
+	public DirectDebit getDirectDebit() {
+		if(paymentMandate==null) return null;
+		// class PaymentMandate extends PaymentMandateType implements DirectDebit
+		PaymentMandate directDebit = new PaymentMandate(paymentMandate);
+		return directDebit;
 	}
 
 }

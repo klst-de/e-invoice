@@ -86,7 +86,7 @@ public class PaymentMandate extends PaymentMandateType implements DirectDebit {
 	 */
 	@Override
 	public String getDebitedAccountID() {
-		return super.getID().getValue();
+		return getDebitedAccountID(this);
 	}
 	static String getDebitedAccountID(PaymentMandateType doc) {
 		FinancialAccountType fa = doc.getPayerFinancialAccount();
@@ -108,4 +108,11 @@ public class PaymentMandate extends PaymentMandateType implements DirectDebit {
 		super.setPayerFinancialAccount(fa);
 	}
 
+	public String toString() {
+		return "["
+			+"MandateReferencetID="+this.getMandateReferencetID()
+			+", BankAssignedCreditorID="+this.getBankAssignedCreditorID()
+			+", DebitedAccountID="+this.getDebitedAccountID()
+			+ "]";
+	}
 }
