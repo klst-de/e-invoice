@@ -73,7 +73,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 
 	@Override
 	public void setSupportingDocumentReference(String id) {
-		super.setID(Invoice.newIDType(id, null));
+		super.setID(Identifier.newIDType(id, null));
 	}
 
 	@Override

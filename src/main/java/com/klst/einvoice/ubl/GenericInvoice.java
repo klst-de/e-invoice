@@ -134,9 +134,9 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 	// BT-1 + 1..1 Invoice number
 	public void setId(String id) {
 		if(isInvoiceType) {
-			invoice.setID(Invoice.newIDType(id, null)); // null : No identification scheme 
+			invoice.setID(Identifier.newIDType(id, null)); // null : No identification scheme 
 		} else {
-			creditNote.setID(Invoice.newIDType(id, null)); // null : No identification scheme 
+			creditNote.setID(Identifier.newIDType(id, null)); // null : No identification scheme 
 		}
 	}
 	
@@ -345,7 +345,7 @@ UBL:
 	public void setProjectReference(String id, String name) {
 		if(id==null) return; // optional
 		ProjectReferenceType projectReference = new ProjectReferenceType();
-		projectReference.setID(Invoice.newIDType(id, null));
+		projectReference.setID(Identifier.newIDType(id, null));
 		if(isInvoiceType) {
 			invoice.getProjectReference().add(projectReference);
 		} else {
@@ -376,7 +376,7 @@ UBL:
 	public void setContractReference(String id) {
 		if(id==null) return; // optional
 		DocumentReferenceType reference = new DocumentReferenceType();
-		reference.setID(Invoice.newIDType(id, null));
+		reference.setID(Identifier.newIDType(id, null));
 		if(isInvoiceType) {
 			invoice.getContractDocumentReference().add(reference);
 		} else {
@@ -406,7 +406,7 @@ UBL:
 	public void setOrderReference(String docRefId) {
 		if(docRefId==null) return; // optional
 		OrderReferenceType orderReference = new OrderReferenceType();
-		orderReference.setID(Invoice.newIDType(docRefId, null)); // null : No identification scheme
+		orderReference.setID(Identifier.newIDType(docRefId, null)); // null : No identification scheme
 		
 		if(isInvoiceType) {
 			invoice.setOrderReference(orderReference);

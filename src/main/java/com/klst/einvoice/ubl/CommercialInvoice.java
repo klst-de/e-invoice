@@ -1,7 +1,7 @@
 package com.klst.einvoice.ubl;
 
 @Deprecated // use class GenericInvoice
-public class CommercialInvoice extends Invoice {
+public class CommercialInvoice extends Identifier {
 
 //	public CommercialInvoice(InvoiceType invoice) {
 //		super(invoice);

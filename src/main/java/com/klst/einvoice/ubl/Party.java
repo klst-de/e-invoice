@@ -361,7 +361,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	public void setId(String name, String schemeID) {
 		if(name==null) return;
 		PartyIdentificationType partyIdentification = new PartyIdentificationType();
-		partyIdentification.setID(Invoice.newIDType(name, schemeID));
+		partyIdentification.setID(Identifier.newIDType(name, schemeID));
 		super.getPartyIdentification().add(partyIdentification);
 	}
 
@@ -442,7 +442,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		partyTaxScheme.setCompanyID(companyID);
 		
 		TaxSchemeType taxScheme = new TaxSchemeType();
-		taxScheme.setID(Invoice.newIDType(schemeID, null));
+		taxScheme.setID(Identifier.newIDType(schemeID, null));
 		partyTaxScheme.setTaxScheme(taxScheme);
 		
 		List<PartyTaxSchemeType> list = super.getPartyTaxScheme();

@@ -88,10 +88,10 @@ public class VatBreakdown extends TaxSubtotalType implements CoreInvoiceVatBreak
 
 	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, String vat, Percent taxRate, String exemptionText, String exemptionCode) {
 		TaxCategoryType taxCategory = new TaxCategoryType();
-		taxCategory.setID(Invoice.newIDType(codeEnum.getValue(), null));
+		taxCategory.setID(Identifier.newIDType(codeEnum.getValue(), null));
 		
 		TaxSchemeType taxScheme = new TaxSchemeType();
-		taxScheme.setID(Invoice.newIDType(vat, null)); // USt/VAT
+		taxScheme.setID(Identifier.newIDType(vat, null)); // USt/VAT
 		taxCategory.setTaxScheme(taxScheme);
 		
 		if(taxRate!=null) {
