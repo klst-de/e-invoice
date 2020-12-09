@@ -3,10 +3,7 @@ package com.klst.xrechnung.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.junit.Before;
@@ -19,21 +16,14 @@ import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
-import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.ubl.Address;
 import com.klst.einvoice.ubl.Contact;
-import com.klst.einvoice.ubl.Delivery;
 import com.klst.einvoice.ubl.GenericInvoice;
-import com.klst.einvoice.ubl.Invoice;
-import com.klst.einvoice.ubl.Party;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyNameType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.SupplierPartyType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
