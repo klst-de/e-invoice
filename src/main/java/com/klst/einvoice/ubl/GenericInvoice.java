@@ -1026,7 +1026,7 @@ UBL:
 	}
 	private static Amount getPrepaidAmount(MonetaryTotalType monetaryTotal) {
 		PrepaidAmountType amount = monetaryTotal.getPrepaidAmount();
-		return new Amount(amount.getCurrencyID(), amount.getValue());		
+		return amount==null? null : new Amount(amount.getCurrencyID(), amount.getValue());		
 	}
 
 	@Override
