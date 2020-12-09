@@ -23,7 +23,19 @@ Bsp: 01.15a:
                     <ram:BICID>[BIC]</ram:BICID>
                 </ram:PayeeSpecifiedCreditorFinancialInstitution>                                   bis hierhin -->
             </ram:SpecifiedTradeSettlementPaymentMeans>
-keine Testfälle für DIRECT DEBIT
+            
+Testfälle für DIRECT DEBIT
+Bsp: 03.01a:
+        <ram:ApplicableHeaderTradeSettlement>
+            <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
+            <ram:SpecifiedTradeSettlementPaymentMeans>
+                <ram:TypeCode>59</ram:TypeCode>
+                <ram:PayerPartyDebtorFinancialAccount>
+                    <ram:IBANID schemeID="IBAN">DE75512108001245126199</ram:IBANID>
+                </ram:PayerPartyDebtorFinancialAccount>
+            </ram:SpecifiedTradeSettlementPaymentMeans>
+
+Bsp: 03.04a , 03.04a
  */
 public class FinancialAccount implements CreditTransfer, DirectDebit {
 
@@ -33,10 +45,12 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 	
 	FinancialAccount(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
 		super();
-		payeePartyCreditorFinancialAccount = tradeSettlementPaymentMeans.getPayeePartyCreditorFinancialAccount();
-		payeeSpecifiedCreditorFinancialInstitution = tradeSettlementPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution();
-		payerPartyDebtorFinancialAccount = tradeSettlementPaymentMeans.getPayerPartyDebtorFinancialAccount();
-		//tradeSettlementPaymentMeans.getPayerSpecifiedDebtorFinancialInstitution();
+		if(tradeSettlementPaymentMeans!=null) {
+			payeePartyCreditorFinancialAccount = tradeSettlementPaymentMeans.getPayeePartyCreditorFinancialAccount();
+			payeeSpecifiedCreditorFinancialInstitution = tradeSettlementPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution();
+			payerPartyDebtorFinancialAccount = tradeSettlementPaymentMeans.getPayerPartyDebtorFinancialAccount();
+			//tradeSettlementPaymentMeans.getPayerSpecifiedDebtorFinancialInstitution();
+		}
 	}
 	
 	FinancialAccount(boolean isDirectDebit) {
@@ -113,6 +127,10 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 	public void setPaymentServiceProviderID(BICId bic) {
 		if(bic==null) return;
 		payeeSpecifiedCreditorFinancialInstitution.setBICID(CrossIndustryInvoice.newIDType(bic));
+		//payeeSpecifiedCreditorFinancialInstitution.setAustralianBSBID(value);
+//		payeeSpecifiedCreditorFinancialInstitution.setAustrianBankleitzahlID(value); //  durch IBAN abgelöst
+		//payeeSpecifiedCreditorFinancialInstitution.setCanadianPaymentsAssociationID(value);
+		// ...
 	}
 
 	@Override

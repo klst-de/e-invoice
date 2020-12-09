@@ -14,9 +14,12 @@ import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
+import com.klst.einvoice.unece.uncefact.FinancialAccount;
+import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.einvoice.unece.uncefact.VatBreakdown;
@@ -100,30 +103,6 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			LOG.info("SpecifiedTaxRegistration value ID/BT_31:"+BT_31
 					+" schemeID/BT_31_0:"+BT_31_0
 					);
-//			if(BT_31_0.equals("VA")) {
-//				// OK : Umsatzsteuernummer
-////				if(BT_31.startsWith(testSellerParty.getAddress().getCountryCode())) {
-////					// OK : Umsatzsteuernummer mit vorangestelltem Ländercode.
-////				} else {
-////					LOG.warning("Korrektur wg. https://github.com/klst-de/e-invoice/issues/5 : Umsatzsteuernummer mit vorangestelltem Ländercode. ");
-////					BT_31 = testSellerParty.getAddress().getCountryCode() + BT_31;
-////				}	
-//			} else {
-//				if(testSellerParty.getSpecifiedTaxRegistration().size()==1) {
-//					LOG.warning("Korrektur wg. https://github.com/klst-de/e-invoice/issues/5 : schemeID is "+BT_31_0);
-////					BT_31_0 = "VA";
-////					BT_31 = testSellerParty.getAddress().getCountryCode() + BT_31;
-//					sellerParty.setTaxRegistrationId(testSellerParty.getAddress().getCountryCode()+"123456789", "VA");
-//				} else {
-//					LOG.warning("KEINE Korrektur wg. https://github.com/klst-de/e-invoice/issues/5 : schemeID is "+BT_31_0);
-//				}
-//			}
-////			if(BT_31.startsWith(testSellerParty.getAddress().getCountryCode())) {
-////				// OK : Umsatzsteuernummer mit vorangestelltem Ländercode.
-////			} else {
-////				LOG.warning("Korrektur wg. https://github.com/klst-de/e-invoice/issues/5 : Umsatzsteuernummer mit vorangestelltem Ländercode. ");
-////				BT_31 = testSellerParty.getAddress().getCountryCode() + BT_31;
-////			}	
 			if(BT_31_0.equals("FC") && BT_31.equals("123/456/789") && testTradeSellerParty.getSpecifiedTaxRegistration().size()==1) {
 				// harccoded patch wg. https://github.com/klst-de/e-invoice/issues/5
 				sellerParty.setTaxRegistrationId("DE123456789", "VA");
@@ -184,20 +163,28 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		PaymentInstructions pi = testDoc.getPaymentInstructions();
 		LOG.info("testDoc.PaymentInstructions pi.RemittanceInformation:"+pi.getRemittanceInformation() + 
 				" PaymentMeansEnum:"+pi.getPaymentMeansEnum() + " PaymentMeansText:"+pi.getPaymentMeansText());
-		List<CreditTransfer> testCtList = pi.getCreditTransfer();
-		CreditTransfer testCt = null;
-		if(testCtList.isEmpty()) {
+		List<CreditTransfer> creditTransferList = pi.getCreditTransfer();
+		CreditTransfer creditTransferAccount = null;
+		if(creditTransferList.isEmpty()) {
 			// no CreditTransfer
 		} else {
-			testCtList.forEach(testCT -> {
-				LOG.info("CreditTransfer "+testCT);
-//				LOG.info("testCT.PaymentAccountID:"+testCT.getPaymentAccountID() 
-//					+ " PaymentAccountName:"+testCT.getPaymentAccountName()
-//					+ " PaymentServiceProviderID:"+testCT.getPaymentServiceProviderID() );
+			creditTransferList.forEach(testCT -> {
+				LOG.info("interface CreditTransfer "+testCT);
 			});
-			testCt = testCtList.get(0);
+			creditTransferAccount = creditTransferList.get(0);
 		}
-		cii.setPaymentInstructions(pi.getPaymentMeansEnum(), pi.getPaymentMeansText(), pi.getRemittanceInformation(), testCt, null, null);
+		
+		DirectDebit directDebitAccount = null; // getMandateReferencetID : direct debit authorisation == Einzugsermächtigung
+		DirectDebit dd = pi.getDirectDebit(); // interface DirectDebit
+		if(dd==null) {
+			// no DirectDebit
+		} else {
+			LOG.info("interface DirectDebit "+dd);
+			IBANId iban = new IBANId(dd.getDebitedAccountID());
+			directDebitAccount = new FinancialAccount(iban);
+		}
+
+		cii.setPaymentInstructions(pi.getPaymentMeansEnum(), pi.getPaymentMeansText(), pi.getRemittanceInformation(), creditTransferAccount, null, directDebitAccount);
 
 		cii.setDocumentCurrency(testDoc.getDocumentCurrency());
 		cii.setTaxCurrency(testDoc.getTaxCurrency()); // BT-6 + 0..1 (optional)
@@ -229,6 +216,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				testDoc.getInvoiceTotalTaxInclusive(), 
 				testDoc.getDuePayable());
         cii.setInvoiceTax(testDoc.getInvoiceTax());
+    	LOG.info("-----------------Prepaid amount "+testDoc.getPrepaid());
+        testDoc.getPrepaid();
 //        cii.setInvoiceTaxInAccountingCurrency(  ...  ist nicht implementiert TODO
 
         List<TradeLineItem> lines = testDoc.getLines();
