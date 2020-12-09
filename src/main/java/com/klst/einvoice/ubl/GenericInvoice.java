@@ -63,6 +63,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PrepaidA
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ProfileIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.StartDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxCurrencyCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxInclusiveAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPointDateType;
@@ -212,18 +213,23 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 	@Override
 	public void setTaxCurrency(String isoCurrencyCode) {
 		if(isoCurrencyCode==null) return;
-		PaymentCurrencyCodeType paymentCurrencyCode = new PaymentCurrencyCodeType();
-		paymentCurrencyCode.setValue(isoCurrencyCode); 
+		TaxCurrencyCodeType taxCurrencyCode = new TaxCurrencyCodeType();
+		taxCurrencyCode.setValue(isoCurrencyCode);
+//		PaymentCurrencyCodeType paymentCurrencyCode = new PaymentCurrencyCodeType();
+//		paymentCurrencyCode.setValue(isoCurrencyCode); 
 		if(isInvoiceType) {
-			invoice.setPaymentCurrencyCode(paymentCurrencyCode);
+			invoice.setTaxCurrencyCode(taxCurrencyCode);
+//			invoice.setPaymentCurrencyCode(paymentCurrencyCode);
 		} else {
-			creditNote.setPaymentCurrencyCode(paymentCurrencyCode);
+			creditNote.setTaxCurrencyCode(taxCurrencyCode);
+//			creditNote.setPaymentCurrencyCode(paymentCurrencyCode);
 		}
 	}
 	
 	@Override
 	public String getTaxCurrency() {
-		PaymentCurrencyCodeType code = isInvoiceType ? invoice.getPaymentCurrencyCode() : creditNote.getPaymentCurrencyCode();
+//		PaymentCurrencyCodeType code = isInvoiceType ? invoice.getPaymentCurrencyCode() : creditNote.getPaymentCurrencyCode();
+		TaxCurrencyCodeType code = isInvoiceType ? invoice.getTaxCurrencyCode() : creditNote.getTaxCurrencyCode();
 		return code==null ? null : code.getValue();
 	}
 
