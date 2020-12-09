@@ -368,10 +368,20 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 		payable.copyTo(payableAmt);
 		tradeSettlementHeaderMonetarySummation.getDuePayableAmount().add(payableAmt); // add to list
 	}
-	void setInvoiceTax(Amount taxTotalAmount) {
+	void setInvoiceTax(Amount amount) {
 		AmountType taxTotalAmt = new AmountType();
-		taxTotalAmount.copyTo(taxTotalAmt);
+		amount.copyTo(taxTotalAmt);
 		tradeSettlementHeaderMonetarySummation.getTaxTotalAmount().add(taxTotalAmt); // add to list
+	}
+	Amount getPrepaid() {
+		List<AmountType> list = tradeSettlementHeaderMonetarySummation.getTotalPrepaidAmount();
+//		LOG.info("::::::::::::: List<AmountType> list size="+list.size()); // wg. BUG in 03.01a
+		return list.isEmpty() ? null : new Amount(list.get(0).getCurrencyID(), list.get(0).getValue());		
+	}
+	void setPrepaid(Amount amount) {
+		AmountType prepaidAmount = new AmountType();
+		amount.copyTo(prepaidAmount);
+		tradeSettlementHeaderMonetarySummation.getTotalPrepaidAmount().add(prepaidAmount); // add to list
 	}
 	
 	TradeSettlementHeaderMonetarySummationType getTradeSettlementHeaderMonetarySummation() {

@@ -211,13 +211,15 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         	LOG.info("added vatBreakdown "+vatBreakdown);
         });
 		
+        Amount prePaidAmount = testDoc.getPrepaid();
+    	LOG.info("-----------------Prepaid amount "+prePaidAmount);
         cii.setDocumentTotals(testDoc.getInvoiceLineNetTotal(), 
 				testDoc.getInvoiceTotalTaxExclusive(), 
 				testDoc.getInvoiceTotalTaxInclusive(), 
 				testDoc.getDuePayable());
         cii.setInvoiceTax(testDoc.getInvoiceTax());
-    	LOG.info("-----------------Prepaid amount "+testDoc.getPrepaid());
-        testDoc.getPrepaid();
+        cii.setPrepaid(prePaidAmount);
+        
 //        cii.setInvoiceTaxInAccountingCurrency(  ...  ist nicht implementiert TODO
 
         List<TradeLineItem> lines = testDoc.getLines();

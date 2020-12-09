@@ -176,7 +176,6 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setBuyer(getBuyerParty(doc));
 		LOG.info("\n SellerTaxRepresentativeParty:");;
 		setTaxRepresentative(getTaxRepresentativeParty(doc)); // optional
-		LOG.info("\n ...");
 		
 		TradeSettlementHeaderMonetarySummationType stshms = ahts.getTradeSettlementHeaderMonetarySummation(); // BG-22 1..1
 		setDocumentTotals(new Amount(stshms.getLineTotalAmount().get(0).getValue())     // getInvoiceLineNetTotal(doc)
@@ -184,6 +183,17 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 						, new Amount(stshms.getGrandTotalAmount().get(0).getValue())    // getInvoiceTotalTaxInclusive(doc)
 						, new Amount(stshms.getDuePayableAmount().get(0).getValue())    // getDuePayable(doc)
 				);
+		List<AmountType> prepaidAmountList = stshms.getTotalPrepaidAmount();
+		LOG.info("prepaidAmountList.size="+prepaidAmountList.size());
+		if(prepaidAmountList.isEmpty()) {
+			// nix tun
+		} else {
+			// BG-22.BT-113 0..1 (optional) 
+			// nur das erste Element holen und kopieren:
+			AmountType amount =prepaidAmountList.get(0);
+			this.setPrepaid(new Amount(amount.getCurrencyID(), amount.getValue()));
+		}
+		LOG.info("\n ...");
 
 		List<AmountType> list = stshms.getTaxTotalAmount(); // BT-110, BT-111 1..1
 		if(list.isEmpty()) {
@@ -975,12 +985,29 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	public Amount getInvoiceTotalTaxInclusive() {
 		return new Amount(applicableHeaderTradeSettlement.getTradeSettlementHeaderMonetarySummation().getGrandTotalAmount().get(0).getValue());
 	}
+	// BG-22.BT-113 - 1..1/0..1 (optional) The sum of amounts which have been paid in advance.
+	// Summe bereits gezahlter Beträge.
+	@Override
+	public Amount getPrepaid() {
+		return applicableHeaderTradeSettlement.getPrepaid();
+	}
 	// BG-22.BT-115 - 1..1/1..1
 	@Override
-	public Amount getDuePayable() {
+	public Amount getDuePayable() { 
 		return new Amount(applicableHeaderTradeSettlement.getTradeSettlementHeaderMonetarySummation().getDuePayableAmount().get(0).getValue());
 	}
 	
+	/**
+	 * setter optional total amounts of the invoice
+	 * 
+	 * BG-22.BT-113 0..1 (optional) The sum of amounts which have been paid in advance.
+	 */
+	// Summe bereits gezahlter Beträge.
+	@Override
+	public void setPrepaid(Amount amount) {
+		applicableHeaderTradeSettlement.setPrepaid(amount);
+	}
+
 	/**
 	 * mandatory total amounts of the invoice
 	 * 
@@ -993,7 +1020,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	public void setDocumentTotals(Amount lineExtension, Amount taxExclusive, Amount taxInclusive, Amount payable) {
 		LOG.info("lineExtension:"+lineExtension + " taxExclusive:"+taxExclusive + " taxInclusive:"+taxInclusive + " payable:"+payable);
 		applicableHeaderTradeSettlement.setDocumentTotals(lineExtension, taxExclusive, taxInclusive, payable);
-		// zurückschreinem:
+		// zurückschreiben:
 		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement.get());
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
 	}
@@ -1053,12 +1080,6 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 
 	@Override
 	public void setChargesTotal(Amount amount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setPaid(Amount amount) {
 		// TODO Auto-generated method stub
 		
 	}
