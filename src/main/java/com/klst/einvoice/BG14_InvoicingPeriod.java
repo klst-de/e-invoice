@@ -1,9 +1,7 @@
 package com.klst.einvoice;
 
-import java.sql.Timestamp;
-
 /**
- * BG-14 INVOICING PERIOD 
+ * BG-14 INVOICING PERIOD with BT-73 Invoicing period start date and BT-74 Invoicing period end date
  * <p>
  * A group of business terms providing information on the invoice period.
  * Used to indicate when the period covered by the invoice starts and when it ends. 
@@ -13,21 +11,12 @@ import java.sql.Timestamp;
  * <br>EN16931-ID: 	BG-14
  * <br>Rule ID: 	
  * <br>Request ID: 	R34
+ * <p>
+ * BT-73 and BT-74
+ * Cardinality: 	0..1
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
-
-// TODO Idee runter zu ubl und cii und public raus ?!
-public interface BG14_InvoicingPeriod {
-	
-	// BT-73 +++ 0..1 Invoicing period start date
-	public void setStartDate(String ymd);
-	public void setStartDate(Timestamp ts);
-	public Timestamp getStartDateAsTimestamp();
-	
-	// BT-74 +++ 0..1 Invoicing period end date
-	public void setEndDate(String ymd);
-	public void setEndDate(Timestamp ts);
-	public Timestamp getEndDateAsTimestamp();
+public interface BG14_InvoicingPeriod extends IPeriod {
 	
 }

@@ -63,6 +63,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setBuyerReference(testDoc.getBuyerReferenceValue()); // BT-10 + 0..1 (optional)
 		
 //		makeOptionals(cii);
+//		cii.setStartDate(testDoc.getStartDateAsTimestamp()); // BG-14.BT-73
+//		cii.setEndDate(testDoc.getEndDateAsTimestamp()); // BG-14.BT-74
 		cii.setTaxPointDate(testDoc.getTaxPointDateAsTimestamp()); // BT-7 BT-7-0
 		cii.setOrderReference(testDoc.getOrderReference()); // BT-14 + 0..1	
 		List<Object> noteList = testDoc.getNotes();
@@ -236,6 +238,9 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         			);
         	
         	line.setNote(testLine.getNote()); // opt
+    		line.setStartDate(testLine.getStartDateAsTimestamp()); // BG-26.BT-134
+    		line.setEndDate(testLine.getEndDateAsTimestamp()); // BG-26.BT-135
+
         	line.setDescription(testLine.getDescription());
         	line.setSellerAssignedID(testLine.getSellerAssignedID()); // 0..1 BT-128 ram:SellerAssignedID
         	List<Object> cl = testLine.getClassificationList();

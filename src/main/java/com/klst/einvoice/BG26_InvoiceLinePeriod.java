@@ -1,9 +1,7 @@
 package com.klst.einvoice;
 
-import java.sql.Timestamp;
-
 /**
- * BG-26 INVOICE LINE PERIOD
+ * BG-26 INVOICE LINE PERIOD with BT-134 Invoice line period start date and BT-135 Invoice line period end date
  * <p>
  * A group of business terms providing information about the period relevant for the Invoice line.
  * Is also called Invoice line delivery period
@@ -12,19 +10,12 @@ import java.sql.Timestamp;
  * <br>EN16931-ID: 	BG-26
  * <br>Rule ID: 	
  * <br>Request ID: 	R30
+ * <p>
+ * BT-134 and BT-135
+ * Cardinality: 	0..1
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
-public interface BG26_InvoiceLinePeriod {
-	
-	// BT-134 +++ 0..1 Invoice line period start date
-	public void setStartDate(String ymd);
-	public void setStartDate(Timestamp ts);
-	public Timestamp getStartDateAsTimestamp();
-	
-	// BT-135 +++ 0..1 Invoice line period end date
-	public void setEndDate(String ymd);
-	public void setEndDate(Timestamp ts);
-	public Timestamp getEndDateAsTimestamp();
-	
+public interface BG26_InvoiceLinePeriod extends IPeriod {
+
 }

@@ -1,10 +1,13 @@
 package com.klst.einvoice.unece.uncefact;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoiceLine;
+import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
@@ -16,6 +19,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductClassificationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeProductType;
@@ -23,6 +27,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
@@ -42,7 +47,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  */
 public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreInvoiceLine {
 
-//	private static final Logger LOG = Logger.getLogger(TradeLineItem.class.getName());
+	private static final Logger LOG = Logger.getLogger(TradeLineItem.class.getName());
 
 	public TradeLineItem() {
 		super();
@@ -156,18 +161,67 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	// TODO BT-128  IssuerAssignedID
-/*
-       TODO
-                <ram:BillingSpecifiedPeriod>
-                    <ram:StartDateTime>
-                        <udt:DateTimeString format="102">20160101</udt:DateTimeString>
-                    </ram:StartDateTime>
-                    <ram:EndDateTime>
-                        <udt:DateTimeString format="102">20161231</udt:DateTimeString>
-                    </ram:EndDateTime>
-                </ram:BillingSpecifiedPeriod>
 
- */
+	// BT-134 +++ 0..1 Invoice line period start date
+	@Override
+	public void setStartDate(String ymd) {
+		setStartDate(DateTimeFormats.ymdToTs(ymd));
+	}
+
+	@Override
+	public void setStartDate(Timestamp ts) {
+		if(ts==null) return;
+		DateTimeType dateTime = CrossIndustryInvoice.newDateTime(ts);
+		if(specifiedLineTradeSettlement.getBillingSpecifiedPeriod()==null) {
+//			LOG.info("creating SpecifiedPeriodType and setBillingSpecifiedPeriod");
+			SpecifiedPeriodType sp = new SpecifiedPeriodType();
+			sp.setStartDateTime(dateTime);
+			specifiedLineTradeSettlement.setBillingSpecifiedPeriod(sp);
+		} else {
+			specifiedLineTradeSettlement.getBillingSpecifiedPeriod().setStartDateTime(dateTime);
+		}
+	}
+
+	@Override
+	public Timestamp getStartDateAsTimestamp() {
+		return getStartDateAsTimestamp(specifiedLineTradeSettlement);
+	}
+	static Timestamp getStartDateAsTimestamp(LineTradeSettlementType lts) {
+		SpecifiedPeriodType specifiedPeriod = lts.getBillingSpecifiedPeriod();
+		if(specifiedPeriod==null) return null;
+		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
+		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
+	}
+
+	@Override
+	public void setEndDate(String ymd) {
+		setEndDate(DateTimeFormats.ymdToTs(ymd));		
+	}
+
+	@Override
+	public void setEndDate(Timestamp ts) {
+		if(ts==null) return;
+		DateTimeType dateTime = CrossIndustryInvoice.newDateTime(ts);
+		if(specifiedLineTradeSettlement.getBillingSpecifiedPeriod()==null) {
+			SpecifiedPeriodType sp = new SpecifiedPeriodType();
+			sp.setStartDateTime(dateTime);
+			specifiedLineTradeSettlement.setBillingSpecifiedPeriod(sp);			
+		} else {
+			specifiedLineTradeSettlement.getBillingSpecifiedPeriod().setEndDateTime(dateTime);
+		}
+	}
+
+	@Override
+	public Timestamp getEndDateAsTimestamp() {
+		return getEndDateAsTimestamp(specifiedLineTradeSettlement);
+	}
+	static Timestamp getEndDateAsTimestamp(LineTradeSettlementType lts) {
+		SpecifiedPeriodType specifiedPeriod = lts.getBillingSpecifiedPeriod();
+		if(specifiedPeriod==null) return null;
+		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
+		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
+
 	@Override // 0 .. 1 BT-155 Bsp: <ram:SellerAssignedID>246</ram:SellerAssignedID>
 	public void setSellerAssignedID(String id) {
 		if(id==null) return;
