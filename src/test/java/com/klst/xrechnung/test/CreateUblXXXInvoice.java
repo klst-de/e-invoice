@@ -179,7 +179,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setDocumentCurrency(testDoc.getDocumentCurrency());
 		ublInvoice.setTaxCurrency(testDoc.getTaxCurrency());
 		ublInvoice.setBuyerReference(testDoc.getBuyerReferenceValue());
-		ublInvoice.setContractReference(testDoc.getContractReference());
+		ublInvoice.setContractReference(testDoc.getContractReference()); // optional
+		ublInvoice.setStartDate(testDoc.getStartDateAsTimestamp()); // optional
+		ublInvoice.setEndDate(testDoc.getEndDateAsTimestamp()); // optional
 		LOG.info("ublInvoice "+ublInvoice);
 		
 		ublInvoice.setSeller(testDoc.getSeller());
@@ -341,6 +343,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					);
 			
 			// opt:
+			targetLine.setStartDate(testLine.getStartDateAsTimestamp()); // optional
+			targetLine.setEndDate(testLine.getEndDateAsTimestamp()); // optional
+
 			targetLine.setSellerAssignedID(testLine.getSellerAssignedID());   //BT-155 0..1
 			targetLine.setBuyerAssignedID(testLine.getBuyerAssignedID());     //BT-156 0..1
 			targetLine.setStandardID(testLine.getStandardID(), "TODOSchema"); //BT-157 0..1 , BT-157-1 required

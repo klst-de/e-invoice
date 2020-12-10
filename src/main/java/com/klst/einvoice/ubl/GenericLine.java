@@ -271,51 +271,56 @@ public class GenericLine<T> implements CoreInvoiceLine {
 
 	// BG-26 ++ 0..1 INVOICE LINE PERIOD
 	// BG-26.BT-134 +++ 0..1 Invoice line period start date / Das Datum, an dem der Rechnungszeitraum der betreffenden Rechnungsposition beginnt.
-//	@Override
+	List<PeriodType> periodList = null;
+	PeriodType getPeriod0() {
+		if(periodList==null) {
+			periodList = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
+			if(periodList.isEmpty()) {
+				LOG.info("periodList.isEmpty()");
+				PeriodType period = new PeriodType();
+				periodList.add(period);
+			}
+		} 
+		return periodList.get(0);
+	}
+	@Override
 	public void setStartDate(String ymd) {	
 		setStartDate(DateTimeFormats.ymdToTs(ymd));
 	}
-//	@Override
+	@Override
 	public void setStartDate(Timestamp ts) {
+		if(ts==null) return; // optional
 		StartDateType date = new StartDateType();
 		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
-		PeriodType period = new PeriodType();
+		PeriodType period = getPeriod0();
 		period.setStartDate(date);
-		if(isInvoiceLineType) {
-			iLine.getInvoicePeriod().add(period);
-		} else {
-			cnLine.getInvoicePeriod().add(period);
-		}	
 	}
 	
-//	@Override
+	@Override
 	public Timestamp getStartDateAsTimestamp() {
 		List<PeriodType> list = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
 		if(list.isEmpty()) return null;
 		DateType date = (DateType)list.get(0).getStartDate();
+		if(date==null) return null;
 		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
 	}
 	
 	// BG-26.BT-135 +++ 0..1 Invoice line period end date
-//	@Override
+	@Override
 	public void setEndDate(String ymd) {	
 		setEndDate(DateTimeFormats.ymdToTs(ymd));
 	}
-//	@Override
+	@Override
 	public void setEndDate(Timestamp ts) {
+		if(ts==null) return; // optional
 		EndDateType date = new EndDateType();
 		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
-		PeriodType period = new PeriodType();
+		PeriodType period = getPeriod0();
 		period.setEndDate(date);
-		if(isInvoiceLineType) {
-			iLine.getInvoicePeriod().add(period);
-		} else {
-			cnLine.getInvoicePeriod().add(period);
-		}	
 	}
 	
-//	@Override
-	public Timestamp getEndDate() {
+	@Override
+	public Timestamp getEndDateAsTimestamp() {
 		List<PeriodType> list = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
 		if(list.isEmpty()) return null;
 		DateType date = (DateType)list.get(0).getEndDate();

@@ -20,7 +20,7 @@ import com.klst.untdid.codelist.TaxCategoryCode;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for EN_16931_1_2017 rule and request IDs
  */
-public interface CoreInvoiceLine {
+public interface CoreInvoiceLine extends BG26_InvoiceLinePeriod {
 
 	/**
 	 * Invoice line identifier
