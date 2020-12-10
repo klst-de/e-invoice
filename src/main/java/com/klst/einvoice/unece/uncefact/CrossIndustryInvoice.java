@@ -167,6 +167,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setTaxPointDate(getTaxPointDateAsTimestamp(ahts)); // optional
 		
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional
+		setContractReference(getContractReferenceID(doc)); // optional
 		setOrderReference(getOrderReferenceID(doc)); // optional
 
 		addNotes(doc);	
@@ -506,16 +507,36 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	}
 
 	// BT-12 + 0..1 Contract reference
+/*
+test daten in 03 06 08 15
+CII: 01.03a-INVOICE_uncefact.xml :
+        <ram:ApplicableHeaderTradeAgreement>
+        ...
+            <ram:ContractReferencedDocument>
+                <ram:IssuerAssignedID>CR987654</ram:IssuerAssignedID>
+            </ram:ContractReferencedDocument>UBL:
+UBL: 
+    <cac:ContractDocumentReference>
+        <cbc:ID>CR987654</cbc:ID>
+    </cac:ContractDocumentReference>
+ */
 	@Override
 	public void setContractReference(String id) {
-		// TODO test daten in 03 06 08 15
-		
+		if(id==null) return; // optional
+		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
+		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
+		referencedDocument.setIssuerAssignedID(newIDType(id, null)); // null : No identification scheme
+		headerTradeAgreement.setContractReferencedDocument(referencedDocument);
 	}
 
 	@Override
 	public String getContractReference() {
-		// TODO Auto-generated method stub
-		return null;
+		return getContractReferenceID(this);
+	}
+	static String getContractReferenceID(CrossIndustryInvoiceType doc) {
+		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		ReferencedDocumentType referencedDocument = headerTradeAgreement.getContractReferencedDocument();
+		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();
 	}
 
 	// BT-13 + 0..1 Purchase order reference
@@ -559,8 +580,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	static String getOrderReferenceID(CrossIndustryInvoiceType doc) {
 		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		ReferencedDocumentType referencedDocument = headerTradeAgreement.getSellerOrderReferencedDocument();
-		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();
-		
+		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
 	}
 
 	/* INVOICE NOTE                                BG-1                        0..*

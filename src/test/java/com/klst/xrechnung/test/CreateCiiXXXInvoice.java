@@ -63,6 +63,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setBuyerReference(testDoc.getBuyerReferenceValue()); // BT-10 + 0..1 (optional)
 		
 //		makeOptionals(cii);
+		cii.setContractReference(testDoc.getContractReference()); // BT-12 + 0..1	
 //		cii.setStartDate(testDoc.getStartDateAsTimestamp()); // BG-14.BT-73
 //		cii.setEndDate(testDoc.getEndDateAsTimestamp()); // BG-14.BT-74
 		cii.setTaxPointDate(testDoc.getTaxPointDateAsTimestamp()); // BT-7 BT-7-0
