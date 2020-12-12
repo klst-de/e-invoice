@@ -168,7 +168,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional
 		setContractReference(getContractReferenceID(doc)); // optional
-		List<BG24_AdditionalSupportingDocs> asd = getAdditionalSupportingDocuments(doc);
+		
+		List<BG24_AdditionalSupportingDocs> asd = getAdditionalSupportingDocuments(doc); // 0..n
 		asd.forEach(asdoc -> {
 			LOG.info("asdoc   Reference="+asdoc.getSupportingDocumentReference());
 			LOG.info("asdoc Description="+asdoc.getSupportingDocumentDescription()); // aka Name
@@ -1196,20 +1197,6 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	@Override
 	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
 		this.addSupportigDocument(docRefId, null, description, content, mimeCode, filename);
-//		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-//		referencedDocument.setIssuerAssignedID(new Identifier(docRefId));
-//		if(description!=null) {
-//			referencedDocument.getName().add(new Text(description));
-//		}
-//		
-//		BinaryObjectType binaryObject = new BinaryObjectType();
-//		binaryObject.setValue(content);
-//		binaryObject.setMimeCode(mimeCode);
-//		binaryObject.setFilename(filename);
-//		referencedDocument.getAttachmentBinaryObject().add(binaryObject);
-//				
-//		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
-//		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
 	}
 
 	@Override
@@ -1242,17 +1229,6 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	@Override
 	public void addSupportigDocument(String docRefId, String description, String uri) {
 		this.addSupportigDocument(docRefId, null, description, uri);
-//		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-//		referencedDocument.setIssuerAssignedID(new Identifier(docRefId));
-//		if(description!=null) {
-//			referencedDocument.getName().add(new Text(description));
-//		}
-//		if(url!=null) {
-//			referencedDocument.setURIID(new Identifier(url));
-//		}
-//				
-//		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
-//		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
 	}
 	
 	public void addSupportigDocument(ReferencedDocument doc) {

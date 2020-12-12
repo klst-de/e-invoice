@@ -1126,6 +1126,19 @@ UBL:
 			creditNote.getAdditionalDocumentReference().add(asDoc);
 		}
 	}
+
+	@Override
+	public void addSupportigDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename) {
+		LOG.warning("Code "+code+" is ignored in UBL");
+		this.addSupportigDocument(docRefId, description, content, mimeCode, filename);
+	}
+
+	@Override
+	public void addSupportigDocument(String docRefId, String code, String description, String uri) {
+		LOG.warning("Code "+code+" is ignored in UBL");
+		addSupportigDocument(docRefId, description, uri);
+	}
+
 	@Override
 	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments() {
 		List<DocumentReferenceType> documentReferenceList;

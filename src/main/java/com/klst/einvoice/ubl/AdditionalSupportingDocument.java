@@ -212,4 +212,10 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		return attachment.getEmbeddedDocumentBinaryObject();
 	}
 
+	@Override
+	public String getSupportingDocumentCode() {
+		// not defined in UBL
+		return null;
+	}
+
 }

@@ -137,9 +137,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		List<BG24_AdditionalSupportingDocs> additionalSupportingDocs = testDoc.getAdditionalSupportingDocuments();
 		additionalSupportingDocs.forEach(additionalSupportingDoc -> {
 			
-			ReferencedDocument doc = new ReferencedDocument(additionalSupportingDoc.getSupportingDocumentReference()
-				, additionalSupportingDoc.getSupportingDocumentCode());
-			
+//			ReferencedDocument doc = new ReferencedDocument(additionalSupportingDoc.getSupportingDocumentReference()
+//				, additionalSupportingDoc.getSupportingDocumentCode());
 //			cii.addSupportigDocument(doc); // methode nicht in API Core Invoice, nur die zwei:
 			byte[] byteDoc = additionalSupportingDoc.getAttachedDocument();
 			if(byteDoc==null) {
@@ -155,14 +154,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 						, additionalSupportingDoc.getAttachedDocumentMimeCode()
 						, additionalSupportingDoc.getAttachedDocumentFilename());				
 			}
-//			LOG.warning("wg CII-DT-021error[CII-DT-021] - Name should not be present");
-///* TODO !!!!!!!!!!!!!
-//
-//Name aka DocumentDescription wird nur akzeptiert wenn auch Code da ist - das ist in den kosit Testdaten 03.01 der Fall
-//Code ist in ZUGFeRD-2.1.1%20-%20Spezifikation_TA.pdf als BT-122-0 gekennzeichnet
-//
-// */
 		});
+		
 		BusinessParty testPayeeParty = testDoc.getPayee();
 		if(testPayeeParty==null) {
 			LOG.warning("testPayeeParty==null" );
