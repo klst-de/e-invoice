@@ -477,7 +477,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename);
 	
 	/**
-	 * use this to add an Eexternal document
+	 * use this to add an External document
 	 * 
 	 * @param docRefId
 	 * @param description
