@@ -465,25 +465,34 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void addVATBreakDown(CoreInvoiceVatBreakdown vatBreakdown);
 	
 	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
+	// BG-24.BT-122 ++ 1..1 Supporting document reference
+	// BG-24.BT-122-0  1..1 TypeCode
+	// BG-24.BT-123 ++ 0..1 Supporting document description
+	// BG-24.BT-124 ++ 0..1 External document location
+	// BG-24.BT-125 ++ 0..1 Attached document
 	/**
 	 * use this to add an attached document
 	 * 
-	 * @param docRefId
-	 * @param description
-	 * @param content - the document content
+	 * @param docRefId - BG-24.BT-122 Supporting document reference
+	 * @param code - BG-24.BT-122-0 TypeCode (CII only)
+	 * @param description/name - BG-24.BT-123 Supporting document description
+	 * @param content - BG-24.BT-125 Attached document content
 	 * @param mimeCode
 	 * @param filename
 	 */
+	public void addSupportigDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename);
 	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename);
 	
 	/**
 	 * use this to add an External document
 	 * 
-	 * @param docRefId
-	 * @param description
-	 * @param url
+	 * @param docRefId - BG-24.BT-122 Supporting document reference
+	 * @param code - BG-24.BT-122-0 TypeCode (CII only)
+	 * @param description/name - BG-24.BT-123 Supporting document description
+	 * @param uri locationUri
 	 */
-	public void addSupportigDocument(String docRefId, String description, String url);
+	public void addSupportigDocument(String docRefId, String code, String description, String uri);
+	public void addSupportigDocument(String docRefId, String description, String uri);
 	
 	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments();
 	

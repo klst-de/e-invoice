@@ -13,6 +13,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 // BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
 // 0 .. n AdditionalReferencedDocument Rechnungsbegründende Unterlagen BG-24
 // BG-24.BT-122 ++ 1..1 Supporting document reference
+// BG-24.BT-122-0  1..1 TypeCode
 // BG-24.BT-123 ++ 0..1 Supporting document description
 // BG-24.BT-124 ++ 0..1 External document location
 // BG-24.BT-125 ++ 0..1 Attached document
@@ -37,9 +38,10 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	 * 
 	 * @param docRefId, BG-24.BT-122 (mandatory BT business term) Supporting document reference
 	 */
-	public ReferencedDocument(String docRefId) {
+	public ReferencedDocument(String docRefId, String code) {
 		this();
 		setSupportingDocumentReference(docRefId);
+		setSupportingDocumentCode(code);
 	}
 	
 	@Override
@@ -88,10 +90,10 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 
 	// BG-24.BT-125 ++ 0..1 Attached document
 	@Override
-	public void setAttachedDocument(byte[] doc, String mimeCode, String filename) {
+	public void setAttachedDocument(byte[] content, String mimeCode, String filename) {
 		if(super.getAttachmentBinaryObject().isEmpty()) {
 			BinaryObjectType e = new BinaryObjectType();
-			e.setValue(doc);
+			e.setValue(content);
 			e.setMimeCode(mimeCode);
 			e.setFilename(filename);
 			super.getAttachmentBinaryObject().add(e);
@@ -101,31 +103,32 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	@Override
 	public byte[] getAttachedDocument() {
 		List<BinaryObjectType> binaryObjects = super.getAttachmentBinaryObject();
-		if(binaryObjects==null) return null;
+		if(binaryObjects.isEmpty()) return null;
 		return binaryObjects.get(0).getValue();
 	}
 
 	@Override
 	public String getAttachedDocumentMimeCode() {
 		List<BinaryObjectType> binaryObjects = super.getAttachmentBinaryObject();
-		if(binaryObjects==null) return null;
+		if(binaryObjects.isEmpty()) return null;
 		return binaryObjects.get(0).getMimeCode();
 	}
 
 	@Override
 	public String getAttachedDocumentFilename() {
 		List<BinaryObjectType> binaryObjects = super.getAttachmentBinaryObject();
-		if(binaryObjects==null) return null;
+		if(binaryObjects.isEmpty()) return null;
 		return binaryObjects.get(0).getFilename();
 	}
 
-	public void setSupportingDocumentCode(String code) {
+	void setSupportingDocumentCode(String code) {
 		if(code==null) return;
 		DocumentCodeType documentCode = new DocumentCodeType();
 		documentCode.setValue(code);
 		super.setTypeCode(documentCode);
 	}
 
+	@Override
 	public String getSupportingDocumentCode() {
 		DocumentCodeType documentCode = super.getTypeCode();
 		return documentCode==null? null : documentCode.getValue();

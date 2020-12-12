@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
@@ -20,6 +21,7 @@ import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.FinancialAccount;
 import com.klst.einvoice.unece.uncefact.IBANId;
+import com.klst.einvoice.unece.uncefact.ReferencedDocument;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.einvoice.unece.uncefact.VatBreakdown;
@@ -131,6 +133,36 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		LOG.info("buyerParty:"+buyerParty.getBusinessName() + " Address:"+buyerParty.getAddress());
 		cii.setBuyer(buyerParty);
 		
+		// Cardinality: 0..n EN16931-ID: BG-24 
+		List<BG24_AdditionalSupportingDocs> additionalSupportingDocs = testDoc.getAdditionalSupportingDocuments();
+		additionalSupportingDocs.forEach(additionalSupportingDoc -> {
+			
+			ReferencedDocument doc = new ReferencedDocument(additionalSupportingDoc.getSupportingDocumentReference()
+				, additionalSupportingDoc.getSupportingDocumentCode());
+			
+//			cii.addSupportigDocument(doc); // methode nicht in API Core Invoice, nur die zwei:
+			byte[] byteDoc = additionalSupportingDoc.getAttachedDocument();
+			if(byteDoc==null) {
+				cii.addSupportigDocument(additionalSupportingDoc.getSupportingDocumentReference()
+						, additionalSupportingDoc.getSupportingDocumentCode()
+						, additionalSupportingDoc.getSupportingDocumentDescription()
+						, additionalSupportingDoc.getExternalDocumentLocation());
+			} else {
+				cii.addSupportigDocument(additionalSupportingDoc.getSupportingDocumentReference()
+						, additionalSupportingDoc.getSupportingDocumentCode()
+						, additionalSupportingDoc.getSupportingDocumentDescription()
+						, byteDoc
+						, additionalSupportingDoc.getAttachedDocumentMimeCode()
+						, additionalSupportingDoc.getAttachedDocumentFilename());				
+			}
+//			LOG.warning("wg CII-DT-021error[CII-DT-021] - Name should not be present");
+///* TODO !!!!!!!!!!!!!
+//
+//Name aka DocumentDescription wird nur akzeptiert wenn auch Code da ist - das ist in den kosit Testdaten 03.01 der Fall
+//Code ist in ZUGFeRD-2.1.1%20-%20Spezifikation_TA.pdf als BT-122-0 gekennzeichnet
+//
+// */
+		});
 		BusinessParty testPayeeParty = testDoc.getPayee();
 		if(testPayeeParty==null) {
 			LOG.warning("testPayeeParty==null" );

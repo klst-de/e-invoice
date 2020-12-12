@@ -173,14 +173,11 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 			LOG.info("asdoc   Reference="+asdoc.getSupportingDocumentReference());
 			LOG.info("asdoc Description="+asdoc.getSupportingDocumentDescription()); // aka Name
 			LOG.info("asdoc    Location="+asdoc.getExternalDocumentLocation());
-			LOG.info("asdoc        Type="+
-			((ReferencedDocument)asdoc).getTypeCode().getValue() );
-			ReferencedDocument rd = new ReferencedDocument(asdoc.getSupportingDocumentReference());
-			rd.setTypeCode(((ReferencedDocument)asdoc).getTypeCode());
+			LOG.info("asdoc        Type="+asdoc.getSupportingDocumentCode());
+			ReferencedDocument rd = new ReferencedDocument(asdoc.getSupportingDocumentReference(), asdoc.getSupportingDocumentCode());
 			rd.setSupportingDocumentDescription(asdoc.getSupportingDocumentDescription()); // aka Name
 			rd.setExternalDocumentLocation(asdoc.getExternalDocumentLocation());
-			addSupportigDocument(asdoc.getSupportingDocumentReference(), 
-					asdoc.getSupportingDocumentDescription(), asdoc.getExternalDocumentLocation());
+			addSupportigDocument(rd);
 		});
 
 		setOrderReference(getOrderReferenceID(doc)); // optional
@@ -1198,18 +1195,39 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
  */
 	@Override
 	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new Identifier(docRefId));
-		if(description!=null) {
-			referencedDocument.getName().add(new Text(description));
-		}
+		this.addSupportigDocument(docRefId, null, description, content, mimeCode, filename);
+//		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
+//		referencedDocument.setIssuerAssignedID(new Identifier(docRefId));
+//		if(description!=null) {
+//			referencedDocument.getName().add(new Text(description));
+//		}
+//		
+//		BinaryObjectType binaryObject = new BinaryObjectType();
+//		binaryObject.setValue(content);
+//		binaryObject.setMimeCode(mimeCode);
+//		binaryObject.setFilename(filename);
+//		referencedDocument.getAttachmentBinaryObject().add(binaryObject);
+//				
+//		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
+//		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
+	}
+
+	@Override
+	public void addSupportigDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename) {
+		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId, code);
+		referencedDocument.setSupportingDocumentDescription(description);
+		referencedDocument.setAttachedDocument(content, mimeCode, filename);
 		
-		BinaryObjectType binaryObject = new BinaryObjectType();
-		binaryObject.setValue(content);
-		binaryObject.setMimeCode(mimeCode);
-		binaryObject.setFilename(filename);
-		referencedDocument.getAttachmentBinaryObject().add(binaryObject);
-				
+		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
+		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
+	}
+
+	@Override
+	public void addSupportigDocument(String docRefId, String code, String description, String uri) {
+		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId, code);
+		referencedDocument.setSupportingDocumentDescription(description);
+		referencedDocument.setExternalDocumentLocation(uri);
+		
 		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
 		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
 	}
@@ -1219,22 +1237,24 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 * 
 	 * @param docRefId    BG-24.BT-122 ++ 1..1 Supporting document reference
 	 * @param description BG-24.BT-123 ++ 0..1 Supporting document description
-	 * @param url         BG-24.BT-124 ++ 0..1 External document location
+	 * @param uri         BG-24.BT-124 ++ 0..1 External document location uri
 	 */
 	@Override
-	public void addSupportigDocument(String docRefId, String description, String url) {
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new Identifier(docRefId));
-		if(description!=null) {
-			referencedDocument.getName().add(new Text(description));
-		}
-		if(url!=null) {
-			referencedDocument.setURIID(new Identifier(url));
-		}
-				
-		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
-		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
+	public void addSupportigDocument(String docRefId, String description, String uri) {
+		this.addSupportigDocument(docRefId, null, description, uri);
+//		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
+//		referencedDocument.setIssuerAssignedID(new Identifier(docRefId));
+//		if(description!=null) {
+//			referencedDocument.getName().add(new Text(description));
+//		}
+//		if(url!=null) {
+//			referencedDocument.setURIID(new Identifier(url));
+//		}
+//				
+//		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
+//		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
 	}
+	
 	public void addSupportigDocument(ReferencedDocument doc) {
 		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
 		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(doc);
@@ -1254,8 +1274,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		referencedDocuments.forEach(refDoc -> {
 			IDType issuerAssignedID = refDoc.getIssuerAssignedID();
 			DocumentCodeType documentCode = refDoc.getTypeCode(); // 916 ?
-			ReferencedDocument rd = new ReferencedDocument(issuerAssignedID.getValue());
-			rd.setTypeCode(documentCode);
+			ReferencedDocument rd = new ReferencedDocument(issuerAssignedID.getValue(), documentCode.getValue());
 			
 			List<TextType> texts = refDoc.getName();
 			texts.forEach(text -> {
@@ -1338,10 +1357,12 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	}	
 
 	// ----------------- gemeinsam mit TradeParty
+	@Deprecated
 	static IDType newIDType(IBANId iban) {
 		return new Identifier(iban.getValue(), iban.getSchemeID());
 	}
 	
+	@Deprecated
 	static IDType newIDType(BICId bic) {
 		return new Identifier(bic.getValue(), bic.getSchemeID());
 	}
