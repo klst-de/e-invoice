@@ -112,7 +112,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	
 	// 1 .. 1 LineID BT-126
 	void setId(String id) {
-		associatedDocumentLineDocument.setLineID(CrossIndustryInvoice.newIDType(id, null)); // null : No identification scheme is to be used.
+		associatedDocumentLineDocument.setLineID(new Identifier(id)); // No identification scheme is to be used.
 		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
 	}
 
@@ -125,7 +125,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	public void setNote(String text) {
 		if(text==null) return;
 		NoteType note = new NoteType();
-		note.getContent().add(CrossIndustryInvoice.newTextType(text)); // Kardinalität: 1 .. 1 TODO test
+		note.getContent().add(new Text(text)); // Kardinalität: 1 .. 1 TODO test
 		associatedDocumentLineDocument.getIncludedNote().add(note);
 		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
 	}
@@ -139,7 +139,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 	// 1 .. 1 SpecifiedTradeProduct.Name BT-153
 	void setItemName(String text) {
-		specifiedTradeProduct.getName().add(CrossIndustryInvoice.newTextType(text));
+		specifiedTradeProduct.getName().add(new Text(text));
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
 
@@ -151,7 +151,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override // 0 .. 1 SpecifiedTradeProduct.Description BT-154 Bsp: <ram:Description>Zeitschrift Inland</ram:Description>
 	public void setDescription(String text) {
 		if(text==null) return;
-		specifiedTradeProduct.setDescription(CrossIndustryInvoice.newTextType(text));
+		specifiedTradeProduct.setDescription(new Text(text));
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
 
@@ -225,7 +225,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override // 0 .. 1 BT-155 Bsp: <ram:SellerAssignedID>246</ram:SellerAssignedID>
 	public void setSellerAssignedID(String id) {
 		if(id==null) return;
-		specifiedTradeProduct.setSellerAssignedID(CrossIndustryInvoice.newIDType(id, null)); // null : No identification scheme is to be used.
+		specifiedTradeProduct.setSellerAssignedID(new Identifier(id)); // No identification scheme is to be used.
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
 
@@ -237,7 +237,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override // 0 .. 1 BT-156
 	public void setBuyerAssignedID(String id) {
 		if(id==null) return;
-		specifiedTradeProduct.setBuyerAssignedID(CrossIndustryInvoice.newIDType(id, null)); // null : No identification scheme is to be used.
+		specifiedTradeProduct.setBuyerAssignedID(new Identifier(id)); // No identification scheme is to be used.
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
 
@@ -261,7 +261,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override // 0 .. 1 BT-157
 	public void setStandardID(String id, String schemeID) {
 		if(id==null) return;
-		specifiedTradeProduct.setGlobalID(CrossIndustryInvoice.newIDType(id, schemeID));
+		specifiedTradeProduct.setGlobalID(new Identifier(id, schemeID));
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
 
@@ -348,7 +348,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	public void setOrderLineID(String id) {
 		if(id==null) return;
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setLineID(CrossIndustryInvoice.newIDType(id, null)); // null : No identification scheme is to be used.
+		referencedDocument.setLineID(new Identifier(id)); // No identification scheme is to be used.
 		specifiedLineTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument);
 		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
 	}

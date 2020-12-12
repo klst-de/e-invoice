@@ -208,7 +208,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		if(companyId==null) return;
 		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
 		TaxRegistrationType taxRegistration = new TaxRegistrationType();
-		taxRegistration.setID(CrossIndustryInvoice.newIDType(companyId,schemeID));
+		taxRegistration.setID(new Identifier(companyId, schemeID));
 		taxRegistrationList.add(taxRegistration);
 	}
 	void addPartyTaxID(String companyId)  {
@@ -226,7 +226,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 
 	void setPartyName(String name) {
 		if(name==null) return;
-		super.setName(CrossIndustryInvoice.newTextType(name));
+		super.setName(new Text(name));
 	}
 	
 	@Override
@@ -248,7 +248,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	@Override
 	public void setBusinessName(String name) {
 		if(name==null) return;
-		legalOrganization.setTradingBusinessName(CrossIndustryInvoice.newTextType(name));
+		legalOrganization.setTradingBusinessName(new Text(name));
 		super.setSpecifiedLegalOrganization(legalOrganization);
 	}
 
@@ -265,7 +265,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	@Override
 	public void setId(String name, String schemeID) {
 		if(name==null) return;
-		super.getID().add(CrossIndustryInvoice.newIDType(name, schemeID));
+		super.getID().add(new Identifier(name, schemeID));
 	}
 
 	@Override
@@ -281,7 +281,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	@Override
 	public void setCompanyId(String name, String schemeID) {
 		if(name==null) return;
-		legalOrganization.setID(CrossIndustryInvoice.newIDType(name, schemeID));
+		legalOrganization.setID(new Identifier(name, schemeID));
 		super.setSpecifiedLegalOrganization(legalOrganization);
 	}
 
@@ -317,7 +317,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	@Override
 	public void setCompanyLegalForm(String name) {
 		if(name==null) return;
-		super.getDescription().add(CrossIndustryInvoice.newTextType(name));
+		super.getDescription().add(new Text(name));
 	}
 
 	@Override // 0..1 also genügt der erste
@@ -330,7 +330,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	public void setUriUniversalCommunication(String name, String schemeID) {
 		if(name==null) return;
 		UniversalCommunicationType universalCommunicationType = new UniversalCommunicationType();
-		universalCommunicationType.setURIID(CrossIndustryInvoice.newIDType(name, schemeID));
+		universalCommunicationType.setURIID(new Identifier(name, schemeID));
 		super.getURIUniversalCommunication().add(universalCommunicationType);
 	}
 

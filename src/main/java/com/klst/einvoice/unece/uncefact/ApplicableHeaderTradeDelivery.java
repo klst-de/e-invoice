@@ -43,7 +43,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 		party = new TradeParty(null, address, null);
 		party.setBusinessName(businessName);
 		party.setId(locationId);
-		if(schemeId!=null) party.getGlobalID().add(CrossIndustryInvoice.newIDType(schemeId, null));
+		if(schemeId!=null) party.getGlobalID().add(new Identifier(schemeId));
 		setParty(party);		
 		setActualDate(ts);
 	}

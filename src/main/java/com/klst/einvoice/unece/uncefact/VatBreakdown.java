@@ -153,7 +153,7 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 	@Override
 	public void setTaxExemption(String text, String id) {
 		if(text!=null) {
-			super.setExemptionReason(CrossIndustryInvoice.newTextType(text));
+			super.setExemptionReason(new Text(text));
 		}
 		if(id!=null) {
 			CodeType code = new CodeType();

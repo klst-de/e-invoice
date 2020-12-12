@@ -102,7 +102,7 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 	@Override
 	public void setPaymentAccountID(String accountId) {
 		if(accountId==null) return;
-		payeePartyCreditorFinancialAccount.setProprietaryID(CrossIndustryInvoice.newIDType(accountId, null));		
+		payeePartyCreditorFinancialAccount.setProprietaryID(new Identifier(accountId));		
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 	@Override
 	public void setPaymentAccountName(String name) {
 		if(name==null) return;
-		payeePartyCreditorFinancialAccount.setAccountName(CrossIndustryInvoice.newTextType(name));		
+		payeePartyCreditorFinancialAccount.setAccountName(new Text(name));		
 	}
 
 	@Override
@@ -136,7 +136,7 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 	@Override
 	public void setPaymentServiceProviderID(String id) {
 		if(id==null) return;
-		payeeSpecifiedCreditorFinancialInstitution.setBICID(CrossIndustryInvoice.newIDType(id, null));	
+		payeeSpecifiedCreditorFinancialInstitution.setBICID(new Identifier(id));	
 	}
 
 	public String toString() {

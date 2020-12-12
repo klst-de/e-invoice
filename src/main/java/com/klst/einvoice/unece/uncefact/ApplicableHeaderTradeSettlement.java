@@ -246,7 +246,7 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 		getTradeSettlementPaymentMeans().setTypeCode(pmc);
 		
 		if(text!=null) { // BT-82 
-			tradeSettlementPaymentMeans.getInformation().add(CrossIndustryInvoice.newTextType(text));
+			tradeSettlementPaymentMeans.getInformation().add(new Text(text));
 		}
 	}
 	
@@ -260,7 +260,7 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 	@Override
 	public void setRemittanceInformation(String text) { 
 		if(text==null) return;
-		applicableHeaderTradeSettlement.getPaymentReference().add(CrossIndustryInvoice.newTextType(text));
+		applicableHeaderTradeSettlement.getPaymentReference().add(new Text(text));
 	}
 
 	@Override

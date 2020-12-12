@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 
+import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
@@ -52,11 +53,6 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 //		return id.getValue();
 		// oder direkt:
 		return super.getIssuerAssignedID().getValue();
-		
-//		IDType issuerAssignedID = super.getIssuerAssignedID();
-//		new Identifier(issuerAssignedID.getValue(), issuerAssignedID.getSchemeID(), issuerAssignedID.getSchemeVersionID());
-//		// TODO Auto-generated method stub
-//		return null;
 	}
 
 	// BG-24.BT-123 ++ 0..1 Supporting document description
@@ -80,6 +76,7 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	// in CII abgebildet auf ram:URIID , test Bsp 03.03a
 	@Override
 	public void setExternalDocumentLocation(String locationUri) {
+		if(locationUri==null) return;
 		super.setURIID(new Identifier(locationUri));
 	}
 
@@ -120,9 +117,18 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 		List<BinaryObjectType> binaryObjects = super.getAttachmentBinaryObject();
 		if(binaryObjects==null) return null;
 		return binaryObjects.get(0).getFilename();
-//		List<SpecifiedBinaryFileType> specifiedBinaryFiles = super.getAttachedSpecifiedBinaryFile();
-//		// TODO Auto-generated method stub
-//		return null;
+	}
+
+	public void setSupportingDocumentCode(String code) {
+		if(code==null) return;
+		DocumentCodeType documentCode = new DocumentCodeType();
+		documentCode.setValue(code);
+		super.setTypeCode(documentCode);
+	}
+
+	public String getSupportingDocumentCode() {
+		DocumentCodeType documentCode = super.getTypeCode();
+		return documentCode==null? null : documentCode.getValue();
 	}
 
 }

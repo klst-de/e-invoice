@@ -168,6 +168,21 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional
 		setContractReference(getContractReferenceID(doc)); // optional
+		List<BG24_AdditionalSupportingDocs> asd = getAdditionalSupportingDocuments(doc);
+		asd.forEach(asdoc -> {
+			LOG.info("asdoc   Reference="+asdoc.getSupportingDocumentReference());
+			LOG.info("asdoc Description="+asdoc.getSupportingDocumentDescription()); // aka Name
+			LOG.info("asdoc    Location="+asdoc.getExternalDocumentLocation());
+			LOG.info("asdoc        Type="+
+			((ReferencedDocument)asdoc).getTypeCode().getValue() );
+			ReferencedDocument rd = new ReferencedDocument(asdoc.getSupportingDocumentReference());
+			rd.setTypeCode(((ReferencedDocument)asdoc).getTypeCode());
+			rd.setSupportingDocumentDescription(asdoc.getSupportingDocumentDescription()); // aka Name
+			rd.setExternalDocumentLocation(asdoc.getExternalDocumentLocation());
+			addSupportigDocument(asdoc.getSupportingDocumentReference(), 
+					asdoc.getSupportingDocumentDescription(), asdoc.getExternalDocumentLocation());
+		});
+
 		setOrderReference(getOrderReferenceID(doc)); // optional
 
 		addNotes(doc);	
@@ -235,7 +250,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	 */
 	@Override
 	public void setId(String id) {
-		exchangedDocument.setID(newIDType(id, null)); // null : No identification scheme is to be used.
+		exchangedDocument.setID(new Identifier(id)); // No identification scheme is to be used.
 	}
 	
 	@Override
@@ -421,7 +436,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		if(description==null) {
 //			LOG.warning("text==null");
 		} else {
-			tradePaymentTerms.getDescription().add(newTextType(description)); // returns List<TextType>
+			tradePaymentTerms.getDescription().add(new Text(description)); // returns List<TextType>
 		}
 		if(ts==null) {
 //			LOG.warning("Timestamp ts==null");
@@ -463,7 +478,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	@Override
 	public void setBuyerReference(String reference) {
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setBuyerReference(newTextType(reference));
+		headerTradeAgreement.setBuyerReference(new Text(reference));
 		
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
 		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
@@ -489,8 +504,8 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public void setProjectReference(String docRefId, String name) {
 		if(docRefId==null) return; // optional
 		ProcuringProjectType procuringProject = new ProcuringProjectType();
-		procuringProject.setID(CrossIndustryInvoice.newIDType(docRefId, null));
-		procuringProject.setName(CrossIndustryInvoice.newTextType(name));
+		procuringProject.setID(new Identifier(docRefId));
+		procuringProject.setName(new Text(name));
 		
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
 		headerTradeAgreement.setSpecifiedProcuringProject(procuringProject);
@@ -525,7 +540,7 @@ UBL:
 		if(id==null) return; // optional
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(newIDType(id, null)); // null : No identification scheme
+		referencedDocument.setIssuerAssignedID(new Identifier(id)); // No identification scheme
 		headerTradeAgreement.setContractReferencedDocument(referencedDocument);
 	}
 
@@ -564,7 +579,7 @@ UBL:
 	public void setOrderReference(String docRefId) {
 		if(docRefId==null) return; // optional
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(newIDType(docRefId, null)); // null : No identification scheme
+		referencedDocument.setIssuerAssignedID(new Identifier(docRefId)); // No identification scheme
 		
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
 		headerTradeAgreement.setSellerOrderReferencedDocument(referencedDocument);
@@ -649,14 +664,14 @@ UBL:
 	void setProcessControl(String customization, String profile) {
 		ExchangedDocumentContextType exchangedDocumentContext = new ExchangedDocumentContextType();
 		DocumentContextParameterType documentContextParameter = new DocumentContextParameterType();
-		documentContextParameter.setID(newIDType(customization, null)); // null : No identification scheme
+		documentContextParameter.setID(new Identifier(customization)); // No identification scheme
 
 		exchangedDocumentContext.getGuidelineSpecifiedDocumentContextParameter().add(documentContextParameter);
 		if(profile==null) {
 			// profileIDType ist optional
 		} else { 
 			DocumentContextParameterType dcp = new DocumentContextParameterType();
-			dcp.setID(newIDType(profile, null)); // null : No identification scheme
+			dcp.setID(new Identifier(profile)); // No identification scheme
 			exchangedDocumentContext.getBusinessProcessSpecifiedDocumentContextParameter().add(dcp);
 		}
 		this.setExchangedDocumentContext(exchangedDocumentContext);
@@ -714,7 +729,7 @@ UBL:
 	@Override
 	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts) {
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(newIDType(docRefId, null)); // null : No identification scheme
+		referencedDocument.setIssuerAssignedID(new Identifier(docRefId)); // No identification scheme
 		FormattedDateTimeType dateTime = newFormattedDateTimeType(ts);
 		if(dateTime!=null) referencedDocument.setFormattedIssueDateTime(dateTime);
 
@@ -1151,12 +1166,42 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	}
 	
 	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
+	// 0 .. n AdditionalReferencedDocument Rechnungsbegründende Unterlagen BG-24
+	// BG-24.BT-122 ++ 1..1 Supporting document reference
+	// BG-24.BT-123 ++ 0..1 Supporting document description
+	// BG-24.BT-124 ++ 0..1 External document location
+	// BG-24.BT-125 ++ 0..1 Attached document
+//	An attached document embedded as binary object or sent together with the invoice.
+//	Attached document is used when 	documentation shall be stored with the 	Invoice for future reference or audit 	purposes.
+//	R35 Binary object
+	//                 1..1 Attached document
+	//                      Mime code / The mime code of the attached document.
+	//                      Allowed mime codes:
+	//	- application/pdf
+	// 	- image/png
+	// 	- image/jpeg
+	// 	- text/csv
+	// 	- application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet
+	// 	- application/vnd.oasis.opendocument.spreadsheet
+	//                 1..1 Attached document Filename / The file name of the attached document
+/* test daten
+
+        <ram:ApplicableHeaderTradeAgreement>
+        ...
+            <ram:AdditionalReferencedDocument>
+                <ram:IssuerAssignedID>01_15_Anhang_01.pdf</ram:IssuerAssignedID>
+                <ram:TypeCode>916</ram:TypeCode>
+                <ram:Name>Aufschlüsselung der einzelnen Leistungspositionen</ram:Name>
+                <ram:AttachmentBinaryObject mimeCode="application/pdf" filename="01_15_Anhang_01.pdf">... binary data ...</ram:AttachmentBinaryObject>
+            </ram:AdditionalReferencedDocument>
+
+ */
 	@Override
 	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(CrossIndustryInvoice.newIDType(docRefId, null));
+		referencedDocument.setIssuerAssignedID(new Identifier(docRefId));
 		if(description!=null) {
-			referencedDocument.getName().add(CrossIndustryInvoice.newTextType(description));
+			referencedDocument.getName().add(new Text(description));
 		}
 		
 		BinaryObjectType binaryObject = new BinaryObjectType();
@@ -1169,25 +1214,67 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
 	}
 
+	/**
+	 * add Additional Referenced Document 0..n(optional) BG-24
+	 * 
+	 * @param docRefId    BG-24.BT-122 ++ 1..1 Supporting document reference
+	 * @param description BG-24.BT-123 ++ 0..1 Supporting document description
+	 * @param url         BG-24.BT-124 ++ 0..1 External document location
+	 */
 	@Override
 	public void addSupportigDocument(String docRefId, String description, String url) {
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(CrossIndustryInvoice.newIDType(docRefId, null));
+		referencedDocument.setIssuerAssignedID(new Identifier(docRefId));
 		if(description!=null) {
-			referencedDocument.getName().add(CrossIndustryInvoice.newTextType(description));
+			referencedDocument.getName().add(new Text(description));
 		}
 		if(url!=null) {
-			referencedDocument.setURIID(CrossIndustryInvoice.newIDType(url, null));
+			referencedDocument.setURIID(new Identifier(url));
 		}
 				
 		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
 		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
 	}
+	public void addSupportigDocument(ReferencedDocument doc) {
+		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
+		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(doc);
+	}
 
 	@Override
 	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments() {
-		LOG.warning(NOT_IMPEMENTED); // TODO
-		return null;
+		return getAdditionalSupportingDocuments(this);
+	}
+	static List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments(CrossIndustryInvoiceType doc) {
+		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		List<ReferencedDocumentType> referencedDocuments = headerTradeAgreement.getAdditionalReferencedDocument();
+		List<BG24_AdditionalSupportingDocs> result = new ArrayList<BG24_AdditionalSupportingDocs>();
+		if(referencedDocuments.isEmpty()) {
+			return result;
+		}
+		referencedDocuments.forEach(refDoc -> {
+			IDType issuerAssignedID = refDoc.getIssuerAssignedID();
+			DocumentCodeType documentCode = refDoc.getTypeCode(); // 916 ?
+			ReferencedDocument rd = new ReferencedDocument(issuerAssignedID.getValue());
+			rd.setTypeCode(documentCode);
+			
+			List<TextType> texts = refDoc.getName();
+			texts.forEach(text -> {
+				rd.getName().add(text);
+			});
+			
+			List<BinaryObjectType> binaryObjects = refDoc.getAttachmentBinaryObject();
+			binaryObjects.forEach(bo -> {
+				BinaryObjectType bot = new BinaryObjectType();
+				bot.setValue(bo.getValue());
+				bot.setMimeCode(bo.getMimeCode());
+				bot.setFilename(bo.getFilename());
+				rd.getAttachmentBinaryObject().add(bot);
+			});
+			
+			// ReferencedDocument implements BG24_AdditionalSupportingDocs, daher kann ich einfügen:
+			result.add(rd);
+		});
+		return result;
 	}
 
 	/* INVOICE LINE                                BG-25                       1..* (mandatory)
@@ -1252,26 +1339,13 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 
 	// ----------------- gemeinsam mit TradeParty
 	static IDType newIDType(IBANId iban) {
-		return newIDType(iban.getValue(), iban.getSchemeID());
+		return new Identifier(iban.getValue(), iban.getSchemeID());
 	}
 	
 	static IDType newIDType(BICId bic) {
-		return newIDType(bic.getValue(), bic.getSchemeID());
+		return new Identifier(bic.getValue(), bic.getSchemeID());
 	}
 	
-	static IDType newIDType(String value, String schemeID) {
-		IDType ID = new IDType();
-		ID.setValue(value);
-		ID.setSchemeID(schemeID);
-		return ID;
-	}
-
-	static TextType newTextType(String value) {
-		TextType text = new TextType();
-		text.setValue(value);
-		return text;
-	}
-
 	// ----------------- 
 	@Override
 	public BusinessParty createParty(String name, PostalAddress address, IContact contact) {
