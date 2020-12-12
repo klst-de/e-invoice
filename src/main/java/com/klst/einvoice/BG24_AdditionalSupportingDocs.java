@@ -13,7 +13,7 @@ package com.klst.einvoice;
  * Cardinality: 	0..n
  * <br>EN16931-ID: 	BG-24
  * <br>Rule ID: 	
- * <br>Request ID: 	R36
+ * <br>Request ID: 	R36 / multiple attached or referenced documents at document level
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
@@ -46,14 +46,22 @@ xs:sequence
 required mimeCode MIME-Code des Anhangsdokuments                    BT-125-1 
 required filename Dateiname des Anhangsdokuments                    BT-125-2
  */
-// TODO Idee runter zu ubl und cii und public raus ?!
 public interface BG24_AdditionalSupportingDocs {
 	
-	// BT-122 ++ 1..1 Supporting document reference
+	/**
+	 * set business term BT-122 (mandatory): Supporting document reference
+	 * <p>
+	 * Business rule BR-52: Each Additional supporting document (BG-24) shall contain a 
+	 *                      Supporting document reference (BT-122).
+	 * @param id
+	 */
 	public void setSupportingDocumentReference(String id);
 	public String getSupportingDocumentReference();
 	
-	// BT-122-0 ++ 0..1 undocumented , see https://github.com/klst-de/e-invoice/issues/10
+	// Code 0..1 undocumented , see https://github.com/klst-de/e-invoice/issues/10
+	// bzw. https://github.com/itplr-kosit/validator-configuration-xrechnung/issues/26
+	// Im Beispiel 01.15a-INVOICE_uncefact.xml wird <ram:TypeCode>916</ram:TypeCode> verwendet
+	// was zur Warnung führt
 //	public void setSupportingDocumentCode(String code);
 //	public String getSupportingDocumentCode();
 	
