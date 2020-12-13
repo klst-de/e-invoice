@@ -50,4 +50,9 @@ public class Identifier extends IDType {
 		this(id.getValue(), id.getSchemeID(), id.getSchemeVersionID());
 	}
 	
+	public String toString() {
+		return "["+(super.getSchemeID()==null? "":",SchemeID="+getSchemeID())
+			+(super.getSchemeVersionID()==null? "":",SchemeVersionID="+getSchemeVersionID())
+			+"\""+super.getValue()+"\"]";
+	}
 }
