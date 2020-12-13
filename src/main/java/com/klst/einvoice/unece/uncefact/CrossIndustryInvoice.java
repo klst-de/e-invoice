@@ -34,6 +34,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProcuringProjectType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
@@ -132,21 +133,34 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 		}
 
-		ApplicableHeaderTradeSettlement ahts = ApplicableHeaderTradeSettlement.getApplicableHeaderTradeSettlement(doc.getSupplyChainTradeTransaction());
+		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(
+				doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
 		LOG.info("\n PayeeParty:");
-		setPayee(ahts.getPayeeTradeParty());
+		setPayee(applicableHeaderTradeSettlement.getPayeeTradeParty());
 		
-		LOG.info("PaymentMeans "+ahts.getPaymentMeansEnum() + " PaymentMeansText:"+ahts.getPaymentMeansText() + " RemittanceInformation:"+ahts.getRemittanceInformation());
-		List<CreditTransfer> creditTransferList = ahts.getCreditTransfer();
-		setPaymentInstructions(ahts.getPaymentMeansEnum(), ahts.getPaymentMeansText(), ahts.getRemittanceInformation()
-				, creditTransferList, null, ahts.getDirectDebit());
+		IDType creditorReferenceID = //doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getCreditorReferenceID();
+				applicableHeaderTradeSettlement.getCreditorReferenceID();
+		Identifier creditorReference = creditorReferenceID==null? null : new Identifier(creditorReferenceID);
+		LOG.info("getPaymentMeansEnum="+applicableHeaderTradeSettlement.getPaymentMeansEnum() 
+		 + " creditorReference:"+ creditorReference
+		 + " PaymentMeansText:"+applicableHeaderTradeSettlement.getPaymentMeansText() 
+		 + " RemittanceInformation:"+applicableHeaderTradeSettlement.getRemittanceInformation());
+		List<CreditTransfer> creditTransferList = applicableHeaderTradeSettlement.getCreditTransfer();
+		LOG.info("creditTransferList size="+creditTransferList.size());
+		DirectDebit dd = applicableHeaderTradeSettlement.getDirectDebit();
+		LOG.info("DirectDebit ="+dd);
+		setPaymentInstructions(applicableHeaderTradeSettlement.getPaymentMeansEnum()
+				, applicableHeaderTradeSettlement.getPaymentMeansText(), applicableHeaderTradeSettlement.getRemittanceInformation()
+				, creditTransferList, null, dd);
 		
-		setStartDate(getStartDateAsTimestamp(ahts));
-		setEndDate(getEndDateAsTimestamp(ahts));
+		setStartDate(getStartDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement()));
+		setEndDate(getEndDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement()));
 		
-		setPaymentTermsAndDate(getPaymentTerm(ahts), getDueDateAsTimestamp(ahts)); // optional
+		setPaymentTermsAndDate(getPaymentTerm(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement())
+				, getDueDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement())); // optional
 		
-		List<TradeTaxType> attList = ahts.getApplicableTradeTax();
+		List<TradeTaxType> attList = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getApplicableTradeTax();
+//		List<TradeTaxType> XttList = applicableHeaderTradeSettlement.getApplicableTradeTax();
 		List<VatBreakdown> vatBreakdownList = new ArrayList<VatBreakdown>(attList.size()); // VatBreakdown extends TradeTaxType
 		attList.forEach(vbd -> {
 			VatBreakdown vatBreakdown = new VatBreakdown(vbd);
@@ -158,13 +172,14 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));
 		
-		String documentCurrency = ahts.getDocumentCurrency();
+		String documentCurrency = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getInvoiceCurrencyCode().getValue();
+//		String documentCurrency = applicableHeaderTradeSettlement.getDocumentCurrency();
 		setDocumentCurrency(documentCurrency);
 
-		String taxCurrency = ahts.getTaxCurrency();
+		String taxCurrency = applicableHeaderTradeSettlement.getTaxCurrency();
 		setTaxCurrency(taxCurrency); // optional
 		
-		setTaxPointDate(getTaxPointDateAsTimestamp(ahts)); // optional
+		setTaxPointDate(getTaxPointDateAsTimestamp(applicableHeaderTradeSettlement)); // optional
 		
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional
 		setContractReference(getContractReferenceID(doc)); // optional
@@ -191,7 +206,10 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		LOG.info("\n SellerTaxRepresentativeParty:");;
 		setTaxRepresentative(getTaxRepresentativeParty(doc)); // optional
 		
-		TradeSettlementHeaderMonetarySummationType stshms = ahts.getTradeSettlementHeaderMonetarySummation(); // BG-22 1..1
+		TradeSettlementHeaderMonetarySummationType stshms 
+			= doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getSpecifiedTradeSettlementHeaderMonetarySummation();
+				//applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation(); // BG-22 1..1
+		LOG.info("-------------------- stshms:"+stshms);;
 		setDocumentTotals(new Amount(stshms.getLineTotalAmount().get(0).getValue())     // getInvoiceLineNetTotal(doc)
 						, new Amount(stshms.getTaxBasisTotalAmount().get(0).getValue()) // getInvoiceTotalTaxExclusive(doc)
 						, new Amount(stshms.getGrandTotalAmount().get(0).getValue())    // getInvoiceTotalTaxInclusive(doc)
@@ -411,9 +429,9 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public Timestamp getDueDateAsTimestamp() {
 		return getDueDateAsTimestamp(applicableHeaderTradeSettlement);
 	}
-	static Timestamp getDueDateAsTimestamp(ApplicableHeaderTradeSettlement ahts) {
+	static Timestamp getDueDateAsTimestamp(HeaderTradeSettlementType ahts) {
 		if(ahts==null) return null;
-		List<TradePaymentTermsType> tradePaymentTermsList = ahts.get().getSpecifiedTradePaymentTerms(); // 0 .. n
+		List<TradePaymentTermsType> tradePaymentTermsList = ahts.getSpecifiedTradePaymentTerms(); // 0 .. n
 		// tradePaymentTermsList / Detailinformationen zu Zahlungsbedingungen
 		if(tradePaymentTermsList.isEmpty()) return null;
 		DateTimeType dateTime = tradePaymentTermsList.get(0).getDueDateDateTime();
@@ -460,8 +478,8 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public String getPaymentTerm() {
 		return getPaymentTerm(applicableHeaderTradeSettlement);
 	}
-	static String getPaymentTerm(ApplicableHeaderTradeSettlement ahts) {
-		List<TradePaymentTermsType> tradePaymentTermsList = ahts.get().getSpecifiedTradePaymentTerms();
+	static String getPaymentTerm(HeaderTradeSettlementType ahts) {
+		List<TradePaymentTermsType> tradePaymentTermsList = ahts.getSpecifiedTradePaymentTerms();
 		if(tradePaymentTermsList.isEmpty()) return null;
 		
 		TradePaymentTermsType tradePaymentTerms = tradePaymentTermsList.get(0); // da Cardinality 0..1 kann es nur einen geben
@@ -936,7 +954,7 @@ UBL:
 	public Timestamp getStartDateAsTimestamp() {
 		return getStartDateAsTimestamp(applicableHeaderTradeSettlement);
 	}
-	static Timestamp getStartDateAsTimestamp(ApplicableHeaderTradeSettlement ahts) {
+	static Timestamp getStartDateAsTimestamp(HeaderTradeSettlementType ahts) {
 		SpecifiedPeriodType specifiedPeriod = ahts.getBillingSpecifiedPeriod();
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
@@ -960,7 +978,7 @@ UBL:
 	public Timestamp getEndDateAsTimestamp() {
 		return getEndDateAsTimestamp(applicableHeaderTradeSettlement);
 	}
-	static Timestamp getEndDateAsTimestamp(ApplicableHeaderTradeSettlement ahts) {
+	static Timestamp getEndDateAsTimestamp(HeaderTradeSettlementType ahts) {
 		SpecifiedPeriodType specifiedPeriod = ahts.getBillingSpecifiedPeriod();
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
@@ -990,7 +1008,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	@Override
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		// TODO dieser ctor kann BG-14 informationen überschreiben !!!!
+		// TODO dieser ctor kann BG14_InvoicingPeriod informationen überschreiben ? !!!!
 		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 		setPaymentInstructions(applicableHeaderTradeSettlement);
 	}

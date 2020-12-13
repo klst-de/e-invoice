@@ -79,13 +79,13 @@ in ram:ApplicableHeaderTradeSettlement stecken auch BT-5, BT-6
                 <ram:Name>[Payee name]</ram:Name>
             </ram:PayeeTradeParty>
 
-   01.15a-INVOICE_uncefact.xml :                                ohne PayeeTradeParty
+   01.15a-INVOICE_uncefact.xml :                                ohne PayeeTradeParty, CreditTransfer
         <ram:ApplicableHeaderTradeSettlement>
             <ram:PaymentReference>0000123456</ram:PaymentReference>
             <ram:TaxCurrencyCode>EUR</ram:TaxCurrencyCode>
             <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
             <ram:SpecifiedTradeSettlementPaymentMeans>
-                <ram:TypeCode>30</ram:TypeCode>
+                <ram:TypeCode>30</ram:TypeCode>             -- CreditTransfer 		(30)
                 <ram:PayeePartyCreditorFinancialAccount>
                     <ram:IBANID>DE12123000001234567890</ram:IBANID>
                     <ram:AccountName>[Payment account name]</ram:AccountName>
@@ -116,38 +116,74 @@ in ram:ApplicableHeaderTradeSettlement stecken auch BT-5, BT-6
             </ram:SpecifiedTradeSettlementHeaderMonetarySummation>
         </ram:ApplicableHeaderTradeSettlement>
 
+   03.01a-INVOICE_uncefact.xml :                                SEPADirectDebit
+        <ram:ApplicableHeaderTradeSettlement>
+            <ram:CreditorReferenceID>[Bank assigned creditor identifier]</ram:CreditorReferenceID>
+            <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
+            <ram:SpecifiedTradeSettlementPaymentMeans>
+                <ram:TypeCode>59</ram:TypeCode>                 -- SEPADirectDebit 	(59)
+                <ram:PayerPartyDebtorFinancialAccount>
+                    <!-- dies ist eine nicht existerende aber valide IBAN als test dummy -->
+                    <ram:IBANID>DE75512108001245126199</ram:IBANID>
+                </ram:PayerPartyDebtorFinancialAccount>
+            </ram:SpecifiedTradeSettlementPaymentMeans>
+
  */
-public class ApplicableHeaderTradeSettlement implements PaymentInstructions, CreditTransferFactory, DirectDebitFactory {
+public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType implements PaymentInstructions, CreditTransferFactory, DirectDebitFactory {
 
 	private static final Logger LOG = Logger.getLogger(ApplicableHeaderTradeSettlement.class.getName());
 	
-	HeaderTradeSettlementType applicableHeaderTradeSettlement = null;
-	TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummation = null;
+//	HeaderTradeSettlementType applicableHeaderTradeSettlement = null; // das ist super!
+//	TradeSettlementHeaderMonetarySummationType tradeSettlementHeaderMonetarySummation = null;
 	TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = null; // 1st elem in SpecifiedTradeSettlementPaymentMeans List
 	SpecifiedPeriodType billingSpecifiedPeriod = null; // BG-14 ++ 0..1 INVOICING PERIOD
 	
 	static ApplicableHeaderTradeSettlement getApplicableHeaderTradeSettlement(SupplyChainTradeTransactionType supplyChainTradeTransaction) {
 		if(supplyChainTradeTransaction==null) return null;
-		return new ApplicableHeaderTradeSettlement(supplyChainTradeTransaction);
+		return new ApplicableHeaderTradeSettlement(supplyChainTradeTransaction.getApplicableHeaderTradeSettlement());
 	}
 	
-	ApplicableHeaderTradeSettlement(SupplyChainTradeTransactionType supplyChainTradeTransaction) {
-		// 1 .. 1 ApplicableHeaderTradeSettlement : darf nicht null sein
-		applicableHeaderTradeSettlement = supplyChainTradeTransaction.getApplicableHeaderTradeSettlement();
-		// 1 .. 1 SpecifiedTradeSettlementHeaderMonetarySummation Gesamtsummen auf Dokumentenebene BG-22 : ebenfalls nicht null
-		tradeSettlementHeaderMonetarySummation = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation();
-		if(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
+	// copy ctor
+	ApplicableHeaderTradeSettlement(HeaderTradeSettlementType ahts) {
+		super();
+		this.setDocumentCurrency(ahts.getInvoiceCurrencyCode().getValue());
+		if(ahts.getCreditorReferenceID()!=null) {
+			this.setCreditorReferenceID(new Identifier(ahts.getCreditorReferenceID()));
+		}
+		if(ahts.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) { 
+		} else {
+			TradeSettlementPaymentMeansType tspm = ahts.getSpecifiedTradeSettlementPaymentMeans().get(0);
+			//setPaymentMeansText gibt es nur als setPaymentMeans:
+			setPaymentMeans(PaymentMeansEnum.valueOf(tspm.getTypeCode()), getPaymentMeansText(tspm));
+			getPaymentMeansText(ahts.getSpecifiedTradeSettlementPaymentMeans().get(0));
+		}
+		if(getRemittanceInformation(ahts)!=null) { // getRemittanceInformation
+			this.setRemittanceInformation(getRemittanceInformation(ahts));
+		}
+		// 1 .. 1 SpecifiedTradeSettlementHeaderMonetarySummation Gesamtsummen auf Dokumentenebene BG-22 : nicht null
+//		tradeSettlementHeaderMonetarySummation = ahts.getSpecifiedTradeSettlementHeaderMonetarySummation();
+		setSpecifiedTradeSettlementHeaderMonetarySummation(ahts.getSpecifiedTradeSettlementHeaderMonetarySummation());
+		if(ahts.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
 			// no PaymentInstructions
 		} else {
-			tradeSettlementPaymentMeans = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans().get(0);
+			tradeSettlementPaymentMeans = ahts.getSpecifiedTradeSettlementPaymentMeans().get(0);
+			PaymentMeansEnum code = getPaymentMeansEnum();
+			// String getPaymentMeansText() 
+			// String getRemittanceInformation()
+			List<CreditTransfer> creditTransfer = getCreditTransfer();
+			// TODO
+			LOG.warning("TODO paymentCard");
+			PaymentCard paymentCard = null;
+			init(code, getPaymentMeansText(), getRemittanceInformation(), creditTransfer, paymentCard, getDirectDebit());
 		}
 	}
 	
 	// ctor
 	ApplicableHeaderTradeSettlement() {
-		applicableHeaderTradeSettlement = new HeaderTradeSettlementType();
-		tradeSettlementHeaderMonetarySummation = new TradeSettlementHeaderMonetarySummationType();
-		applicableHeaderTradeSettlement.setSpecifiedTradeSettlementHeaderMonetarySummation(tradeSettlementHeaderMonetarySummation);
+//		applicableHeaderTradeSettlement = new HeaderTradeSettlementType();
+		super();
+//		tradeSettlementHeaderMonetarySummation = new TradeSettlementHeaderMonetarySummationType();
+//		super.setSpecifiedTradeSettlementHeaderMonetarySummation(tradeSettlementHeaderMonetarySummation);
 	}
 	
 	ApplicableHeaderTradeSettlement(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
@@ -158,7 +194,7 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 
 	private void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation,
 			List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-//		LOG.info("PaymentMeansEnum:"+code + ", paymentMeansText:"+paymentMeansText);
+		LOG.info("-----------------PaymentMeansEnum:"+code + ", paymentMeansText:"+paymentMeansText);
 		if(code==null) return;
 		getTradeSettlementPaymentMeans(); // create if neccessary
 		
@@ -173,24 +209,28 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 	private TradeSettlementPaymentMeansType getTradeSettlementPaymentMeans() {
 		if(tradeSettlementPaymentMeans==null) {
 			tradeSettlementPaymentMeans = new TradeSettlementPaymentMeansType();
-			applicableHeaderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans().add(tradeSettlementPaymentMeans);	
+			super.getSpecifiedTradeSettlementPaymentMeans().add(tradeSettlementPaymentMeans);	
 		}
 		return tradeSettlementPaymentMeans;
 	}
 
 	// liefert das gekapselte Objekt
 	HeaderTradeSettlementType get() {
-		return applicableHeaderTradeSettlement;
+		return this;
 	}
 	
 	// BT-5 + 1..1 Invoice currency code
 	void setDocumentCurrency(String isoCurrencyCode) {
 		CurrencyCodeType currencyCode = new CurrencyCodeType();
 		currencyCode.setValue(isoCurrencyCode);
-		applicableHeaderTradeSettlement.setInvoiceCurrencyCode(currencyCode);		
+		super.setInvoiceCurrencyCode(currencyCode);		
 	}
 	String getDocumentCurrency() {
-		return applicableHeaderTradeSettlement.getInvoiceCurrencyCode().getValue();
+		if(super.getInvoiceCurrencyCode()==null) {
+			LOG.warning("BT-5 + 1..1 Invoice currency code is null !!!!!!!!!!!!!!!!!!");
+			return null;
+		}
+		return super.getInvoiceCurrencyCode().getValue();
 	}
 	
 	// BT-6 + 0..1 VAT accounting currency code
@@ -198,10 +238,10 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 		if(isoCurrencyCode==null) return;  // optional
 		CurrencyCodeType currencyCode = new CurrencyCodeType();
 		currencyCode.setValue(isoCurrencyCode);
-		applicableHeaderTradeSettlement.setTaxCurrencyCode(currencyCode);
+		super.setTaxCurrencyCode(currencyCode);
 	}
 	public String getTaxCurrency() {
-		CurrencyCodeType currencyCode = applicableHeaderTradeSettlement.getTaxCurrencyCode();
+		CurrencyCodeType currencyCode = super.getTaxCurrencyCode();
 		return currencyCode==null ? null : currencyCode.getValue();
 	}
 	
@@ -210,7 +250,7 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 		if(ts==null) return;  // optional
 		TradeTaxType tradeTax = new TradeTaxType();
 		tradeTax.setTaxPointDate(newDateType(ts));
-		applicableHeaderTradeSettlement.getApplicableTradeTax().add(tradeTax);
+		super.getApplicableTradeTax().add(tradeTax);
 	}
 	
 	DateType newDateType(Timestamp ts) {
@@ -252,20 +292,27 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 	
 	@Override
 	public String getPaymentMeansText() {
+		return getPaymentMeansText(tradeSettlementPaymentMeans);
+	}
+	static String getPaymentMeansText(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
 		if(tradeSettlementPaymentMeans==null) return null;
 		return tradeSettlementPaymentMeans.getInformation().isEmpty() ? null : tradeSettlementPaymentMeans.getInformation().get(0).getValue();
 	}
+	
 
 	// 0 .. 1 PaymentReference Verwendungszweck                                        BT-83
 	@Override
 	public void setRemittanceInformation(String text) { 
 		if(text==null) return;
-		applicableHeaderTradeSettlement.getPaymentReference().add(new Text(text));
+		super.getPaymentReference().add(new Text(text));
 	}
 
 	@Override
 	public String getRemittanceInformation() {
-		List<TextType> list = applicableHeaderTradeSettlement.getPaymentReference();
+		return getRemittanceInformation(this);
+	}
+	static String getRemittanceInformation(HeaderTradeSettlementType headerTradeSettlement) {
+		List<TextType> list = headerTradeSettlement.getPaymentReference();
 		return list.isEmpty() ? null : list.get(0).getValue();
 	}
 
@@ -336,14 +383,20 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
 		if(financialAccount==null) {
 			financialAccount = new FinancialAccount(iban);
+			financialAccount.setBankAssignedCreditorID(bankAssignedCreditorID);
+			financialAccount.setMandateReferencetID(mandateID);
 		}
 		return financialAccount;
 	}
 
 	@Override
 	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
-		// TODO Auto-generated method stub
-		return null;
+		if(financialAccount==null) {
+			financialAccount = new FinancialAccount(debitedAccountID, null, null);
+			financialAccount.setBankAssignedCreditorID(bankAssignedCreditorID);
+			financialAccount.setMandateReferencetID(mandateID);
+		}
+		return financialAccount;
 	}
 
 // ----------------
@@ -352,65 +405,71 @@ public class ApplicableHeaderTradeSettlement implements PaymentInstructions, Cre
 		LOG.info("lineExtension:"+lineExtension + " taxExclusive:"+taxExclusive + " taxInclusive:"+taxInclusive + " payable:"+payable);
 		AmountType lineTotalAmt = new AmountType();
 		lineExtension.copyTo(lineTotalAmt);
-		tradeSettlementHeaderMonetarySummation.getLineTotalAmount().add(lineTotalAmt); // add to list
+		TradeSettlementHeaderMonetarySummationType gesamtsummen = super.getSpecifiedTradeSettlementHeaderMonetarySummation();
+		if(gesamtsummen==null) {
+			LOG.info("gesamtsummen==null ===> erstellen");
+			setSpecifiedTradeSettlementHeaderMonetarySummation(new TradeSettlementHeaderMonetarySummationType());
+		}
+		getSpecifiedTradeSettlementHeaderMonetarySummation().getLineTotalAmount().add(lineTotalAmt); // add to list
 		
 		AmountType taxBasisTotalAmt = new AmountType();
 		taxExclusive.copyTo(taxBasisTotalAmt);
-		tradeSettlementHeaderMonetarySummation.getTaxBasisTotalAmount().add(taxBasisTotalAmt); // add to list
+		getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxBasisTotalAmount().add(taxBasisTotalAmt); // add to list
 		
 		AmountType taxTotalAmt = new AmountType();
 		taxInclusive.copyTo(taxTotalAmt);
 
 		taxTotalAmt.setCurrencyID(taxInclusive.getCurrencyID()); // wg. validation 
-		tradeSettlementHeaderMonetarySummation.getGrandTotalAmount().add(taxTotalAmt); // add to list
+		getSpecifiedTradeSettlementHeaderMonetarySummation().getGrandTotalAmount().add(taxTotalAmt); // add to list
 		
 		AmountType payableAmt = new AmountType();
 		payable.copyTo(payableAmt);
-		tradeSettlementHeaderMonetarySummation.getDuePayableAmount().add(payableAmt); // add to list
+		getSpecifiedTradeSettlementHeaderMonetarySummation().getDuePayableAmount().add(payableAmt); // add to list
 	}
 	void setInvoiceTax(Amount amount) {
 		AmountType taxTotalAmt = new AmountType();
 		amount.copyTo(taxTotalAmt);
-		tradeSettlementHeaderMonetarySummation.getTaxTotalAmount().add(taxTotalAmt); // add to list
+		getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxTotalAmount().add(taxTotalAmt); // add to list
 	}
 	Amount getPrepaid() {
-		List<AmountType> list = tradeSettlementHeaderMonetarySummation.getTotalPrepaidAmount();
+		List<AmountType> list = getSpecifiedTradeSettlementHeaderMonetarySummation().getTotalPrepaidAmount();
 //		LOG.info("::::::::::::: List<AmountType> list size="+list.size()); // wg. BUG in 03.01a
 		return list.isEmpty() ? null : new Amount(list.get(0).getCurrencyID(), list.get(0).getValue());		
 	}
 	void setPrepaid(Amount amount) {
 		AmountType prepaidAmount = new AmountType();
 		amount.copyTo(prepaidAmount);
-		tradeSettlementHeaderMonetarySummation.getTotalPrepaidAmount().add(prepaidAmount); // add to list
+		getSpecifiedTradeSettlementHeaderMonetarySummation().getTotalPrepaidAmount().add(prepaidAmount); // add to list
 	}
 	
+	@Deprecated
 	TradeSettlementHeaderMonetarySummationType getTradeSettlementHeaderMonetarySummation() {
-		return tradeSettlementHeaderMonetarySummation;
+		return getSpecifiedTradeSettlementHeaderMonetarySummation();
 	}
 
-	TradeParty getPayeeTradeParty() {
-		TradePartyType party = applicableHeaderTradeSettlement.getPayeeTradeParty();
+	public TradeParty getPayeeTradeParty() {
+		TradePartyType party = super.getPayeeTradeParty();
 		return party==null ? null : new TradeParty(party);
 	}
 	
-	List<TradeTaxType> getApplicableTradeTax() {
-		return applicableHeaderTradeSettlement.getApplicableTradeTax();
-	}
+//	List<TradeTaxType> getApplicableTradeTax() {
+//		return super.getApplicableTradeTax();
+//	}
 	
 	// BG-14 ++ 0..1 INVOICING PERIOD
-	SpecifiedPeriodType getBillingSpecifiedPeriod() {
+	public SpecifiedPeriodType getBillingSpecifiedPeriod() {
 		if(billingSpecifiedPeriod==null) {
-			billingSpecifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
+			billingSpecifiedPeriod = super.getBillingSpecifiedPeriod();
 			if(billingSpecifiedPeriod==null) {
 				billingSpecifiedPeriod = new SpecifiedPeriodType();
-				applicableHeaderTradeSettlement.setBillingSpecifiedPeriod(billingSpecifiedPeriod);
+				super.setBillingSpecifiedPeriod(billingSpecifiedPeriod);
 			}
 		}
 		return billingSpecifiedPeriod;
 	}
 
 	void addPaymentTerms(TradePaymentTermsType tradePaymentTerms) {
-		applicableHeaderTradeSettlement.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
+		super.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
 	}
 
 }
