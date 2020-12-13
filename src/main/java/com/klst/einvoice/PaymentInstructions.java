@@ -26,6 +26,8 @@ import com.klst.untdid.codelist.PaymentMeansEnum;
  */
 // implemented in PaymentMeans extends PaymentMeansType (UBL)
 //                PaymentMeans extends TradeSettlementPaymentMeansType (CII)
+//  class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType 
+//                                     implements PaymentInstructions, CreditTransferFactory, DirectDebitFactory
 public interface PaymentInstructions {
 
 	/**
