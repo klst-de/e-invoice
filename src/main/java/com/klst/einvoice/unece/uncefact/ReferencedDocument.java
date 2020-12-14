@@ -60,6 +60,7 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	// BG-24.BT-123 ++ 0..1 Supporting document description
 	@Override
 	public void setSupportingDocumentDescription(String text) {
+		if(text==null) return;
 		if(super.getName().isEmpty()) {
 			super.getName().add(new Text(text));
 		} else {
