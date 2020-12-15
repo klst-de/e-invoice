@@ -46,7 +46,13 @@ public class CiiTest {
 			"01.13a-INVOICE_uncefact.xml" , // OK
 			"01.14a-INVOICE_uncefact.xml" ,
 			"01.15a-INVOICE_uncefact.xml" ,
-			"zugferd2_invoice_pdfa3b.xml" // ist PROFILE_BASIC, geändert in PROFILE_COMFORT
+			"zugferd2_invoice_pdfa3b.xml" ,// war PROFILE_BASIC, geändert in PROFILE_COMFORT
+//			"02.01a-INVOICE_uncefact.xml" , // testcase 02.01a-INVOICE_uncefact #16
+			"03.01a-INVOICE_uncefact.xml" ,
+			"03.02a-INVOICE_uncefact.xml" ,
+			"03.03a-INVOICE_uncefact.xml" ,
+			"03.04a-INVOICE_uncefact.xml" ,
+			"03.05a-INVOICE_uncefact.xml" 
 			};
 	
 	private static final String XRECHNUNG_2p0 = BG2_ProcessControl.PROFILE_XRECHNUNG;
@@ -180,6 +186,7 @@ public class CiiTest {
     
 	@Test
     public void ciixml_last() {
+//    	InvoiceFactory factory = new CreateCiiXXXInvoice("02.01a-INVOICE_uncefact.xml");
     	InvoiceFactory factory = new CreateCiiXXXInvoice(CII_XML[CII_XML.length-1]);
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);

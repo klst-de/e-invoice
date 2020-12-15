@@ -16,8 +16,10 @@ import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CoreInvoiceVatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.unece.uncefact.Amount;
+import com.klst.einvoice.unece.uncefact.ApplicableHeaderTradeSettlement;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.FinancialAccount;
 import com.klst.einvoice.unece.uncefact.IBANId;
@@ -26,6 +28,7 @@ import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.einvoice.unece.uncefact.VatBreakdown;
 import com.klst.marshaller.CiiTransformer;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
@@ -189,30 +192,51 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		}
 		
 		PaymentInstructions pi = testDoc.getPaymentInstructions();
-		LOG.info("testDoc.PaymentInstructions pi.RemittanceInformation:"+pi.getRemittanceInformation() + 
-				" PaymentMeansEnum:"+pi.getPaymentMeansEnum() + " PaymentMeansText:"+pi.getPaymentMeansText());
-		List<CreditTransfer> creditTransferList = pi.getCreditTransfer();
-		CreditTransfer creditTransferAccount = null;
-		if(creditTransferList.isEmpty()) {
-			// no CreditTransfer
-		} else {
-			creditTransferList.forEach(testCT -> {
-				LOG.info("interface CreditTransfer "+testCT);
-			});
-			creditTransferAccount = creditTransferList.get(0);
-		}
-		
-		DirectDebit directDebitAccount = null; // getMandateReferencetID : direct debit authorisation == Einzugsermächtigung
-		DirectDebit dd = pi.getDirectDebit(); // interface DirectDebit
-		if(dd==null) {
-			// no DirectDebit
-		} else {
-			LOG.info("interface DirectDebit "+dd);
-			IBANId iban = new IBANId(dd.getDebitedAccountID());
-			directDebitAccount = new FinancialAccount(iban);
+		ApplicableHeaderTradeSettlement ats = (ApplicableHeaderTradeSettlement)pi;
+		PaymentMeansEnum code = ats.getPaymentMeansEnum();
+		if(code!=null) {
+			LOG.info("testDoc.PaymentInstructions RemittanceInformation:"+ats.getRemittanceInformation() + 
+					" CreditorReferenceID:" + ats.getCreditorReferenceID() +
+					" PaymentMeansEnum:"+code + " PaymentMeansText:"+ats.getPaymentMeansText());
+			List<CreditTransfer> creditTransferList = pi.getCreditTransfer();
+			CreditTransfer creditTransferAccount = null;
+			PaymentCard paymentCard = null;
+			DirectDebit directDebitAccount = null; // getMandateReferencetID : direct debit authorisation == Einzugsermächtigung
+			DirectDebit dd = pi.getDirectDebit(); // interface DirectDebit
+			switch(code) { 
+			case CreditTransfer:
+			case SEPACreditTransfer:
+				if(creditTransferList.isEmpty()) {
+					// no CreditTransfer
+				} else {
+					creditTransferList.forEach(testCT -> {
+						LOG.info("interface CreditTransfer "+testCT);
+					});
+					creditTransferAccount = creditTransferList.get(0);
+				}
+				break;
+			case BankCard:
+				paymentCard = pi.getPaymentCard();
+				LOG.info("paymentCard.Account"+paymentCard.getCardAccountID());
+				break;
+			case DirectDebit: 
+			case SEPADirectDebit: 
+				if(dd==null) {
+					// no DirectDebit
+				} else {
+					IBANId iban = new IBANId(dd.getDebitedAccountID());
+					LOG.info("interface DirectDebit "+dd + " IBAN="+iban);
+					directDebitAccount = new FinancialAccount(iban);
+				}
+				break;
+			default:
+				LOG.warning("[BR-DE-13] In der Rechnung müssen Angaben zu genau einer der drei Gruppen sein: CREDIT TRANSFER, PAYMENT CARD INFORMATION, DIRECT DEBIT - Ist:"+code);
+				break;
+			}
+			cii.setPaymentInstructions(ats.getPaymentMeansEnum(), ats.getPaymentMeansText(), ats.getRemittanceInformation()
+					, creditTransferAccount, paymentCard, directDebitAccount);
 		}
 
-		cii.setPaymentInstructions(pi.getPaymentMeansEnum(), pi.getPaymentMeansText(), pi.getRemittanceInformation(), creditTransferAccount, null, directDebitAccount);
 
 		cii.setDocumentCurrency(testDoc.getDocumentCurrency());
 		cii.setTaxCurrency(testDoc.getTaxCurrency()); // BT-6 + 0..1 (optional)
