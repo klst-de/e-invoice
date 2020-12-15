@@ -1,5 +1,7 @@
 package com.klst.einvoice.unece.uncefact;
 
+import java.util.logging.Logger;
+
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 
@@ -13,36 +15,52 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 /*
 Bsp: 01.15a:
 
+        <ram:ApplicableHeaderTradeSettlement>
+            <ram:PaymentReference>0000123456</ram:PaymentReference>
+            <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
             <ram:SpecifiedTradeSettlementPaymentMeans>
-                <ram:TypeCode>30</ram:TypeCode>                                        <!-- BT-81
-                <ram:PayeePartyCreditorFinancialAccount>                               <!-- BG-17 0..n CREDIT TRANSFER
-                    <ram:IBANID>DE12123000001234567890</ram:IBANID>
+                <ram:TypeCode>58</ram:TypeCode>                         <!-- BT-81
+                <ram:PayeePartyCreditorFinancialAccount>                <!-- BG-17 0..n CREDIT TRANSFER
+                    <ram:IBANID>DE75512108001245126199</ram:IBANID>
                     <ram:AccountName>[Payment account name]</ram:AccountName>
                 </ram:PayeePartyCreditorFinancialAccount>
-                <ram:PayeeSpecifiedCreditorFinancialInstitution>
+                <ram:PayeeSpecifiedCreditorFinancialInstitution>                 2-te Eintrag
                     <ram:BICID>[BIC]</ram:BICID>
-                </ram:PayeeSpecifiedCreditorFinancialInstitution>                                   bis hierhin -->
+                </ram:PayeeSpecifiedCreditorFinancialInstitution>              bis hierhin -->
             </ram:SpecifiedTradeSettlementPaymentMeans>
-            
+
 Testfälle für DIRECT DEBIT
 Bsp: 03.01a:
         <ram:ApplicableHeaderTradeSettlement>
+            <ram:CreditorReferenceID>[Bank assigned creditor identifier]</ram:CreditorReferenceID>
             <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
             <ram:SpecifiedTradeSettlementPaymentMeans>
                 <ram:TypeCode>59</ram:TypeCode>
                 <ram:PayerPartyDebtorFinancialAccount>
-                    <ram:IBANID schemeID="IBAN">DE75512108001245126199</ram:IBANID>
+                    <!-- dies ist eine nicht existerende aber valide IBAN als test dummy -->
+                    <ram:IBANID>DE75512108001245126199</ram:IBANID>
                 </ram:PayerPartyDebtorFinancialAccount>
             </ram:SpecifiedTradeSettlementPaymentMeans>
+            ...
+            <ram:SpecifiedTradePaymentTerms>
+                <ram:Description>Dieses Guthaben werden wir auf Ihr Konto erstatten.</ram:Description>
+                <ram:DueDateDateTime>
+                    <udt:DateTimeString format="102">20190314</udt:DateTimeString>
+                </ram:DueDateDateTime>
+                <ram:DirectDebitMandateID>[Mandate reference identifier]</ram:DirectDebitMandateID>
+            </ram:SpecifiedTradePaymentTerms>
 
 Bsp: 03.04a , 03.04a
  */
 public class FinancialAccount implements CreditTransfer, DirectDebit {
 
+	private static final Logger LOG = Logger.getLogger(FinancialAccount.class.getName());
+
 	CreditorFinancialAccountType payeePartyCreditorFinancialAccount = null;
 	CreditorFinancialInstitutionType payeeSpecifiedCreditorFinancialInstitution = null;
 	DebtorFinancialAccountType payerPartyDebtorFinancialAccount = null;
 	
+	// ram:SpecifiedTradeSettlementPaymentMeans
 	FinancialAccount(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
 		super();
 		if(tradeSettlementPaymentMeans!=null) {
@@ -154,20 +172,28 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 	}
 
 // ---------------- implements DirectDebit:
+	Identifier directDebitMandate = null;
+	
+	// BG-19.BT-89
 	@Override
 	public String getMandateReferencetID() {
-		// TODO Auto-generated method stub
-		return null;
+//		LOG.info("TODO Auto-generated method stub");
+		return directDebitMandate==null? null : directDebitMandate.getValue();
 	}
 
 	@Override
 	public void setMandateReferencetID(String id) {
-		// TODO Auto-generated method stub
-		
+		directDebitMandate = new Identifier(id);
+	}
+	public void setMandateReferencetID(Identifier id) {
+		directDebitMandate = id;
 	}
 
+	// BG-19.BT-90 +++ 0..1 Bank assigned creditor identifier, CreditorReferenceID, Kennung des Gläubigers
+	// Hinweis: Wird verwendet, um den Käufer vorweg über eine SEPA-Lastschrift in Kenntnis zu setzen.
 	@Override
 	public String getBankAssignedCreditorID() {
+		LOG.info("TODO Auto-generated method stub");
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -178,6 +204,7 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 		
 	}
 
+	// BG-19.BT-91
 	@Override
 	public String getDebitedAccountID() {
 		if(payerPartyDebtorFinancialAccount==null) return null;
@@ -189,14 +216,14 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 
 	@Override
 	public void setDebitedAccountID(String id) {
-		// TODO Auto-generated method stub
-		
+		if(id==null) return;
+		payerPartyDebtorFinancialAccount.setIBANID(new Identifier(id));		
 	}
 
 	@Override
 	public void setDebitedAccountID(IBANId iban) { // use ctor
 		if(iban==null) return;
-		payerPartyDebtorFinancialAccount.setIBANID(CrossIndustryInvoice.newIDType(iban));		
+		payerPartyDebtorFinancialAccount.setIBANID(new Identifier(iban.getValue(), iban.getSchemeID()));		
 	}
 
 }

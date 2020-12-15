@@ -108,7 +108,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 		
 		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement();
-		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement.get());
+		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
 		
 		exchangedDocument = new ExchangedDocumentType();
@@ -145,6 +145,10 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		 + " creditorReference:"+ creditorReference
 		 + " PaymentMeansText:"+applicableHeaderTradeSettlement.getPaymentMeansText() 
 		 + " RemittanceInformation:"+applicableHeaderTradeSettlement.getRemittanceInformation());
+		// [BR-DE-13] In der Rechnung müssen Angaben zu genau einer der drei Gruppen 
+		// - "CREDIT TRANSFER" (BG-17), 
+		// - "PAYMENT CARD INFORMATION" (BG-18) oder 
+		// - "DIRECT DEBIT" (BG-19) übermittelt werden.
 		List<CreditTransfer> creditTransferList = applicableHeaderTradeSettlement.getCreditTransfer();
 		LOG.info("creditTransferList size="+creditTransferList.size());
 		DirectDebit dd = applicableHeaderTradeSettlement.getDirectDebit();
@@ -186,10 +190,10 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		
 		List<BG24_AdditionalSupportingDocs> asd = getAdditionalSupportingDocuments(doc); // 0..n
 		asd.forEach(asdoc -> {
-			LOG.info("asdoc   Reference="+asdoc.getSupportingDocumentReference());
+//			LOG.info("asdoc   Reference="+asdoc.getSupportingDocumentReference());
 			LOG.info("asdoc Description="+asdoc.getSupportingDocumentDescription()); // aka Name
-			LOG.info("asdoc    Location="+asdoc.getExternalDocumentLocation());
-			LOG.info("asdoc        Type="+asdoc.getSupportingDocumentCode());
+//			LOG.info("asdoc    Location="+asdoc.getExternalDocumentLocation());
+//			LOG.info("asdoc        Type="+asdoc.getSupportingDocumentCode());
 			ReferencedDocument rd = new ReferencedDocument(asdoc.getSupportingDocumentReference(), asdoc.getSupportingDocumentCode());
 			rd.setSupportingDocumentDescription(asdoc.getSupportingDocumentDescription()); // aka Name
 			rd.setExternalDocumentLocation(asdoc.getExternalDocumentLocation());
@@ -230,13 +234,14 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		List<AmountType> list = stshms.getTaxTotalAmount(); // BT-110, BT-111 1..1
 		if(list.isEmpty()) {
 			// sollte nicht vorkommen
-		} else {
+		} else {  
 			for(int i=0; i<list.size(); i++) {
 				LOG.info("i="+i + " taxCurrency:"+taxCurrency + " documentCurrency:"+documentCurrency);
 				if(taxCurrency==null || documentCurrency.equals(taxCurrency)) {
 					Amount invoiceTaxAmount = list.get(i).getCurrencyID()==null ? new Amount(list.get(i).getValue()) : new Amount(list.get(i).getCurrencyID(), list.get(i).getValue());
-					LOG.info("invoiceTaxAmount "+invoiceTaxAmount);
-					setInvoiceTax(invoiceTaxAmount);
+					LOG.info("nur Info: invoiceTaxAmount "+invoiceTaxAmount);
+					// TODO Bug !!!!!!!!!!!!! setInvoiceTax schreibt Liste fort endloss!!!!!!!
+					//setInvoiceTax(invoiceTaxAmount);
 				}
 			}
 		}
@@ -749,12 +754,12 @@ UBL:
 		FormattedDateTimeType dateTime = newFormattedDateTimeType(ts);
 		if(dateTime!=null) referencedDocument.setFormattedIssueDateTime(dateTime);
 
-		applicableHeaderTradeSettlement.get().setInvoiceReferencedDocument(referencedDocument);
+		applicableHeaderTradeSettlement.setInvoiceReferencedDocument(referencedDocument);
 	}
 
 	@Override
 	public String getPrecedingInvoiceReference() {
-		ReferencedDocumentType referencedDocument = applicableHeaderTradeSettlement.get().getInvoiceReferencedDocument();
+		ReferencedDocumentType referencedDocument = applicableHeaderTradeSettlement.getInvoiceReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
 	}
 	static String getPrecedingInvoiceReference(CrossIndustryInvoiceType doc) {
@@ -869,11 +874,11 @@ UBL:
 	}
 	public void setPayee(BusinessParty party) {
 		LOG.info("Payee BusinessParty party "+party);
-		applicableHeaderTradeSettlement.get().setPayeeTradeParty((TradePartyType) party);
+		applicableHeaderTradeSettlement.setPayeeTradeParty((TradePartyType) party);
 	}
 
 	public BusinessParty getPayee() {
-		TradePartyType payeeParty = applicableHeaderTradeSettlement.get().getPayeeTradeParty();
+		TradePartyType payeeParty = applicableHeaderTradeSettlement.getPayeeTradeParty();
 		return payeeParty==null ? null : new TradeParty(payeeParty);
 	}
 
@@ -994,8 +999,12 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
  */
 	@Override // wg. interface PaymentInstructionsFactory
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText) {
-		return null; // TODO
-//		return ((PaymentMeans)applicableHeaderTradeSettlement).createPaymentInstructions(code, paymentMeansText);
+		if(applicableHeaderTradeSettlement==null) {
+			applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement();
+		}
+		PaymentInstructions paymentInstructions = (PaymentInstructions)applicableHeaderTradeSettlement;
+		paymentInstructions.setPaymentMeans(code, paymentMeansText);
+		return paymentInstructions;
 	}
 
 	@Override
@@ -1009,13 +1018,43 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		// TODO dieser ctor kann BG14_InvoicingPeriod informationen überschreiben ? !!!!
-		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
-		setPaymentInstructions(applicableHeaderTradeSettlement);
+		LOG.info("???????????"+applicableHeaderTradeSettlement);
+		if(applicableHeaderTradeSettlement==null) {
+			//applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+			createPaymentInstructions(code, paymentMeansText);
+		}
+		//setPaymentInstructions(applicableHeaderTradeSettlement);
+		if(code==null) {
+			LOG.warning("PaymentMeansEnum code ist nicht vorhanden!!!!!! code="+code);
+			return;
+		}
+		applicableHeaderTradeSettlement.setPaymentMeans(code, paymentMeansText);
+		applicableHeaderTradeSettlement.setRemittanceInformation(remittanceInformation);
+		switch(code) { 
+		case CreditTransfer:
+		case SEPACreditTransfer:
+			creditTransfer.forEach(ct -> {
+				applicableHeaderTradeSettlement.addCreditTransfer(ct);
+			});
+			break;		
+		case BankCard: 
+			
+			// ... TODO PAYMENT CARD INFORMATION
+//			applicableHeaderTradeSettlement.setPaymentCard(paymentCard);
+			break;
+		case DirectDebit: 
+		case SEPADirectDebit: 
+			applicableHeaderTradeSettlement.setDirectDebit(directDebit);
+			break;
+		default:
+			LOG.warning(NOT_IMPEMENTED + ": PaymentMeans "+code);
+			break;
+		}
 	}
 
 	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
-		// TODO ?brauche ich es? im ctor: applicableHeaderTradeSettlement = new ...
-		// und : supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement.get());
+		LOG.info("// TODO ?brauche ich es? im ctor: applicableHeaderTradeSettlement = new ...");
+		applicableHeaderTradeSettlement.setPaymentInstructions(paymentInstructions);
 	}
 	public PaymentInstructions getPaymentInstructions() {
 		return applicableHeaderTradeSettlement; // das implementiert PaymentInstructions!
@@ -1024,17 +1063,17 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	// BG-22.BT-106 - 1..1/1..1
 	@Override
 	public Amount getInvoiceLineNetTotal() {
-		return new Amount(applicableHeaderTradeSettlement.getTradeSettlementHeaderMonetarySummation().getLineTotalAmount().get(0).getValue());
+		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getLineTotalAmount().get(0).getValue());
 	}
 	// BG-22.BT-109 - 1..1/1..1
 	@Override
 	public Amount getInvoiceTotalTaxExclusive() {
-		return new Amount(applicableHeaderTradeSettlement.getTradeSettlementHeaderMonetarySummation().getTaxBasisTotalAmount().get(0).getValue());
+		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxBasisTotalAmount().get(0).getValue());
 	}
 	// BG-22.BT-112 - 1..1/1..1
 	@Override
 	public Amount getInvoiceTotalTaxInclusive() {
-		return new Amount(applicableHeaderTradeSettlement.getTradeSettlementHeaderMonetarySummation().getGrandTotalAmount().get(0).getValue());
+		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getGrandTotalAmount().get(0).getValue());
 	}
 	// BG-22.BT-113 - 1..1/0..1 (optional) The sum of amounts which have been paid in advance.
 	// Summe bereits gezahlter Beträge.
@@ -1045,7 +1084,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	// BG-22.BT-115 - 1..1/1..1
 	@Override
 	public Amount getDuePayable() { 
-		return new Amount(applicableHeaderTradeSettlement.getTradeSettlementHeaderMonetarySummation().getDuePayableAmount().get(0).getValue());
+		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getDuePayableAmount().get(0).getValue());
 	}
 	
 	/**
@@ -1056,6 +1095,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	// Summe bereits gezahlter Beträge.
 	@Override
 	public void setPrepaid(Amount amount) {
+		if(amount==null) return;
 		applicableHeaderTradeSettlement.setPrepaid(amount);
 	}
 
@@ -1072,12 +1112,12 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		LOG.info("lineExtension:"+lineExtension + " taxExclusive:"+taxExclusive + " taxInclusive:"+taxInclusive + " payable:"+payable);
 		applicableHeaderTradeSettlement.setDocumentTotals(lineExtension, taxExclusive, taxInclusive, payable);
 		// zurückschreiben:
-		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement.get());
+		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
 	}
 
 	private Amount getInvoiceTax(boolean sameCurrency) {
-		List<AmountType> list = applicableHeaderTradeSettlement.getTradeSettlementHeaderMonetarySummation().getTaxTotalAmount();
+		List<AmountType> list = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxTotalAmount();
 		if(list.isEmpty()) return null;
 		for(int i=0; i<list.size(); i++) {
 			if(sameCurrency && (this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
@@ -1108,6 +1148,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 * 
 	 * @param taxTotalAmount : Invoice total VAT amount
 	 */
+	// BG-22.BT-110 CoreInvoice extends BG22_DocumentTotals : sum of all VAT category tax amounts
 	@Override
 	public void setInvoiceTax(Amount taxTotalAmount) {
 //		LOG.info("taxTotalAmount "+taxTotalAmount);
