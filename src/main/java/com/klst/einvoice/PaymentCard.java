@@ -10,7 +10,7 @@ package com.klst.einvoice;
  * Cardinality: 	0..1
  * <br>EN16931-ID: 	BG-18
  * <br>Rule ID: 	
- * <br>Request ID: 	R64
+ * <br>Request ID: 	R64 information for relating an invoice to a payment card used for settlement
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for (en)EN_16931_1_2017 rule and request IDs
  */
@@ -21,27 +21,26 @@ package com.klst.einvoice;
 
 /*  (de) rules / Geschäftsregel:
  * 
- * BR-DE-13 : Lastschriftverfahren: Gläubiger-ID
- * In der Rechnung müssen Angaben zu genau einer der drei Gruppen „CREDIT TRANSFER“ (BG-17), 
- * „PAYMENT CARD INFORMATION“ (BG-18) oder „DIRECT DEBIT“ (BG-19) übermittelt werden.
- * 
+ * BR-51 Karteninformationen
+ * Falls in der Rechnung Informationen zur verwendeten Zahlungskarte (BG-18) angegeben sind, 
+ * müssen die letzten 4 bis 6 Ziffern der Zahlungskartennummer (BT-87) angezeigt werden.
  */
 
 public interface PaymentCard {
-	
+
 	/**
 	 * Payment card primary account number
 	 * <p>
-	 * Unique identifier assigned by the Payee for referencing the direct debit mandate.
+	 * The Primary Account Number (PAN) of the card used for payment.
 	 * <p>
 	 * In accordance with card payments security standards an invoice should never include a full card primary account number. 
 	 * At the moment PCI Security Standards Council has defined that the first 6 digits and last 4 digits 
 	 * are the maximum number of digits to be shown.
 	 * <p>
-	 * Cardinality: 	0..1
-	 * <br>EN16931-ID: 	BT-87
+	 * Cardinality: 	1..1
+	 * <br>EN16931-ID: 	BG-18.BT-87
 	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R64
+	 * <br>Request ID: 	R64 information for relating an invoice to a payment card used for settlement
 	 * 
 	 * @return Text
 	 */
@@ -54,9 +53,9 @@ public interface PaymentCard {
 	 * The name of the payment card holder.
 	 * <p>
 	 * Cardinality: 	0..1
-	 * <br>EN16931-ID: 	BT-88
+	 * <br>EN16931-ID: 	BG-18.BT-88
 	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R64
+	 * <br>Request ID: 	R64 information for relating an invoice to a payment card used for settlement
 	 * 
 	 * @return Text
 	 */
