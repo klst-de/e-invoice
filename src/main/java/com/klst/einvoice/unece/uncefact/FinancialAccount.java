@@ -114,7 +114,7 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 	@Override
 	public void setPaymentAccountID(IBANId iban) { // use ctor
 		if(iban==null) return;
-		payeePartyCreditorFinancialAccount.setIBANID(CrossIndustryInvoice.newIDType(iban));		
+		payeePartyCreditorFinancialAccount.setIBANID(new Identifier(iban.getValue(), iban.getSchemeID()));		
 	}
 
 	@Override
@@ -144,11 +144,7 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 	@Override
 	public void setPaymentServiceProviderID(BICId bic) {
 		if(bic==null) return;
-		payeeSpecifiedCreditorFinancialInstitution.setBICID(CrossIndustryInvoice.newIDType(bic));
-		//payeeSpecifiedCreditorFinancialInstitution.setAustralianBSBID(value);
-//		payeeSpecifiedCreditorFinancialInstitution.setAustrianBankleitzahlID(value); //  durch IBAN abgelöst
-		//payeeSpecifiedCreditorFinancialInstitution.setCanadianPaymentsAssociationID(value);
-		// ...
+		payeeSpecifiedCreditorFinancialInstitution.setBICID(new Identifier(bic.getValue(), bic.getSchemeID()));
 	}
 
 	@Override

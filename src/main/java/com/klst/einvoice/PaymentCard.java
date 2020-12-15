@@ -45,7 +45,12 @@ public interface PaymentCard {
 	 * @return Text
 	 */
 	public String getCardAccountID();
-	public void setCardAccountID(String id);
+	
+	/**
+	 * 
+	 * @param pan - (mandatory) Payment card primary account number (pan)
+	 */
+	public void setCardAccountID(String pan);
 
 	/**
 	 * Payment card holder name
@@ -60,6 +65,11 @@ public interface PaymentCard {
 	 * @return Text
 	 */
 	public String getCardHolderName();
+	
+	/**
+	 * 
+	 * @param name - (optional) name of the payment card holder
+	 */
 	public void setCardHolderName(String name);
 		
 }
