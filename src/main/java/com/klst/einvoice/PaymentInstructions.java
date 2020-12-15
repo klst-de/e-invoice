@@ -144,8 +144,12 @@ public interface PaymentInstructions {
 	public void addCreditTransfer(CreditTransfer creditTransfer);
 	public List<CreditTransfer> getCreditTransfer();
 	
-	// ... TODO PAYMENT CARD INFORMATION
+	// BG-18 (optional) PAYMENT CARD INFORMATION
+	public void setPaymentCard(PaymentCard paymentCard);
+	public PaymentCard getPaymentCard();
 	
+	// BG-19 (optional) DIRECT DEBIT
 	public void setDirectDebit(DirectDebit directDebit);
 	public DirectDebit getDirectDebit();
+	
 }
