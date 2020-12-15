@@ -174,26 +174,23 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		// 1 .. 1 SpecifiedTradeSettlementHeaderMonetarySummation Gesamtsummen auf Dokumentenebene BG-22 : nicht null
 //		tradeSettlementHeaderMonetarySummation = ahts.getSpecifiedTradeSettlementHeaderMonetarySummation();
 		setSpecifiedTradeSettlementHeaderMonetarySummation(ahts.getSpecifiedTradeSettlementHeaderMonetarySummation());
+		
 		if(ahts.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
 			// no PaymentInstructions
 		} else {
-//			tradeSettlementPaymentMeans = ahts.getSpecifiedTradeSettlementPaymentMeans().get(0);
-//			LOG.info("init tradeSettlementPaymentMeans="+tradeSettlementPaymentMeans);
-//			PaymentMeansEnum code = getPaymentMeansEnum(tradeSettlementPaymentMeans);
-			PaymentMeansEnum code = getPaymentMeansEnum(ahts.getSpecifiedTradeSettlementPaymentMeans().get(0));
-//			LOG.warning("??????????????????? PaymentMeansEnum code ="+code);
-			// String getPaymentMeansText() 
-			// String getRemittanceInformation()
+			TradeSettlementPaymentMeansType tspm0 = ahts.getSpecifiedTradeSettlementPaymentMeans().get(0);
+			PaymentMeansEnum code = getPaymentMeansEnum(tspm0);
+			
+			PaymentCard paymentCard = tspm0==null? null : 
+				(tspm0.getApplicableTradeSettlementFinancialCard()==null? null : 
+					new FinancialCard(FinancialCard.getCardAccountID(tspm0.getApplicableTradeSettlementFinancialCard()), FinancialCard.getCardHolderName(tspm0.getApplicableTradeSettlementFinancialCard())) );
+			LOG.info("PaymentMeansEnum code ="+code + " copy ctor ahts paymentCard="+paymentCard);
 			List<CreditTransfer> creditTransfer = getCreditTransfer(ahts);
-			LOG.warning("copy ctor ahts creditTransfer.size="+creditTransfer.size());
+			LOG.info("PaymentMeansEnum code ="+code + " copy ctor ahts creditTransfer.size="+creditTransfer.size());
 //			creditTransfer.forEach(ct -> { // BG-17
 //				addCreditTransfer(ct);
 //			});
 
-			// TODO
-			LOG.warning("TODO paymentCard");
-			PaymentCard paymentCard = null;
-			
 			Identifier directDebitMandate = getDirectDebitMandateID(ahts);
 			LOG.info(">>>>>>>>>>>ahts.directDebitMandate="+directDebitMandate);
 			FinancialAccount directDebit = getFinancialAccount(ahts);
@@ -216,6 +213,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 	private void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation,
 			List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		LOG.info("-----------------PaymentMeansEnum:"+code + ", paymentMeansText:"+paymentMeansText
+				+ (paymentCard==null? "keine paymentCard" : " paymentCard.CardAccountID="+paymentCard.getCardAccountID())
 				+ (directDebit==null? "" : " MandateReferencetID="+directDebit.getMandateReferencetID()) );
 		if(code==null) return;
 //		getTradeSettlementPaymentMeans(); // create if neccessary
@@ -225,6 +223,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		creditTransfer.forEach(ct -> { // BG-17
 			addCreditTransfer(ct);
 		});
+		setPaymentCard(paymentCard); // BG-18
 		setDirectDebit(directDebit); // BG-19
 	}
 	
@@ -394,6 +393,32 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		ret.add(financialAccount);
 		return ret;
 	}
+
+	// implements BG-18 (optional) PAYMENT CARD INFORMATION
+	@Override
+	public PaymentCard getPaymentCard() {
+		return getPaymentCard(this);
+	}
+	static PaymentCard getPaymentCard(HeaderTradeSettlementType headerTradeSettlement) {
+		if(headerTradeSettlement.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
+			LOG.warning("superXXX.getSpecifiedTradeSettlementPaymentMeans().isEmpty()");
+			return null;
+		}
+		return new FinancialCard(headerTradeSettlement.getSpecifiedTradeSettlementPaymentMeans().get(0));
+	}
+	
+	@Override
+	public void setPaymentCard(PaymentCard paymentCard) {
+		if(paymentCard==null) return;
+		if(super.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
+			LOG.warning("super.getSpecifiedTradeSettlementPaymentMeans().isEmpty()");
+			return;
+		}
+		if(paymentCard instanceof FinancialCard) {
+			getSpecifiedTradeSettlementPaymentMeans().get(0).setApplicableTradeSettlementFinancialCard((FinancialCard)paymentCard);
+		}
+	}
+
 
 	// BG-19 ++ 0..1 DIRECT DEBIT
 	@Override

@@ -1037,10 +1037,8 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 				applicableHeaderTradeSettlement.addCreditTransfer(ct);
 			});
 			break;		
-		case BankCard: 
-			
-			// ... TODO PAYMENT CARD INFORMATION
-//			applicableHeaderTradeSettlement.setPaymentCard(paymentCard);
+		case BankCard:
+			applicableHeaderTradeSettlement.setPaymentCard(paymentCard);
 			break;
 		case DirectDebit: 
 		case SEPADirectDebit: 

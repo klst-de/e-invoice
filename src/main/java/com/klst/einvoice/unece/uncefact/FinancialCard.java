@@ -3,6 +3,7 @@ package com.klst.einvoice.unece.uncefact;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.PaymentCard;
+import com.klst.einvoice.PaymentCardFactory;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementFinancialCardType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
@@ -24,14 +25,19 @@ Bsp: 03.02a:
           </ram:SpecifiedTradeSettlementPaymentMeans>
 
 */
-public class FinancialCard extends TradeSettlementFinancialCardType implements PaymentCard {
+public class FinancialCard extends TradeSettlementFinancialCardType implements PaymentCard, PaymentCardFactory {
 
 	private static final Logger LOG = Logger.getLogger(FinancialCard.class.getName());
 	
-//	FinancialCard() {
-//		super();
-//	}
-	
+	// implements PaymentCardFactory
+	@Override
+	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
+		return create(cardAccountID, cardHolderName);
+	}
+	static PaymentCard create(String cardAccountID, String cardHolderName) {
+		return cardAccountID==null? null : new FinancialCard(cardAccountID, cardHolderName);
+	}
+
 	/**
 	 * BG-18 PAYMENT CARD INFORMATION
 	 * 
@@ -63,7 +69,13 @@ public class FinancialCard extends TradeSettlementFinancialCardType implements P
 	// BG-18.BT-87
 	@Override
 	public String getCardAccountID() {
-		return super.getID().getValue();
+		return getCardAccountID(this);
+	}
+	static String getCardAccountID(TradeSettlementFinancialCardType card) {
+		if(card.getID()==null) {
+			LOG.warning("(mandatory) Payment card primary account number (pan) is not set.");
+		}
+		return card.getID().getValue();
 	}
 
 	@Override
@@ -78,7 +90,11 @@ public class FinancialCard extends TradeSettlementFinancialCardType implements P
 	// BG-18.BT-88
 	@Override
 	public String getCardHolderName() {
-		return super.getCardholderName()==null ? null : super.getCardholderName().getValue();
+		return getCardHolderName(this);
+	}
+	static String getCardHolderName(TradeSettlementFinancialCardType card) {
+		if(card==null) return null;
+		return card.getCardholderName()==null ? null : card.getCardholderName().getValue();
 	}
 
 	@Override
