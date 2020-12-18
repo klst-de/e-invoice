@@ -149,6 +149,7 @@ public interface BG22_DocumentTotals {
 	 * @param amount , Allowances on line level are included in the Invoice line net amount which is summed up into the Sum of Invoice line net amount.
 	 */
 	public void setAllowancesTotal(Amount amount);
+	public Amount getAllowancesTotal(); 
 	
 	/**
 	 * Sum of all charges on document level in the Invoice.
@@ -160,6 +161,7 @@ public interface BG22_DocumentTotals {
 	 * @param amount , Charges on line level are included in the Invoice line net amount which is summed up into the Sum of Invoice line net amount.
 	 */
 	public void setChargesTotal(Amount amount);
+	public Amount getChargesTotal(); 
 	
 	/**
 	 * The total VAT amount for the Invoice.

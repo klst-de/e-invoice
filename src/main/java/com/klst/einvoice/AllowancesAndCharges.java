@@ -138,7 +138,7 @@ public interface AllowancesAndCharges {
 	public Amount getAmount(); 
 
 	/**
-	 * BT-93, BT100 (optional) Document level allowance/charge base amount
+	 * BT-93, BT-100 (optional) Document level allowance/charge base amount
 	 * <p>
 	 * The base amount that may be used, in conjunction with the document level allowance/charge percentage, 
 	 * to calculate the document level allowance/charge amount.
@@ -151,7 +151,7 @@ public interface AllowancesAndCharges {
 	public Amount getBaseAmount(); 
 
 	/**
-	 * BT-94, BT101 (optional) Document level allowance/charge percentage
+	 * BT-94, BT-101 (optional) Document level allowance/charge percentage
 	 * <p>
 	 * The percentage that may be used, in conjunction with the document level allowance/charge base amount, 
 	 * to calculate the document level allowance/charge amount.
@@ -164,7 +164,7 @@ public interface AllowancesAndCharges {
 	public BigDecimal getPercentage();
 
 	/**
-	 * BT-95, BT102 (mandatory) Document level allowance/charge VAT category code
+	 * BT-95, BT-102 (mandatory) Document level allowance/charge VAT category code
 	 * <p>
 	 * A coded identification of what VAT category applies to the document level allowance/charge.
 	 * 
@@ -180,15 +180,20 @@ public interface AllowancesAndCharges {
 	 * beispielsweise eine Versicherungssteuer oder eine Mineralölsteuer werden, 
 	 * muss das EXTENDED Profil genutzt werden. 
 	 * Der Code für die Steuerart muss dann der Codeliste UNTDID 5153 entnommen werden.
+	 * https://service.unece.org/trade/untdid/d01b/trsd/trsdtax.htm
+	 * 
 	 * Geschäftsregel: BR-32 Abschläge auf Dokumentenebene
 	 *  Jeder Abschlag auf Dokumentenebene (BG-20) muss einen Code für die für diesen Abschlag 
 	 *  geltende Umsatzsteuer auf Dokumentenebene (BT-95) haben
 	 */
+	public void setVATCategory(String code);
+	public String getVATCategory();
+	// BT-95-0, BT-102-0
 	public void setVATCode(String code);
 	public String getVATCode();
 	
 	/**
-	 * BT-96, BT103 0..1 Document level allowance/charge VAT rate
+	 * BT-96, BT-103 0..1 Document level allowance/charge VAT rate
 	 * <p>
 	 * The VAT rate, represented as percentage that applies to the document level allowance/charge.
 	 * 
@@ -200,7 +205,7 @@ public interface AllowancesAndCharges {
 	public BigDecimal getVATPercentage();
 
 	/**
-	 * BT-97, BT104 0..1 Document level allowance/charge reason
+	 * BT-97, BT-104 0..1 Document level allowance/charge reason
 	 * <p>
 	 * The reason for the document level allowance/charge, expressed as text.
 	 * 
@@ -215,7 +220,7 @@ Jeder Abschlag auf Dokumentenebene (BG-20) muss einen Grund für diesen Abschlag
 oder einen Code für den Grund für diesen Abschlag auf Dokumentenebene (BT-98) haben.
 
 . Geschäftsregel: BR-CO-22 Zuschläge auf Dokumentenebene
-Jeder Zuschlag auf Dokumentenebene (BG-21) muss einen Grund für den Zuschlag auf Dokumentenebene (BT104) 
+Jeder Zuschlag auf Dokumentenebene (BG-21) muss einen Grund für den Zuschlag auf Dokumentenebene (BT-104) 
 oder einen Code des Grundes für den Zuschlag auf Dokumentenebene (BT-105) oder beides enthalten.
 
 . Geschäftsregel: BR-CO-21 Abschläge auf Dokumentenebene
@@ -227,7 +232,7 @@ Der Code des Grundes für den Abschlag auf Dokumentenebene (BT-98)
 und der Grund für den Abschlag auf Dokumentenebene (BT-97) müssen dieselbe Zuschlagsart anzeigen.
 
 . Geschäftsregel: BR-38 Zuschläge auf Dokumentenebene
-Jeder Zuschlag auf Dokumentenebene (BG-21) muss einen Grund für den Zuschlag auf Dokumentenebene (BT104) 
+Jeder Zuschlag auf Dokumentenebene (BG-21) muss einen Grund für den Zuschlag auf Dokumentenebene (BT-104) 
 oder einen Code des Grundes für den Zuschlag auf Dokumentenebene (BT-105) haben.
 
 	 */

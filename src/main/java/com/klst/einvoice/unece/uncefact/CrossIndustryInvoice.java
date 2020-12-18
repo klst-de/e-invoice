@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.AllowanceCharge;
+import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
@@ -219,14 +221,24 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 						, new Amount(stshms.getGrandTotalAmount().get(0).getValue())    // getInvoiceTotalTaxInclusive(doc)
 						, new Amount(stshms.getDuePayableAmount().get(0).getValue())    // getDuePayable(doc)
 				);
+		List<AmountType> allowanceTotalAmountList = stshms.getAllowanceTotalAmount(); // BG-22.BT-107
+		if(!allowanceTotalAmountList.isEmpty()) {
+			// nur das erste Element holen und kopieren:
+			AmountType amount = allowanceTotalAmountList.get(0);
+			this.setAllowancesTotal(new Amount(amount.getCurrencyID(), amount.getValue()));
+		}
+		List<AmountType> chargeTotalAmountList = stshms.getChargeTotalAmount(); // BG-22.BT-108
+		if(!chargeTotalAmountList.isEmpty()) {
+			// nur das erste Element holen und kopieren:
+			AmountType amount = chargeTotalAmountList.get(0);
+			this.setChargesTotal(new Amount(amount.getCurrencyID(), amount.getValue()));
+		}
 		List<AmountType> prepaidAmountList = stshms.getTotalPrepaidAmount();
 		LOG.info("prepaidAmountList.size="+prepaidAmountList.size());
-		if(prepaidAmountList.isEmpty()) {
-			// nix tun
-		} else {
+		if(!prepaidAmountList.isEmpty()) {
 			// BG-22.BT-113 0..1 (optional) 
 			// nur das erste Element holen und kopieren:
-			AmountType amount =prepaidAmountList.get(0);
+			AmountType amount = prepaidAmountList.get(0);
 			this.setPrepaid(new Amount(amount.getCurrencyID(), amount.getValue()));
 		}
 		LOG.info("\n ...");
@@ -1058,6 +1070,16 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		return applicableHeaderTradeSettlement; // das implementiert PaymentInstructions!
 	}
 
+	// BG-20 + BG-21- 0..n
+	@Override
+	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
+		applicableHeaderTradeSettlement.addAllowanceCharge(allowanceOrCharge);
+	}
+	@Override
+	public List<AllowancesAndCharges> getAllowancesAndCharges() {
+		return applicableHeaderTradeSettlement.getAllowancesAndCharges();
+	}
+
 	// BG-22.BT-106 - 1..1/1..1
 	@Override
 	public Amount getInvoiceLineNetTotal() {
@@ -1085,6 +1107,30 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getDuePayableAmount().get(0).getValue());
 	}
 	
+	// BG-22.BT-107
+	@Override
+	public Amount getAllowancesTotal() {
+		return applicableHeaderTradeSettlement.getAllowancesTotal();
+	}
+
+	@Override
+	public void setAllowancesTotal(Amount amount) {
+		if(amount==null) return;
+		applicableHeaderTradeSettlement.setAllowancesTotal(amount);
+	}
+
+	// BG-22.BT-108
+	@Override
+	public Amount getChargesTotal() {
+		return applicableHeaderTradeSettlement.getChargesTotal();
+	}
+
+	@Override
+	public void setChargesTotal(Amount amount) {
+		if(amount==null) return;
+		applicableHeaderTradeSettlement.setChargesTotal(amount);
+	}
+
 	/**
 	 * setter optional total amounts of the invoice
 	 * 
@@ -1096,7 +1142,14 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		if(amount==null) return;
 		applicableHeaderTradeSettlement.setPrepaid(amount);
 	}
-
+	
+	// BG-22.BT-114
+	@Override
+	public void setRounding(Amount amount) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	/**
 	 * mandatory total amounts of the invoice
 	 * 
@@ -1160,24 +1213,6 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 			LOG.warning("Document currency is "+getDocumentCurrency() + " equals to Tax Currency!");
 		}
 		setInvoiceTax(amount);	
-	}
-
-	@Override
-	public void setAllowancesTotal(Amount amount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setChargesTotal(Amount amount) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setRounding(Amount amount) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	/*

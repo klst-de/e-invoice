@@ -461,6 +461,18 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 // CopyIndicator . Datentyp: udt:IndicatorType . Kardinalität: 0 .. 1 , nur EXTENDED
 // LanguageID Sprachkennzeichen . Datentyp: udt:IDType . Kardinalität: 0 .. 1 , nur EXTENDED
 	
+	/**
+	 * add an allowance or charge
+	 * <p>
+	 * BG-20 + 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+	 * <br>
+	 * BG-21 + 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
+	 * 
+	 * @param allowanceOrCharge
+	 */
+	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge);
+	public List<AllowancesAndCharges> getAllowancesAndCharges();
+	
 	// VAT BREAKDOWN BG-23 1..* (mandatory)
 	public void addVATBreakDown(CoreInvoiceVatBreakdown vatBreakdown);
 	

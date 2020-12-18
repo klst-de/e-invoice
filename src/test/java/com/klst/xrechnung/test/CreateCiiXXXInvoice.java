@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
@@ -39,12 +40,12 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 	private static final Logger LOG = Logger.getLogger(CreateCiiXXXInvoice.class.getName());
-	
+
 	private static final String TESTDIR = "src/test/resources/"; // mit Daten aus xrechnung-1.2.0-testsuite-2018-12-14.zip\instances\
-	
+
 	private File testFile;
 	private CrossIndustryInvoice testDoc;
-	
+
 	// ctor
 	public CreateCiiXXXInvoice() {
 		super(CiiTransformer.getInstance());
@@ -66,20 +67,20 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //		cii.setDocumentCurrency(testDoc.getDocumentCurrency());                           ---- verschoben hinter pi
 //		cii.setTaxCurrency(testDoc.getTaxCurrency()); // BT-6 + 0..1 (optional)
 		cii.setBuyerReference(testDoc.getBuyerReferenceValue()); // BT-10 + 0..1 (optional)
-		
+
 //		makeOptionals(cii);
-		cii.setContractReference(testDoc.getContractReference()); // BT-12 + 0..1	
+		cii.setContractReference(testDoc.getContractReference()); // BT-12 + 0..1
 //		cii.setStartDate(testDoc.getStartDateAsTimestamp()); // BG-14.BT-73
 //		cii.setEndDate(testDoc.getEndDateAsTimestamp()); // BG-14.BT-74
 		cii.setTaxPointDate(testDoc.getTaxPointDateAsTimestamp()); // BT-7 BT-7-0
-		cii.setOrderReference(testDoc.getOrderReference()); // BT-14 + 0..1	
+		cii.setOrderReference(testDoc.getOrderReference()); // BT-14 + 0..1
 		List<Object> noteList = testDoc.getNotes();
 		noteList.forEach(note -> {
 			if(note instanceof NoteType) {
 				cii.setNote(((NoteType)note).getContent().get(0).getValue());
 			}
 		});
-		
+
 
 		BG4_Seller testSellerParty = testDoc.getSeller();
 		BusinessParty sellerParty = cii.createParty( testSellerParty.getRegistrationName()     // BT-27 String name
@@ -93,7 +94,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		// BT-31 + BT-32
 		if(((TradeParty)testSellerParty).getSpecifiedTaxRegistration().isEmpty()) {
 			LOG.warning("sellerParty.SpecifiedTaxRegistration().isEmpty() !!!!!!!!!!!!!" );
-		} 
+		}
 			/* 01.10a-INVOICE_uncefact.xml                      hat zwei Einträge:
                 <ram:SpecifiedTaxRegistration>
                     <ram:ID schemeID="VA">DE123456789</ram:ID>
@@ -122,7 +123,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				+" VAT identifier (BT-31):"+sellerParty.getTaxRegistrationId()
 				);
 		cii.setSeller((TradeParty)sellerParty);
-		
+
 		BG7_Buyer buyerParty = testDoc.getBuyer();
 		if(((TradeParty)buyerParty).getSpecifiedTaxRegistration().isEmpty()) {
 			LOG.warning("buyerParty.SpecifiedTaxRegistration().isEmpty() !!!!!!!!!!!!!" );
@@ -135,11 +136,17 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		}
 		LOG.info("buyerParty:"+buyerParty.getBusinessName() + " Address:"+buyerParty.getAddress());
 		cii.setBuyer(buyerParty);
+
+		// BG-20 + BG-21- 0..n
+		List<AllowancesAndCharges> aac = testDoc.getAllowancesAndCharges();
+		aac.forEach(ac ->{
+			cii.addAllowanceCharge(ac);
+		});
 		
-		// Cardinality: 0..n EN16931-ID: BG-24 
+		// Cardinality: 0..n EN16931-ID: BG-24
 		List<BG24_AdditionalSupportingDocs> additionalSupportingDocs = testDoc.getAdditionalSupportingDocuments();
 		additionalSupportingDocs.forEach(additionalSupportingDoc -> {
-			
+
 //			ReferencedDocument doc = new ReferencedDocument(additionalSupportingDoc.getSupportingDocumentReference()
 //				, additionalSupportingDoc.getSupportingDocumentCode());
 //			cii.addSupportigDocument(doc); // methode nicht in API Core Invoice, nur die zwei:
@@ -155,10 +162,10 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 						, additionalSupportingDoc.getSupportingDocumentDescription()
 						, byteDoc
 						, additionalSupportingDoc.getAttachedDocumentMimeCode()
-						, additionalSupportingDoc.getAttachedDocumentFilename());				
+						, additionalSupportingDoc.getAttachedDocumentFilename());
 			}
 		});
-		
+
 		BusinessParty testPayeeParty = testDoc.getPayee();
 		if(testPayeeParty==null) {
 			LOG.warning("testPayeeParty==null" );
@@ -169,7 +176,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 					);
 			cii.setPayee(testPayeeParty.getRegistrationName(), testPayeeParty.getId(), testPayeeParty.getCompanyLegalForm());
 		}
-		
+
 		BusinessParty testSellerTaxRepresentativeParty = testDoc.getTaxRepresentative();
 		if(testSellerTaxRepresentativeParty==null) {
 			LOG.warning("testSellerTaxRepresentativeParty==null" );
@@ -184,18 +191,18 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //					, CoreInvoiceVatBreakdown.VAT);
 					, "VA");
 		}
-		
+
 		BG13_DeliveryInformation delivery = testDoc.getDelivery();
 		if(delivery!=null) {
 			LOG.info("delivery:"+delivery);
 			cii.setDelivery(delivery);
 		}
-		
+
 		PaymentInstructions pi = testDoc.getPaymentInstructions();
 		ApplicableHeaderTradeSettlement ats = (ApplicableHeaderTradeSettlement)pi;
 		PaymentMeansEnum code = ats.getPaymentMeansEnum();
 		if(code!=null) {
-			LOG.info("testDoc.PaymentInstructions RemittanceInformation:"+ats.getRemittanceInformation() + 
+			LOG.info("testDoc.PaymentInstructions RemittanceInformation:"+ats.getRemittanceInformation() +
 					" CreditorReferenceID:" + ats.getCreditorReferenceID() +
 					" PaymentMeansEnum:"+code + " PaymentMeansText:"+ats.getPaymentMeansText());
 			List<CreditTransfer> creditTransferList = pi.getCreditTransfer();
@@ -203,7 +210,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			PaymentCard paymentCard = null;
 			DirectDebit directDebitAccount = null; // getMandateReferencetID : direct debit authorisation == Einzugsermächtigung
 			DirectDebit dd = pi.getDirectDebit(); // interface DirectDebit
-			switch(code) { 
+			switch(code) {
 			case CreditTransfer:
 			case SEPACreditTransfer:
 				if(creditTransferList.isEmpty()) {
@@ -219,8 +226,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				paymentCard = pi.getPaymentCard();
 				LOG.info("paymentCard.Account"+paymentCard.getCardAccountID());
 				break;
-			case DirectDebit: 
-			case SEPADirectDebit: 
+			case DirectDebit:
+			case SEPADirectDebit:
 				if(dd==null) {
 					// no DirectDebit
 				} else {
@@ -243,12 +250,12 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 		LOG.info("testDoc.getPaymentTerm():"+testDoc.getPaymentTerm() + " testDoc.getDueDateAsTimestamp():"+testDoc.getDueDateAsTimestamp());
 		cii.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp()); // BT-9 & BT-20 (optional)
-		
+
 		// es ist entscheidend, dass die setter nach cii.setPaymentInstructions ausgeführt werden!!!!!!!!!!!!!!!
 		LOG.info(">>> testDoc.StartDateAsTimestamp "+ testDoc.getStartDateAsTimestamp());
 		cii.setStartDate(testDoc.getStartDateAsTimestamp());
 		cii.setEndDate(testDoc.getEndDateAsTimestamp());
-		
+
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
@@ -262,16 +269,22 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         	cii.addVATBreakDown(vatBreakdown);
         	LOG.info("added vatBreakdown "+vatBreakdown);
         });
-		
+
         Amount prePaidAmount = testDoc.getPrepaid();
     	LOG.info("-----------------Prepaid amount "+prePaidAmount);
-        cii.setDocumentTotals(testDoc.getInvoiceLineNetTotal(), 
-				testDoc.getInvoiceTotalTaxExclusive(), 
-				testDoc.getInvoiceTotalTaxInclusive(), 
+        cii.setDocumentTotals(testDoc.getInvoiceLineNetTotal(),
+				testDoc.getInvoiceTotalTaxExclusive(),
+				testDoc.getInvoiceTotalTaxInclusive(),
 				testDoc.getDuePayable());
         cii.setInvoiceTax(testDoc.getInvoiceTax());
         cii.setPrepaid(prePaidAmount);
-        
+        Amount allowancesTotalAmount = testDoc.getAllowancesTotal();
+    	LOG.info("---------AllowancesTotal amount "+allowancesTotalAmount);
+        cii.setAllowancesTotal(allowancesTotalAmount);
+        Amount chargesTotalAmount = testDoc.getChargesTotal();
+    	LOG.info("------------chargesTotal amount "+chargesTotalAmount);
+        cii.setChargesTotal(chargesTotalAmount);
+
 //        cii.setInvoiceTaxInAccountingCurrency(  ...  ist nicht implementiert TODO
 
         List<TradeLineItem> lines = testDoc.getLines();
@@ -286,7 +299,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         			, testLine.getItemName()
         			, testLine.getTaxCategory(), testLine.getTaxRate() // mandatory, rate can be null
         			);
-        	
+
         	line.setNote(testLine.getNote()); // opt
     		line.setStartDate(testLine.getStartDateAsTimestamp()); // BG-26.BT-134
     		line.setEndDate(testLine.getEndDateAsTimestamp()); // BG-26.BT-135
@@ -306,14 +319,14 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         LOG.info("LineGroup finished.");
 		return cii;
 	}
-//	void makeOptionals(CrossIndustryInvoice cii) {	
-//		
+//	void makeOptionals(CrossIndustryInvoice cii) {
+//
 //		cii.setTaxPointDate(testDoc.getTaxPointDateAsTimestamp()); // BT-7 BT-7-0
-//		
+//
 ////		cii.setProjectReference("PR12345678", "Project reference");
-//		
+//
 //		cii.setOrderReference(testDoc.getOrderReference()); // BT-14 + 0..1
-//		
+//
 //		List<Object> noteList = testDoc.getNotes();
 //		noteList.forEach(note -> {
 //			cii.addNote(note);
@@ -327,7 +340,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		LOG.info("test file "+file.getAbsolutePath() + " canRead:"+file.canRead());
 		return file;
 	}
-	
+
 	private CrossIndustryInvoice toModel(File xmlfile) {
 		CrossIndustryInvoiceType invoice;
 		CrossIndustryInvoice cii = null;
