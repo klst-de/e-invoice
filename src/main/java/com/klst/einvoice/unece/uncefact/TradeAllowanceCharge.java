@@ -12,6 +12,7 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.IndicatorType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 
 /*
@@ -60,18 +61,45 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	// copy ctor
 	TradeAllowanceCharge(TradeAllowanceChargeType tradeAllowanceCharge) {
 		this();
+		super.setChargeIndicator(tradeAllowanceCharge.getChargeIndicator());
 		this.setAmount(getAmount(tradeAllowanceCharge));
 		this.setBaseAmount(getAmount(tradeAllowanceCharge));
 		this.setPercentage(getPercentage(tradeAllowanceCharge));
-		String vatCode = getVATCode(tradeAllowanceCharge);
-		String vatCategory = getVATCategory(tradeAllowanceCharge);
-//		getVATPercentage(tradeAllowanceCharge);
-//		this.setVAT(getVATCode(tradeAllowanceCharge), getVATCategory(tradeAllowanceCharge), getVATPercentage(tradeAllowanceCharge));
-		this.setVAT(vatCode, vatCategory, getVATPercentage(tradeAllowanceCharge));
+		this.setVAT(getVATCode(tradeAllowanceCharge), getVATCategory(tradeAllowanceCharge)
+				, getVATPercentage(tradeAllowanceCharge));
 		this.setReasonText(getReasonText(tradeAllowanceCharge));
 		this.setReasoncode(getReasoncode(tradeAllowanceCharge));
 	}
 	
+	@Override
+	public void setChargeIndicator(boolean value) {
+		IndicatorType indicator = new IndicatorType();
+		indicator.setIndicator(value);
+		super.setChargeIndicator(indicator);
+	}
+	
+	@Override
+	public boolean isAllowance() {
+		return isAllowance(this);
+	}
+	static boolean isAllowance(TradeAllowanceChargeType tradeAllowanceCharge) {
+		IndicatorType indicator = tradeAllowanceCharge.getChargeIndicator();
+		IndicatorType allowance = new IndicatorType();
+		allowance.setIndicator(AllowancesAndCharges.ALLOWANCE);
+		return indicator.equals(allowance);
+	}
+
+	@Override
+	public boolean isCharge() {
+		return isCharge(this);
+	}
+	static boolean isCharge(TradeAllowanceChargeType tradeAllowanceCharge) {
+		IndicatorType indicator = tradeAllowanceCharge.getChargeIndicator();
+		IndicatorType charge = new IndicatorType();
+		charge.setIndicator(AllowancesAndCharges.CHARGE);
+		return indicator.equals(charge);
+	}
+
 	// BT-92, BT-99 (mandatory) Document level allowance/charge amount
 	@Override
 	public void setAmount(Amount amount) {

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
@@ -58,7 +59,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDat
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PayableAmountType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentCurrencyCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PrepaidAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ProfileIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.StartDateType;
@@ -920,14 +920,26 @@ UBL:
 		return new Amount(amount.getCurrencyID(), amount.getValue());		
 	}
 	
+	// BG-22.BT-107 ++ 0..1 Sum of all allowances on document level in the Invoice
 	@Override
 	public void setAllowancesTotal(Amount taxTotalAmount) {
 		// TODO Summe aller in der Rechnung enthaltenen Nachlässe der Dokumentenebene.
 	}
+	@Override
+	public Amount getAllowancesTotal() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
+	// BG-22.BT-108 ++ 0..1 Sum of all charges on document level in the Invoice
 	@Override
 	public void setChargesTotal(Amount taxTotalAmount) {
 		// TODO Summe aller in der Rechnung enthaltenen Abgaben der Dokumentenebene.
+	}
+	@Override
+	public Amount getChargesTotal() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	// BG-22.BT-109 ++ 1..1 Invoice total amount without VAT
@@ -1070,6 +1082,19 @@ UBL:
 		return taxTotalFirst;
 	}
 	
+	// BG-20 + 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+	// BG-21 + 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
+	@Override
+	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public List<AllowancesAndCharges> getAllowancesAndCharges() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	// BG-23 + 1..n VAT BREAKDOWN
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
 		TaxSubtotalType taxSubtotal = new VatBreakdown(taxableAmount, tax, taxCategoryCode, taxRate);

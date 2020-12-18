@@ -44,8 +44,8 @@ UBL:
     </cac:TaxCategory>
   </cac:AllowanceCharge>
   <cac:AllowanceCharge>
-    <cbc:ChargeIndicator>false</cbc:ChargeIndicator>              <!-- false : ABSCHLAG / ALLOWANCE -->
-    <cbc:AllowanceChargeReasonCode>102</cbc:AllowanceChargeReasonCode>
+    <cbc:ChargeIndicator>false</cbc:ChargeIndicator>                   <!-- false : ABSCHLAG / ALLOWANCE -->
+    <cbc:AllowanceChargeReasonCode>102</cbc:AllowanceChargeReasonCode> <!-- Fixed long term -->
     <cbc:AllowanceChargeReason>Fixed long term</cbc:AllowanceChargeReason>
     <cbc:MultiplierFactorNumeric>0</cbc:MultiplierFactorNumeric>
     <cbc:Amount currencyID="EUR">0</cbc:Amount>
@@ -115,8 +115,10 @@ public interface AllowancesAndCharges {
 	public static final boolean ALLOWANCE = false;
 	public static final boolean CHARGE = true;
 
-//	public void setChargeIndicator(boolean indicator);
-//	public boolean getChargeIndicator();
+	// BG-20-00, BG-21-00
+	public void setChargeIndicator(boolean indicator);
+	public boolean isAllowance();
+	public boolean isCharge();
 	
 	/**
 	 * BT-92, BT-99 (mandatory) Document level allowance/charge amount
