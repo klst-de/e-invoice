@@ -284,6 +284,9 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         Amount chargesTotalAmount = testDoc.getChargesTotal();
     	LOG.info("------------chargesTotal amount "+chargesTotalAmount);
         cii.setChargesTotal(chargesTotalAmount);
+        Amount roundingAmount = testDoc.getRounding();
+    	LOG.info("------------    rounding amount "+roundingAmount);
+        cii.setRounding(roundingAmount);
 
 //        cii.setInvoiceTaxInAccountingCurrency(  ...  ist nicht implementiert TODO
 

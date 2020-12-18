@@ -241,6 +241,12 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 			AmountType amount = prepaidAmountList.get(0);
 			this.setPrepaid(new Amount(amount.getCurrencyID(), amount.getValue()));
 		}
+		List<AmountType> roundingAmountList = stshms.getRoundingAmount(); // BG-22.BT-114
+		if(!roundingAmountList.isEmpty()) {
+			// nur das erste Element holen und kopieren:
+			AmountType amount = roundingAmountList.get(0);
+			this.setRounding(new Amount(amount.getCurrencyID(), amount.getValue()));
+		}
 		LOG.info("\n ...");
 
 		List<AmountType> list = stshms.getTaxTotalAmount(); // BT-110, BT-111 1..1
@@ -1145,9 +1151,13 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	
 	// BG-22.BT-114
 	@Override
+	public Amount getRounding() {
+		return applicableHeaderTradeSettlement.getRounding();
+	}
+	@Override
 	public void setRounding(Amount amount) {
-		// TODO Auto-generated method stub
-		
+		if(amount==null) return;
+		applicableHeaderTradeSettlement.setRounding(amount);
 	}
 	
 	/**

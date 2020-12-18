@@ -219,5 +219,6 @@ public interface BG22_DocumentTotals {
 	 * @param amount , The amount to be added to the invoice total to round the amount to be paid.
 	 */
 	public void setRounding(Amount amount);
+	public Amount getRounding(); 
 	
 }

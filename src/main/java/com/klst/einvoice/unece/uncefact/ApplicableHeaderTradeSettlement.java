@@ -605,6 +605,16 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		amount.copyTo(chargesTotalAmount);
 		getSpecifiedTradeSettlementHeaderMonetarySummation().getChargeTotalAmount().add(chargesTotalAmount); // add to list
 	}
+	Amount getRounding() {
+		List<AmountType> list = getSpecifiedTradeSettlementHeaderMonetarySummation().getRoundingAmount();
+		return list.isEmpty() ? null : new Amount(list.get(0).getCurrencyID(), list.get(0).getValue());		
+	}
+	void setRounding(Amount amount) {
+		if(amount==null) return;
+		AmountType rounding = new AmountType();
+		amount.copyTo(rounding);
+		getSpecifiedTradeSettlementHeaderMonetarySummation().getRoundingAmount().add(rounding); // add to list
+	}
 	
 	public TradeParty getPayeeTradeParty() {
 		TradePartyType party = super.getPayeeTradeParty();

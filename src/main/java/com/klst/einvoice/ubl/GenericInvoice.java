@@ -1050,6 +1050,12 @@ UBL:
 		monetaryTotal.setPrepaidAmount(prepaidAmount);
 	}
 	
+	// BG-22.BT-114 0..1 (optional) Rounding
+	@Override
+	public Amount getRounding() {
+		return null;
+		// TODO 	
+	}
 	@Override
 	public void setRounding(Amount taxTotalAmount) {
 		// TODO Der Betrag, um den der Rechnungsbetrag gerundet wurde.
