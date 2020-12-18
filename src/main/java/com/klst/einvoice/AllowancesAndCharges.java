@@ -231,8 +231,8 @@ Jeder Zuschlag auf Dokumentenebene (BG-21) muss einen Grund für den Zuschlag au
 oder einen Code des Grundes für den Zuschlag auf Dokumentenebene (BT-105) haben.
 
 	 */
-	public void setReason(String text);
-	public String getReason();
+	public void setReasonText(String text);
+	public String getReasonText();
 	
 	/**
 	 * BT-98, BT-103 0..1 Document level allowance/charge reason code
@@ -272,7 +272,7 @@ Include PEPPOL subset:
 105 - Yearly turnover
 
 	 */
-	public void setReasonCode(String code);
-	public String getReasonCode();
+	public void setReasoncode(String code);
+	public String getReasoncode();
 	
 }
