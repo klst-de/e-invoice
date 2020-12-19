@@ -258,7 +258,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
-        	BG23_VatBreakdown vatBreakdown = new VatBreakdown( new Amount(tradeTax.getBasisAmount().get(0).getValue())
+        	BG23_VatBreakdown vatBreakdown = cii.createVATBreakDown( new Amount(tradeTax.getBasisAmount().get(0).getValue())
 					,new Amount(tradeTax.getCalculatedAmount().get(0).getValue())
 					,TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
 					,tradeTax.getRateApplicablePercent()==null ? null : tradeTax.getRateApplicablePercent().getValue()

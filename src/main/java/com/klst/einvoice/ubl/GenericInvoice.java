@@ -1101,18 +1101,17 @@ UBL:
 		return null;
 	}
 
+	@Override
+	public BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode code, BigDecimal percent) {
+		return new VatBreakdown(taxableAmount, tax, code, percent);
+	}
+
 	// BG-23 + 1..n VAT BREAKDOWN
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
 		TaxSubtotalType taxSubtotal = new VatBreakdown(taxableAmount, tax, taxCategoryCode, taxRate);
 		
 		taxTotalFirst = getTaxTotalFirst();
 		taxTotalFirst.getTaxSubtotal().add(taxSubtotal);
-//		
-//		if(isInvoiceType) {
-//			invoice.getTaxTotal().add(0, taxTotal);
-//		} else {
-//			creditNore.getTaxTotal().add(0, taxTotal);
-//		}
 	}
 
 	@Override

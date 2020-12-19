@@ -19,7 +19,7 @@ public class VatBreakdown extends TradeTaxType implements BG23_VatBreakdown {
 	}
 
 	// copy ctor
-	public VatBreakdown(TradeTaxType tradeTax) {
+	VatBreakdown(TradeTaxType tradeTax) {
 		this();
 		init( new Amount(tradeTax.getBasisAmount().get(0).getValue())
 			, new Amount(tradeTax.getCalculatedAmount().get(0).getValue())
@@ -30,7 +30,7 @@ public class VatBreakdown extends TradeTaxType implements BG23_VatBreakdown {
 				, tradeTax.getExemptionReasonCode()==null ? null : tradeTax.getExemptionReasonCode().getValue());
 	}
 
-	public VatBreakdown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
+	VatBreakdown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
 		this();
 		init(taxableAmount, taxAmount, codeEnum, percent);
 	}

@@ -1215,6 +1215,11 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
        VatBreakdown extends ApplicableTradeTax
 
 	 */
+	@Override
+	public BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode codeEnum, BigDecimal taxRate) {
+		return new VatBreakdown(taxableAmount, tax, codeEnum, taxRate);
+	}
+	
 	/**
 	 * Adds a mandatory VAT BREAKDOWN element
 	 * 
