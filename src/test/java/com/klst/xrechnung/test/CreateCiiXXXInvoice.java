@@ -74,9 +74,13 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //		cii.setEndDate(testDoc.getEndDateAsTimestamp()); // BG-14.BT-74
 		cii.setOrderReference(testDoc.getOrderReference()); // BT-14 + 0..1
 		List<Object> noteList = testDoc.getNotes();
-		noteList.forEach(note -> {
-			if(note instanceof NoteType) {
-				cii.setNote(((NoteType)note).getContent().get(0).getValue());
+		noteList.forEach(n -> {
+			if(n instanceof NoteType) {
+				NoteType note = (NoteType)n;
+				String code = note.getSubjectCode()==null? null : note.getSubjectCode().getValue();
+				// die Kardinalität: von BT-22/Content ist 1 .. 1
+				String content = note.getContent().isEmpty()? null : note.getContent().get(0).getValue();
+				cii.setNote(code, content);
 			}
 		});
 

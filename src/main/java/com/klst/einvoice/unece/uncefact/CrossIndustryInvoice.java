@@ -48,6 +48,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
@@ -207,7 +208,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 
 		setOrderReference(getOrderReferenceID(doc)); // optional
 
-		addNotes(doc);	
+		addNotes(doc.getExchangedDocument());	
 		LOG.info("\n SellerParty:");;
 		setSeller(getSellerParty(doc));
 		LOG.info("\n BuyerParty:");;
@@ -623,16 +624,24 @@ UBL:
 	 */
 	@Override
 	public List<Object> getNotes() {
-		return getNotes(this);
+		return getNotes(this.exchangedDocument);
 	}
-	static List<Object> getNotes(CrossIndustryInvoiceType doc) {
-		ExchangedDocumentType ed = doc.getExchangedDocument();
+	static List<Object> getNotes(ExchangedDocumentType ed) {
 		List<NoteType> noteList = ed.getIncludedNote();
 		List<Object> res = new ArrayList<Object>(noteList.size());
 		noteList.forEach(note -> {
 			res.add(note);
 		});
 		return res;
+	}
+	private void addNotes(ExchangedDocumentType ed) {
+		List<NoteType> noteList = ed.getIncludedNote();
+		noteList.forEach(note -> {
+			String code = note.getSubjectCode()==null? null : note.getSubjectCode().getValue();
+			// die Kardinalität: von BT-22/Content ist 1 .. 1
+			String content = note.getContent().isEmpty()? null : note.getContent().get(0).getValue();
+			this.addNote(code, content);
+		});
 	}
 
 	@Override
@@ -645,25 +654,18 @@ UBL:
 	}
 	public void addNote(String subjectCode, String noteContent) {
 		NoteType note = new NoteType();
-		TextType content = new TextType();
-		content.setValue(noteContent);
+		TextType content = new Text(noteContent);
 		note.getContent().add(content);
 		if(subjectCode!=null) {
-			TextType subject = new TextType();
-			subject.setValue(subjectCode);
-			note.setSubject(subject); //  z.B ADU
+			CodeType code = new CodeType();
+			code.setValue(subjectCode);
+			note.setSubjectCode(code); //  z.B ADU
 		}
 		addNote(note);
 	}
 	public void addNote(Object note) {
 		exchangedDocument.getIncludedNote().add((NoteType)note);
 		super.setExchangedDocument(exchangedDocument);
-	}
-	void addNotes(CrossIndustryInvoiceType doc) {
-		List<Object> noteList = getNotes(doc);
-		noteList.forEach(note -> {
-			exchangedDocument.getIncludedNote().add((NoteType)note);
-		});
 	}
 
 	/* PROCESS CONTROL                             BG-2                        1 (mandatory) 
