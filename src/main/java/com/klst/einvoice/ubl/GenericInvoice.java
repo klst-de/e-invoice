@@ -14,7 +14,7 @@ import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
-import com.klst.einvoice.CoreInvoiceVatBreakdown;
+import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.DirectDebit;
@@ -1116,7 +1116,7 @@ UBL:
 	}
 
 	@Override
-	public void addVATBreakDown(CoreInvoiceVatBreakdown vatBreakdown) {
+	public void addVATBreakDown(BG23_VatBreakdown vatBreakdown) {
 		taxTotalFirst = getTaxTotalFirst();
 		taxTotalFirst.getTaxSubtotal().add((VatBreakdown)vatBreakdown);
 	}

@@ -474,7 +474,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public List<AllowancesAndCharges> getAllowancesAndCharges();
 	
 	// VAT BREAKDOWN BG-23 1..* (mandatory)
-	public void addVATBreakDown(CoreInvoiceVatBreakdown vatBreakdown);
+	public void addVATBreakDown(BG23_VatBreakdown vatBreakdown);
 	
 	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	// BG-24.BT-122 ++ 1..1 Supporting document reference

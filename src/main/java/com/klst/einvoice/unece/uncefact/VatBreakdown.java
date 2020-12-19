@@ -2,7 +2,7 @@ package com.klst.einvoice.unece.uncefact;
 
 import java.math.BigDecimal;
 
-import com.klst.einvoice.CoreInvoiceVatBreakdown;
+import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
@@ -12,7 +12,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 
-public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdown {
+public class VatBreakdown extends TradeTaxType implements BG23_VatBreakdown {
 
 	VatBreakdown() {
 		super();
@@ -107,7 +107,7 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 	 */
 	@Override
 	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal taxRate) {
-		setTaxCategoryAndRate(codeEnum, CoreInvoiceVatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate));
+		setTaxCategoryAndRate(codeEnum, BG23_VatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate));
 	}
 
 	@Override
@@ -148,7 +148,7 @@ public class VatBreakdown extends TradeTaxType implements CoreInvoiceVatBreakdow
 	/**
 	 * VAT exemption reason text and code
 	 *
-	 * @see com.klst.einvoice.CoreInvoiceVatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
+	 * @see com.klst.einvoice.BG23_VatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void setTaxExemption(String text, String id) {

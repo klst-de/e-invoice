@@ -3,7 +3,7 @@ package com.klst.einvoice.ubl;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.klst.einvoice.CoreInvoiceVatBreakdown;
+import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
@@ -16,7 +16,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
 
-public class VatBreakdown extends TaxSubtotalType implements CoreInvoiceVatBreakdown {
+public class VatBreakdown extends TaxSubtotalType implements BG23_VatBreakdown {
 
 	VatBreakdown() {
 		super();
@@ -58,7 +58,7 @@ public class VatBreakdown extends TaxSubtotalType implements CoreInvoiceVatBreak
 		setTaxBaseAmount(taxableAmount);
 		setCalculatedTaxAmount(taxAmount);
 //		setTaxCategoryCodeAndRate(codeEnum, taxRate);
-		setTaxCategoryAndRate(codeEnum, CoreInvoiceVatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate)
+		setTaxCategoryAndRate(codeEnum, BG23_VatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate)
 				, exemptionText, exemptionCode);
 	}
 
@@ -123,7 +123,7 @@ public class VatBreakdown extends TaxSubtotalType implements CoreInvoiceVatBreak
 	 */
 // TODO raus	@Override
 	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal taxRate) {
-		setTaxCategoryAndRate(codeEnum, CoreInvoiceVatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate), null, null);
+		setTaxCategoryAndRate(codeEnum, BG23_VatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate), null, null);
 	}
 
 // TODO raus	@Override
@@ -150,7 +150,7 @@ public class VatBreakdown extends TaxSubtotalType implements CoreInvoiceVatBreak
 	/**
 	 * VAT exemption reason text and code
 	 * 
-	 * @see com.klst.einvoice.CoreInvoiceVatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
+	 * @see com.klst.einvoice.BG23_VatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
 	 */
  	@Override
 	public void setTaxExemption(String text, String code) {

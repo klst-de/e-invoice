@@ -10,7 +10,7 @@ import com.klst.einvoice.BG10_Payee;
 import com.klst.einvoice.BG11_SellerTaxRepresentativeParty;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
-import com.klst.einvoice.CoreInvoiceVatBreakdown;
+import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
 
@@ -202,7 +202,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.
-	public static final String DEFAULT_TAX_SCHEME = CoreInvoiceVatBreakdown.VAT;
+	public static final String DEFAULT_TAX_SCHEME = BG23_VatBreakdown.VAT;
 	
 	/**
 	 * Buyer/Seller VAT identifier - The VAT identifier (also known as VAT identification number).

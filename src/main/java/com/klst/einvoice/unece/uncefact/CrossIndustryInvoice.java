@@ -14,7 +14,7 @@ import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
-import com.klst.einvoice.CoreInvoiceVatBreakdown;
+import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.IContact;
@@ -1221,7 +1221,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 * @param vatBreakdown
 	 */
 	@Override
-	public void addVATBreakDown(CoreInvoiceVatBreakdown vatBreakdown) {
+	public void addVATBreakDown(BG23_VatBreakdown vatBreakdown) {
 		List<TradeTaxType> tradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
 		tradeTaxes.add((VatBreakdown)vatBreakdown);
 	}
