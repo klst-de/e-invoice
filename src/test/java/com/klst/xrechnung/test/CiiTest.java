@@ -47,7 +47,7 @@ public class CiiTest {
 			"01.14a-INVOICE_uncefact.xml" ,
 			"01.15a-INVOICE_uncefact.xml" ,
 			"zugferd2_invoice_pdfa3b.xml" ,// war PROFILE_BASIC, geändert in PROFILE_COMFORT
-//			"02.01a-INVOICE_uncefact.xml" , // testcase 02.01a-INVOICE_uncefact #16
+			"02.01a-INVOICE_uncefact.xml" , // see issue #16
 			"03.01a-INVOICE_uncefact.xml" ,
 			"03.02a-INVOICE_uncefact.xml" ,
 			"03.03a-INVOICE_uncefact.xml" ,
