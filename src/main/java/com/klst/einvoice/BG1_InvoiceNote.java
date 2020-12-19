@@ -48,7 +48,11 @@ public interface BG1_InvoiceNote {
 	 * <br> A textual note that gives unstructured information that is relevant to the Invoice as a whole.
  	 * Such as the reason for any correction or assignment note in case the invoice has been factored.
 	 */
+	// https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred4451.htm
 	void setNote(String subjectCode, String content);
 	void setNote(String content);
 
+	// TODO:
+//	Note createNote(String subjectCode, String content); // factory
+//	void addNote(Note note);
 }

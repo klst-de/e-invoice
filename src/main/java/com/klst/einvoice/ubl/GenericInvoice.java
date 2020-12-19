@@ -464,6 +464,17 @@ UBL:
 	// BG-1 + 0..n INVOICE NOTE
 	// BG-1.BT-21 ++ 0..1 Invoice note subject code
 	// BG-1.BT-22 ++ 1..1 Invoice note /aka content
+/* 
+    Bei UBL wird der subjectCode vor dem content in ein Note eingefügt.
+    Das geht natürlich nur wenn alle Notes subjectCode + content haben.
+    Bei zwei Elementen in <cbc:Note> kann man nicht entscheiden, ob das erste el ein subjectCode oder content ist
+    
+Bsp 05: das erste el ist subjectCode, das zweite content:
+UBL:
+    <cbc:Note>ADU</cbc:Note>
+    <cbc:Note>Trainer: Herr […]</cbc:Note>
+
+ */
 	@Override
 	public void setNote(String subjectCode, String content) {
 		if(content==null) return; // optional
