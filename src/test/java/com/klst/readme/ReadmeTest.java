@@ -28,7 +28,7 @@ public class ReadmeTest {
 
 	private static final Logger LOG = Logger.getLogger(ReadmeTest.class.getName());
 	
-	static final String XRECHNUNG_12 = CoreInvoice.PROFILE_XRECHNUNG;
+	static final String XRECHNUNG_20 = CoreInvoice.PROFILE_XRECHNUNG;
 	static final String EUR = "EUR"; 
 	
 	static private AbstactTransformer transformer;
@@ -50,7 +50,7 @@ public class ReadmeTest {
 	@Test
 	public void commercialInvoiceTest() {
 		  GenericInvoice<InvoiceType> ublInvoice =
-				  GenericInvoice.createInvoice(XRECHNUNG_12, null, DocumentNameCode.CommercialInvoice);
+				  GenericInvoice.createInvoice(XRECHNUNG_20, null, DocumentNameCode.CommercialInvoice);
 		  LOG.info("ublInvoice.Class:"+ublInvoice.get().getClass());
 		  ublInvoice.setId("123456XX");
 		  ublInvoice.setIssueDate("2016-04-04");
