@@ -48,11 +48,16 @@ public class CiiTest {
 			"01.15a-INVOICE_uncefact.xml" ,
 			"zugferd2_invoice_pdfa3b.xml" ,// war PROFILE_BASIC, geändert in PROFILE_COMFORT
 			"02.01a-INVOICE_uncefact.xml" , // see issue #16
+			"02.02a-INVOICE_uncefact.xml" ,
+			"02.03a-INVOICE_uncefact.xml" ,
+			"02.04a-INVOICE_uncefact.xml" ,
+			"02.05a-INVOICE_uncefact.xml" ,
+			"02.06a-INVOICE_uncefact.xml" ,
 			"03.01a-INVOICE_uncefact.xml" ,
 			"03.02a-INVOICE_uncefact.xml" ,
 			"03.03a-INVOICE_uncefact.xml" ,
 			"03.04a-INVOICE_uncefact.xml" ,
-			"03.05a-INVOICE_uncefact.xml" 
+			"03.05a-INVOICE_uncefact.xml"
 			};
 	
 	private static final String XRECHNUNG_2p0 = BG2_ProcessControl.PROFILE_XRECHNUNG;
