@@ -295,4 +295,16 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		return directDebit;
 	}
 
+	@Override
+	public void setPaymentCard(PaymentCard paymentCard) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public PaymentCard getPaymentCard() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
