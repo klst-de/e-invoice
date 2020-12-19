@@ -92,23 +92,22 @@ CII: ApplicableHeaderTradeSettlement ...
             </ram:SpecifiedTradeAllowanceCharge>
             
 0 .. n SpecifiedTradeAllowanceCharge Zu- und Abschläge auf Dokumentenebene           BG-20, BG-21
-1 .. 1 ChargeIndicator Schalter für Zu-/Abschlag                                     BG-20-0 , BG-21-0  xs:choice
-1 .. 1 Indicator Schalter für Zu-/Abschlag, Wert                                     BG-20-00, BG-21-00
-(
-0 .. 1 SequenceNumeric Berechnungsreihenfolge
-0 .. 1 CalculationPercent Prozentualer Zu- oder Abschlag auf Dokumentenebene         BT-94, BT-101
-0 .. 1 BasisAmount Grundbetrag des Zu- oder Abschlags auf Dokumentenebene            BT-93, BT-100
-0 .. 1 BasisQuantity Basismenge des Rabatts required unitCode Einheit der Preisbasismenge
-1 .. 1 ActualAmount Betrag des Zu- oder Abschlags auf Dokumentenebene                BT-92, BT-99
-0 .. 1 ReasonCode Code für den Grund für den Zu- oder Abschlag auf Dokumentenebene   BT-98, BT-105
-0 .. 1 Reason Grund für den Zu- oder Abschlag auf Dokumentenebene                    BT-97, BT-104
-1 .. 1 CategoryTradeTax Detailinformationen zu Steuerangaben                                       xs:sequence
-1 .. 1 TypeCode Code für die Umsatzsteuerkategorie 
-        des Zu- oder Abschlages auf Dokumentenebene                                  BT-95-0, BT-102-0
-1 .. 1 CategoryCode Code für die Umsatzsteuerkategorie 
-        des Zu- oder Abschlages auf Dokumentenebene                                  BT-95  , BT-102
-0 .. 1 RateApplicablePercent Umsatzsteuersatz 
-        für den Zu- oder Abschlag auf Dokumentenebene                                BT-96  , BT-103
+ 1 .. 1 ChargeIndicator Schalter für Zu-/Abschlag                                     BG-20-0 , BG-21-0  xs:choice
+  1 .. 1 Indicator Schalter für Zu-/Abschlag, Wert                                     BG-20-00, BG-21-00
+ 0 .. 1 SequenceNumeric Berechnungsreihenfolge
+ 0 .. 1 CalculationPercent Prozentualer Zu- oder Abschlag auf Dokumentenebene         BT-94, BT-101
+ 0 .. 1 BasisAmount Grundbetrag des Zu- oder Abschlags auf Dokumentenebene            BT-93, BT-100
+ 0 .. 1 BasisQuantity Basismenge des Rabatts required unitCode Einheit der Preisbasismenge
+ 1 .. 1 ActualAmount Betrag des Zu- oder Abschlags auf Dokumentenebene                BT-92, BT-99
+ 0 .. 1 ReasonCode Code für den Grund für den Zu- oder Abschlag auf Dokumentenebene   BT-98, BT-105
+ 0 .. 1 Reason Grund für den Zu- oder Abschlag auf Dokumentenebene                    BT-97, BT-104
+ 1 .. 1 CategoryTradeTax Detailinformationen zu Steuerangaben                                       xs:sequence
+  1 .. 1 TypeCode Code für die Umsatzsteuerkategorie 
+          des Zu- oder Abschlages auf Dokumentenebene                                  BT-95-0, BT-102-0
+  1 .. 1 CategoryCode Code für die Umsatzsteuerkategorie 
+          des Zu- oder Abschlages auf Dokumentenebene                                  BT-95  , BT-102
+  0 .. 1 RateApplicablePercent Umsatzsteuersatz 
+          für den Zu- oder Abschlag auf Dokumentenebene                                BT-96  , BT-103
  */
 public interface AllowancesAndCharges {
 	
