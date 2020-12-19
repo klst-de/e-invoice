@@ -72,7 +72,6 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setContractReference(testDoc.getContractReference()); // BT-12 + 0..1
 //		cii.setStartDate(testDoc.getStartDateAsTimestamp()); // BG-14.BT-73
 //		cii.setEndDate(testDoc.getEndDateAsTimestamp()); // BG-14.BT-74
-		cii.setTaxPointDate(testDoc.getTaxPointDateAsTimestamp()); // BT-7 BT-7-0
 		cii.setOrderReference(testDoc.getOrderReference()); // BT-14 + 0..1
 		List<Object> noteList = testDoc.getNotes();
 		noteList.forEach(note -> {
@@ -269,6 +268,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         	cii.addVATBreakDown(vatBreakdown);
         	LOG.info("added vatBreakdown "+vatBreakdown);
         });
+
+		cii.setTaxPointDate(testDoc.getTaxPointDateAsTimestamp()); // BT-7 BT-7-0
 
         Amount prePaidAmount = testDoc.getPrepaid();
     	LOG.info("-----------------Prepaid amount "+prePaidAmount);

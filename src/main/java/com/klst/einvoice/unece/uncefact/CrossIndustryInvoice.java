@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.klst.einvoice.AllowanceCharge;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
@@ -185,7 +184,11 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		String taxCurrency = applicableHeaderTradeSettlement.getTaxCurrency();
 		setTaxCurrency(taxCurrency); // optional
 		
-		setTaxPointDate(getTaxPointDateAsTimestamp(applicableHeaderTradeSettlement)); // optional
+		Timestamp ts = ApplicableHeaderTradeSettlement.getTaxPointDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
+		LOG.info("TaxPointDateAsTimestamp="+ts);
+		if(ts!=null) { // optional
+			setTaxPointDate(ts);
+		}
 		
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional
 		setContractReference(getContractReferenceID(doc)); // optional
@@ -258,8 +261,6 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 				if(taxCurrency==null || documentCurrency.equals(taxCurrency)) {
 					Amount invoiceTaxAmount = list.get(i).getCurrencyID()==null ? new Amount(list.get(i).getValue()) : new Amount(list.get(i).getCurrencyID(), list.get(i).getValue());
 					LOG.info("nur Info: invoiceTaxAmount "+invoiceTaxAmount);
-					// TODO Bug !!!!!!!!!!!!! setInvoiceTax schreibt Liste fort endloss!!!!!!!
-					//setInvoiceTax(invoiceTaxAmount);
 				}
 			}
 		}
@@ -396,28 +397,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 
 	@Override
 	public Timestamp getTaxPointDateAsTimestamp() {
-		return getTaxPointDateAsTimestamp(applicableHeaderTradeSettlement);
-	}
-	static Timestamp getTaxPointDateAsTimestamp(ApplicableHeaderTradeSettlement ahts) {
-		List<TradeTaxType> tradeTaxList = ahts.getApplicableTradeTax();
-		if(tradeTaxList.isEmpty()) return null;
-		
-		List<Timestamp> results = new ArrayList<Timestamp>(tradeTaxList.size());
-		tradeTaxList.forEach(tradeTax -> {
-			DateType date = tradeTax.getTaxPointDate();
-			if(date==null) {
-				LOG.warning("getTaxPointDateAsTimestamp(doc) TaxPointDate is null");
-			} else if(DateTimeFormats.CCYYMMDD_QUALIFIER.equals(date.getDateString().getFormat())) {
-				results.add(DateTimeFormats.ymdToTs(date.getDateString().getValue()));
-			} else {
-				LOG.warning("not CCYYMMDD-Format:"+date.getDateString().getFormat() + " value:"+date.getDateString().getValue());
-			}		
-		});
-		if(results.isEmpty()) return null;
-		if(results.size()>1) {
-			LOG.warning("results.size()>1:"+results.size());
-		}
-		return results.get(0);
+		return ApplicableHeaderTradeSettlement.getTaxPointDateAsTimestamp(applicableHeaderTradeSettlement);
 	}
 	
 	// BT-8 + 0..1 Value added tax point date code

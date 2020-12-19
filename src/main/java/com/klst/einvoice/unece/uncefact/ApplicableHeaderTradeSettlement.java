@@ -144,20 +144,39 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 
 	private static final Logger LOG = Logger.getLogger(ApplicableHeaderTradeSettlement.class.getName());
 	
-//	TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = null; // 1st elem in SpecifiedTradeSettlementPaymentMeans List
-
 	SpecifiedPeriodType billingSpecifiedPeriod = null; // BG-14 ++ 0..1 INVOICING PERIOD
-//	List<AllowancesAndCharges> allowancesAndCharges = null; // BG-20 + BG-21
-	
+
 	static ApplicableHeaderTradeSettlement getApplicableHeaderTradeSettlement(SupplyChainTradeTransactionType supplyChainTradeTransaction) {
 		if(supplyChainTradeTransaction==null) return null;
 		return new ApplicableHeaderTradeSettlement(supplyChainTradeTransaction.getApplicableHeaderTradeSettlement());
 	}
-	
+	static Timestamp getTaxPointDateAsTimestamp(HeaderTradeSettlementType ahts) {
+		List<TradeTaxType> tradeTaxList = ahts.getApplicableTradeTax();
+		if(tradeTaxList.isEmpty()) return null;
+		
+		List<Timestamp> results = new ArrayList<Timestamp>(tradeTaxList.size());
+		tradeTaxList.forEach(tradeTax -> {
+			DateType date = tradeTax.getTaxPointDate();
+			if(date==null) {
+				LOG.warning("getTaxPointDateAsTimestamp(doc) TaxPointDate is null");
+			} else if(DateTimeFormats.CCYYMMDD_QUALIFIER.equals(date.getDateString().getFormat())) {
+				results.add(DateTimeFormats.ymdToTs(date.getDateString().getValue()));
+			} else {
+				LOG.warning("not CCYYMMDD-Format:"+date.getDateString().getFormat() + " value:"+date.getDateString().getValue());
+			}		
+		});
+		if(results.isEmpty()) return null;
+		if(results.size()>1) {
+			LOG.warning("results.size()>1:"+results.size());
+		}
+		return results.get(0);
+	}
+
 	// BG-16 + 0..1 PAYMENT INSTRUCTIONS @see PaymentInstructions and PaymentInstructionsFactory
 	void setPaymentInstructions(PaymentInstructions paymentInstructions) {
 		
 	}
+	
 	// copy ctor
 	ApplicableHeaderTradeSettlement(HeaderTradeSettlementType ahts) {
 		super();
@@ -175,8 +194,8 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		if(getRemittanceInformation(ahts)!=null) { // getRemittanceInformation
 			this.setRemittanceInformation(getRemittanceInformation(ahts));
 		}
+		
 		// 1 .. 1 SpecifiedTradeSettlementHeaderMonetarySummation Gesamtsummen auf Dokumentenebene BG-22 : nicht null
-//		tradeSettlementHeaderMonetarySummation = ahts.getSpecifiedTradeSettlementHeaderMonetarySummation();
 		setSpecifiedTradeSettlementHeaderMonetarySummation(ahts.getSpecifiedTradeSettlementHeaderMonetarySummation());
 		
 		if(ahts.getSpecifiedTradeAllowanceCharge().isEmpty()) {
@@ -204,7 +223,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 //			});
 
 			Identifier directDebitMandate = getDirectDebitMandateID(ahts);
-			LOG.info(">>>>>>>>>>>ahts.directDebitMandate="+directDebitMandate);
+			LOG.info("ahts.directDebitMandate="+directDebitMandate);
 			FinancialAccount directDebit = getFinancialAccount(ahts);
 			directDebit.setMandateReferencetID(directDebitMandate);
 			init(code, getPaymentMeansText(), getRemittanceInformation(), creditTransfer, paymentCard, directDebit);
@@ -228,7 +247,6 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 				+ (paymentCard==null? "keine paymentCard" : " paymentCard.CardAccountID="+paymentCard.getCardAccountID())
 				+ (directDebit==null? "" : " MandateReferencetID="+directDebit.getMandateReferencetID()) );
 		if(code==null) return;
-//		getTradeSettlementPaymentMeans(); // create if neccessary
 		
 		setPaymentMeans(code, paymentMeansText); // BT-81, BT-82
 		setRemittanceInformation(remittanceInformation); // BT-83
@@ -268,9 +286,16 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 	// BT-7 + 0..1 Value added tax point date
 	void setTaxPointDate(Timestamp ts) {
 		if(ts==null) return;  // optional
-		TradeTaxType tradeTax = new TradeTaxType();
-		tradeTax.setTaxPointDate(newDateType(ts));
-		super.getApplicableTradeTax().add(tradeTax);
+		List<TradeTaxType> listBG23 = super.getApplicableTradeTax();
+		// 0..n ApplicableTradeTax Umsatzsteueraufschlüsselung BG-23
+		if(listBG23==null) {
+			LOG.warning("das darf nicht sein ------- exception");
+			// oder doch?
+			return;
+		}
+		listBG23.forEach(tradeTax -> {
+			tradeTax.setTaxPointDate(newDateType(ts));
+		});
 	}
 	
 	DateType newDateType(Timestamp ts) {
@@ -317,7 +342,6 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 			getSpecifiedTradeSettlementPaymentMeans().add(tradeSettlementPaymentMeans);
 		}
 		getSpecifiedTradeSettlementPaymentMeans().get(0).setTypeCode(pmc);
-//		getTradeSettlementPaymentMeans().setTypeCode(pmc);
 		
 		if(text!=null) { // BT-82 
 			getSpecifiedTradeSettlementPaymentMeans().get(0).getInformation().add(new Text(text));
@@ -369,34 +393,14 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		getSpecifiedTradeSettlementPaymentMeans().get(0).setPayeeSpecifiedCreditorFinancialInstitution(financialAccount.payeeSpecifiedCreditorFinancialInstitution);
 	}
 
-	FinancialAccount financialAccount = null;
-//	@Deprecated
-//	FinancialAccount getFinancialAccount() {
-//		if(financialAccount==null) {
-//			if(super.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
-//				LOG.warning("super.getSpecifiedTradeSettlementPaymentMeans().isEmpty()");
-//				return null;
-//			}
-//			financialAccount = new FinancialAccount(getSpecifiedTradeSettlementPaymentMeans().get(0));
-//		}
-//		return financialAccount;
-//	}
-	
 	// BG-17 Kardinalität ist 0..n, aber in CII kann es nur 0..1 sein
 	@Override
 	public List<CreditTransfer> getCreditTransfer() {
 		return getCreditTransfer(this);
-//		List<CreditTransfer> ret = new ArrayList<CreditTransfer>();
-//		CreditTransfer ct = getFinancialAccount(); //new FinancialAccount(tradeSettlementPaymentMeans);
-//		if(ct.getPaymentAccountID()==null) {
-//			return ret; // empty List
-//		}
-//		ret.add(ct);
-//		return ret;
 	}
 	static List<CreditTransfer> getCreditTransfer(HeaderTradeSettlementType haderTradeSettlement) {
 		List<CreditTransfer> ret = new ArrayList<CreditTransfer>();
-//		--------CreditTransfer ct = getFinancialAccount(); //new FinancialAccount(tradeSettlementPaymentMeans);
+
 		if(haderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
 			LOG.warning("super.getSpecifiedTradeSettlementPaymentMeans().isEmpty()");
 			return ret;	// leere Liste zurück
@@ -490,6 +494,8 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 	}
 
 // ---------------- implements CreditTransferFactory:
+	private FinancialAccount financialAccount = null;
+
 	@Override
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
 		if(financialAccount==null) {
@@ -529,9 +535,8 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		return financialAccount;
 	}
 
+	// TradeAllowanceCharge extends TradeAllowanceChargeType implements AllowancesAndCharges
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
-// CII:		AllowanceCharge muss ableiten von TradeAllowanceChargeType
-// TradeAllowanceCharge von TradeAllowanceChargeType ableiten 
 		super.getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge); // ram:SpecifiedTradeAllowanceCharge
 	}
 	public List<AllowancesAndCharges> getAllowancesAndCharges() {
