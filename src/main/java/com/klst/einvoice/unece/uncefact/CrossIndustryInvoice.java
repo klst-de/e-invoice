@@ -1414,18 +1414,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		return headerTradeAgreement;
 	}	
 
-	// ----------------- gemeinsam mit TradeParty
-	@Deprecated
-	static IDType newIDType(IBANId iban) {
-		return new Identifier(iban.getValue(), iban.getSchemeID());
-	}
-	
-	@Deprecated
-	static IDType newIDType(BICId bic) {
-		return new Identifier(bic.getValue(), bic.getSchemeID());
-	}
-	
-	// ----------------- 
+	// ----------------- gemeinsam mit TradeParty : delegate
 	@Override
 	public BusinessParty createParty(String name, PostalAddress address, IContact contact) {
 		return new TradeParty(name, address, contact); 
