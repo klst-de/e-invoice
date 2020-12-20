@@ -138,7 +138,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(
 				doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
 		LOG.info("\n PayeeParty:");
-		setPayee(applicableHeaderTradeSettlement.getPayeeTradeParty());
+		TradePartyType tradeParty = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getPayeeTradeParty();
+		if(tradeParty!=null) setPayee(new TradeParty(tradeParty));
 		
 		IDType creditorReferenceID = //doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getCreditorReferenceID();
 				applicableHeaderTradeSettlement.getCreditorReferenceID();
