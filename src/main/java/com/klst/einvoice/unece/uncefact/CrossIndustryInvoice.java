@@ -167,14 +167,14 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 				, getDueDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement())); // optional
 		
 		List<TradeTaxType> attList = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getApplicableTradeTax();
-//		List<TradeTaxType> XttList = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		List<ApplicableTradeTax> vatBreakdownList = new ArrayList<ApplicableTradeTax>(attList.size()); // VatBreakdown extends TradeTaxType
-		attList.forEach(applicableTradeTax -> {
-			ApplicableTradeTax vatBreakdown = new ApplicableTradeTax(applicableTradeTax);
-			LOG.info("vatBreakdown "+vatBreakdown);
-			vatBreakdownList.add(vatBreakdown);
+		List<ApplicableTradeTax> applicableTradeTaxes = new ArrayList<ApplicableTradeTax>(attList.size()); 
+		// ApplicableTradeTax extends TradeTaxType
+		attList.forEach(att -> {
+			ApplicableTradeTax applicableTradeTax = new ApplicableTradeTax(att);
+			LOG.info("applicableTradeTax "+applicableTradeTax);
+			applicableTradeTaxes.add(applicableTradeTax);
 		});
-		addVATBreakDown(vatBreakdownList);
+		addVATBreakDown(applicableTradeTaxes);
 
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));

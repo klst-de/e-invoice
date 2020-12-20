@@ -158,8 +158,9 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		TradeTaxType tradeTax = getCategoryTradeTax(this);
 		if(tradeTax==null) {
 			LOG.info("tradeTax==null, expected one element. Create it.");
-			tradeTax = new TradeTaxType();
+			tradeTax = new CategoryTradeTax(code, category, percentage); //TradeTaxType();
 			super.getCategoryTradeTax().add(tradeTax);
+			return;
 		}
 		TaxTypeCodeType taxTypeCode = new TaxTypeCodeType();
 		taxTypeCode.setValue(code);

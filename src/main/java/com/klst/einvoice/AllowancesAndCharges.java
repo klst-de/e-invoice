@@ -109,7 +109,7 @@ CII: ApplicableHeaderTradeSettlement ...
   0 .. 1 RateApplicablePercent Umsatzsteuersatz 
           für den Zu- oder Abschlag auf Dokumentenebene                                BT-96  , BT-103
  */
-public interface AllowancesAndCharges {
+public interface AllowancesAndCharges extends ITaxCategory {
 	
 	public static final boolean ALLOWANCE = false;
 	public static final boolean CHARGE = true;
@@ -164,6 +164,12 @@ public interface AllowancesAndCharges {
 	public void setPercentage(BigDecimal percentage);
 	public BigDecimal getPercentage();
 
+	// BT-95-0, BT-102-0 (CII)
+	@Override
+	public void setVATCode(String code);
+	@Override
+	public String getVATCode();
+	
 	/**
 	 * BT-95, BT-102 (mandatory) Document level allowance/charge VAT category code
 	 * <p>
@@ -187,11 +193,10 @@ public interface AllowancesAndCharges {
 	 *  Jeder Abschlag auf Dokumentenebene (BG-20) muss einen Code für die für diesen Abschlag 
 	 *  geltende Umsatzsteuer auf Dokumentenebene (BT-95) haben
 	 */
+	@Override
 	public void setVATCategory(String code);
+	@Override
 	public String getVATCategory();
-	// BT-95-0, BT-102-0
-	public void setVATCode(String code);
-	public String getVATCode();
 	
 	/**
 	 * BT-96, BT-103 0..1 Document level allowance/charge VAT rate
@@ -202,7 +207,9 @@ public interface AllowancesAndCharges {
 	 * 
 	 * @param percentage
 	 */
+	@Override
 	public void setVATPercentage(BigDecimal percentage);
+	@Override
 	public BigDecimal getVATPercentage();
 
 	/**

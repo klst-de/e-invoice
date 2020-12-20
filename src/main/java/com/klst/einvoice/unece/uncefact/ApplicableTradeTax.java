@@ -26,9 +26,29 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 
 0..n ApplicableTradeTax  BG-23 VAT BREAKDOWN 
      Umsatzsteueraufschlüsselung
+1 .. 1 CalculatedAmount           Kategoriespezifischer Steuerbetrag                             BT-117
+1 .. 1 TypeCode                   Code der Umsatzsteuerkategorie                                 BT-118-0
+0 .. 1 ExemptionReason            Grund der Steuerbefreiung (Freitext)                           BT-120
+1 .. 1 BasisAmount                Steuerbasisbetrag                                              BT-116
+0 .. 1 LineTotalBasisAmount       Warenbetrag des Steuersatzes
+0 .. 1 AllowanceChargeBasisAmount Gesamtbetrag Zu- und Abschläge des Steuersatzes auf Dokumentenebene
+1 .. 1 CategoryCode               Codierte Bezeichnung einer Umsatzsteuerkategorie               BT-118
+0 .. 1 ExemptionReasonCode        Code für den Umsatzsteuerbefreiungsgrund                       BT-121
+0 .. 1 TaxPointDate               Datum der Steuerfälligkeit xs:choice
+1 .. 1 DateString                 Datum der Steuerfälligkeit, Wert                               BT-7 
+required format                   Datum, Format                                                  BT-7-0
+0 .. 1 DueDateTypeCode            Code für das Datum der Steuerfälligkeit                        BT-8
+0 .. 1 RateApplicablePercent      Kategoriespezifischer Umsatzsteuersatz                         BT-119
+
      
 1..n ApplicableTradeTax  BG-30 LINE VAT INFORMATION
      Umsatzsteuerinformationen auf der Ebene der Rechnungsposition 
+0 .. 1 CalculatedAmount      Steuerbetrag
+1 .. 1 TypeCode              Steuerart (Code)                                                    BT-151-0
+0 .. 1 ExemptionReason       Grund der Steuerbefreiung (Freitext)
+1 .. 1 CategoryCode          Code der Umsatzsteuerkategorie des in Rechnung gestellten Artikels  BT-151
+0 .. 1 ExemptionReasonCode   Code für den Umsatzsteuerbefreiungsgrund
+0 .. 1 RateApplicablePercent Umsatzsteuersatz für den in Rechnung gestellten Artikel             BT-152
 
  */
 public class ApplicableTradeTax extends TradeTaxType implements BG23_VatBreakdown {
@@ -152,20 +172,33 @@ public class ApplicableTradeTax extends TradeTaxType implements BG23_VatBreakdow
 	}
 
 /*
+01.04a-INVOICE_uncefact.xml :
+...
+            <ram:SpecifiedLineTradeSettlement>
+                <ram:ApplicableTradeTax>                                              <!-- BG-30 LINE VAT INFORMATION -->
+                    <ram:TypeCode>VAT</ram:TypeCode>
+                    <ram:CategoryCode>O</ram:CategoryCode>
+                </ram:ApplicableTradeTax>
+                <ram:SpecifiedTradeSettlementLineMonetarySummation>
+                    <ram:LineTotalAmount>120</ram:LineTotalAmount>
+                </ram:SpecifiedTradeSettlementLineMonetarySummation>
+            </ram:SpecifiedLineTradeSettlement>
+        </ram:IncludedSupplyChainTradeLineItem>
 
-            <ram:ApplicableTradeTax>
+        <ram:ApplicableHeaderTradeSettlement>
+... 
+            <ram:ApplicableTradeTax>                                                  <!-- BG-23 VAT BREAKDOWN -->
                 <ram:CalculatedAmount>0</ram:CalculatedAmount>
                 <ram:TypeCode>VAT</ram:TypeCode>
-                <ram:ExemptionReason>als gemeinnützig anerkannt</ram:ExemptionReason>
+                <ram:ExemptionReason>als gemeinnützig anerkannt</ram:ExemptionReason> <!-- BT-120 -->
                 <ram:BasisAmount>120</ram:BasisAmount>
                 <ram:CategoryCode>O</ram:CategoryCode>
                 <ram:RateApplicablePercent>0</ram:RateApplicablePercent>
             </ram:ApplicableTradeTax>
 
-
  */
 	/**
-	 * VAT exemption reason text and code
+	 * VAT exemption reason text (BT-120) and code (BT-121)
 	 *
 	 * @see com.klst.einvoice.BG23_VatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
 	 */
