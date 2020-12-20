@@ -150,6 +150,11 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		if(supplyChainTradeTransaction==null) return null;
 		return new ApplicableHeaderTradeSettlement(supplyChainTradeTransaction.getApplicableHeaderTradeSettlement());
 	}
+	
+	static Timestamp taxPointDateAsTimestamp(DateType date) {
+		return DateTimeFormats.ymdToTs(date.getDateString().getValue());
+	}
+	
 	static Timestamp getTaxPointDateAsTimestamp(HeaderTradeSettlementType ahts) {
 		List<TradeTaxType> tradeTaxList = ahts.getApplicableTradeTax();
 		if(tradeTaxList.isEmpty()) return null;
@@ -160,7 +165,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 			if(date==null) {
 				LOG.warning("getTaxPointDateAsTimestamp(doc) TaxPointDate is null");
 			} else if(DateTimeFormats.CCYYMMDD_QUALIFIER.equals(date.getDateString().getFormat())) {
-				results.add(DateTimeFormats.ymdToTs(date.getDateString().getValue()));
+				results.add(taxPointDateAsTimestamp(date));
 			} else {
 				LOG.warning("not CCYYMMDD-Format:"+date.getDateString().getFormat() + " value:"+date.getDateString().getValue());
 			}		
@@ -181,6 +186,9 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 	ApplicableHeaderTradeSettlement(HeaderTradeSettlementType ahts) {
 		super();
 		this.setDocumentCurrency(ahts.getInvoiceCurrencyCode().getValue());
+		if(ahts.getTaxCurrencyCode()!=null) {
+			this.setTaxCurrency(ahts.getTaxCurrencyCode().getValue());
+		}
 		if(ahts.getCreditorReferenceID()!=null) {
 			this.setCreditorReferenceID(new Identifier(ahts.getCreditorReferenceID()));
 		}

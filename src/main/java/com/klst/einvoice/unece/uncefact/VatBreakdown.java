@@ -182,6 +182,10 @@ public class VatBreakdown extends TradeTaxType implements BG23_VatBreakdown {
 		stringBuilder.append(getTaxCategoryCode()==null ? "null" : getTaxCategoryCode());
 		stringBuilder.append(", TaxCategoryRate:");
 		stringBuilder.append(getTaxCategoryRate()==null ? "null" : getTaxCategoryRate());
+		if(this.getTaxPointDate()!=null) {
+			stringBuilder.append(", TaxPointDate:");
+			stringBuilder.append(ApplicableHeaderTradeSettlement.taxPointDateAsTimestamp(getTaxPointDate()));			
+		}
 		stringBuilder.append("]");
 		return stringBuilder.toString();
 	}
