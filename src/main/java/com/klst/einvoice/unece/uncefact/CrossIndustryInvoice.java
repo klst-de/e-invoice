@@ -168,9 +168,9 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		
 		List<TradeTaxType> attList = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getApplicableTradeTax();
 //		List<TradeTaxType> XttList = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		List<VatBreakdown> vatBreakdownList = new ArrayList<VatBreakdown>(attList.size()); // VatBreakdown extends TradeTaxType
+		List<ApplicableTradeTax> vatBreakdownList = new ArrayList<ApplicableTradeTax>(attList.size()); // VatBreakdown extends TradeTaxType
 		attList.forEach(applicableTradeTax -> {
-			VatBreakdown vatBreakdown = new VatBreakdown(applicableTradeTax);
+			ApplicableTradeTax vatBreakdown = new ApplicableTradeTax(applicableTradeTax);
 			LOG.info("vatBreakdown "+vatBreakdown);
 			vatBreakdownList.add(vatBreakdown);
 		});
@@ -1223,7 +1223,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 */
 	@Override
 	public BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode codeEnum, BigDecimal taxRate) {
-		return new VatBreakdown(taxableAmount, tax, codeEnum, taxRate);
+		return new ApplicableTradeTax(taxableAmount, tax, codeEnum, taxRate);
 	}
 	
 	/**
@@ -1234,24 +1234,24 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	@Override
 	public void addVATBreakDown(BG23_VatBreakdown vatBreakdown) {
 		List<TradeTaxType> tradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		tradeTaxes.add((VatBreakdown)vatBreakdown);
+		tradeTaxes.add((ApplicableTradeTax)vatBreakdown);
 	}
-	private void addVATBreakDown(List<VatBreakdown> vatBreakdowns) {
+	private void addVATBreakDown(List<ApplicableTradeTax> vatBreakdowns) {
 		List<TradeTaxType> applicableTradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
 		vatBreakdowns.forEach(applicableTradeTax -> {
 			applicableTradeTaxes.add(applicableTradeTax);
 		});	
 	}
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
-		VatBreakdown vatBreakdown = new VatBreakdown(taxableAmount, tax, taxCategoryCode, taxRate);
+		ApplicableTradeTax vatBreakdown = new ApplicableTradeTax(taxableAmount, tax, taxCategoryCode, taxRate);
 		addVATBreakDown(vatBreakdown);
 	}
-	public List<VatBreakdown> getVATBreakDowns() {
+	public List<ApplicableTradeTax> getVATBreakDowns() {
 		if(applicableHeaderTradeSettlement==null) return null;
 		List<TradeTaxType> list = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		List<VatBreakdown> result = new ArrayList<VatBreakdown>(list.size()); // VatBreakdown extends TradeTaxType
+		List<ApplicableTradeTax> result = new ArrayList<ApplicableTradeTax>(list.size()); // VatBreakdown extends TradeTaxType
 		list.forEach(vbd -> {
-			result.add(new VatBreakdown(vbd));
+			result.add(new ApplicableTradeTax(vbd));
 		});
 		return result;
 	}

@@ -12,14 +12,33 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 
-public class VatBreakdown extends TradeTaxType implements BG23_VatBreakdown {
+/*
+ * BG-23 VAT BREAKDOWN 
+ * <p>
+ * A group of business terms providing information about VAT breakdown by different 
+ * categories, rates and exemption reasons
+ * 
+ * <p>
+ * BG-30 LINE VAT INFORMATION
+ * <p>
+ * A group of business terms providing information about the VAT applicable 
+ * for the goods and services invoiced on the Invoice line.
 
-	VatBreakdown() {
+0..n ApplicableTradeTax  BG-23 VAT BREAKDOWN 
+     Umsatzsteueraufschlüsselung
+     
+1..n ApplicableTradeTax  BG-30 LINE VAT INFORMATION
+     Umsatzsteuerinformationen auf der Ebene der Rechnungsposition 
+
+ */
+public class ApplicableTradeTax extends TradeTaxType implements BG23_VatBreakdown {
+
+	ApplicableTradeTax() {
 		super();
 	}
 
 	// copy ctor
-	VatBreakdown(TradeTaxType tradeTax) {
+	ApplicableTradeTax(TradeTaxType tradeTax) {
 		this();
 		init( new Amount(tradeTax.getBasisAmount().get(0).getValue())
 			, new Amount(tradeTax.getCalculatedAmount().get(0).getValue())
@@ -30,7 +49,7 @@ public class VatBreakdown extends TradeTaxType implements BG23_VatBreakdown {
 				, tradeTax.getExemptionReasonCode()==null ? null : tradeTax.getExemptionReasonCode().getValue());
 	}
 
-	VatBreakdown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
+	ApplicableTradeTax(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
 		this();
 		init(taxableAmount, taxAmount, codeEnum, percent);
 	}

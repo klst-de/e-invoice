@@ -27,7 +27,7 @@ import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.einvoice.unece.uncefact.ReferencedDocument;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
-import com.klst.einvoice.unece.uncefact.VatBreakdown;
+import com.klst.einvoice.unece.uncefact.ApplicableTradeTax;
 import com.klst.marshaller.CiiTransformer;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
@@ -262,7 +262,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setStartDate(testDoc.getStartDateAsTimestamp());
 		cii.setEndDate(testDoc.getEndDateAsTimestamp());
 
-        List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
+        List<ApplicableTradeTax> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
         	BG23_VatBreakdown vatBreakdown = cii.createVATBreakDown( new Amount(tradeTax.getBasisAmount().get(0).getValue())
