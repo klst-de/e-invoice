@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.untdid.codelist.TaxCategoryCode;
+import com.klst.untdid.codelist.TaxTypeCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
@@ -146,7 +147,7 @@ public class ApplicableTradeTax extends TradeTaxType implements BG23_VatBreakdow
 	 */
 	@Override
 	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal taxRate) {
-		setTaxCategoryAndRate(codeEnum, BG23_VatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate));
+		setTaxCategoryAndRate(codeEnum, TaxTypeCode.VAT, taxRate==null ? null : new Percent(taxRate));
 	}
 
 	@Override

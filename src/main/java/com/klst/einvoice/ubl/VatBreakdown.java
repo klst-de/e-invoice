@@ -6,6 +6,7 @@ import java.util.List;
 import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.TaxCategoryCode;
+import com.klst.untdid.codelist.TaxTypeCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
@@ -58,7 +59,7 @@ public class VatBreakdown extends TaxSubtotalType implements BG23_VatBreakdown {
 		setTaxBaseAmount(taxableAmount);
 		setCalculatedTaxAmount(taxAmount);
 //		setTaxCategoryCodeAndRate(codeEnum, taxRate);
-		setTaxCategoryAndRate(codeEnum, BG23_VatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate)
+		setTaxCategoryAndRate(codeEnum, TaxTypeCode.VAT, taxRate==null ? null : new Percent(taxRate)
 				, exemptionText, exemptionCode);
 	}
 
@@ -123,7 +124,7 @@ public class VatBreakdown extends TaxSubtotalType implements BG23_VatBreakdown {
 	 */
 // TODO raus	@Override
 	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal taxRate) {
-		setTaxCategoryAndRate(codeEnum, BG23_VatBreakdown.VAT, taxRate==null ? null : new Percent(taxRate), null, null);
+		setTaxCategoryAndRate(codeEnum, TaxTypeCode.VAT, taxRate==null ? null : new Percent(taxRate), null, null);
 	}
 
 // TODO raus	@Override

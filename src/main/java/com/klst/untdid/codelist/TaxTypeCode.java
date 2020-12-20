@@ -47,6 +47,8 @@ public enum TaxTypeCode {
 	PetroleumTax 		("AAA"),
 	ValueAddedTax 	    ("VAT"); // the default
 	
+	public static final String VAT = TaxTypeCode.ValueAddedTax.getValue();
+	
 	/**
 	 * @see <A HREF="https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred5153.htm">UN/EDIFACT 5153</A>
 	 */

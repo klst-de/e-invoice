@@ -202,7 +202,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.
-	public static final String DEFAULT_TAX_SCHEME = BG23_VatBreakdown.VAT;
+	public static final String DEFAULT_TAX_SCHEME = "VAT";
 	
 	/**
 	 * Buyer/Seller VAT identifier - The VAT identifier (also known as VAT identification number).

@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.untdid.codelist.TaxCategoryCode;
+import com.klst.untdid.codelist.TaxTypeCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
@@ -54,7 +55,7 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 	}
 
 	static TaxSchemeType getVatScheme() {
-		return getVatScheme(BG23_VatBreakdown.VAT);
+		return getVatScheme(TaxTypeCode.VAT);
 	}
 
 	public VatCategory() {
@@ -196,6 +197,6 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 //		LOG.warning("getTaxRateAsString:"+getTaxRateAsString());
 //		LOG.warning("joined:"+joined);
 		String id = getID()==null ? "'noID'" : getID().getValue();
-		return id + " " + getTaxRateAsString()+" - " + BG23_VatBreakdown.VAT + joined;
+		return id + " " + getTaxRateAsString()+" - " + TaxTypeCode.VAT + joined;
 	}
 }
