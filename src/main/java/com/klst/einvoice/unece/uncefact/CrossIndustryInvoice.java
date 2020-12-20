@@ -168,8 +168,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		List<TradeTaxType> attList = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getApplicableTradeTax();
 //		List<TradeTaxType> XttList = applicableHeaderTradeSettlement.getApplicableTradeTax();
 		List<VatBreakdown> vatBreakdownList = new ArrayList<VatBreakdown>(attList.size()); // VatBreakdown extends TradeTaxType
-		attList.forEach(vbd -> {
-			VatBreakdown vatBreakdown = new VatBreakdown(vbd);
+		attList.forEach(applicableTradeTax -> {
+			VatBreakdown vatBreakdown = new VatBreakdown(applicableTradeTax);
 			LOG.info("vatBreakdown "+vatBreakdown);
 			vatBreakdownList.add(vatBreakdown);
 		});
@@ -219,7 +219,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		TradeSettlementHeaderMonetarySummationType stshms 
 			= doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getSpecifiedTradeSettlementHeaderMonetarySummation();
 				//applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation(); // BG-22 1..1
-		LOG.info("-------------------- stshms:"+stshms);;
+		LOG.info("-------------------- stshms:"+stshms);
 		setDocumentTotals(new Amount(stshms.getLineTotalAmount().get(0).getValue())     // getInvoiceLineNetTotal(doc)
 						, new Amount(stshms.getTaxBasisTotalAmount().get(0).getValue()) // getInvoiceTotalTaxExclusive(doc)
 						, new Amount(stshms.getGrandTotalAmount().get(0).getValue())    // getInvoiceTotalTaxInclusive(doc)
@@ -258,10 +258,13 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 			// sollte nicht vorkommen
 		} else {  
 			for(int i=0; i<list.size(); i++) {
-				LOG.info("i="+i + " taxCurrency:"+taxCurrency + " documentCurrency:"+documentCurrency);
-				if(taxCurrency==null || documentCurrency.equals(taxCurrency)) {
-					Amount invoiceTaxAmount = list.get(i).getCurrencyID()==null ? new Amount(list.get(i).getValue()) : new Amount(list.get(i).getCurrencyID(), list.get(i).getValue());
-					LOG.info("nur Info: invoiceTaxAmount "+invoiceTaxAmount);
+//				LOG.info("i="+i + " taxCurrency:"+this.getTaxCurrency() + " documentCurrency:"+this.getDocumentCurrency());
+				if(getTaxCurrency()==null || getDocumentCurrency().equals(getTaxCurrency())) {
+					Amount invoiceTaxAmount = 
+						list.get(i).getCurrencyID()==null ? new Amount(list.get(i).getValue()) 
+							                              : new Amount(list.get(i).getCurrencyID(), list.get(i).getValue());
+					LOG.info("i="+i + " nur Info: invoiceTaxAmount "+invoiceTaxAmount 
+						+ " taxCurrency:"+this.getTaxCurrency() + " documentCurrency:"+this.getDocumentCurrency());
 				}
 			}
 		}
@@ -1162,12 +1165,12 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	private Amount getInvoiceTax(boolean sameCurrency) {
 		List<AmountType> list = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxTotalAmount();
 		if(list.isEmpty()) return null;
+		LOG.info("TaxCurrency="+getTaxCurrency() + " DocumentCurrency="+getDocumentCurrency());
 		for(int i=0; i<list.size(); i++) {
 			if(sameCurrency && (this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
-//				return new Amount(list.get(i).getValue());
 				return list.get(i).getCurrencyID()==null ? new Amount(list.get(i).getValue()) : new Amount(list.get(i).getCurrencyID(), list.get(i).getValue());
 			} else if(!sameCurrency && !(this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
-				return new Amount(list.get(i).getCurrencyID(), list.get(i).getValue());
+				return new Amount(getTaxCurrency(), list.get(i).getValue());
 			}
 		}
 		return null;
@@ -1232,10 +1235,10 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		List<TradeTaxType> tradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
 		tradeTaxes.add((VatBreakdown)vatBreakdown);
 	}
-	public void addVATBreakDown(List<VatBreakdown> vatBreakdowns) {
-		List<TradeTaxType> tradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		vatBreakdowns.forEach(vbd -> {
-			tradeTaxes.add(vbd);
+	private void addVATBreakDown(List<VatBreakdown> vatBreakdowns) {
+		List<TradeTaxType> applicableTradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
+		vatBreakdowns.forEach(applicableTradeTax -> {
+			applicableTradeTaxes.add(applicableTradeTax);
 		});	
 	}
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {

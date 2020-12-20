@@ -8,13 +8,13 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
-import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.PaymentCard;
@@ -249,6 +249,9 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 
 		cii.setDocumentCurrency(testDoc.getDocumentCurrency());
+		if(testDoc.getTaxCurrency()!=null) {
+			cii.setTaxCurrency(testDoc.getTaxCurrency());
+		}
 		cii.setTaxCurrency(testDoc.getTaxCurrency()); // BT-6 + 0..1 (optional)
 
 		LOG.info("testDoc.getPaymentTerm():"+testDoc.getPaymentTerm() + " testDoc.getDueDateAsTimestamp():"+testDoc.getDueDateAsTimestamp());
@@ -281,7 +284,17 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				testDoc.getInvoiceTotalTaxExclusive(),
 				testDoc.getInvoiceTotalTaxInclusive(),
 				testDoc.getDuePayable());
-        cii.setInvoiceTax(testDoc.getInvoiceTax());
+        Amount invoiceTaxAmount = testDoc.getInvoiceTax();
+    	LOG.info("--------------InvoiceTax amount "+invoiceTaxAmount);
+        Amount invoiceTaxIAAmount = testDoc.getInvoiceTaxInAccountingCurrency();
+    	LOG.info("--InvoiceTaxInAccountingCurrency amount "+invoiceTaxIAAmount);
+    	if(invoiceTaxAmount==null) {
+    		// wie im Bsp. 02.01a
+            cii.setInvoiceTax(new Amount(cii.getDocumentCurrency(), invoiceTaxIAAmount.getValue()));   	
+    		cii.setInvoiceTaxInAccountingCurrency(invoiceTaxIAAmount);
+    	} else {
+            cii.setInvoiceTax(invoiceTaxAmount);   	
+    	}
         cii.setPrepaid(prePaidAmount);
         Amount allowancesTotalAmount = testDoc.getAllowancesTotal();
     	LOG.info("---------AllowancesTotal amount "+allowancesTotalAmount);
