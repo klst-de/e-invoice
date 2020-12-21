@@ -197,7 +197,19 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				testDoc.getInvoiceTotalTaxExclusive(), 
 				testDoc.getInvoiceTotalTaxInclusive(), 
 				testDoc.getDuePayable());
-		ublInvoice.setInvoiceTax(testDoc.getInvoiceTax());
+		
+		Amount invoiceTaxAmount =  testDoc.getInvoiceTax();
+    	LOG.info("----------------------InvoiceTax amount "+invoiceTaxAmount);
+        Amount invoiceTaxIAAmount = testDoc.getInvoiceTaxInAccountingCurrency();
+    	LOG.info("--InvoiceTaxInAccountingCurrency amount "+invoiceTaxIAAmount);
+    	if(invoiceTaxAmount==null) {
+    		// wie im Bsp. 02.01a
+    		ublInvoice.setInvoiceTax(new Amount(testDoc.getDocumentCurrency(), invoiceTaxIAAmount.getValue()));   	
+            ublInvoice.setInvoiceTaxInAccountingCurrency(invoiceTaxIAAmount);
+    	} else {
+    		ublInvoice.setInvoiceTax(invoiceTaxAmount);
+    	}
+		
 		LOG.info("(optional) getPrepaid="+testDoc.getPrepaid());	
 		ublInvoice.setPrepaid(testDoc.getPrepaid());
 		LOG.info("finished DocumentTotalsGroup.");

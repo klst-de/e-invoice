@@ -971,24 +971,17 @@ UBL:
 		amount.copyTo(taxAmount);
 		taxTotalFirst = getTaxTotalFirst();
 		taxTotalFirst.setTaxAmount(taxAmount);
-//		if(isInvoiceType) {
-//			invoice.getTaxTotal().add(0, taxTotal);
-//		} else {
-//			creditNore.getTaxTotal().add(0, taxTotal);
-//		}
 	}
 
 	TaxTotalType getTaxTotal(boolean sameCurrency) {
 		List<TaxTotalType> list = isInvoiceType ? invoice.getTaxTotal() : creditNote.getTaxTotal();
 		if(list.isEmpty()) return null;
+		LOG.info("TaxCurrency="+getTaxCurrency() + " DocumentCurrency="+getDocumentCurrency());
 		for(int i=0; i<list.size(); i++) {
 			TaxTotalType taxTotal = list.get(i);
-//			TaxAmountType amount = taxTotal.getTaxAmount();
 			if(sameCurrency && (this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
-//				LOG.info("i:"+i+"/"+list.size() + " sameCurrency "+ this.getDocumentCurrency()+"=?="+this.getTaxCurrency() + " amount:"+amount);
 				return taxTotal;
 			} else if(!sameCurrency && !(this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
-//				LOG.info("i:"+i+"/"+list.size() + " !sameCurrency "+ this.getDocumentCurrency()+"=?="+this.getTaxCurrency());
 				return taxTotal;
 			}
 		}
@@ -998,7 +991,8 @@ UBL:
 		TaxTotalType taxTotal = getTaxTotal(sameCurrency);
 		if(taxTotal==null) return null;
 		TaxAmountType amount = taxTotal.getTaxAmount();
-		return new Amount(amount.getCurrencyID(), amount.getValue());
+		return sameCurrency? new Amount(amount.getCurrencyID(), amount.getValue())
+				: new Amount(this.getTaxCurrency(), amount.getValue());
 	}
 	
 	// BG-22.BT-110 ++ 0..1 Invoice total VAT amount
@@ -1018,7 +1012,23 @@ UBL:
 		if(this.getDocumentCurrency().equals(this.getTaxCurrency())) {
 			LOG.warning("Document currency is "+getDocumentCurrency() + " equals to Tax Currency!");
 		}
-		setInvoiceTax(amount);		
+		// als 2tes el hinzu:
+		List<TaxTotalType> list;
+		if(isInvoiceType) {
+			list = invoice.getTaxTotal();
+		} else {
+			list = creditNote.getTaxTotal();
+		}
+		LOG.info("***sollte 1 sein*** List<TaxTotalType> size="+list.size());
+		if(list.size()==1) {
+			TaxAmountType taxAmount = new TaxAmountType();
+			amount.copyTo(taxAmount);
+			TaxTotalType tt = new TaxTotalType();
+			tt.setTaxAmount(taxAmount);
+			list.add(tt);
+		} else {
+			LOG.warning("***nicht 1 !!!*** List<TaxTotalType> size="+list.size());			
+		}
 	}
 
 	@Override
