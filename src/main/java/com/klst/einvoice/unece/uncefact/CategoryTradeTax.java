@@ -69,6 +69,7 @@ public class CategoryTradeTax extends TradeTaxType implements ITaxCategory {
 	}
 	
 	// BT-95, BT-102 (mandatory) Document level allowance/charge VAT category code
+	// BG-23.BT-118
 	@Override
 	public void setTaxCategoryCode(String code) {
 		TaxCategoryCodeType taxCategoryCode = new TaxCategoryCodeType();
@@ -85,12 +86,13 @@ public class CategoryTradeTax extends TradeTaxType implements ITaxCategory {
 	}
 
 	// BT-96, BT-103 0..1 Document level allowance/charge VAT rate
+	// BG-23.BT-119
 	@Override
 	public void setTaxPercentage(BigDecimal rate) {
-		if(rate!=null) setTaxPercentage(new Percent(rate));;
+		setTaxPercentage(new Percent(rate));
 	}
 	public void setTaxPercentage(Percent rate) {
-		if(rate!=null) super.setRateApplicablePercent(rate);;
+		if(rate!=null) super.setRateApplicablePercent(rate);
 	}
 	
 	@Override

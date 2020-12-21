@@ -11,7 +11,6 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 
 /*
  * BG-23 VAT BREAKDOWN 
@@ -52,6 +51,8 @@ required format                   Datum, Format                                 
 0 .. 1 RateApplicablePercent Umsatzsteuersatz für den in Rechnung gestellten Artikel             BT-152
 
  */
+// TODO ApplicableTradeTax von CategoryTradeTax ableiten, denn beide sind UNterklassen von TradeTaxType:
+//             CategoryTradeTax extends TradeTaxType implements ITaxCategory
 public class ApplicableTradeTax extends TradeTaxType implements BG23_VatBreakdown {
 
 	ApplicableTradeTax() {
@@ -121,48 +122,61 @@ public class ApplicableTradeTax extends TradeTaxType implements BG23_VatBreakdow
 		return new Amount(super.getCalculatedAmount().get(0).getValue());
 	}
 
-	/* BT-118   CategoryCode
-	 * BT-118-0 TypeCode Code der Umsatzsteuerkategorie, Hinweis: Fester Wert = "VAT"
-	 * BT-119   RateApplicablePercent, EN16931 0..1 (optional), wg BR-DE-14 1.1
-	 */
-	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, String typeCode, Percent taxRate) {
-		TaxCategoryCodeType taxCategory = new TaxCategoryCodeType();
-		taxCategory.setValue(codeEnum.getValue());
-		super.setCategoryCode(taxCategory);
-		
-		TaxTypeCodeType taxTypeCode = new TaxTypeCodeType();
-		taxTypeCode.setValue(typeCode); // USt/VAT
-		super.setTypeCode(taxTypeCode);
-		
-		if(taxRate!=null) {
-			super.setRateApplicablePercent(taxRate);
-		}
-	}
-
-	@Override
-	public void setTaxCategoryCode(String code) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public TaxCategoryCode getTaxCategoryCode() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
+	// BG-23.BT-118-0
+	@Override // TODO raus, da wie CategoryTradeTax.setTaxType
 	public void setTaxType(String type) {
-		// TODO Auto-generated method stub
-		
+		TaxTypeCodeType taxTypeCode = new TaxTypeCodeType();
+		taxTypeCode.setValue(type);
+		super.setTypeCode(taxTypeCode);		
 	}
 
 	@Override
 	public String getTaxType() {
-		// TODO Auto-generated method stub
-		return null;
+		return super.getTypeCode().getValue();
 	}
 
+	// BG-23.BT-118
+	@Override
+	public void setTaxCategoryCode(String code) {
+		TaxCategoryCodeType taxCategoryCode = new TaxCategoryCodeType();
+		taxCategoryCode.setValue(code);
+		super.setCategoryCode(taxCategoryCode);
+	}
+
+	@Override
+	public void setTaxCategoryCode(TaxCategoryCode code) {
+		setTaxCategoryCode(code.getValue());
+	}
+
+	@Override
+	public TaxCategoryCode getTaxCategoryCode() {
+		return TaxCategoryCode.valueOf(super.getCategoryCode());
+	}
+
+	// BG-23.BT-119
+	@Override
+	public void setTaxPercentage(BigDecimal rate) {
+		setTaxPercentage(new Percent(rate));
+	}
+	public void setTaxPercentage(Percent rate) {
+		if(rate!=null) super.setRateApplicablePercent(rate);
+	}
+
+	@Override
+	public BigDecimal getTaxPercentage() {
+		return super.getRateApplicablePercent()==null? null : getRateApplicablePercent().getValue();
+	}
+
+	/* 
+	 * BT-118-0 TypeCode Code der Umsatzsteuerkategorie, Hinweis: Fester Wert = "VAT"
+	 * BT-118   CategoryCode
+	 * BT-119   RateApplicablePercent, EN16931 0..1 (optional), wg BR-DE-14 1.1
+	 */
+	void setTaxCategoryAndRate(String type, TaxCategoryCode code, BigDecimal rate) {
+		setTaxCategoryCode(code.getValue());
+		setTaxType(type);	
+		setTaxPercentage(rate);
+	}
 
 	/* BT-118 1..1 CategoryCode
 	 * BT-119 0..1 RateApplicablePercent, wg BR-DE-14 1.1
@@ -172,29 +186,7 @@ public class ApplicableTradeTax extends TradeTaxType implements BG23_VatBreakdow
 	 */
 	@Override
 	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal taxRate) {
-		setTaxCategoryAndRate(codeEnum, TaxTypeCode.VAT, taxRate==null ? null : new Percent(taxRate));
-	}
-
-	@Override
-	public void setTaxCategoryCode(TaxCategoryCode code) {
-		setTaxCategoryCodeAndRate(code, null);	
-	}
-
-//	@Override
-//	public TaxCategoryCode getTaxCategoryCode() {
-//		return TaxCategoryCode.valueOf(super.getCategoryCode());
-//	}
-
-	@Override
-	public void setTaxPercentage(BigDecimal taxableAmount) {
-		// TODO Auto-generated method stub
-		// use ctor
-	}
-
-	@Override
-	public BigDecimal getTaxPercentage() {
-		PercentType percent = super.getRateApplicablePercent();
-		return percent==null ? null : percent.getValue();
+		setTaxCategoryAndRate(TaxTypeCode.VAT, codeEnum, taxRate);
 	}
 
 /*

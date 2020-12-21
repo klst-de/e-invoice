@@ -70,7 +70,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		if(tradeTax==null) {
 			LOG.warning("tradeTax==null, expected one element.");
 		}
-		this.setVAT(tradeTax.getTaxType(), tradeTax.getTaxCategoryCode(), tradeTax.getTaxPercentage());
+		this.setTax(tradeTax.getTaxType(), tradeTax.getTaxCategoryCode(), tradeTax.getTaxPercentage());
 		this.setReasonText(getReasonText(tradeAllowanceCharge));
 		this.setReasoncode(getReasoncode(tradeAllowanceCharge));
 	}
@@ -158,7 +158,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		return percent==null ? null : percent.getValue();
 	}
 
-	void setVAT(String type, TaxCategoryCode category, BigDecimal percentage) {
+	void setTax(String type, TaxCategoryCode category, BigDecimal percentage) {
 		CategoryTradeTax tradeTax = getCategoryTradeTax(this);
 		if(tradeTax==null) {
 			LOG.info("tradeTax==null, expected one element. Create it.");
