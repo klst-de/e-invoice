@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.TaxCategoryCode;
-import com.klst.untdid.codelist.TaxTypeCode;
 
 /**
  * VAT BREAKDOWN
@@ -98,14 +97,6 @@ public interface BG23_VatBreakdown extends ITaxCategory {
 	public String getTaxType();
 
 	/**
-	 * set tax category code and rate
-	 * 
-	 * @param codeEnum BT-118
-	 * @param percent  BT-119
-	 */
-	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal percent); // use ctor
-	
-	/**
 	 * VAT category code 
 	 * <p>
 	 * Coded identification of a VAT category, entries of UNTDID 5305
@@ -123,6 +114,16 @@ public interface BG23_VatBreakdown extends ITaxCategory {
 	public void setTaxCategoryCode(TaxCategoryCode code);
 	@Override
 	public TaxCategoryCode getTaxCategoryCode();
+	
+	/**
+	 * set tax category code and rate
+	 * 
+	 * @param codeEnum BT-118
+	 * @param percent  BT-119
+	 */
+	// TODO in Oberklasse verschieben
+	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal percent); // use ctor
+//	public void setTaxCategoryAndRate(String typeCode, TaxCategoryCode codeEnum, BigDecimal percent);
 	
 	/**
 	 * VAT category rate
