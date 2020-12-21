@@ -124,11 +124,10 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	
 	// BT-126 ++ 1..1 Invoice line identifier
 	void setId(String id) {
-//		LOG.info("isInvoiceLineType:"+isInvoiceLineType + " id:"+id);
 		if(isInvoiceLineType) {
-			iLine.setID(Identifier.newIDType(id, null)); // null : No identification scheme 
+			iLine.setID(new Identifier(id)); // No identification scheme 
 		} else {
-			cnLine.setID(Identifier.newIDType(id, null)); // null : No identification scheme 
+			cnLine.setID(new Identifier(id)); 
 		}
 	}
 
@@ -165,7 +164,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		LOG.warning(NOT_IMPEMENTED); // TODO
  		if(id==null) return;
 		ItemIdentificationType itemIdentification = new ItemIdentificationType();
-		itemIdentification.setID(Identifier.newIDType(id, schemeID));
+		itemIdentification.setID(new Identifier(id, schemeID));
 		
 		if(isInvoiceLineType) {
 			ItemType item = iLine.getItem();
@@ -500,7 +499,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	public void setSellerAssignedID(String id) {
  		if(id==null) return;
 		ItemIdentificationType itemIdentification = new ItemIdentificationType();
-		itemIdentification.setID(Identifier.newIDType(id, null));
+		itemIdentification.setID(new Identifier(id));
 		
 		if(isInvoiceLineType) {
 			ItemType item = iLine.getItem();
@@ -526,7 +525,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	public void setBuyerAssignedID(String id) {
  		if(id==null) return;
 		ItemIdentificationType itemIdentification = new ItemIdentificationType();
-		itemIdentification.setID(Identifier.newIDType(id, null));
+		itemIdentification.setID(new Identifier(id));
 		
 		if(isInvoiceLineType) {
 			ItemType item = iLine.getItem();
@@ -552,7 +551,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	public void setStandardID(String id, String schemeID) {
  		if(id==null) return;
 		ItemIdentificationType itemIdentification = new ItemIdentificationType();
-		itemIdentification.setID(Identifier.newIDType(id, schemeID));
+		itemIdentification.setID(new Identifier(id, schemeID));
 		
 		if(isInvoiceLineType) {
 			ItemType item = iLine.getItem();

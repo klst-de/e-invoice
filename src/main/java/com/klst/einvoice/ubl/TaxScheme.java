@@ -11,7 +11,7 @@ public class TaxScheme extends TaxSchemeType {
 
 	TaxScheme(String code) {
 		super();
-		super.setID(Identifier.newIDType(code, null));
+		super.setID(new Identifier(code));
 	}
 	TaxScheme() {
 		this(TaxTypeCode.VAT);

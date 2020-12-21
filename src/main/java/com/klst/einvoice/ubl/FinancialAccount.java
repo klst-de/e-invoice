@@ -51,12 +51,12 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 	@Override
 	// 1..1 BT-84   IBANID        Kennung des Zahlungskontos
 	public void setPaymentAccountID(IBANId iban) {
-		super.setID(Identifier.newIDType(iban.getValue(), null)); // wg. https://github.com/klst-de/e-invoice/issues/7 ohne iban.getSchemeID()));
+		super.setID(new Identifier(iban.getValue())); // wg. https://github.com/klst-de/e-invoice/issues/7 ohne iban.getSchemeID()));
 	}
 
 	@Override
 	public void setPaymentAccountID(String id) {
-		super.setID(Identifier.newIDType(id, null));	
+		super.setID(new Identifier(id));	
 	}
 
 	/*
@@ -112,7 +112,7 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 //		branch.setFinancialInstitution(fi);
 		// ... und so bei xrechnung:
 		BranchType branch = new BranchType();
-		branch.setID(Identifier.newIDType(id, schema));
+		branch.setID(new Identifier(id, schema));
 		super.setFinancialInstitutionBranch(branch);
 	}
 
