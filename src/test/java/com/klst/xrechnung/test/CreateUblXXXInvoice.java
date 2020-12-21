@@ -14,6 +14,7 @@ import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
+import com.klst.einvoice.ubl.CardAccount;
 import com.klst.einvoice.ubl.FinancialAccount;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.ubl.GenericLine;
@@ -282,7 +283,18 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			LOG.warning("!!!!!!!!! mehrere "+creditTransfer.size()+" creditTransfer Einträge");
 		}
 		
-		PaymentCard paymentCard = ublInvoice.createPaymentCard(null, null);
+		PaymentCard testCard = paymentInstructions.getPaymentCard();
+		PaymentCard paymentCard = null;
+		if(testCard!=null) {
+			LOG.info("testCard.CardAccountID="+testCard.getCardAccountID() +" CardHolderName="+testCard.getCardHolderName());
+			paymentCard = ublInvoice.createPaymentCard(testCard.getCardAccountID(), testCard.getCardHolderName());
+			String nw = ((CardAccount)testCard).getNetwork();
+			if(nw!=null) {
+				((CardAccount)paymentCard).setNetwork(nw);
+			}
+		} else {
+			LOG.warning("paymentCard.isEmpty");
+		}
 		
 		DirectDebit directDebit = null;
 		DirectDebit dd = testDoc.getDirectDebit();

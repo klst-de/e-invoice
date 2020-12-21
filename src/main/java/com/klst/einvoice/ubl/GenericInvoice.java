@@ -854,10 +854,10 @@ UBL:
 		return new FinancialAccount(accountId, accountName, bic);
 	}
 
-	@Override
+	@Override // implements interface PaymentCardFactory
 	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
-		LOG.warning(NOT_IMPEMENTED); // TODO
-		return null;
+		if(cardAccountID==null) return null;
+		return CardAccount.createPaymentCard(cardAccountID, cardHolderName);
 	}
 	
 	// BG-16.BG-19 ++ 0..1 DIRECT DEBIT

@@ -10,6 +10,7 @@ import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CardAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMandateType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
@@ -119,7 +120,8 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	// copy ctor
 	public PaymentMeans(PaymentMeansType doc) {
 		this();
-//		String paymentMeansText = doc.getInstructionNote().isEmpty() ? null : doc.getInstructionNote().get(0).getValue();
+		PaymentMeansEnum code = getPaymentMeansEnum(doc);
+		LOG.info("-----------------------getPaymentMeansCode="+code);
 		String paymentMeansText = getPaymentMeansText(doc);
 		String remittanceInformation = getRemittanceInformation(doc);
 				// doc.getPaymentID().isEmpty() ? null : doc.getPaymentID().get(0).getValue();
@@ -137,6 +139,30 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			paymentMandate = new PaymentMandate(doc.getPaymentMandate());
 			super.setPaymentMandate(paymentMandate);
 		}
+		switch(code) { 
+		case CreditTransfer:
+		case SEPACreditTransfer:
+			// TODO
+//			creditTransfer.forEach(ct -> {
+//				applicableHeaderTradeSettlement.addCreditTransfer(ct);
+//			});
+			break;		
+		case BankCard:
+			CardAccountType ca = doc.getCardAccount();
+			this.setPaymentCard(new CardAccount(ca));
+			break;
+		case DirectDebit: 
+		case SEPADirectDebit: 
+			this.setDirectDebit(getDirectDebit());
+			break;
+		default:
+			LOG.warning("NOT_IMPEMENTED + : PaymentMeans "+code);
+			break;
+		}
+
+		LOG.info("copy ctor fertig: CT.size="+this.getCreditTransfer().size() 
+				+ " PC:"+this.getPaymentCard()
+				+ " DD:"+this.getDirectDebit());
 	}
 	
 	FinancialAccountType payeeFinancialAccount;
@@ -161,7 +187,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			super.setPayeeFinancialAccount(payeeFinancialAccount);
 		});
 		if(paymentCard!=null) {
-			// TODO
+			this.setCardAccount((CardAccount)paymentCard);
 		}
 		if(directDebit!=null) {
 			setDirectDebit(directDebit);
@@ -295,16 +321,16 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		return directDebit;
 	}
 
+	// BG-18 (optional) PAYMENT CARD INFORMATION
 	@Override
 	public void setPaymentCard(PaymentCard paymentCard) {
-		// TODO Auto-generated method stub
-		
+		if(paymentCard==null) return;
+		super.setCardAccount((CardAccount)paymentCard);
 	}
 
 	@Override
 	public PaymentCard getPaymentCard() {
-		// TODO Auto-generated method stub
-		return null;
+		return super.getCardAccount()==null? null : new CardAccount(getCardAccount());
 	}
 
 }
