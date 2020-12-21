@@ -17,14 +17,14 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
 
-public class VatBreakdown extends TaxSubtotalType implements BG23_VatBreakdown {
+public class TaxSubtotal extends TaxSubtotalType implements BG23_VatBreakdown {
 
-	VatBreakdown() {
+	TaxSubtotal() {
 		super();
 	}
 
 	// copy ctor
-	public VatBreakdown(TaxSubtotalType tradeTax) {
+	public TaxSubtotal(TaxSubtotalType tradeTax) {
 		this();
 		List<TaxExemptionReasonType> taxExemptionReasonList = tradeTax.getTaxCategory().getTaxExemptionReason();
 		TaxExemptionReasonCodeType tec = tradeTax.getTaxCategory().getTaxExemptionReasonCode();
@@ -37,7 +37,7 @@ public class VatBreakdown extends TaxSubtotalType implements BG23_VatBreakdown {
 			);
 	}
 
-	public VatBreakdown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
+	public TaxSubtotal(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
 		this();
 		init(taxableAmount, taxAmount, codeEnum, percent);
 	}
@@ -116,7 +116,7 @@ public class VatBreakdown extends TaxSubtotalType implements BG23_VatBreakdown {
 	}
 
 
-// TODO TaxCategory class extends TaxCategoryType
+// TODO TaxCategory class extends TaxCategoryType verwenden
 	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, String vat, Percent taxRate, String exemptionText, String exemptionCode) {
 		TaxCategoryType taxCategory = new TaxCategoryType();
 		taxCategory.setID(Identifier.newIDType(codeEnum.getValue(), null));

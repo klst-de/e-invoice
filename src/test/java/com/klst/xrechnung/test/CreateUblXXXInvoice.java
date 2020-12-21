@@ -18,7 +18,7 @@ import com.klst.einvoice.ubl.FinancialAccount;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.ubl.GenericLine;
 import com.klst.einvoice.ubl.PaymentMeans;
-import com.klst.einvoice.ubl.VatBreakdown;
+import com.klst.einvoice.ubl.TaxSubtotal;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
@@ -115,10 +115,10 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("finished DocumentTotalsGroup.");
 		
 //		makeVatBreakDownGroup2(ublInvoice);
-        List<VatBreakdown> vbdList = testCN.getVATBreakDowns();
+        List<TaxSubtotal> vbdList = testCN.getVATBreakDowns();
         LOG.info("CreditNote VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
-        	VatBreakdown vatBreakdown = new VatBreakdown(
+        	TaxSubtotal vatBreakdown = new TaxSubtotal(
         	  new Amount(tradeTax.getTaxableAmount().getCurrencyID(), tradeTax.getTaxableAmount().getValue())
 			, new Amount(tradeTax.getTaxAmount().getCurrencyID(), tradeTax.getTaxAmount().getValue())
 			, TaxCategoryCode.valueOf(tradeTax.getTaxCategory())
@@ -326,10 +326,10 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makeVatBreakDownGroup(GenericInvoice ublInvoice) {
-        List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
+        List<TaxSubtotal> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
-        	BG23_VatBreakdown vatBreakdown = new VatBreakdown(
+        	BG23_VatBreakdown vatBreakdown = new TaxSubtotal(
         	  new Amount(tradeTax.getTaxableAmount().getCurrencyID(), tradeTax.getTaxableAmount().getValue())
 			, new Amount(tradeTax.getTaxAmount().getCurrencyID(), tradeTax.getTaxAmount().getValue())
 			, TaxCategoryCode.valueOf(tradeTax.getTaxCategory())

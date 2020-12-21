@@ -1124,12 +1124,12 @@ UBL:
 
 	@Override
 	public BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode code, BigDecimal percent) {
-		return new VatBreakdown(taxableAmount, tax, code, percent);
+		return new TaxSubtotal(taxableAmount, tax, code, percent);
 	}
 
 	// BG-23 + 1..n VAT BREAKDOWN
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
-		TaxSubtotalType taxSubtotal = new VatBreakdown(taxableAmount, tax, taxCategoryCode, taxRate);
+		TaxSubtotalType taxSubtotal = new TaxSubtotal(taxableAmount, tax, taxCategoryCode, taxRate);
 		
 		taxTotalFirst = getTaxTotalFirst();
 		taxTotalFirst.getTaxSubtotal().add(taxSubtotal);
@@ -1138,9 +1138,9 @@ UBL:
 	@Override
 	public void addVATBreakDown(BG23_VatBreakdown vatBreakdown) {
 		taxTotalFirst = getTaxTotalFirst();
-		taxTotalFirst.getTaxSubtotal().add((VatBreakdown)vatBreakdown);
+		taxTotalFirst.getTaxSubtotal().add((TaxSubtotal)vatBreakdown);
 	}
-	public void addVATBreakDown(List<VatBreakdown> vatBreakdowns) {
+	public void addVATBreakDown(List<TaxSubtotal> vatBreakdowns) {
 		taxTotalFirst = getTaxTotalFirst();
 //		LOG.info("anfügen #"+vatBreakdowns.size());
 		vatBreakdowns.forEach(vbd -> {
@@ -1148,14 +1148,14 @@ UBL:
 		});	
 	}
 
-	public List<VatBreakdown> getVATBreakDowns() {
+	public List<TaxSubtotal> getVATBreakDowns() {
 		List<TaxTotalType> taxTotalList = isInvoiceType ? invoice.getTaxTotal() : creditNote.getTaxTotal();
 		LOG.info("List<TaxTotalType> taxTotalList size="+taxTotalList.size());
 		taxTotalFirst = getTaxTotalFirst();
 		List<TaxSubtotalType> taxSuptotalList = taxTotalFirst.getTaxSubtotal();
-		List<VatBreakdown> result = new ArrayList<VatBreakdown>(taxSuptotalList.size()); // VatBreakdown extends TaxSubtotalType
+		List<TaxSubtotal> result = new ArrayList<TaxSubtotal>(taxSuptotalList.size()); // VatBreakdown extends TaxSubtotalType
 		taxSuptotalList.forEach(vbd -> {
-			VatBreakdown taxSubtotal = new VatBreakdown(vbd);
+			TaxSubtotal taxSubtotal = new TaxSubtotal(vbd);
 			result.add(taxSubtotal);
 		});	
 		return result;
