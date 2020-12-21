@@ -3,6 +3,7 @@ package com.klst.einvoice;
 import java.math.BigDecimal;
 
 import com.klst.einvoice.unece.uncefact.Amount;
+import com.klst.untdid.codelist.TaxCategoryCode;
 
 /**
  * Common Interface for optional DOCUMENT LEVEL ALLOWANCES (BG-20) and CHARGES (BG-21)
@@ -166,9 +167,9 @@ public interface AllowancesAndCharges extends ITaxCategory {
 
 	// BT-95-0, BT-102-0 (CII)
 	@Override
-	public void setVATCode(String code);
+	public void setTaxType(String code);
 	@Override
-	public String getVATCode();
+	public String getTaxType();
 	
 	/**
 	 * BT-95, BT-102 (mandatory) Document level allowance/charge VAT category code
@@ -194,9 +195,11 @@ public interface AllowancesAndCharges extends ITaxCategory {
 	 *  geltende Umsatzsteuer auf Dokumentenebene (BT-95) haben
 	 */
 	@Override
-	public void setVATCategory(String code);
+	public void setTaxCategoryCode(String code);
 	@Override
-	public String getVATCategory();
+	public void setTaxCategoryCode(TaxCategoryCode code);
+	@Override
+	public TaxCategoryCode getTaxCategoryCode();
 	
 	/**
 	 * BT-96, BT-103 0..1 Document level allowance/charge VAT rate
@@ -208,9 +211,9 @@ public interface AllowancesAndCharges extends ITaxCategory {
 	 * @param percentage
 	 */
 	@Override
-	public void setVATPercentage(BigDecimal percentage);
+	public void setTaxPercentage(BigDecimal percentage);
 	@Override
-	public BigDecimal getVATPercentage();
+	public BigDecimal getTaxPercentage();
 
 	/**
 	 * BT-97, BT-104 0..1 Document level allowance/charge reason
