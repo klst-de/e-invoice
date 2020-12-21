@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.TaxCategoryCode;
+import com.klst.untdid.codelist.TaxTypeCode;
 
 /**
  * VAT BREAKDOWN
@@ -40,7 +41,7 @@ import com.klst.untdid.codelist.TaxCategoryCode;
  * BR-DE-14 Kategoriespezifischer Umsatzsteuersatz :
  * Das Element „VAT category rate“ (BT-119) muss übermittelt werden.
  */
-public interface BG23_VatBreakdown {
+public interface BG23_VatBreakdown extends ITaxCategory {
 
 	/**
 	 * VAT category taxable amount
@@ -91,9 +92,10 @@ public interface BG23_VatBreakdown {
 	 * 
 	 * <br>EN16931-ID: 	BT-118-0
 	 */
-	// BT-118-0 TypeCode Code der Umsatzsteuerkategorie, Hinweis: Fester Wert = "VAT"
-	// wird auch als default für BT-31-0, BT-32-0 TaxRegistrationId.schemeID verwendet, in CII steht "VA"
-	public static final String VAT = "VAT";
+	@Override
+	public void setTaxType(String code); // use ctor
+	@Override
+	public String getTaxType();
 
 	/**
 	 * set tax category code and rate
@@ -115,9 +117,11 @@ public interface BG23_VatBreakdown {
 	 * 
 	 * @param Code
 	 */
-	// BT-118   CategoryCode Codierte Bezeichnung einer Umsatzsteuerkategorie
-	// BT-118-0 TypeCode Code der Umsatzsteuerkategorie, Hinweis: Fester Wert = "VAT"
-	public void setTaxCategoryCode(TaxCategoryCode code); // use ctor
+	@Override
+	public void setTaxCategoryCode(String code);
+	@Override
+	public void setTaxCategoryCode(TaxCategoryCode code);
+	@Override
 	public TaxCategoryCode getTaxCategoryCode();
 	
 	/**
@@ -138,8 +142,8 @@ public interface BG23_VatBreakdown {
 	 * Geschäftsregel: BR-DE-14 Das Element „VAT category rate“ (BT-119) muss übermittelt werden.
 	 */
 	// 
-	public void setTaxCategoryRate(BigDecimal taxableAmount); // use ctor
-	public BigDecimal getTaxCategoryRate();
+	public void setTaxPercentage(BigDecimal taxableAmount); // use ctor
+	public BigDecimal getTaxPercentage();
 
 	/**
 	 * VAT exemption reason text and code

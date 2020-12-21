@@ -138,7 +138,32 @@ public class ApplicableTradeTax extends TradeTaxType implements BG23_VatBreakdow
 			super.setRateApplicablePercent(taxRate);
 		}
 	}
-	
+
+	@Override
+	public void setTaxCategoryCode(String code) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public TaxCategoryCode getTaxCategoryCode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setTaxType(String type) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getTaxType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 	/* BT-118 1..1 CategoryCode
 	 * BT-119 0..1 RateApplicablePercent, wg BR-DE-14 1.1
 	 * 
@@ -155,19 +180,19 @@ public class ApplicableTradeTax extends TradeTaxType implements BG23_VatBreakdow
 		setTaxCategoryCodeAndRate(code, null);	
 	}
 
-	@Override
-	public TaxCategoryCode getTaxCategoryCode() {
-		return TaxCategoryCode.valueOf(super.getCategoryCode());
-	}
+//	@Override
+//	public TaxCategoryCode getTaxCategoryCode() {
+//		return TaxCategoryCode.valueOf(super.getCategoryCode());
+//	}
 
 	@Override
-	public void setTaxCategoryRate(BigDecimal taxableAmount) {
+	public void setTaxPercentage(BigDecimal taxableAmount) {
 		// TODO Auto-generated method stub
 		// use ctor
 	}
 
 	@Override
-	public BigDecimal getTaxCategoryRate() {
+	public BigDecimal getTaxPercentage() {
 		PercentType percent = super.getRateApplicablePercent();
 		return percent==null ? null : percent.getValue();
 	}
@@ -234,7 +259,7 @@ public class ApplicableTradeTax extends TradeTaxType implements BG23_VatBreakdow
 		stringBuilder.append(", TaxCategoryCode:");
 		stringBuilder.append(getTaxCategoryCode()==null ? "null" : getTaxCategoryCode());
 		stringBuilder.append(", TaxCategoryRate:");
-		stringBuilder.append(getTaxCategoryRate()==null ? "null" : getTaxCategoryRate());
+		stringBuilder.append(getTaxPercentage()==null ? "null" : getTaxPercentage());
 		if(this.getTaxPointDate()!=null) {
 			stringBuilder.append(", TaxPointDate:");
 			stringBuilder.append(ApplicableHeaderTradeSettlement.taxPointDateAsTimestamp(getTaxPointDate()));			

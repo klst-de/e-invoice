@@ -2,6 +2,8 @@ package com.klst.einvoice;
 
 import java.math.BigDecimal;
 
+import com.klst.untdid.codelist.TaxCategoryCode;
+
 /**
  * used in
  * <br> AllowancesAndCharges, DOCUMENT LEVEL ALLOWANCES (BG-20) and CHARGES (BG-21)
@@ -11,19 +13,23 @@ import java.math.BigDecimal;
 public interface ITaxCategory {
 	
 	// ALLOWANCES (BG-20) and CHARGES (BG-21)
-	// BT-95, BT-102 (mandatory) Document level allowance/charge VAT category code
-	public void setVATCategory(String code);
-	public String getVATCategory();
-	
-	// ALLOWANCES (BG-20) and CHARGES (BG-21)
 	// BT-95-0, BT-102-0
 	// nur CII, UBL const "VAT"
-	public void setVATCode(String code);
-	public String getVATCode();
+	// BG-23.BT-118-0
+	public void setTaxType(String type);
+	public String getTaxType();
+	
+	// ALLOWANCES (BG-20) and CHARGES (BG-21)
+	// BT-95, BT-102 (mandatory) Document level allowance/charge VAT category code
+	// BG-23.BT-118
+	public void setTaxCategoryCode(String code);
+	public void setTaxCategoryCode(TaxCategoryCode code);
+	public TaxCategoryCode getTaxCategoryCode();
 	
 	// ALLOWANCES (BG-20) and CHARGES (BG-21)
 	// BT-96, BT-103 0..1 Document level allowance/charge VAT rate
-	public void setVATPercentage(BigDecimal percentage);
-	public BigDecimal getVATPercentage();
+	// BG-23.BT-119
+	public void setTaxPercentage(BigDecimal percentage);
+	public BigDecimal getTaxPercentage();
 	
 }

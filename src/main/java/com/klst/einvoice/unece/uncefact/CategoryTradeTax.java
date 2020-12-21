@@ -27,17 +27,20 @@ public class CategoryTradeTax extends TradeTaxType implements ITaxCategory {
 		super();
 	}
 
+	// copy ctor
+	CategoryTradeTax(TradeTaxType tradeTaxType) {
+		this();
+		setTaxType(tradeTaxType.getTypeCode().getValue());
+		setTaxCategoryCode(tradeTaxType.getCategoryCode().getValue());
+		if(tradeTaxType.getRateApplicablePercent()==null) return;
+		setTaxPercentage(tradeTaxType.getRateApplicablePercent().getValue());
+	}
+	
 	CategoryTradeTax(String type, String code, Percent rate) {
 		this();
-		TaxTypeCodeType taxTypeCode = new TaxTypeCodeType();
-		taxTypeCode.setValue(type);
-		super.setTypeCode(taxTypeCode);
-		
-		TaxCategoryCodeType taxCategoryCode = new TaxCategoryCodeType();
-		taxCategoryCode.setValue(code);
-		super.setCategoryCode(taxCategoryCode);
-		
-		if(rate!=null) super.setRateApplicablePercent(rate);;
+		setTaxType(type);
+		setTaxCategoryCode(code);
+		setTaxPercentage(rate);
 	}
 	
 	CategoryTradeTax(String type, String code, BigDecimal rate) {
@@ -52,33 +55,46 @@ public class CategoryTradeTax extends TradeTaxType implements ITaxCategory {
 		this(TaxTypeCode.ValueAddedTax, code, rate);
 	}
 	
+	// ALLOWANCES (BG-20.BT-95-0) and CHARGES (BG-21.BT-102-0)
+	// BG-23.BT-118-0
+	@Override
+	public void setTaxType(String type) {
+		TaxTypeCodeType taxTypeCode = new TaxTypeCodeType();
+		taxTypeCode.setValue(type);
+		super.setTypeCode(taxTypeCode);		
+	}
+	@Override
+	public String getTaxType() {
+		return super.getTypeCode().getValue();
+	}
+	
 	// BT-95, BT-102 (mandatory) Document level allowance/charge VAT category code
 	@Override
-	public void setVATCategory(String code) {
-		
+	public void setTaxCategoryCode(String code) {
+		TaxCategoryCodeType taxCategoryCode = new TaxCategoryCodeType();
+		taxCategoryCode.setValue(code);
+		super.setCategoryCode(taxCategoryCode);
 	}
 	@Override
-	public String getVATCategory() {
-		return super.getCategoryCode().getValue();
-	}
-	// BT-95-0, BT-102-0
-	@Override
-	public void setVATCode(String code) {
-		
+	public void setTaxCategoryCode(TaxCategoryCode code) {
+		setTaxCategoryCode(code.getValue());
 	}
 	@Override
-	public String getVATCode() {
-		return super.getTypeCode().getValue();
+	public TaxCategoryCode getTaxCategoryCode() {
+		return TaxCategoryCode.valueOf(super.getCategoryCode());
 	}
 
 	// BT-96, BT-103 0..1 Document level allowance/charge VAT rate
 	@Override
-	public void setVATPercentage(BigDecimal percentage) {
-		
+	public void setTaxPercentage(BigDecimal rate) {
+		if(rate!=null) setTaxPercentage(new Percent(rate));;
+	}
+	public void setTaxPercentage(Percent rate) {
+		if(rate!=null) super.setRateApplicablePercent(rate);;
 	}
 	
 	@Override
-	public BigDecimal getVATPercentage() {
+	public BigDecimal getTaxPercentage() {
 		return super.getRateApplicablePercent()==null? null : getRateApplicablePercent().getValue();
 	}
 

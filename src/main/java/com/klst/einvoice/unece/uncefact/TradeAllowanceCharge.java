@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
+import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.AllowanceChargeReasonCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
@@ -65,8 +66,11 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		this.setAmount(getAmount(tradeAllowanceCharge));
 		this.setBaseAmount(getAmount(tradeAllowanceCharge));
 		this.setPercentage(getPercentage(tradeAllowanceCharge));
-		this.setVAT(getVATCode(tradeAllowanceCharge), getVATCategory(tradeAllowanceCharge)
-				, getVATPercentage(tradeAllowanceCharge));
+		CategoryTradeTax tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
+		if(tradeTax==null) {
+			LOG.warning("tradeTax==null, expected one element.");
+		}
+		this.setVAT(tradeTax.getTaxType(), tradeTax.getTaxCategoryCode(), tradeTax.getTaxPercentage());
 		this.setReasonText(getReasonText(tradeAllowanceCharge));
 		this.setReasoncode(getReasoncode(tradeAllowanceCharge));
 	}
@@ -154,95 +158,92 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		return percent==null ? null : percent.getValue();
 	}
 
-	void setVAT(String code, String category, BigDecimal percentage) {
-		TradeTaxType tradeTax = getCategoryTradeTax(this);
+	void setVAT(String type, TaxCategoryCode category, BigDecimal percentage) {
+		CategoryTradeTax tradeTax = getCategoryTradeTax(this);
 		if(tradeTax==null) {
 			LOG.info("tradeTax==null, expected one element. Create it.");
-			tradeTax = new CategoryTradeTax(code, category, percentage); //TradeTaxType();
+			tradeTax = new CategoryTradeTax(type, category.getValue(), percentage);
 			super.getCategoryTradeTax().add(tradeTax);
 			return;
 		}
-		TaxTypeCodeType taxTypeCode = new TaxTypeCodeType();
-		taxTypeCode.setValue(code);
-		tradeTax.setTypeCode(taxTypeCode);
-		
-		TaxCategoryCodeType taxCategoryCode = new TaxCategoryCodeType();
-		taxCategoryCode.setValue(category);
-		tradeTax.setCategoryCode(taxCategoryCode);
-
-		if(percentage==null) return;
-		tradeTax.setRateApplicablePercent(new Percent(percentage));
+		tradeTax.setTaxType(type);
+		tradeTax.setTaxCategoryCode(category);
+		tradeTax.setTaxPercentage(percentage);
 	}
 	
 	// null or first Element, because of 1..1 CategoryTradeTax
-	private static TradeTaxType getCategoryTradeTax(TradeAllowanceChargeType tradeAllowanceCharge) {
+	private static CategoryTradeTax getCategoryTradeTax(TradeAllowanceChargeType tradeAllowanceCharge) {
 		List<TradeTaxType> categoryTradeTax = tradeAllowanceCharge.getCategoryTradeTax();
 		if(categoryTradeTax.isEmpty()) return null; // sollte nicht vorkommen, da mandatory
+		
 		// nur das erste Element holen:
-		return categoryTradeTax.get(0);
+		TradeTaxType tradeTax = categoryTradeTax.get(0);
+		if(tradeTax instanceof CategoryTradeTax) return (CategoryTradeTax)tradeTax;
+		// copy ctor:
+		return new CategoryTradeTax(tradeTax);
 	}
 	
 	// BT-95-0, BT-102-0
 	@Override
-	public void setVATCode(String code) {
-		TradeTaxType tradeTax = getCategoryTradeTax(this);
+	public void setTaxType(String type) {
+		CategoryTradeTax tradeTax = getCategoryTradeTax(this);
 		if(tradeTax==null) {
 			LOG.warning("tradeTax==null, expected one element.");
 		}
-		TaxTypeCodeType taxTypeCode = new TaxTypeCodeType();
-		taxTypeCode.setValue(code);
-		tradeTax.setTypeCode(taxTypeCode);
+		tradeTax.setTaxType(type);
 	}
 
 	@Override // liefert immer "VAT"
-	public String getVATCode() {
-		return getVATCode(this);
+	public String getTaxType() {
+		return getTaxType(this);
 	}
-	static String getVATCode(TradeAllowanceChargeType tradeAllowanceCharge) {
-		TradeTaxType tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
-		return tradeTax==null? null : tradeTax.getTypeCode().getValue();
+	static String getTaxType(TradeAllowanceChargeType tradeAllowanceCharge) {
+		CategoryTradeTax tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
+		return tradeTax==null? null : tradeTax.getTaxType();
 	}
 
 	// BT-95, BT-102 1..1 (mandatory) Document level allowance/charge VAT category code
 	@Override
-	public void setVATCategory(String category) {
-		TradeTaxType tradeTax = getCategoryTradeTax(this);
-		if(tradeTax==null) {
-			LOG.warning("tradeTax==null, expected one element.");
-		}
-		TaxCategoryCodeType taxCategoryCode = new TaxCategoryCodeType();
-		taxCategoryCode.setValue(category);
-		tradeTax.setCategoryCode(taxCategoryCode);
+	public void setTaxCategoryCode(TaxCategoryCode code) {
+		setTaxCategoryCode(code.getValue());
 	}
 
 	@Override
-	public String getVATCategory() {
-		return getVATCategory(this);
+	public void setTaxCategoryCode(String category) {
+		CategoryTradeTax tradeTax = getCategoryTradeTax(this);
+		if(tradeTax==null) {
+			LOG.warning("tradeTax==null, expected one element.");
+		}
+		tradeTax.setTaxCategoryCode(category);
 	}
-	static String getVATCategory(TradeAllowanceChargeType tradeAllowanceCharge) {
-		TradeTaxType tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
-		return tradeTax==null? null : tradeTax.getCategoryCode().getValue();
+
+	@Override
+	public TaxCategoryCode getTaxCategoryCode() {
+		return getTaxCategoryCode(this);
+	}
+	static TaxCategoryCode getTaxCategoryCode(TradeAllowanceChargeType tradeAllowanceCharge) {
+		CategoryTradeTax tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
+		return tradeTax==null? null : tradeTax.getTaxCategoryCode();
 	}
 
 	// BT-96, BT103 0..1 Document level allowance/charge VAT rate
 	@Override
-	public void setVATPercentage(BigDecimal percentage) {
+	public void setTaxPercentage(BigDecimal percentage) {
 		if(percentage==null) return;
-		TradeTaxType tradeTax = getCategoryTradeTax(this);
+		CategoryTradeTax tradeTax = getCategoryTradeTax(this);
 		if(tradeTax==null) {
 			LOG.warning("tradeTax==null, expected one element.");
 		}
-		tradeTax.setRateApplicablePercent(new Percent(percentage));
+		tradeTax.setTaxPercentage(percentage);
 	}
 
 	@Override
-	public BigDecimal getVATPercentage() {
-		return getVATPercentage(this);
+	public BigDecimal getTaxPercentage() {
+		return getTaxPercentage(this);
 	}
-	static BigDecimal getVATPercentage(TradeAllowanceChargeType tradeAllowanceCharge) {
-		TradeTaxType tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
-		PercentType percent = tradeTax==null? null : tradeTax.getRateApplicablePercent();
-		return percent==null ? null : percent.getValue();
+	static BigDecimal getTaxPercentage(TradeAllowanceChargeType tradeAllowanceCharge) {
+		CategoryTradeTax tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
+		return tradeTax==null? null : tradeTax.getTaxPercentage();
 	}
 
 	// BT-97, BT-104 0..1 Document level allowance/charge reason

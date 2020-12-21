@@ -138,12 +138,12 @@ public class VatBreakdown extends TaxSubtotalType implements BG23_VatBreakdown {
 	}
 
 // TODO raus	@Override
-	public void setTaxCategoryRate(BigDecimal taxableAmount) {
+	public void setTaxPercentage(BigDecimal taxableAmount) {
 		// use ctor
 	}
 
 	@Override
-	public BigDecimal getTaxCategoryRate() {
+	public BigDecimal getTaxPercentage() {
 		PercentType percent = super.getTaxCategory().getPercent();
 		return percent==null ? null : percent.getValue();
 	}
@@ -182,6 +182,24 @@ public class VatBreakdown extends TaxSubtotalType implements BG23_VatBreakdown {
 	public String getTaxExemptionReasonCode() {
 		TaxExemptionReasonCodeType tec = super.getTaxCategory().getTaxExemptionReasonCode();
 		return tec==null ? null : tec.getValue();
+	}
+
+	@Override
+	public void setTaxCategoryCode(String code) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setTaxType(String type) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getTaxType() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
