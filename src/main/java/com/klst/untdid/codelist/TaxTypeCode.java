@@ -37,6 +37,10 @@ Der Code für die Steuerart muss dann der Codeliste UNTDID 5153 entnommen werden
      
      ...
      
+     AAM   Insurance tax
+              A tax levied specifically on insurances.
+     ...
+     
      VAT   Value added tax
               A tax on domestic or imported goods applied to the value
               added at each stage in the production/distribution cycle
@@ -45,6 +49,7 @@ Der Code für die Steuerart muss dann der Codeliste UNTDID 5153 entnommen werden
 public enum TaxTypeCode {
 
 	PetroleumTax 		("AAA"),
+	InsuranceTax 		("AAM"),
 	ValueAddedTax 	    ("VAT"); // the default
 	
 	public static final String VAT = TaxTypeCode.ValueAddedTax.getValue();

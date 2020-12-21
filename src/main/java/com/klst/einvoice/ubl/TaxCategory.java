@@ -28,19 +28,12 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
  * <br>Cardinality: 1..1 (mandatory)
  * <br>Req.ID: R45, R48
  */
+// auch in <cac:AllowanceCharge>
 // TODO warum wird es nur in GenericLine verwendet?
 public class TaxCategory extends TaxCategoryType {
 
 //	private static final Logger LOG = Logger.getLogger(VatCategory.class.getName());
 	
-//	static TaxSchemeType getVatScheme(String type) {
-//		return new TaxScheme(type);
-//	}
-//
-//	static TaxSchemeType getVatScheme() {
-//		return getVatScheme(TaxTypeCode.VAT);
-//	}
-
 	public TaxCategory() {
 		super();
 	}
