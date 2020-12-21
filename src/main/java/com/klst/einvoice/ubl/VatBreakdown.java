@@ -87,6 +87,36 @@ public class VatBreakdown extends TaxSubtotalType implements BG23_VatBreakdown {
 		return new Amount(super.getTaxAmount().getValue());
 	}
 
+	// BG-23.BT-118-0
+	@Override
+	public void setTaxType(String type) {
+//		TaxSchemeType taxScheme = new TaxSchemeType();
+//		taxScheme.setID(Identifier.newIDType(type, null)); // USt/VAT
+//		taxCategory.setTaxScheme(taxScheme);
+	}
+	@Override
+	public String getTaxType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// BG-23.BT-118
+	@Override
+	public void setTaxCategoryCode(String code) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void setTaxCategoryCode(TaxCategoryCode code) {
+		setTaxCategoryCodeAndRate(code, null);	
+	}
+	@Override
+	public TaxCategoryCode getTaxCategoryCode() {
+		return TaxCategoryCode.valueOf(super.getTaxCategory());
+	}
+
+
+// TODO TaxCategory class extends TaxCategoryType
 	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, String vat, Percent taxRate, String exemptionText, String exemptionCode) {
 		TaxCategoryType taxCategory = new TaxCategoryType();
 		taxCategory.setID(Identifier.newIDType(codeEnum.getValue(), null));
@@ -122,22 +152,12 @@ public class VatBreakdown extends TaxSubtotalType implements BG23_VatBreakdown {
 	 * @param codeEnum BT-118
 	 * @param percent  BT-119
 	 */
-// TODO raus	@Override
+	@Override
 	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal taxRate) {
 		setTaxCategoryAndRate(codeEnum, TaxTypeCode.VAT, taxRate==null ? null : new Percent(taxRate), null, null);
 	}
 
-// TODO raus	@Override
-	public void setTaxCategoryCode(TaxCategoryCode code) {
-		setTaxCategoryCodeAndRate(code, null);	
-	}
-
 	@Override
-	public TaxCategoryCode getTaxCategoryCode() {
-		return TaxCategoryCode.valueOf(super.getTaxCategory());
-	}
-
-// TODO raus	@Override
 	public void setTaxPercentage(BigDecimal taxableAmount) {
 		// use ctor
 	}
@@ -182,24 +202,6 @@ public class VatBreakdown extends TaxSubtotalType implements BG23_VatBreakdown {
 	public String getTaxExemptionReasonCode() {
 		TaxExemptionReasonCodeType tec = super.getTaxCategory().getTaxExemptionReasonCode();
 		return tec==null ? null : tec.getValue();
-	}
-
-	@Override
-	public void setTaxCategoryCode(String code) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setTaxType(String type) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getTaxType() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

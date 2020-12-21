@@ -5,7 +5,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.untdid.codelist.TaxCategoryCode;
 import com.klst.untdid.codelist.TaxTypeCode;
 
@@ -29,6 +28,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
  * <br>Cardinality: 1..1 (mandatory)
  * <br>Req.ID: R45, R48
  */
+// TODO umbenennen in TaxCategory. ?warum wird es nur in GenericLine verwendet?
 public class VatCategory extends TaxCategoryType {
 
 //	private static final Logger LOG = Logger.getLogger(VatCategory.class.getName());
@@ -102,10 +102,6 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 	 * 
 	 * @return Code
 	 */
-	@Deprecated
-	public String getTaxCategoryCodeDeprecated() {
-		return getID().getValue();
-	}
 	public TaxCategoryCode getTaxCategoryCode() {
 		return TaxCategoryCode.valueOf(this);
 	}
