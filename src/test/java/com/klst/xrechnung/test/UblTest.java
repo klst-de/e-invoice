@@ -45,6 +45,13 @@ public class UblTest {
 			"01.13a-INVOICE_ubl.xml" ,
 			"01.14a-INVOICE_ubl.xml" ,
 			"01.15a-INVOICE_ubl.xml" };
+	private static final String[] UBL_02_XML = {
+			"02.01a-INVOICE_ubl.xml" ,
+			"02.02a-INVOICE_ubl.xml" ,
+			"03.01a-INVOICE_ubl.xml" ,
+			"03.02a-INVOICE_ubl.xml" ,
+			"04.01a-INVOICE_ubl.xml" ,  // 1 Warnung SubInvoiceLine
+			"04.02a-INVOICE_ubl.xml" }; // 1 Warnung SubInvoiceLine
 	
 	static private KositValidation validation;
 	
@@ -82,13 +89,26 @@ public class UblTest {
     	assertTrue(validation.check(bytes));
    }
     
-    @Test
+	@Test
     public void ublAll() {
     	for(int i=0; i<UBL_XML.length; i++) {
     		String fileName = UBL_XML[i];
         	InvoiceFactory factory = new CreateUblXXXInvoice(fileName);
         	byte[] bytes = factory.toUbl(); // the xml
         	LOG.info("\n-------------------------------- "+fileName);
+        	assertTrue(validation.check(bytes));
+    	}
+    }
+    
+    @Test
+    public void ublAll02() {
+    	for(int i=0; i<UBL_02_XML.length; i++) {
+    		String fileName = UBL_02_XML[i];
+        	InvoiceFactory factory = new CreateUblXXXInvoice(fileName);
+        	byte[] bytes = factory.toUbl(); // the xml
+        	LOG.info("\n-------------------------------- "+fileName);
+        	String xml = new String(bytes);
+        	LOG.info("xml=\n"+xml);
         	assertTrue(validation.check(bytes));
     	}
    }
@@ -110,7 +130,7 @@ public class UblTest {
 
 	@Test
     public void ubl15_AdditionalDocs() {
-    	InvoiceFactory factory = new CreateUblXXXInvoice("01.15a-INVOICE_ubl.xml");
+    	InvoiceFactory factory = new CreateUblXXXInvoice("02.01a-INVOICE_ubl.xml");
     	Object o = factory.makeInvoice();
     	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>((InvoiceType)o);
     	List<BG24_AdditionalSupportingDocs> asdList = ublInvoice.getAdditionalSupportingDocuments();
