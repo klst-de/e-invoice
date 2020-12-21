@@ -28,8 +28,8 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
  * <br>Cardinality: 1..1 (mandatory)
  * <br>Req.ID: R45, R48
  */
-// TODO umbenennen in TaxCategory. ?warum wird es nur in GenericLine verwendet?
-public class VatCategory extends TaxCategoryType {
+// TODO warum wird es nur in GenericLine verwendet?
+public class TaxCategory extends TaxCategoryType {
 
 //	private static final Logger LOG = Logger.getLogger(VatCategory.class.getName());
 	
@@ -58,11 +58,11 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 		return getVatScheme(TaxTypeCode.VAT);
 	}
 
-	public VatCategory() {
+	public TaxCategory() {
 		super();
 	}
 	
-	public VatCategory(TaxCategoryType taxCategory) {
+	public TaxCategory(TaxCategoryType taxCategory) {
 		this();
 		if(taxCategory.getPercent()==null) {
 			// nix, da optional
@@ -73,7 +73,7 @@ daher diese Methode, so zu verwenden: VatCategory.getVatScheme("DE")
 		super.setTaxScheme(taxCategory.getTaxScheme());
 	}
 	
-	public VatCategory(TaxCategoryCode taxCategoryCode, Percent taxRate) {
+	public TaxCategory(TaxCategoryCode taxCategoryCode, Percent taxRate) {
 		this();
 		
 		IDType taxID = new IDType();

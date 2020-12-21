@@ -401,7 +401,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	 * @param percent 0..1 EN16931-ID: BT-152
 	 */
 	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, Percent percent) {
-		VatCategory taxCategory = new VatCategory(codeEnum, percent);
+		TaxCategory taxCategory = new TaxCategory(codeEnum, percent);
 		if(isInvoiceLineType) {
 			ItemType item = iLine.getItem();
 			item.getClassifiedTaxCategory().add(taxCategory);
