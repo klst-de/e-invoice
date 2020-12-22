@@ -57,8 +57,8 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	TradeAllowanceCharge(TradeAllowanceChargeType tradeAllowanceCharge) {
 		super();
 		super.setChargeIndicator(tradeAllowanceCharge.getChargeIndicator());
-		this.setAmountWithoutTax(getAmount(tradeAllowanceCharge));
-		this.setAssessmentBase(getAmount(tradeAllowanceCharge));
+		this.setAmountWithoutTax(getAmountWithoutTax(tradeAllowanceCharge));
+		this.setAssessmentBase(getAssessmentBase(tradeAllowanceCharge));
 		this.setPercentage(getPercentage(tradeAllowanceCharge));
 		CategoryTradeTax tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
 		if(tradeTax==null) {
@@ -108,9 +108,9 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	@Override
 	public Amount getAmountWithoutTax() {
-		return getAmount(this);
+		return getAmountWithoutTax(this);
 	}
-	static Amount getAmount(TradeAllowanceChargeType tradeAllowanceCharge) {
+	static Amount getAmountWithoutTax(TradeAllowanceChargeType tradeAllowanceCharge) {
 		List<AmountType> list = tradeAllowanceCharge.getActualAmount();
 		if(list.isEmpty()) return null; // sollte nicht vorkommen, da mandatory
 		// nur das erste Element holen und kopieren:
@@ -129,9 +129,9 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	@Override
 	public Amount getAssessmentBase() {
-		return getBaseAmount(this);
+		return getAssessmentBase(this);
 	}
-	static Amount getBaseAmount(TradeAllowanceChargeType tradeAllowanceCharge) {
+	static Amount getAssessmentBase(TradeAllowanceChargeType tradeAllowanceCharge) {
 		AmountType amount = tradeAllowanceCharge.getBasisAmount();
 		return amount==null? null : new Amount(amount.getCurrencyID(), amount.getValue());
 	}
