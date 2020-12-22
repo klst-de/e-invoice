@@ -1,6 +1,7 @@
 package com.klst.xrechnung.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -13,6 +14,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.ubl.GenericInvoice;
@@ -114,7 +116,7 @@ public class UblTest {
    }
 
 	@Test
-    public void ubl14_Delivery() {
+    public void ubl114_Delivery() {
     	InvoiceFactory factory = new CreateUblXXXInvoice("01.14a-INVOICE_ubl.xml");
     	Object o = factory.makeInvoice();
     	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>((InvoiceType)o);
@@ -129,7 +131,7 @@ public class UblTest {
 	}
 
 	@Test
-    public void ubl15_AdditionalDocs() {
+    public void ubl115_AdditionalDocs() {
     	InvoiceFactory factory = new CreateUblXXXInvoice("02.01a-INVOICE_ubl.xml");
     	Object o = factory.makeInvoice();
     	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>((InvoiceType)o);
@@ -141,6 +143,21 @@ public class UblTest {
     	assertEquals("application/pdf", asDoc.getAttachedDocumentMimeCode());
     	assertEquals("01_15_Anhang_01.pdf", asDoc.getAttachedDocumentFilename());
     	assertNull(asDoc.getExternalDocumentLocation());
+	}
+	
+	@Test
+    public void ubl201_AllowanceCharge() {
+    	InvoiceFactory factory = new CreateUblXXXInvoice("02.01a-INVOICE_ubl.xml");
+    	Object o = factory.makeInvoice();
+    	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>((InvoiceType)o);
+    	List<AllowancesAndCharges> list = ublInvoice.getAllowancesAndCharges();
+    	assertNotNull(list);
+    	assertEquals(2, list.size());
+    	assertTrue(list.get(0).isCharge());
+    	assertEquals("Testing", list.get(0).getReasonText());	
+    	assertEquals("VAT", list.get(0).getTaxType());	
+    	assertEquals("E", list.get(0).getTaxCategoryCode().getValue());	
+    	assertTrue(list.get(1).isAllowance());
 	}
 
 	@Test
