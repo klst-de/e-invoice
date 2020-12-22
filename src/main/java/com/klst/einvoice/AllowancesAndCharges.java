@@ -136,8 +136,9 @@ public interface AllowancesAndCharges extends ITaxCategory {
 	 * Geschäftsregel: BR-36 Zuschläge auf Dokumentenebene
 	 * Jeder Zuschlag auf Dokumentenebene (BG-21) muss einen Betrag des Zuschlags auf der Dokumentenebene (BT99) haben.
 	 */
-	public void setAmount(Amount amount);
-	public Amount getAmount(); 
+	// Amount umbenennen wg. Namenskollision in UBL // in AmountWithoutTax
+	public void setAmountWithoutTax(Amount amount);
+	public Amount getAmountWithoutTax(); 
 
 	/**
 	 * BT-93, BT-100 (optional) Document level allowance/charge base amount
@@ -149,8 +150,9 @@ public interface AllowancesAndCharges extends ITaxCategory {
 	 * 
 	 * @param Amount amount
 	 */
-	public void setBaseAmount(Amount amount);
-	public Amount getBaseAmount(); 
+	// BaseAmount umbenennen wg. Namenskollision in UBL // in AssessmentBase
+	public void setAssessmentBase(Amount amount);
+	public Amount getAssessmentBase(); 
 
 	/**
 	 * BT-94, BT-101 (optional) Document level allowance/charge percentage

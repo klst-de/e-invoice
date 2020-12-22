@@ -8,8 +8,6 @@ import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.AllowanceChargeReasonCodeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
@@ -55,16 +53,12 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	private static final Logger LOG = Logger.getLogger(TradeAllowanceCharge.class.getName());
 
-	TradeAllowanceCharge() {
-		super();
-	}
-	
 	// copy ctor
 	TradeAllowanceCharge(TradeAllowanceChargeType tradeAllowanceCharge) {
-		this();
+		super();
 		super.setChargeIndicator(tradeAllowanceCharge.getChargeIndicator());
-		this.setAmount(getAmount(tradeAllowanceCharge));
-		this.setBaseAmount(getAmount(tradeAllowanceCharge));
+		this.setAmountWithoutTax(getAmount(tradeAllowanceCharge));
+		this.setAssessmentBase(getAmount(tradeAllowanceCharge));
 		this.setPercentage(getPercentage(tradeAllowanceCharge));
 		CategoryTradeTax tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
 		if(tradeTax==null) {
@@ -106,14 +100,14 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	// BT-92, BT-99 (mandatory) Document level allowance/charge amount
 	@Override
-	public void setAmount(Amount amount) {
+	public void setAmountWithoutTax(Amount amount) {
 		AmountType actualAmt = new AmountType();
 		amount.copyTo(actualAmt);
 		super.getActualAmount().add(actualAmt);
 	}
 
 	@Override
-	public Amount getAmount() {
+	public Amount getAmountWithoutTax() {
 		return getAmount(this);
 	}
 	static Amount getAmount(TradeAllowanceChargeType tradeAllowanceCharge) {
@@ -126,7 +120,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	// BT-93, BT100 (optional) Document level allowance/charge base amount
 	@Override
-	public void setBaseAmount(Amount amount) {
+	public void setAssessmentBase(Amount amount) {
 		if(amount==null) return;
 		AmountType baseAmt = new AmountType();
 		amount.copyTo(baseAmt);
@@ -134,7 +128,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	}
 
 	@Override
-	public Amount getBaseAmount() {
+	public Amount getAssessmentBase() {
 		return getBaseAmount(this);
 	}
 	static Amount getBaseAmount(TradeAllowanceChargeType tradeAllowanceCharge) {
