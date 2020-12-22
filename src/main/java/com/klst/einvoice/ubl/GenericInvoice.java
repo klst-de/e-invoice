@@ -32,6 +32,7 @@ import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AllowanceChargeType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;
@@ -1113,13 +1114,25 @@ UBL:
 	// BG-21 + 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
 	@Override
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
-		// TODO Auto-generated method stub
-		
+		if(isInvoiceType) {
+			invoice.getAllowanceCharge().add((AllowanceChargeType)allowanceOrCharge);
+		} else {
+			creditNote.getAllowanceCharge().add((AllowanceChargeType)allowanceOrCharge);
+		}
 	}
 	@Override
 	public List<AllowancesAndCharges> getAllowancesAndCharges() {
-		// TODO Auto-generated method stub
-		return null;
+		List<AllowanceChargeType> allowanceChargeList;
+		if(isInvoiceType) {
+			allowanceChargeList = invoice.getAllowanceCharge();
+		} else {
+			allowanceChargeList = creditNote.getAllowanceCharge();
+		}
+		List<AllowancesAndCharges> resList = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
+		allowanceChargeList.forEach(doc -> {
+			resList.add(new AllowanceCharge(doc));
+		});
+		return resList;
 	}
 
 	@Override

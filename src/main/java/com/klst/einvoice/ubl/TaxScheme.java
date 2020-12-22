@@ -29,7 +29,7 @@ public class TaxScheme extends TaxSchemeType implements ITaxType {
 	 * @param type enum, example TaxTypeCode.PetroleumTax or InsuranceTax
 	 * @return
 	 */
-	static public TaxScheme createTaxType(TaxTypeCode type) {
+	static TaxScheme createTaxType(TaxTypeCode type) {
 		return new TaxScheme(type.getValue());
 	}
 	

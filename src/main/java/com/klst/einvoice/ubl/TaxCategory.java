@@ -11,7 +11,6 @@ import com.klst.untdid.codelist.TaxTypeCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PercentType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
@@ -34,11 +33,26 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
  * <br>Cardinality: 1..1 (mandatory)
  * <br>Req.ID: R45, R48
  */
-// auch in <cac:AllowanceCharge>
 // TODO warum wird es nur in GenericLine verwendet?
 public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 
-//	private static final Logger LOG = Logger.getLogger(VatCategory.class.getName());
+//	private static final Logger LOG = Logger.getLogger(TaxCategory.class.getName());
+	
+	/**
+	 * factory method
+	 * 
+	 * @param taxType
+	 * @param taxCode
+	 * @param taxRate
+	 * @return
+	 */
+	static TaxCategory createTaxCategory(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
+		return new TaxCategory(taxType, taxCode, taxRate);
+	}
+	static TaxCategory createTaxCategory(TaxCategoryType doc) {
+		return doc==null? null : new TaxCategory(TaxScheme.getTaxType(doc.getTaxScheme()),
+				TaxCategoryCode.valueOf(doc), getTaxPercentage(doc));
+	}
 	
 	public TaxCategory(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		super();
@@ -102,13 +116,8 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 		super.setPercent(new Percent(percentage));
 	}
 
-	@Override
-	public BigDecimal getTaxPercentage() {
-		return super.getPercent()==null? null : super.getPercent().getValue();
-	}
-
 	/**
-	 * The VAT rate, represented as percentage that applies to the VAT category.
+	 * The tax rate, represented as percentage that applies to the VAT category.
 	 * <p>
 	 * Cardinality: 0..1 (optional)
 	 * <br>ID: BT-119, BT-152
@@ -116,20 +125,22 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 	 * 
 	 * @return Percent
 	 */
-	public BigDecimal getTaxRate() {
-		PercentType percent = this.getPercent();
-		return percent==null ? null : percent.getValue();
+	@Override
+	public BigDecimal getTaxPercentage() {
+		return getTaxPercentage(this);
 	}
-	
 	private static final int SCALE = 2;
-	public BigDecimal getTaxRate(RoundingMode roundingMode) {
-		BigDecimal rate = this.getTaxRate();
+	public BigDecimal getTaxPercentage(RoundingMode roundingMode) {
+		BigDecimal rate = getTaxPercentage();
 		if(rate==null) return rate;
 		return rate.setScale(SCALE, roundingMode);
 	}
+	private static BigDecimal getTaxPercentage(TaxCategoryType doc) {
+		return doc.getPercent()==null? null : doc.getPercent().getValue();
+	}
 
 	private String getTaxRateAsString() {
-		BigDecimal rate = getTaxRate(RoundingMode.HALF_UP);
+		BigDecimal rate = getTaxPercentage(RoundingMode.HALF_UP);
 		return rate==null ? "" : rate.toString()+"%";
 	}
 	
@@ -190,11 +201,16 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 		if(!joined.isEmpty()) {
 			joined = " + ["+joined+"]";
 		}
-//		LOG.warning("ID:"+getID());
-//		LOG.warning("getTaxRateAsString:"+getTaxRateAsString());
-//		LOG.warning("joined:"+joined);
-		String id = getID()==null ? "'noID'" : getID().getValue();
-		return id + " " + getTaxRateAsString()+" - " + TaxTypeCode.VAT + joined;
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[TaxType=");
+		stringBuilder.append(getTaxType()==null ? "null" : getTaxType());
+		stringBuilder.append(", TaxCategoryCode=");
+		stringBuilder.append(getTaxCategoryCode()==null ? "null" : getTaxCategoryCode());
+		stringBuilder.append(", TaxPercentage=");
+		stringBuilder.append(getTaxRateAsString()==null ? "null" : getTaxRateAsString());
+		stringBuilder.append(joined);
+		stringBuilder.append("]");
+		return stringBuilder.toString();
 	}
 
 }

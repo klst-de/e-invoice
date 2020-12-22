@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoiceLine;
+import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
@@ -214,6 +215,12 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("(optional) getPrepaid="+testDoc.getPrepaid());	
 		ublInvoice.setPrepaid(testDoc.getPrepaid());
 		LOG.info("finished DocumentTotalsGroup.");
+		
+		List<AllowancesAndCharges> allowancesAndCharges = testDoc.getAllowancesAndCharges();
+		LOG.info("(optional) AllowancesAndCharges #:"+allowancesAndCharges.size());
+		allowancesAndCharges.forEach(aac -> {
+			ublInvoice.addAllowanceCharge(aac);
+		});
 		
 		makeVatBreakDownGroup(ublInvoice);
 		makeLineGroup(ublInvoice);

@@ -56,7 +56,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	// copy ctor
 	TradeAllowanceCharge(TradeAllowanceChargeType tradeAllowanceCharge) {
 		super();
-		super.setChargeIndicator(tradeAllowanceCharge.getChargeIndicator());
+		this.setChargeIndicator(tradeAllowanceCharge.getChargeIndicator());
 		this.setAmountWithoutTax(getAmountWithoutTax(tradeAllowanceCharge));
 		this.setAssessmentBase(getAssessmentBase(tradeAllowanceCharge));
 		this.setPercentage(getPercentage(tradeAllowanceCharge));
