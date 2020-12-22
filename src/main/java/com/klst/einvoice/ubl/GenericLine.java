@@ -42,7 +42,7 @@ import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.QuantityT
 
 //ohne von T abzuleiten habe ich keinen Zugtiff auf die protected Member:
 //protected IDType id;
-//...
+// ...
 //protected ItemType item;
 //protected PriceType price;
 public class GenericLine<T> implements CoreInvoiceLine {

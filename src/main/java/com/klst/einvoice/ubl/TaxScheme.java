@@ -51,5 +51,8 @@ public class TaxScheme extends TaxSchemeType implements ITaxType {
 	public String getTaxType() {
 		return super.getID().getValue();
 	}
+	static String getTaxType(TaxSchemeType taxScheme) {
+		return taxScheme.getID().getValue();
+	}
 	
 }

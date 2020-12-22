@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.klst.einvoice.ITaxCategory;
 import com.klst.untdid.codelist.TaxCategoryCode;
 import com.klst.untdid.codelist.TaxTypeCode;
 
@@ -16,7 +17,12 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
 
 /**
- * VatCategory contains elements used in Group VAT BREAKDOWN (BG-23) and VAT INFORMATION (BG-30)
+ * TaxCategory contains elements used in Groups DOCUMENT LEVEL ALLOWANCES (BG-20) and CHARGES (BG-21), 
+ * VAT BREAKDOWN (BG-23) and VAT INFORMATION (BG-30)
+ * <p>
+ * BG-20 + 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+ * <br>
+ * BG-21 + 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
  * <p> 
  * BG-23 : VAT BREAKDOWN - A group of business terms providing information about VAT breakdown
  * by different categories, rates and exemption reasons
@@ -30,47 +36,53 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
  */
 // auch in <cac:AllowanceCharge>
 // TODO warum wird es nur in GenericLine verwendet?
-public class TaxCategory extends TaxCategoryType {
+public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 
 //	private static final Logger LOG = Logger.getLogger(VatCategory.class.getName());
 	
-	public TaxCategory() {
+	public TaxCategory(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		super();
+		setTaxType(taxType);
+		setTaxCategoryCode(taxCode);
+		setTaxPercentage(taxRate);
+	}
+	public TaxCategory(TaxCategoryCode taxCode, BigDecimal taxRate) {
+		this(TaxTypeCode.VAT, taxCode, taxRate);
+	}
+	public TaxCategory(TaxCategoryCode taxCode, Percent percent) {
+		this(TaxTypeCode.VAT, taxCode, percent==null? null : percent.getValue());
 	}
 	
-	public TaxCategory(TaxCategoryType taxCategory) {
-		this();
-		if(taxCategory.getPercent()==null) {
-			// nix, da optional
-		} else {
-			super.setPercent(taxCategory.getPercent());
-		}
-		super.setID(taxCategory.getID());
-		super.setTaxScheme(taxCategory.getTaxScheme());
+	public TaxCategory(TaxCategoryCode taxCode) {
+		this(taxCode, (BigDecimal)null);
 	}
 	
-	public TaxCategory(TaxCategoryCode taxCategoryCode, Percent taxRate) {
-		this();
-		
-		IDType taxID = new IDType();
-		taxID.setValue(taxCategoryCode.getValue());
-		
-			
-		TaxSchemeType taxScheme = new TaxScheme();
-		
-		TaxCategoryType taxCategory = new TaxCategoryType();
-		taxCategory.setTaxScheme(taxScheme);
-		taxCategory.setID(taxID);
-		if(taxRate!=null) {
-			taxCategory.setPercent(taxRate);
-			super.setPercent(taxRate);
-		}
-		super.setID(taxCategory.getID());
-		super.setTaxScheme(taxCategory.getTaxScheme());
+	// ALLOWANCES (BG-20.BT-95-0) and CHARGES (BG-21.BT-102-0)
+	// BG-23.BT-118-0
+	public void setTaxType(String type) {
+		TaxSchemeType taxScheme = new TaxScheme(type);
+		super.setTaxScheme(taxScheme);
+	}
+
+	@Override
+	public String getTaxType() {
+		return TaxScheme.getTaxType(super.getTaxScheme());
+	}
+
+	// BT-95, BT-102 (mandatory) Document level allowance/charge VAT category code
+	// BG-23.BT-118
+	@Override
+	public void setTaxCategoryCode(String code) {
+		super.setID(new Identifier(code));
+	}
+
+	@Override
+	public void setTaxCategoryCode(TaxCategoryCode code) {
+		setTaxCategoryCode(code.getValue());
 	}
 
 	/**
-	 * Coded identification of a VAT category. Entries of UNTDID 5305 are used.
+	 * Coded identification of a tax/VAT category. Entries of UNTDID 5305 are used.
 	 * <p>
 	 * Cardinality: 1..1 (mandatory)
 	 * <br>ID: BT-118, BT-151 
@@ -82,6 +94,19 @@ public class TaxCategory extends TaxCategoryType {
 		return TaxCategoryCode.valueOf(this);
 	}
 	
+	// BT-96, BT-103 0..1 Document level allowance/charge tax/VAT rate
+	// BG-23.BT-119
+	@Override
+	public void setTaxPercentage(BigDecimal percentage) {
+		if(percentage==null) return;
+		super.setPercent(new Percent(percentage));
+	}
+
+	@Override
+	public BigDecimal getTaxPercentage() {
+		return super.getPercent()==null? null : super.getPercent().getValue();
+	}
+
 	/**
 	 * The VAT rate, represented as percentage that applies to the VAT category.
 	 * <p>
@@ -171,4 +196,5 @@ public class TaxCategory extends TaxCategoryType {
 		String id = getID()==null ? "'noID'" : getID().getValue();
 		return id + " " + getTaxRateAsString()+" - " + TaxTypeCode.VAT + joined;
 	}
+
 }
