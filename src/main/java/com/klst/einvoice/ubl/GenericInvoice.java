@@ -48,7 +48,9 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Proj
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.SupplierPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSubtotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxTotalType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.AllowanceTotalAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BuyerReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ChargeTotalAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditNoteTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CustomizationIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentCurrencyCodeType;
@@ -60,6 +62,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDat
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PayableAmountType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PayableRoundingAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PrepaidAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ProfileIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.StartDateType;
@@ -932,26 +935,44 @@ UBL:
 		return new Amount(amount.getCurrencyID(), amount.getValue());		
 	}
 	
-	// BG-22.BT-107 ++ 0..1 Sum of all allowances on document level in the Invoice
+	// BG-22.BT-107 ++ 0..1 Sum of all allowances on document level in the In.voice
+	// Summe aller in der Rechnung enthaltenen Nachlässe der Dokumentenebene.
 	@Override
-	public void setAllowancesTotal(Amount taxTotalAmount) {
-		// TODO Summe aller in der Rechnung enthaltenen Nachlässe der Dokumentenebene.
+	public void setAllowancesTotal(Amount allowancesTotalAmount) {
+		if(allowancesTotalAmount==null) return;
+		AllowanceTotalAmountType amount = new AllowanceTotalAmountType();
+		allowancesTotalAmount.copyTo(amount);
+		MonetaryTotalType monetaryTotal = isInvoiceType ? invoice.getLegalMonetaryTotal() : creditNote.getLegalMonetaryTotal();
+		monetaryTotal.setAllowanceTotalAmount(amount);
 	}
 	@Override
 	public Amount getAllowancesTotal() {
-		// TODO Auto-generated method stub
-		return null;
+		MonetaryTotalType monetaryTotal = isInvoiceType ? invoice.getLegalMonetaryTotal() : creditNote.getLegalMonetaryTotal();
+		return getAllowancesTotal(monetaryTotal);
+	}
+	private static Amount getAllowancesTotal(MonetaryTotalType monetaryTotal) {
+		AllowanceTotalAmountType amount = monetaryTotal.getAllowanceTotalAmount();
+		return amount==null? null : new Amount(amount.getCurrencyID(), amount.getValue());		
 	}
 
 	// BG-22.BT-108 ++ 0..1 Sum of all charges on document level in the Invoice
+	// Summe aller in der Rechnung enthaltenen Abgaben der Dokumentenebene.
 	@Override
-	public void setChargesTotal(Amount taxTotalAmount) {
-		// TODO Summe aller in der Rechnung enthaltenen Abgaben der Dokumentenebene.
+	public void setChargesTotal(Amount chargesTotalAmount) {
+		if(chargesTotalAmount==null) return;
+ 		ChargeTotalAmountType amount = new ChargeTotalAmountType();
+		chargesTotalAmount.copyTo(amount);
+		MonetaryTotalType monetaryTotal = isInvoiceType ? invoice.getLegalMonetaryTotal() : creditNote.getLegalMonetaryTotal();
+		monetaryTotal.setChargeTotalAmount(amount);
 	}
 	@Override
 	public Amount getChargesTotal() {
-		// TODO Auto-generated method stub
-		return null;
+		MonetaryTotalType monetaryTotal = isInvoiceType ? invoice.getLegalMonetaryTotal() : creditNote.getLegalMonetaryTotal();
+		return getChargesTotal(monetaryTotal);
+	}
+	private static Amount getChargesTotal(MonetaryTotalType monetaryTotal) {
+		ChargeTotalAmountType amount = monetaryTotal.getChargeTotalAmount();
+		return amount==null? null : new Amount(amount.getCurrencyID(), amount.getValue());		
 	}
 
 	// BG-22.BT-109 ++ 1..1 Invoice total amount without VAT
@@ -1073,14 +1094,23 @@ UBL:
 	}
 	
 	// BG-22.BT-114 0..1 (optional) Rounding
+	// Der Betrag, um den der Rechnungsbetrag gerundet wurde.
 	@Override
 	public Amount getRounding() {
-		return null;
-		// TODO 	
+		MonetaryTotalType monetaryTotal = isInvoiceType ? invoice.getLegalMonetaryTotal() : creditNote.getLegalMonetaryTotal();
+		return getRounding(monetaryTotal);
+	}
+	private static Amount getRounding(MonetaryTotalType monetaryTotal) {
+		PayableRoundingAmountType amount = monetaryTotal.getPayableRoundingAmount();
+		return amount==null? null : new Amount(amount.getCurrencyID(), amount.getValue());		
 	}
 	@Override
-	public void setRounding(Amount taxTotalAmount) {
-		// TODO Der Betrag, um den der Rechnungsbetrag gerundet wurde.
+	public void setRounding(Amount rounding) {
+		if(rounding==null) return;
+		PayableRoundingAmountType amount = new PayableRoundingAmountType();
+		rounding.copyTo(amount);
+		MonetaryTotalType monetaryTotal = isInvoiceType ? invoice.getLegalMonetaryTotal() : creditNote.getLegalMonetaryTotal();
+		monetaryTotal.setPayableRoundingAmount(amount);
 	}
 
 	// BG-22.BT-115 ++ 1..1 Amount due for payment

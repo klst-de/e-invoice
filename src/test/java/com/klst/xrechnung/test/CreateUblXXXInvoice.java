@@ -202,6 +202,21 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		
 		Amount invoiceTaxAmount =  testDoc.getInvoiceTax();
     	LOG.info("----------------------InvoiceTax amount "+invoiceTaxAmount);
+        Amount invoiceATAmount = testDoc.getAllowancesTotal();
+    	LOG.info("-----------------AllowancesTotal amount "+invoiceATAmount);
+    	if(invoiceATAmount!=null) {
+    		ublInvoice.setAllowancesTotal(invoiceATAmount);
+    	}
+        Amount invoiceChargesAmount = testDoc.getChargesTotal();
+    	LOG.info("--------------------ChargesTotal amount "+invoiceChargesAmount);
+    	if(invoiceChargesAmount!=null) {
+    		ublInvoice.setChargesTotal(invoiceChargesAmount);
+    	}
+        Amount invoiceRoundingAmount = testDoc.getRounding();
+    	LOG.info("------------------------Rounding amount "+invoiceRoundingAmount);
+    	if(invoiceRoundingAmount!=null) {
+    		ublInvoice.setRounding(invoiceRoundingAmount);
+    	}
         Amount invoiceTaxIAAmount = testDoc.getInvoiceTaxInAccountingCurrency();
     	LOG.info("--InvoiceTaxInAccountingCurrency amount "+invoiceTaxIAAmount);
     	if(invoiceTaxAmount==null) {
