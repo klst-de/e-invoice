@@ -230,7 +230,12 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("(optional) getPrepaid="+testDoc.getPrepaid());	
 		ublInvoice.setPrepaid(testDoc.getPrepaid());
 		LOG.info("finished DocumentTotalsGroup.");
-		
+
+		LOG.info("(optional) getTaxPointDate="+testDoc.getTaxPointDateAsTimestamp());	
+    	if(testDoc.getTaxPointDateAsTimestamp()!=null) {
+    		ublInvoice.setTaxPointDate(testDoc.getTaxPointDateAsTimestamp());
+    	}
+
 		List<AllowancesAndCharges> allowancesAndCharges = testDoc.getAllowancesAndCharges();
 		LOG.info("(optional) AllowancesAndCharges #:"+allowancesAndCharges.size());
 		allowancesAndCharges.forEach(aac -> {
