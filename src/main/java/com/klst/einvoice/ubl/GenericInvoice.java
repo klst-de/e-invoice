@@ -65,6 +65,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PayableA
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PayableRoundingAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PrepaidAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ProfileIDType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.SalesOrderIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.StartDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxCurrencyCodeType;
@@ -283,11 +284,11 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 	// keine Beispiele 
 	@Override
 	public void setTaxPointDateCode(String code) {
-		LOG.warning(NOT_IMPEMENTED); // TODO in ubl nicht definiert ???
+		LOG.warning(NOT_IMPEMENTED); // in ubl nicht definiert
 	}
 	@Override
 	public String getTaxPointDateCode() {
-		LOG.warning(NOT_IMPEMENTED); // TODO
+		LOG.warning(NOT_IMPEMENTED); // in ubl nicht definiert
 		return null;	
 	}
 	
@@ -376,11 +377,39 @@ test daten in 03 06 08 15
 CII: 01.03a-INVOICE_uncefact.xml :
             <ram:ContractReferencedDocument>
                 <ram:IssuerAssignedID>CR987654</ram:IssuerAssignedID>
-            </ram:ContractReferencedDocument>UBL:
+            </ram:ContractReferencedDocument>
+CII: 02.01a-INVOICE_uncefact.xml :
+            <ram:SellerOrderReferencedDocument>
+                <ram:IssuerAssignedID>ABC123456789</ram:IssuerAssignedID> <!-- BT-14 + 0..1 Verkaufsauftragsreferenz -->
+            </ram:SellerOrderReferencedDocument>
+            <ram:BuyerOrderReferencedDocument>
+                <ram:IssuerAssignedID>65002278</ram:IssuerAssignedID>     <!-- BT-13 + 0..1 Bestellreferenz -->
+            </ram:BuyerOrderReferencedDocument>
+            <ram:ContractReferencedDocument>
+                <ram:IssuerAssignedID>0000000752</ram:IssuerAssignedID>   <!-- BT-12 + 0..1 Vertragsreferenz -->
+            </ram:ContractReferencedDocument>
+            ...
+            <ram:AdditionalReferencedDocument>
+                <ram:IssuerAssignedID>ANG987654321</ram:IssuerAssignedID> <!-- BG-24.BT-17,BT-18 -->
+                <ram:TypeCode>50</ram:TypeCode>
+            </ram:AdditionalReferencedDocument>
+            
 UBL: 
     <cac:ContractDocumentReference>
         <cbc:ID>CR987654</cbc:ID>
     </cac:ContractDocumentReference>
+    
+  <cac:OrderReference>
+    <cbc:ID>65002278</cbc:ID>                          <!-- BT-13 + 0..1 -->
+    <cbc:SalesOrderID>ABC123456789</cbc:SalesOrderID>  <!-- BT-14 + 0..1 -->
+  </cac:OrderReference>
+  <cac:OriginatorDocumentReference>
+    <cbc:ID>ANG987654321</cbc:ID>                      <!-- BG-24.BT-17,BT-18 -->
+  </cac:OriginatorDocumentReference>
+  <cac:ContractDocumentReference>
+    <cbc:ID>0000000752</cbc:ID>                        <!-- BT-12 + 0..1 -->
+  </cac:ContractDocumentReference>
+
  */
 	@Override
 	public void setContractReference(String id) {
@@ -400,23 +429,11 @@ UBL:
 		return list.isEmpty() ? null : list.get(0).getID().getValue(); // wg. 0..1
 	}
 
-	// BT-13 + 0..1 Purchase order reference
-	@Override
-	public void setPurchaseOrderReference(String id) {
-		LOG.warning(NOT_IMPEMENTED); // TODO
-	}
-	@Override
-	public String getPurchaseOrderReference() {
-		LOG.warning(NOT_IMPEMENTED); // TODO
-		return null;	
-	}
-	
-	// BT-14 + 0..1 Sales order reference
-	@Override
-	public void setOrderReference(String docRefId) {
-		if(docRefId==null) return; // optional
-		OrderReferenceType orderReference = new OrderReferenceType();
-		orderReference.setID(new Identifier(docRefId)); // No identification scheme
+	private void setOrderReference(OrderReferenceType orderReference, Identifier id, SalesOrderIDType salesOrderID) {
+		if(id==null && salesOrderID==null) return;
+		if(orderReference==null) orderReference = new OrderReferenceType();
+		if(id!=null) orderReference.setID(id);
+		if(salesOrderID!=null) orderReference.setSalesOrderID(salesOrderID);
 		
 		if(isInvoiceType) {
 			invoice.setOrderReference(orderReference);
@@ -425,11 +442,33 @@ UBL:
 		}
 	}
 
+	// BT-13 + 0..1 Purchase order reference
+	@Override
+	public void setPurchaseOrderReference(String docRefId) {
+		if(docRefId==null) return; // optional
+		setOrderReference(isInvoiceType? invoice.getOrderReference() : creditNote.getOrderReference(), new Identifier(docRefId), null);
+	}
+	@Override
+	public String getPurchaseOrderReference() {
+		OrderReferenceType orderRef = isInvoiceType ? invoice.getOrderReference() : creditNote.getOrderReference();
+		if(orderRef==null) return null;
+		return orderRef.getID().getValue();
+	}
+	
+	// BT-14 + 0..1 Sales order reference
+	@Override
+	public void setOrderReference(String docRefId) {
+		if(docRefId==null) return; // optional
+		SalesOrderIDType salesOrderID = new SalesOrderIDType();
+		salesOrderID.setValue(docRefId);
+		setOrderReference(isInvoiceType? invoice.getOrderReference() : creditNote.getOrderReference(), null, salesOrderID);
+	}
+
 	@Override
 	public String getOrderReference() {
 		OrderReferenceType orderRef = isInvoiceType ? invoice.getOrderReference() : creditNote.getOrderReference();
 		if(orderRef==null) return null;
-		return orderRef.getID().getValue();
+		return orderRef.getSalesOrderID().getValue();
 	}
 
 	// BT-15 + 0..1 Receiving advice reference
@@ -1211,13 +1250,24 @@ UBL:
 	}
 	@Override
 	public void addSupportigDocument(String docRefId, String description, String url) {
-		addSupportigDocument(new AdditionalSupportingDocument(docRefId, description, url));
+		if(docRefId!=null && description==null && url==null) {
+			addOriginatorDocumentReference(new AdditionalSupportingDocument(docRefId, description, url));
+		} else {
+			addSupportigDocument(new AdditionalSupportingDocument(docRefId, description, url));
+		}
 	}
 	void addSupportigDocument(AdditionalSupportingDocument asDoc) {
 		if(isInvoiceType) {
 			invoice.getAdditionalDocumentReference().add(asDoc);
 		} else {
 			creditNote.getAdditionalDocumentReference().add(asDoc);
+		}
+	}
+	void addOriginatorDocumentReference(AdditionalSupportingDocument asDoc) {
+		if(isInvoiceType) {
+			invoice.getOriginatorDocumentReference().add(asDoc);
+		} else {
+			creditNote.getOriginatorDocumentReference().add(asDoc);
 		}
 	}
 
@@ -1235,14 +1285,20 @@ UBL:
 
 	@Override
 	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments() {
-		List<DocumentReferenceType> documentReferenceList;
+		List<DocumentReferenceType> additionalDocumentReferenceList;
+		List<DocumentReferenceType> originatorDocumentReferenceList;
 		if(isInvoiceType) {
-			documentReferenceList = invoice.getAdditionalDocumentReference();
+			additionalDocumentReferenceList = invoice.getAdditionalDocumentReference();
+			originatorDocumentReferenceList = invoice.getOriginatorDocumentReference();
 		} else {
-			documentReferenceList = creditNote.getAdditionalDocumentReference();
+			additionalDocumentReferenceList = creditNote.getAdditionalDocumentReference();
+			originatorDocumentReferenceList = creditNote.getOriginatorDocumentReference();
 		}
-		List<BG24_AdditionalSupportingDocs> resList = new ArrayList<BG24_AdditionalSupportingDocs>(documentReferenceList.size());
-		documentReferenceList.forEach(doc -> {
+		List<BG24_AdditionalSupportingDocs> resList = new ArrayList<BG24_AdditionalSupportingDocs>(additionalDocumentReferenceList.size());
+		additionalDocumentReferenceList.forEach(doc -> {
+			resList.add(new AdditionalSupportingDocument(doc));
+		});
+		originatorDocumentReferenceList.forEach(doc -> {
 			resList.add(new AdditionalSupportingDocument(doc));
 		});
 		return resList;

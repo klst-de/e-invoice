@@ -30,13 +30,9 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.URIType;
  */
 public class AdditionalSupportingDocument extends DocumentReferenceType implements BG24_AdditionalSupportingDocs {
 
-	AdditionalSupportingDocument() {
-		super();
-	}
-	
 	// copy ctor
 	public AdditionalSupportingDocument(DocumentReferenceType doc) {
-		this();
+		super();
 		EmbeddedDocumentBinaryObjectType embeddedDocumentBinaryObject = getEmbeddedDocumentBinaryObject(doc);
 		if(embeddedDocumentBinaryObject==null) {
 			init(getId(doc), getSupportingDocumentDescription(doc), getExternalDocumentLocation(doc));
@@ -47,7 +43,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 	}
 
 	public AdditionalSupportingDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
-		this();
+		super();
 		init(docRefId, description, null);
 		setAttachedDocument(content, mimeCode, filename);
 	}
@@ -60,7 +56,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 	 * @param url, optional
 	 */
 	public AdditionalSupportingDocument(String docRefId, String description, String url) {
-		this();
+		super();
 		init(docRefId, description, url);
 	}
 	
@@ -71,6 +67,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		setExternalDocumentLocation(url);
 	}
 
+	// BG.24.BT-122
 	@Override
 	public void setSupportingDocumentReference(String id) {
 		super.setID(new Identifier(id));
