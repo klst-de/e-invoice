@@ -182,7 +182,6 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setDocumentCurrency(testDoc.getDocumentCurrency());
 		ublInvoice.setTaxCurrency(testDoc.getTaxCurrency());
 		ublInvoice.setBuyerReference(testDoc.getBuyerReferenceValue());
-		ublInvoice.setContractReference(testDoc.getContractReference()); // optional
 		ublInvoice.setStartDate(testDoc.getStartDateAsTimestamp()); // optional
 		ublInvoice.setEndDate(testDoc.getEndDateAsTimestamp()); // optional
 		LOG.info("ublInvoice "+ublInvoice);
@@ -252,8 +251,11 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 
 	void makeOptionals(GenericInvoice ublInvoice) {	
+		ublInvoice.setProjectReference(testDoc.getProjectReference()); // BT-11 + 0..1
+		ublInvoice.setContractReference(testDoc.getContractReference()); // BT-12 + 0..1
 		ublInvoice.setPurchaseOrderReference(testDoc.getPurchaseOrderReference()); // BT-13 + 0..1
 		ublInvoice.setOrderReference(testDoc.getOrderReference()); // BT-14 + 0..1
+		
 		List<Object> notes = testDoc.getNotes();
 		notes.forEach(note -> {
 			ublInvoice.setNote(((NoteType)note).getValue());
