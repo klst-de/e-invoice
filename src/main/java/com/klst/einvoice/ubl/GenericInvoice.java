@@ -468,7 +468,7 @@ UBL:
 	public String getOrderReference() {
 		OrderReferenceType orderRef = isInvoiceType ? invoice.getOrderReference() : creditNote.getOrderReference();
 		if(orderRef==null) return null;
-		return orderRef.getSalesOrderID().getValue();
+		return orderRef.getSalesOrderID()==null? null : orderRef.getSalesOrderID().getValue();
 	}
 
 	// BT-15 + 0..1 Receiving advice reference

@@ -135,9 +135,24 @@ public class UblTest {
     	InvoiceFactory factory = new CreateUblXXXInvoice("02.01a-INVOICE_ubl.xml");
     	Object o = factory.makeInvoice();
     	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>((InvoiceType)o);
+    	Timestamp taxPointDate = ublInvoice.getTaxPointDateAsTimestamp();
+    	assertNotNull(taxPointDate);
+    	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), taxPointDate);
+    	
+    	String contractReference = ublInvoice.getContractReference();
+    	assertNotNull(contractReference);
+    	assertEquals("0000000752", contractReference); 
+    	String purchaseOrderReference = ublInvoice.getPurchaseOrderReference();
+    	assertNotNull(purchaseOrderReference);
+    	assertEquals("65002278", purchaseOrderReference); 
+    	String orderReference = ublInvoice.getOrderReference();
+    	assertNotNull(orderReference);
+    	assertEquals("ABC123456789", orderReference); 
+   	
     	List<BG24_AdditionalSupportingDocs> asdList = ublInvoice.getAdditionalSupportingDocuments();
-    	assertEquals(1, asdList.size());
+    	assertEquals(2, asdList.size());
     	BG24_AdditionalSupportingDocs asDoc = asdList.get(0);
+    	assertEquals("ANG987654321", asdList.get(1).getSupportingDocumentReference());
     	assertEquals("01_15_Anhang_01.pdf", asDoc.getSupportingDocumentReference());
     	assertEquals("Aufschlüsselung der einzelnen Leistungspositionen", asDoc.getSupportingDocumentDescription());
     	assertEquals("application/pdf", asDoc.getAttachedDocumentMimeCode());

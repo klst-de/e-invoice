@@ -3,6 +3,7 @@ package com.klst.xrechnung.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -232,8 +233,10 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("finished DocumentTotalsGroup.");
 
 		LOG.info("(optional) getTaxPointDate="+testDoc.getTaxPointDateAsTimestamp());	
+		Timestamp testTpd = testDoc.getTaxPointDateAsTimestamp();	
+		LOG.info("(optional) getTaxPointDate="+testTpd);	
     	if(testDoc.getTaxPointDateAsTimestamp()!=null) {
-    		ublInvoice.setTaxPointDate(testDoc.getTaxPointDateAsTimestamp());
+    		ublInvoice.setTaxPointDate(testTpd);
     	}
 
 		List<AllowancesAndCharges> allowancesAndCharges = testDoc.getAllowancesAndCharges();
@@ -249,7 +252,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 
 	void makeOptionals(GenericInvoice ublInvoice) {	
-		ublInvoice.setOrderReference(testDoc.getOrderReference());
+		ublInvoice.setPurchaseOrderReference(testDoc.getPurchaseOrderReference()); // BT-13 + 0..1
+		ublInvoice.setOrderReference(testDoc.getOrderReference()); // BT-14 + 0..1
 		List<Object> notes = testDoc.getNotes();
 		notes.forEach(note -> {
 			ublInvoice.setNote(((NoteType)note).getValue());
