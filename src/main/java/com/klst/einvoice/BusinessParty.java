@@ -19,6 +19,10 @@ public interface BusinessParty {
 	public void setBusinessName(String name);
 	
 	public String getId(); // kleingeschrieben, nicht ID!
+	// TODO:  dto für CompanyId
+//	public Identifier getIdentifier();
+//	public void setIdentifier(Identifier id);
+	
 	public void setId(String name);
 	public void setId(String name, String schemeID);
 
@@ -28,13 +32,13 @@ public interface BusinessParty {
 	
 	public String getTaxRegistrationId(); // default VA?
 	public String getTaxRegistrationId(String schemeID);
-//	public void setTaxRegistrationId(String name);                       required schemeID
 	public void setTaxRegistrationId(String name, String schemeID);
 
 	public String getCompanyLegalForm();
 	public void setCompanyLegalForm(String name);
 	
-	public String getUriUniversalCommunication(); // kleingeschrieben, nicht URI!
+	public Identifier getUriUniversalCommunication(); // kleingeschrieben, nicht URI!
+	public void setUriUniversalCommunication(Identifier id);
 	public void setUriUniversalCommunication(String name, String schemeID);
 		
 }

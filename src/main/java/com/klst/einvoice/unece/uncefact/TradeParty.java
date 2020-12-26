@@ -9,6 +9,7 @@ import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessPartyFactory;
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.Identifier;
 import com.klst.einvoice.PostalAddress;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LegalOrganizationType;
@@ -321,11 +322,18 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 
 	@Override // 0..1 also genügt der erste
-	public String getUriUniversalCommunication() {
+	public Identifier getUriUniversalCommunication() {
 		List<UniversalCommunicationType> uriList = super.getURIUniversalCommunication();
-		return uriList.isEmpty() ? null : uriList.get(0).getURIID().getValue(); // ohne schema
+		if(uriList.isEmpty()) return null;
+		return new ID(uriList.get(0).getURIID().getValue(), uriList.get(0).getURIID().getSchemeID()); 
 	}
 
+	@Override
+	public void setUriUniversalCommunication(Identifier id) {
+		if(id==null) return;
+		setUriUniversalCommunication(id.getContent(), id.getSchemeIdentifier());
+	}
+	
 	@Override
 	public void setUriUniversalCommunication(String name, String schemeID) {
 		if(name==null) return;

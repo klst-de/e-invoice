@@ -1,21 +1,9 @@
 package com.klst.einvoice.unece.uncefact;
 
+import com.klst.einvoice.Identifier;
+
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 
-/**
- * Identifier
- * <p>
- * Identifiers (IDs) are keys that are issued by the sender or recipient of a document or by a third party.
- * For each identifier in the model it is stated whether an identification scheme or a scheme version ID may 
- * or shall be defined and if so, from what list the identification schemes may be chosen. 
- * <br>
- * This EN 16931_Identifier is based on the Identifier as defined in ISO 15000-5:2014, Annex B.
- * The Scheme identifier and the Scheme version ID identify the scheme on which the identifier is based.
- * The use of the attributes is specified for each information element in the semantic model.
- * 
- * @see EN_16931_1.pdf : 6.5.6 Identifier.Type
- * @see 200-XRechnung-2020-06-30.pdf : 8.6. Identifier
- */
 /*
  
 Component                 | Use         	Primitive Type | Example
@@ -24,17 +12,13 @@ Scheme identifier         : Conditional 	String         | GLN
 Scheme version identifier : Conditional 	String         | 1.0
  
  */
-public class ID extends IDType {
+public class ID extends IDType implements Identifier {
 
-	ID() {
-		super();
-	}
-	
 	public ID(String content, String schemeID, String schemeVersionID) {
-		this();
-		super.setValue(content);
-		super.setSchemeID(schemeID);
-		super.setSchemeVersionID(schemeVersionID);
+		super();
+		setContent(content);
+		setSchemeIdentifier(schemeID);
+		setSchemeVersion(schemeVersionID);
 	}
 
 	public ID(String content, String schemeID) {
@@ -54,5 +38,37 @@ public class ID extends IDType {
 		return "["+(super.getSchemeID()==null? "":",SchemeID="+getSchemeID())
 			+(super.getSchemeVersionID()==null? "":",SchemeVersionID="+getSchemeVersionID())
 			+"\""+super.getValue()+"\"]";
+	}
+
+	@Override
+	public void setContent(String content) {
+		super.setValue(content);
+	}
+
+	@Override
+	public String getContent() {
+		return super.getValue();
+	}
+
+	@Override
+	public void setSchemeIdentifier(String schemeId) {
+		if(schemeId==null) return;
+		super.setSchemeID(schemeId);
+	}
+
+	@Override
+	public String getSchemeIdentifier() {
+		return super.getSchemeID();
+	}
+
+	@Override
+	public void setSchemeVersion(String versionId) {
+		if(versionId==null) return;
+		super.setSchemeVersionID(versionId);
+	}
+
+	@Override
+	public String getSchemeVersion() {
+		return super.getSchemeVersionID();
 	}
 }

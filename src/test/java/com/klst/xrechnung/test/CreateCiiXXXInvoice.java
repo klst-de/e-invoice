@@ -94,6 +94,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		sellerParty.setId(testSellerParty.getId()); // BT-29
 		sellerParty.setCompanyId(testSellerParty.getCompanyId());
 		sellerParty.setCompanyLegalForm(testSellerParty.getCompanyLegalForm());
+		// [BR-62]-The Seller electronic address (BT-34) shall have a Scheme identifier :
+		sellerParty.setUriUniversalCommunication(testSellerParty.getUriUniversalCommunication());
 		// BT-31 + BT-32
 		if(((TradeParty)testSellerParty).getSpecifiedTaxRegistration().isEmpty()) {
 			LOG.warning("sellerParty.SpecifiedTaxRegistration().isEmpty() !!!!!!!!!!!!!" );
@@ -135,7 +137,9 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			LOG.info("buyerParty.SpecifiedTaxRegistration#:"+buyerTradeParty.getSpecifiedTaxRegistration().size()
 					+ " ID:"+buyerTradeParty.getSpecifiedTaxRegistration().get(0).getID().getValue()
 					+ " schemeID:"+buyerTradeParty.getSpecifiedTaxRegistration().get(0).getID().getSchemeID()
+					+ " UriUniversalCommunication:"+buyerTradeParty.getUriUniversalCommunication()
 					);
+//			buyerParty.setUriUniversalCommunication(buyerTradeParty.getUriUniversalCommunication(), null); // TODO
 		}
 		LOG.info("buyerParty:"+buyerParty.getBusinessName() + " Address:"+buyerParty.getAddress());
 		cii.setBuyer(buyerParty);
