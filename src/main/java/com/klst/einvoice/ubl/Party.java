@@ -12,6 +12,7 @@ import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessPartyFactory;
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.Identifier;
 import com.klst.einvoice.PostalAddress;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
@@ -444,9 +445,15 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 
 	@Override
-	public String getUriUniversalCommunication() {
+	public Identifier getUriUniversalCommunication() {
 		EndpointIDType endpointID = super.getEndpointID();
-		return endpointID==null ? null : endpointID.getValue(); // ohne schema
+		return endpointID==null ? null : new ID(endpointID.getValue(), endpointID.getSchemeID());
+	}
+
+	@Override
+	public void setUriUniversalCommunication(Identifier id) {
+		if(id==null) return;
+		setUriUniversalCommunication(id.getContent(), id.getSchemeIdentifier());
 	}
 
 	@Override
