@@ -143,7 +143,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		
 		IDType creditorReferenceID = //doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getCreditorReferenceID();
 				applicableHeaderTradeSettlement.getCreditorReferenceID();
-		Identifier creditorReference = creditorReferenceID==null? null : new Identifier(creditorReferenceID);
+		ID creditorReference = creditorReferenceID==null? null : new ID(creditorReferenceID);
 		LOG.info("getPaymentMeansEnum="+applicableHeaderTradeSettlement.getPaymentMeansEnum() 
 		 + " creditorReference:"+ creditorReference
 		 + " PaymentMeansText:"+applicableHeaderTradeSettlement.getPaymentMeansText() 
@@ -295,7 +295,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	 */
 	@Override
 	public void setId(String id) {
-		exchangedDocument.setID(new Identifier(id)); // No identification scheme is to be used.
+		exchangedDocument.setID(new ID(id)); // No identification scheme is to be used.
 	}
 	
 	@Override
@@ -503,6 +503,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public void setBuyerReference(String reference) {
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
 		headerTradeAgreement.setBuyerReference(new Text(reference));
+		// TODO hier Leitweg-ID
 		
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
 		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
@@ -528,7 +529,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public void setProjectReference(String docRefId, String name) {
 		if(docRefId==null) return; // optional
 		ProcuringProjectType procuringProject = new ProcuringProjectType();
-		procuringProject.setID(new Identifier(docRefId));
+		procuringProject.setID(new ID(docRefId));
 		procuringProject.setName(new Text(name));
 		
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
@@ -564,7 +565,7 @@ UBL:
 		if(id==null) return; // optional
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new Identifier(id)); // No identification scheme
+		referencedDocument.setIssuerAssignedID(new ID(id)); // No identification scheme
 		headerTradeAgreement.setContractReferencedDocument(referencedDocument);
 	}
 
@@ -603,7 +604,7 @@ UBL:
 	public void setOrderReference(String docRefId) {
 		if(docRefId==null) return; // optional
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new Identifier(docRefId)); // No identification scheme
+		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
 		
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
 		headerTradeAgreement.setSellerOrderReferencedDocument(referencedDocument);
@@ -689,14 +690,14 @@ UBL:
 	void setProcessControl(String customization, String profile) {
 		ExchangedDocumentContextType exchangedDocumentContext = new ExchangedDocumentContextType();
 		DocumentContextParameterType documentContextParameter = new DocumentContextParameterType();
-		documentContextParameter.setID(new Identifier(customization)); // No identification scheme
+		documentContextParameter.setID(new ID(customization)); // No identification scheme
 
 		exchangedDocumentContext.getGuidelineSpecifiedDocumentContextParameter().add(documentContextParameter);
 		if(profile==null) {
 			// profileIDType ist optional
 		} else { 
 			DocumentContextParameterType dcp = new DocumentContextParameterType();
-			dcp.setID(new Identifier(profile)); // No identification scheme
+			dcp.setID(new ID(profile)); // No identification scheme
 			exchangedDocumentContext.getBusinessProcessSpecifiedDocumentContextParameter().add(dcp);
 		}
 		this.setExchangedDocumentContext(exchangedDocumentContext);
@@ -754,7 +755,7 @@ UBL:
 	@Override
 	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts) {
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new Identifier(docRefId)); // No identification scheme
+		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
 		FormattedDateTimeType dateTime = newFormattedDateTimeType(ts);
 		if(dateTime!=null) referencedDocument.setFormattedIssueDateTime(dateTime);
 

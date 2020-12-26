@@ -190,7 +190,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 			this.setTaxCurrency(ahts.getTaxCurrencyCode().getValue());
 		}
 		if(ahts.getCreditorReferenceID()!=null) {
-			this.setCreditorReferenceID(new Identifier(ahts.getCreditorReferenceID()));
+			this.setCreditorReferenceID(new ID(ahts.getCreditorReferenceID()));
 		}
 		if(ahts.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) { 
 		} else {
@@ -230,7 +230,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 //				addCreditTransfer(ct);
 //			});
 
-			Identifier directDebitMandate = getDirectDebitMandateID(ahts);
+			ID directDebitMandate = getDirectDebitMandateID(ahts);
 			LOG.info("ahts.directDebitMandate="+directDebitMandate);
 			FinancialAccount directDebit = getFinancialAccount(ahts);
 			directDebit.setMandateReferencetID(directDebitMandate);
@@ -472,7 +472,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 // 1 .. 1 IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos BG-19/ BT-91
 	@Override
 	public DirectDebit getDirectDebit() {
-		Identifier directDebitMandate = getDirectDebitMandateID(this);
+		ID directDebitMandate = getDirectDebitMandateID(this);
 		LOG.info(">>>>>>>>>>>directDebitMandate="+directDebitMandate);
 		FinancialAccount fa = getFinancialAccount(this);
 		if(fa==null) return null;
@@ -486,8 +486,8 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		}
 		return new FinancialAccount(headerTradeSettlement.getSpecifiedTradeSettlementPaymentMeans().get(0));
 	}
-	static Identifier getDirectDebitMandateID(HeaderTradeSettlementType headerTradeSettlement) {
-		Identifier directDebitMandate = null;
+	static ID getDirectDebitMandateID(HeaderTradeSettlementType headerTradeSettlement) {
+		ID directDebitMandate = null;
 		if(headerTradeSettlement.getSpecifiedTradePaymentTerms().isEmpty()) {
 			// keine Mandatsreferenz
 		} else {
@@ -495,7 +495,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 			if(tradePaymentTerms.getDirectDebitMandateID().isEmpty()) {
 				// keine Mandatsreferenz
 			} else {
-				directDebitMandate = new Identifier(tradePaymentTerms.getDirectDebitMandateID().get(0).getValue());
+				directDebitMandate = new ID(tradePaymentTerms.getDirectDebitMandateID().get(0).getValue());
 			}
 		}
 		return directDebitMandate;

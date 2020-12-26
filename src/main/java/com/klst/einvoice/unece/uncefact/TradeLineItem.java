@@ -112,7 +112,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	
 	// 1 .. 1 LineID BT-126
 	void setId(String id) {
-		associatedDocumentLineDocument.setLineID(new Identifier(id)); // No identification scheme is to be used.
+		associatedDocumentLineDocument.setLineID(new ID(id)); // No identification scheme is to be used.
 		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
 	}
 
@@ -225,7 +225,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override // 0 .. 1 BT-155 Bsp: <ram:SellerAssignedID>246</ram:SellerAssignedID>
 	public void setSellerAssignedID(String id) {
 		if(id==null) return;
-		specifiedTradeProduct.setSellerAssignedID(new Identifier(id)); // No identification scheme is to be used.
+		specifiedTradeProduct.setSellerAssignedID(new ID(id)); // No identification scheme is to be used.
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
 
@@ -237,7 +237,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override // 0 .. 1 BT-156
 	public void setBuyerAssignedID(String id) {
 		if(id==null) return;
-		specifiedTradeProduct.setBuyerAssignedID(new Identifier(id)); // No identification scheme is to be used.
+		specifiedTradeProduct.setBuyerAssignedID(new ID(id)); // No identification scheme is to be used.
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
 
@@ -261,7 +261,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override // 0 .. 1 BT-157
 	public void setStandardID(String id, String schemeID) {
 		if(id==null) return;
-		specifiedTradeProduct.setGlobalID(new Identifier(id, schemeID));
+		specifiedTradeProduct.setGlobalID(new ID(id, schemeID));
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
 
@@ -348,7 +348,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	public void setOrderLineID(String id) {
 		if(id==null) return;
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setLineID(new Identifier(id)); // No identification scheme is to be used.
+		referencedDocument.setLineID(new ID(id)); // No identification scheme is to be used.
 		specifiedLineTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument);
 		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
 	}

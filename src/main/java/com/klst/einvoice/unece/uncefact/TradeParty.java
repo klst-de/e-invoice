@@ -194,8 +194,8 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	 * <br>Rule ID: 	BR-CO-9, BR-CO-26, BR-DE-16
 	 * <br>Request ID: 	R52, R47
 	 * 
-	 * @param Identifier companyId
-	 * @param Identifier schemeID, BT-31-0, BT-32-0, tax registration identifier
+	 * @param ID companyId
+	 * @param ID schemeID, BT-31-0, BT-32-0, tax registration identifier
 	 * <p>
 	 * The local identification (defined by the Seller’s address) of the Seller for tax purposes 
 	 * or a reference that enables the Seller to state his registered tax status.
@@ -208,7 +208,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		if(companyId==null) return;
 		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
 		TaxRegistrationType taxRegistration = new TaxRegistrationType();
-		taxRegistration.setID(new Identifier(companyId, schemeID));
+		taxRegistration.setID(new ID(companyId, schemeID));
 		taxRegistrationList.add(taxRegistration);
 	}
 	void addPartyTaxID(String companyId)  {
@@ -265,7 +265,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	@Override
 	public void setId(String name, String schemeID) {
 		if(name==null) return;
-		super.getID().add(new Identifier(name, schemeID));
+		super.getID().add(new ID(name, schemeID));
 	}
 
 	@Override
@@ -281,7 +281,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	@Override
 	public void setCompanyId(String name, String schemeID) {
 		if(name==null) return;
-		legalOrganization.setID(new Identifier(name, schemeID));
+		legalOrganization.setID(new ID(name, schemeID));
 		super.setSpecifiedLegalOrganization(legalOrganization);
 	}
 
@@ -330,7 +330,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	public void setUriUniversalCommunication(String name, String schemeID) {
 		if(name==null) return;
 		UniversalCommunicationType universalCommunicationType = new UniversalCommunicationType();
-		universalCommunicationType.setURIID(new Identifier(name, schemeID));
+		universalCommunicationType.setURIID(new ID(name, schemeID));
 		super.getURIUniversalCommunication().add(universalCommunicationType);
 	}
 

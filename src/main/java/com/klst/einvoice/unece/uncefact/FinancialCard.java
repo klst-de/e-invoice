@@ -84,7 +84,7 @@ public class FinancialCard extends TradeSettlementFinancialCardType implements P
 			LOG.warning("(mandatory) Payment card primary account number (pan) is null.");
 			return;
 		}
-		super.setID(new Identifier(pan));
+		super.setID(new ID(pan));
 	}
 
 	// BG-18.BT-88

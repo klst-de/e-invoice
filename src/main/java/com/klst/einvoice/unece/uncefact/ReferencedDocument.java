@@ -46,7 +46,7 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	
 	@Override
 	public void setSupportingDocumentReference(String docRefId) {
-		super.setIssuerAssignedID(new Identifier(docRefId));
+		super.setIssuerAssignedID(new ID(docRefId));
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	@Override
 	public void setExternalDocumentLocation(String locationUri) {
 		if(locationUri==null) return;
-		super.setURIID(new Identifier(locationUri));
+		super.setURIID(new ID(locationUri));
 	}
 
 	@Override

@@ -114,13 +114,13 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 	@Override
 	public void setPaymentAccountID(IBANId iban) { // use ctor
 		if(iban==null) return;
-		payeePartyCreditorFinancialAccount.setIBANID(new Identifier(iban.getValue(), iban.getSchemeID()));		
+		payeePartyCreditorFinancialAccount.setIBANID(new ID(iban.getValue(), iban.getSchemeID()));		
 	}
 
 	@Override
 	public void setPaymentAccountID(String accountId) {
 		if(accountId==null) return;
-		payeePartyCreditorFinancialAccount.setProprietaryID(new Identifier(accountId));		
+		payeePartyCreditorFinancialAccount.setProprietaryID(new ID(accountId));		
 	}
 
 	@Override
@@ -144,13 +144,13 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 	@Override
 	public void setPaymentServiceProviderID(BICId bic) {
 		if(bic==null) return;
-		payeeSpecifiedCreditorFinancialInstitution.setBICID(new Identifier(bic.getValue(), bic.getSchemeID()));
+		payeeSpecifiedCreditorFinancialInstitution.setBICID(new ID(bic.getValue(), bic.getSchemeID()));
 	}
 
 	@Override
 	public void setPaymentServiceProviderID(String id) {
 		if(id==null) return;
-		payeeSpecifiedCreditorFinancialInstitution.setBICID(new Identifier(id));	
+		payeeSpecifiedCreditorFinancialInstitution.setBICID(new ID(id));	
 	}
 
 	public String toString() {
@@ -168,7 +168,7 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 	}
 
 // ---------------- implements DirectDebit:
-	Identifier directDebitMandate = null;
+	ID directDebitMandate = null;
 	
 	// BG-19.BT-89
 	@Override
@@ -179,9 +179,9 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 
 	@Override
 	public void setMandateReferencetID(String id) {
-		directDebitMandate = new Identifier(id);
+		directDebitMandate = new ID(id);
 	}
-	public void setMandateReferencetID(Identifier id) {
+	public void setMandateReferencetID(ID id) {
 		directDebitMandate = id;
 	}
 
@@ -213,13 +213,13 @@ public class FinancialAccount implements CreditTransfer, DirectDebit {
 	@Override
 	public void setDebitedAccountID(String id) {
 		if(id==null) return;
-		payerPartyDebtorFinancialAccount.setIBANID(new Identifier(id));		
+		payerPartyDebtorFinancialAccount.setIBANID(new ID(id));		
 	}
 
 	@Override
 	public void setDebitedAccountID(IBANId iban) { // use ctor
 		if(iban==null) return;
-		payerPartyDebtorFinancialAccount.setIBANID(new Identifier(iban.getValue(), iban.getSchemeID()));		
+		payerPartyDebtorFinancialAccount.setIBANID(new ID(iban.getValue(), iban.getSchemeID()));		
 	}
 
 }

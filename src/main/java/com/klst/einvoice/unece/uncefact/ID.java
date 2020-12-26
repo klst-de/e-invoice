@@ -24,29 +24,29 @@ Scheme identifier         : Conditional 	String         | GLN
 Scheme version identifier : Conditional 	String         | 1.0
  
  */
-public class Identifier extends IDType {
+public class ID extends IDType {
 
-	Identifier() {
+	ID() {
 		super();
 	}
 	
-	public Identifier(String content, String schemeID, String schemeVersionID) {
+	public ID(String content, String schemeID, String schemeVersionID) {
 		this();
 		super.setValue(content);
 		super.setSchemeID(schemeID);
 		super.setSchemeVersionID(schemeVersionID);
 	}
 
-	public Identifier(String content, String schemeID) {
+	public ID(String content, String schemeID) {
 		this(content, schemeID, null);
 	}
 	
-	public Identifier(String content) {
+	public ID(String content) {
 		this(content, null, null);
 	}
 		
 	// copy ctor
-	public Identifier(IDType id) {
+	public ID(IDType id) {
 		this(id.getValue(), id.getSchemeID(), id.getSchemeVersionID());
 	}
 	
