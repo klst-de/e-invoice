@@ -12,7 +12,6 @@ import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessPartyFactory;
 import com.klst.einvoice.IContact;
-import com.klst.einvoice.Identifier;
 import com.klst.einvoice.PostalAddress;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
@@ -25,9 +24,9 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Part
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyLegalFormType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EndpointIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.RegistrationNameType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.WebsiteURIType;
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.IdentifierType;
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
 
@@ -84,15 +83,14 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		List<Map<Object,String>> taxSchemesList = getTaxSchemes(party);
 		addTaxSchemes(taxSchemesList);
 		
-		// BT-33 0..1 additional legal info / not used for Buyer
+		// BG-4.BT-33 0..1 additional legal info / not used for Buyer
 		setCompanyLegalForm(map.get(CompanyLegalFormType.class));
 		
-		// BT-34 ++ 0..1 Seller electronic address
-		WebsiteURIType websiteURI = party.getWebsiteURI();
-		if(websiteURI==null) {
-			// nix
-		} else {
-			setUriUniversalCommunication(websiteURI.getValue(), websiteURI.getSchemeID());
+		// BG-4.BT-34 ++ 0..1 Seller electronic address
+		// BG-7.BT-49 ++ 0..1 Buyer electronic address
+		EndpointIDType endpointID = party.getEndpointID();
+		if(endpointID!=null) {
+			setUriUniversalCommunication(endpointID.getValue(), endpointID.getSchemeID());
 		}
 	}
 	
@@ -447,17 +445,17 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	@Override
 	public String getUriUniversalCommunication() {
-		WebsiteURIType websiteURI = super.getWebsiteURI();
-		return websiteURI==null ? null : websiteURI.getValue(); // ohne schema
+		EndpointIDType endpointID = super.getEndpointID();
+		return endpointID==null ? null : endpointID.getValue(); // ohne schema
 	}
 
 	@Override
 	public void setUriUniversalCommunication(String name, String schemeID) {
 		if(name==null) return;
-		WebsiteURIType websiteURI = new WebsiteURIType();
-		websiteURI.setValue(name);
-		websiteURI.setSchemeID(schemeID);
-		super.setWebsiteURI(websiteURI);
+		EndpointIDType endpointID = new EndpointIDType();
+		endpointID.setValue(name);
+		endpointID.setSchemeID(schemeID);
+		super.setEndpointID(endpointID);
 	}
 
 }
