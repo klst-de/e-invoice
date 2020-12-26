@@ -87,7 +87,7 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 	// BG-23.BT-118
 	@Override
 	public void setTaxCategoryCode(String code) {
-		super.setID(new Identifier(code));
+		super.setID(new ID(code));
 	}
 
 	@Override

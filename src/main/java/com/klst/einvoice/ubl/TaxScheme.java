@@ -44,7 +44,7 @@ public class TaxScheme extends TaxSchemeType implements ITaxType {
 
 	@Override
 	public void setTaxType(String type) {
-		super.setID(new Identifier(type));
+		super.setID(new ID(type));
 	}
 
 	@Override

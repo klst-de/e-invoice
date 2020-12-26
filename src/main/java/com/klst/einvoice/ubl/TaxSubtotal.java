@@ -119,10 +119,10 @@ public class TaxSubtotal extends TaxSubtotalType implements BG23_VatBreakdown {
 // TODO TaxCategory class extends TaxCategoryType verwenden
 	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, String vat, Percent taxRate, String exemptionText, String exemptionCode) {
 		TaxCategoryType taxCategory = new TaxCategoryType();
-		taxCategory.setID(new Identifier(codeEnum.getValue()));
+		taxCategory.setID(new ID(codeEnum.getValue()));
 		
 		TaxSchemeType taxScheme = new TaxSchemeType();
-		taxScheme.setID(new Identifier(vat)); // USt/VAT
+		taxScheme.setID(new ID(vat)); // USt/VAT
 		taxCategory.setTaxScheme(taxScheme);
 		
 		if(taxRate!=null) {

@@ -127,12 +127,12 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 
 	@Override
 	public void setId(String name) {
-		setId(new Identifier(name));
+		setId(new ID(name));
 	}
 	
 	@Override
 	public void setId(String name, String schemeID) {
-		setId(new Identifier(name, schemeID));
+		setId(new ID(name, schemeID));
 	}
 	
 	void setId(IDType iD) {

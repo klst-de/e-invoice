@@ -40,6 +40,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Docu
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.MonetaryTotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderReferenceType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyLegalEntityType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentTermsType;
@@ -51,6 +52,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxT
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.AllowanceTotalAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BuyerReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ChargeTotalAmountType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditNoteTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CustomizationIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentCurrencyCodeType;
@@ -140,9 +142,9 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 	// BT-1 + 1..1 Invoice number
 	public void setId(String id) {
 		if(isInvoiceType) {
-			invoice.setID(new Identifier(id));
+			invoice.setID(new ID(id));
 		} else {
-			creditNote.setID(new Identifier(id));
+			creditNote.setID(new ID(id));
 		}
 	}
 	
@@ -356,7 +358,7 @@ UBL:
 	public void setProjectReference(String id, String name) {
 		if(id==null) return; // optional
 		ProjectReferenceType projectReference = new ProjectReferenceType();
-		projectReference.setID(new Identifier(id));
+		projectReference.setID(new ID(id));
 		if(isInvoiceType) {
 			invoice.getProjectReference().add(projectReference);
 		} else {
@@ -415,7 +417,7 @@ UBL:
 	public void setContractReference(String id) {
 		if(id==null) return; // optional
 		DocumentReferenceType reference = new DocumentReferenceType();
-		reference.setID(new Identifier(id));
+		reference.setID(new ID(id));
 		if(isInvoiceType) {
 			invoice.getContractDocumentReference().add(reference);
 		} else {
@@ -429,7 +431,7 @@ UBL:
 		return list.isEmpty() ? null : list.get(0).getID().getValue(); // wg. 0..1
 	}
 
-	private void setOrderReference(OrderReferenceType orderReference, Identifier id, SalesOrderIDType salesOrderID) {
+	private void setOrderReference(OrderReferenceType orderReference, ID id, SalesOrderIDType salesOrderID) {
 		if(id==null && salesOrderID==null) return;
 		if(orderReference==null) orderReference = new OrderReferenceType();
 		if(id!=null) orderReference.setID(id);
@@ -446,7 +448,7 @@ UBL:
 	@Override
 	public void setPurchaseOrderReference(String docRefId) {
 		if(docRefId==null) return; // optional
-		setOrderReference(isInvoiceType? invoice.getOrderReference() : creditNote.getOrderReference(), new Identifier(docRefId), null);
+		setOrderReference(isInvoiceType? invoice.getOrderReference() : creditNote.getOrderReference(), new ID(docRefId), null);
 	}
 	@Override
 	public String getPurchaseOrderReference() {
@@ -654,7 +656,22 @@ UBL:
 	@Override
 	public BG7_Buyer getBuyer() {
 		CustomerPartyType customerparty = isInvoiceType ? invoice.getAccountingCustomerParty() : creditNote.getAccountingCustomerParty();
-		return customerparty==null ? null : new Party(customerparty.getParty());
+		if(customerparty==null) return null;
+		Party buyer = new Party(customerparty.getParty());
+		// BG-7.BT-46 0..1 Buyer identifier                    + 0..1 Scheme identifier
+		// BG-7.BT-47 0..1 Buyer legal registration identifier + 0..1 Scheme identifier
+		List<PartyLegalEntityType> partyLegalEntityList = customerparty.getParty().getPartyLegalEntity();
+		if(!partyLegalEntityList.isEmpty()) {
+			CompanyIDType companyID = partyLegalEntityList.get(0).getCompanyID();
+			if(companyID!=null) {
+//				companyID.getValue();
+//				companyID.getSchemeID();
+				LOG.info(">>>>>>>>>>>>>>>>>>> "+companyID.getValue() + " getSchemeID="+companyID.getSchemeID());
+//				buyer.setCompanyLegalForm(companyID.getValue(), companyID.getSchemeID());
+			}
+		}
+		
+		return buyer;
 	}
 	
 	// BG-10 + 0..1 PAYEE

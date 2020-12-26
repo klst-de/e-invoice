@@ -10,8 +10,9 @@ import com.klst.einvoice.BG10_Payee;
 import com.klst.einvoice.BG11_SellerTaxRepresentativeParty;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
-import com.klst.einvoice.BG23_VatBreakdown;
+import com.klst.einvoice.BusinessPartyFactory;
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.Identifier;
 import com.klst.einvoice.PostalAddress;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
@@ -41,6 +42,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	private static final Logger LOG = Logger.getLogger(Party.class.getName());
 	
+	// wg. PostalAddressFactory, IContactFactory
 	Party() {
 		super();
 	}
@@ -56,29 +58,29 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 			map = mapList.get(0); // first
 		}
 		
-//		this.init(getBusinessName(party )// map.get(RegistrationNameType.class)
-//				, getPostalAddress(party)
-//				, getContact(party)
-//				, map.get(CompanyIDType.class)
-//				, map.get(CompanyLegalFormType.class)
-//				);
 		this.init(map.get(RegistrationNameType.class)
 				, getPostalAddress(party)
 				, getContact(party)
 				);
 		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getRegistrationName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
 		
-		// BT-28 ++ 0..1 Seller trading name / UBL: <cac:PartyName><cbc:Name>
+		// BG-4.BT-28 ++ 0..1 Seller trading name / UBL: <cac:PartyName><cbc:Name>
+		// BG-7.BT-45 ++ 0..1 Buyer trading name
 		setBusinessName(getBusinessName(party ));
 		
-		// BT-29 ++ 0..n Seller identifier
+		// BG-4.BT-29 ++ 0..n Seller identifier
+		// BG-7.BT-46 ++ 0..1 Buyer identifier
 		List<PartyIdentificationType> partyIdentificationList = party.getPartyIdentification();
-		setId(partyIdentificationList.isEmpty() ? null : partyIdentificationList.get(0).getID().getValue());
+		if(!partyIdentificationList.isEmpty()) {
+			setId(partyIdentificationList.get(0).getID().getValue(), partyIdentificationList.get(0).getID().getSchemeID());
+		}
 		
-		// BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
-		setCompanyId(map.get(CompanyIDType.class));
+		// BG-4.BT-30 0..1 Seller legal registration ID 
+		// BG-7.BT-47 0..1 Buyer legal registration identifier
+		setCompanyId(map.get(CompanyIDType.class), map.get(String.class));
 
-		// 0..n wg. BT-31, BT-32, BT-31-0, BT-32-0
+		// 0..n wg. BT-31 Seller VAT identifier, BT-32 Seller tax registration identifier, 
+		//          BT-31-0, BT-32-0
 		List<Map<Object,String>> taxSchemesList = getTaxSchemes(party);
 		addTaxSchemes(taxSchemesList);
 		
@@ -97,23 +99,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	PartyLegalEntityType partyLegalEntity;
 	
 	/**
-	 * 
-	 * @param name             BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
-	 * @param address          BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
-	 * @param contact          BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
-	 * @param companyId        BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
-	 * @param companyLegalForm BT-33 0..1 additional legal info / not used for Buyer
-	 */
-	@Deprecated
-	Party(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
-		this();
-		init(name, address, contact);
-		setCompanyId(companyId);
-		setCompanyLegalForm(companyLegalForm);
-	}
-	
-
-	/**
 	 * ctor for BusinessParty - use BusinessPartyFactory method
 	 * 
 	 * @param name             BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
@@ -125,7 +110,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	Party(String name, PostalAddress address, IContact contact) {
 		this();
 		init(name, address, contact);
-		
 	}
 	
 	void init(String name, PostalAddress address, IContact contact) {
@@ -135,15 +119,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		setIContact(contact);
 	}
 	
-//	void init(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
-//		partyLegalEntity = new PartyLegalEntityType();
-//		setBusinessName(name);
-//		setAddress(address);
-//		setIContact(contact);
-//		setCompanyId(companyId);
-//		setCompanyLegalForm(companyLegalForm);
-//	}
-
 	// PostalAddress
 	@Override
 	public PostalAddress getAddress() {
@@ -300,9 +275,14 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 			RegistrationNameType registrationName = partyLegalEntity.getRegistrationName();
 			String name = registrationName==null ? null : registrationName.getValue();
 			map.put(RegistrationNameType.class, name);
-			IdentifierType companyID = partyLegalEntity.getCompanyID();
+			
+			CompanyIDType companyID = partyLegalEntity.getCompanyID();
 			String companyIDvalue = companyID==null ? null : companyID.getValue();
-			map.put(CompanyIDType.class, companyIDvalue);			
+//			Identifier companyIdentifier = companyID==null ? null : new ID(companyID.getValue(), companyID.getSchemeID());
+			map.put(CompanyIDType.class, companyIDvalue);
+			String companyIDschema = companyID==null ? null : companyID.getSchemeID();
+			map.put(String.class, companyIDschema);
+			
 			TextType companyLegalForm = partyLegalEntity.getCompanyLegalForm();
 			String companyLegalFormValue = companyLegalForm==null ? null : companyLegalForm.getValue();
 			map.put(CompanyLegalFormType.class, companyLegalFormValue);	
@@ -361,7 +341,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	public void setId(String name, String schemeID) {
 		if(name==null) return;
 		PartyIdentificationType partyIdentification = new PartyIdentificationType();
-		partyIdentification.setID(new Identifier(name, schemeID));
+		partyIdentification.setID(new ID(name, schemeID));
 		super.getPartyIdentification().add(partyIdentification);
 	}
 
@@ -442,7 +422,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		partyTaxScheme.setCompanyID(companyID);
 		
 		TaxSchemeType taxScheme = new TaxSchemeType();
-		taxScheme.setID(new Identifier(schemeID));
+		taxScheme.setID(new ID(schemeID));
 		partyTaxScheme.setTaxScheme(taxScheme);
 		
 		List<PartyTaxSchemeType> list = super.getPartyTaxScheme();
@@ -461,7 +441,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		if(name==null) return;
 		CompanyLegalFormType clf = new CompanyLegalFormType();
 		clf.setValue(name);
-		partyLegalEntity.setCompanyLegalForm(clf);		
+		partyLegalEntity.setCompanyLegalForm(clf);	
 		if(super.getPartyLegalEntity().isEmpty()) super.getPartyLegalEntity().add(partyLegalEntity);
 	}
 

@@ -125,9 +125,9 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	// BT-126 ++ 1..1 Invoice line identifier
 	void setId(String id) {
 		if(isInvoiceLineType) {
-			iLine.setID(new Identifier(id)); // No identification scheme 
+			iLine.setID(new ID(id)); // No identification scheme 
 		} else {
-			cnLine.setID(new Identifier(id)); 
+			cnLine.setID(new ID(id)); 
 		}
 	}
 
@@ -164,7 +164,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		LOG.warning(NOT_IMPEMENTED); // TODO
  		if(id==null) return;
 		ItemIdentificationType itemIdentification = new ItemIdentificationType();
-		itemIdentification.setID(new Identifier(id, schemeID));
+		itemIdentification.setID(new ID(id, schemeID));
 		
 		if(isInvoiceLineType) {
 			ItemType item = iLine.getItem();
@@ -499,7 +499,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	public void setSellerAssignedID(String id) {
  		if(id==null) return;
 		ItemIdentificationType itemIdentification = new ItemIdentificationType();
-		itemIdentification.setID(new Identifier(id));
+		itemIdentification.setID(new ID(id));
 		
 		if(isInvoiceLineType) {
 			ItemType item = iLine.getItem();
@@ -525,7 +525,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	public void setBuyerAssignedID(String id) {
  		if(id==null) return;
 		ItemIdentificationType itemIdentification = new ItemIdentificationType();
-		itemIdentification.setID(new Identifier(id));
+		itemIdentification.setID(new ID(id));
 		
 		if(isInvoiceLineType) {
 			ItemType item = iLine.getItem();
@@ -551,7 +551,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	public void setStandardID(String id, String schemeID) {
  		if(id==null) return;
 		ItemIdentificationType itemIdentification = new ItemIdentificationType();
-		itemIdentification.setID(new Identifier(id, schemeID));
+		itemIdentification.setID(new ID(id, schemeID));
 		
 		if(isInvoiceLineType) {
 			ItemType item = iLine.getItem();

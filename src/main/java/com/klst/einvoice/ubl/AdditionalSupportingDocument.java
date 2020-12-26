@@ -70,7 +70,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 	// BG.24.BT-122
 	@Override
 	public void setSupportingDocumentReference(String id) {
-		super.setID(new Identifier(id));
+		super.setID(new ID(id));
 	}
 
 	@Override

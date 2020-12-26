@@ -62,7 +62,7 @@ public class PaymentMandate extends PaymentMandateType implements DirectDebit {
 
 	@Override
 	public void setMandateReferencetID(String id) {
-		super.setID(new Identifier(id));	
+		super.setID(new ID(id));	
 	}
 
 	/*
@@ -97,14 +97,14 @@ public class PaymentMandate extends PaymentMandateType implements DirectDebit {
 	@Override
 	public void setDebitedAccountID(String id) {
 		FinancialAccountType fa = new FinancialAccountType();
-		fa.setID(new Identifier(id));
+		fa.setID(new ID(id));
 		super.setPayerFinancialAccount(fa);
 	}
 
 	@Override
 	public void setDebitedAccountID(IBANId iban) {
 		FinancialAccountType fa = new FinancialAccountType();
-		fa.setID(new Identifier(iban.getValue(), iban.getSchemeID()));
+		fa.setID(new ID(iban.getValue(), iban.getSchemeID()));
 		super.setPayerFinancialAccount(fa);
 	}
 
