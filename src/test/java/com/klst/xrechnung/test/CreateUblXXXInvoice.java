@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
+import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.AllowancesAndCharges;
@@ -188,7 +189,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		
 		ublInvoice.setSeller(testDoc.getSeller());
 		LOG.info("Seller Address and Contact "+ublInvoice.getSeller().getAddress() + " "+ublInvoice.getSeller().getIContact());
+		BG7_Buyer buyer = testDoc.getBuyer();
 		ublInvoice.setBuyer(testDoc.getBuyer());
+		LOG.info("Buyer UriUniversalCommunication:" + buyer.getUriUniversalCommunication());
 		LOG.info("Buyer Address and Contact "+ublInvoice.getBuyer().getAddress() + " "+ublInvoice.getBuyer().getIContact());
 		
 		makeOptionals(ublInvoice);
