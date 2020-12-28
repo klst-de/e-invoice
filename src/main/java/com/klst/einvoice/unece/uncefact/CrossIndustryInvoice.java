@@ -207,7 +207,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 			addSupportigDocument(rd);
 		});
 
-		setOrderReference(getOrderReferenceID(doc)); // optional
+		setPurchaseOrderReference(getPurchaseOrderReference(doc)); // optional BT-13
+		setOrderReference(getOrderReferenceID(doc)); // optional BT-14
 
 		addNotes(doc.getExchangedDocument());	
 		LOG.info("\n SellerParty:");;
@@ -581,25 +582,30 @@ UBL:
 
 	// BT-13 + 0..1 Purchase order reference
 	@Override
-	public void setPurchaseOrderReference(String id) {
-		// TODO Auto-generated method stub
+	public void setPurchaseOrderReference(String docRefId) {
+		if(docRefId==null) return; // optional
+		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
+		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
 		
+		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
+		headerTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument);
+
+		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
+		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
+		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
 	}
 
 	@Override
 	public String getPurchaseOrderReference() {
-		// TODO Auto-generated method stub
-		return null;
+		return getPurchaseOrderReference(this);
+	}
+	public String getPurchaseOrderReference(CrossIndustryInvoiceType doc) {
+		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		ReferencedDocumentType referencedDocument = headerTradeAgreement.getBuyerOrderReferencedDocument();
+		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
 	}
 
 	// BT-14 + 0..1 Sales order reference
-/* IssuerAssignedID Verkaufsauftragsreferenz
-	1 .. 1 ApplicableHeaderTradeAgreement Gruppierung der Vertragsangaben
-	0 .. 1 SellerOrderReferencedDocument Detailangaben zur zugehörigen Auftragsbestätigung xs:sequence 
-	1 .. 1 IssuerAssignedID Verkaufsauftragsreferenz                                                     BT-14 
-	0 .. 1 FormattedIssueDateTime Details zum Auftragsbestätigungsdatum xs:sequence 
-	1 .. 1 DateTimeString Auftragsbestätigungsdatum, Wert required format Datum, Format
- */
 	@Override
 	public void setOrderReference(String docRefId) {
 		if(docRefId==null) return; // optional
