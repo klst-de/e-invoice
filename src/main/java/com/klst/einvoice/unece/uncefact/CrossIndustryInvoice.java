@@ -192,7 +192,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 			setTaxPointDate(ts);
 		}
 		
-		setBuyerReference(getBuyerReferenceValue(doc)); // optional
+		setBuyerReference(getBuyerReferenceValue(doc)); // optional BT-10
+		setProjectReference(getProjectReference(doc), getProjectReferenceName(doc)); // optional BT-11
 		setContractReference(getContractReferenceID(doc)); // optional
 		
 		List<BG24_AdditionalSupportingDocs> asd = getAdditionalSupportingDocuments(doc); // 0..n
@@ -543,8 +544,17 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 
 	@Override
 	public String getProjectReference() {
-		LOG.warning(NOT_IMPEMENTED); // TODO
-		return null;
+		return getProjectReference(this);
+	}
+	static String getProjectReference(CrossIndustryInvoiceType doc) {
+		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		ProcuringProjectType referencedDocument = headerTradeAgreement.getSpecifiedProcuringProject();
+		return referencedDocument==null ? null : (referencedDocument.getID()==null? null : referencedDocument.getID().getValue());	
+	}
+	static String getProjectReferenceName(CrossIndustryInvoiceType doc) {
+		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		ProcuringProjectType referencedDocument = headerTradeAgreement.getSpecifiedProcuringProject();
+		return referencedDocument==null ? null : (referencedDocument.getName()==null? null : referencedDocument.getName().getValue());	
 	}
 
 	// BT-12 + 0..1 Contract reference
@@ -599,7 +609,7 @@ UBL:
 	public String getPurchaseOrderReference() {
 		return getPurchaseOrderReference(this);
 	}
-	public String getPurchaseOrderReference(CrossIndustryInvoiceType doc) {
+	static String getPurchaseOrderReference(CrossIndustryInvoiceType doc) {
 		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		ReferencedDocumentType referencedDocument = headerTradeAgreement.getBuyerOrderReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	

@@ -67,6 +67,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //		cii.setDocumentCurrency(testDoc.getDocumentCurrency());                           ---- verschoben hinter pi
 //		cii.setTaxCurrency(testDoc.getTaxCurrency()); // BT-6 + 0..1 (optional)
 		cii.setBuyerReference(testDoc.getBuyerReferenceValue()); // BT-10 + 0..1 (optional)
+		cii.setProjectReference(testDoc.getProjectReference()); // BT-11 + 0..1 (optional)
 
 //		makeOptionals(cii);
 		cii.setContractReference(testDoc.getContractReference()); // BT-12 + 0..1
