@@ -19,9 +19,9 @@ public interface BusinessParty {
 	public void setBusinessName(String name);
 	
 	public String getId(); // kleingeschrieben, nicht ID!
-	// TODO:  dto für CompanyId
-//	public Identifier getIdentifier();
-//	public void setIdentifier(Identifier id);
+	// get/setIdentifier TODO:  dto für CompanyId
+	public Identifier getIdentifier();
+	public void setIdentifier(Identifier id);
 	
 	public void setId(String name);
 	public void setId(String name, String schemeID);

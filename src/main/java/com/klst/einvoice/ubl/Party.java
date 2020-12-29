@@ -330,7 +330,18 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		List<PartyIdentificationType> partyIdentificationList = super.getPartyIdentification();
 		return partyIdentificationList.isEmpty() ? null : partyIdentificationList.get(0).getID().getValue(); // ohne schema
 	}
+	@Override
+	public Identifier getIdentifier() {
+		List<PartyIdentificationType> partyIdentificationList = super.getPartyIdentification();
+		return partyIdentificationList.isEmpty() ? null 
+				: new ID(partyIdentificationList.get(0).getID().getValue(), partyIdentificationList.get(0).getID().getSchemeID());
+	}
 
+	@Override
+	public void setIdentifier(Identifier id) {
+		setId(id.getContent(), id.getSchemeIdentifier());
+	}
+	
 	@Override
 	public void setId(String name) {
 		setId(name, null);

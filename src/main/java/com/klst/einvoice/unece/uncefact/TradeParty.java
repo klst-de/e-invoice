@@ -48,11 +48,12 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		// BT-28 ++ 0..1 Seller trading name / TradingBusinessName
 		setBusinessName(legalOrganization==null ? null : legalOrganization.getTradingBusinessName()==null ? null : legalOrganization.getTradingBusinessName().getValue());
 
-		// BT-29 ++ 0..n Seller identifier
+		// BG-4.BT-29 ++ 0..n Seller identifier
+		// BG-7.BT-46 ++ 0..1 Buyer identifier
 		List<IDType> iDlist = party.getID();
 		iDlist.forEach(iD -> {
-//			this.setId(iD.getValue()); // oder:
-			super.getID().add(iD);
+			Identifier identifier = new ID(iD.getValue(), iD.getSchemeID());
+			this.setId(identifier.getContent(), identifier.getSchemeIdentifier());
 		});
 		
 		// BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
@@ -254,6 +255,10 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 
 	@Override // 0..n returns the first
+	public Identifier getIdentifier() {
+		List<IDType> list = this.getID();
+		return list.isEmpty() ? null : new ID(list.get(0).getValue(), list.get(0).getSchemeID());
+	}
 	public String getId() {
 		List<IDType> list = this.getID();
 		return list.isEmpty() ? null : list.get(0).getValue();
@@ -262,6 +267,11 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	@Override
 	public void setId(String name) {
 		setId(name, null);
+	}
+	@Override
+	public void setIdentifier(Identifier id) {
+		if(name==null) return;
+		setId(id.getContent(), id.getSchemeIdentifier());
 	}
 	@Override
 	public void setId(String name, String schemeID) {
