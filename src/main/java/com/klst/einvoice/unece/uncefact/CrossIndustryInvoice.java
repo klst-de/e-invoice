@@ -551,7 +551,8 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		ProcuringProjectType referencedDocument = headerTradeAgreement.getSpecifiedProcuringProject();
 		return referencedDocument==null ? null : (referencedDocument.getID()==null? null : referencedDocument.getID().getValue());	
 	}
-	static String getProjectReferenceName(CrossIndustryInvoiceType doc) {
+	// public wg. test
+	public static String getProjectReferenceName(CrossIndustryInvoiceType doc) {
 		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		ProcuringProjectType referencedDocument = headerTradeAgreement.getSpecifiedProcuringProject();
 		return referencedDocument==null ? null : (referencedDocument.getName()==null? null : referencedDocument.getName().getValue());	
