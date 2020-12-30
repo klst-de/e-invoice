@@ -255,7 +255,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 	@Override
 	public void setIdentifier(Identifier id) {
-		if(name==null) return;
+		if(id==null) return;
 		setId(id.getContent(), id.getSchemeIdentifier());
 	}
 	@Override
@@ -277,6 +277,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 
 	@Override
 	public void setCompanyIdentifier(Identifier id) {
+		if(id==null) return;
 		setCompanyId(id.getContent(), id.getSchemeIdentifier());
 	}
 	@Override
