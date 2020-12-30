@@ -18,15 +18,19 @@ public interface BusinessParty {
 	public String getBusinessName();
 	public void setBusinessName(String name);
 	
+	// BG-4.BT-29 ++ 0..n Seller identifier
+	// BG-7.BT-46 ++ 0..1 Buyer identifier
 	public String getId(); // kleingeschrieben, nicht ID!
-	// get/setIdentifier TODO:  dto für CompanyId
 	public Identifier getIdentifier();
 	public void setIdentifier(Identifier id);
-	
 	public void setId(String name);
 	public void setId(String name, String schemeID);
 
+	// BG-4.BT-30 0..1 Seller legal registration ID 
+	// BG-7.BT-47 0..1 Buyer legal registration identifier
 	public String getCompanyId();
+	public Identifier getCompanyIdentifier();
+	public void setCompanyIdentifier(Identifier id);
 	public void setCompanyId(String name);
 	public void setCompanyId(String name, String schemeID);
 	

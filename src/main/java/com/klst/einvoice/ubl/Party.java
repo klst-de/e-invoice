@@ -359,10 +359,21 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	public String getCompanyId() {
 		return getObject(CompanyIDType.class);
 	}
+	
+	@Override
+	public Identifier getCompanyIdentifier() {
+		// TODO
+		return null;
+	}
 
 	@Override
 	public void setCompanyId(String name) {
 		setCompanyId(name, null);
+	}
+
+	@Override
+	public void setCompanyIdentifier(Identifier id) {
+		setCompanyId(id.getContent(), id.getSchemeIdentifier());
 	}
 
 	@Override

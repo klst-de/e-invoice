@@ -94,7 +94,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				                          );
 		sellerParty.setBusinessName(testSellerParty.getBusinessName()) ; // BT-28
 		sellerParty.setIdentifier(testSellerParty.getIdentifier()); // BT-29
-		sellerParty.setCompanyId(testSellerParty.getCompanyId());
+		sellerParty.setCompanyIdentifier(testSellerParty.getCompanyIdentifier()); // BT-30
 		sellerParty.setCompanyLegalForm(testSellerParty.getCompanyLegalForm());
 		// [BR-62]-The Seller electronic address (BT-34) shall have a Scheme identifier :
 		sellerParty.setUriUniversalCommunication(testSellerParty.getUriUniversalCommunication());
