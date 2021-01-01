@@ -18,6 +18,7 @@ import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.Identifier;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
@@ -29,6 +30,7 @@ import com.klst.untdid.codelist.TaxCategoryCode;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._100.ReferenceCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TimeReferenceCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentContextParameterType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
@@ -662,7 +664,45 @@ UBL:
 		return result;
 	}
 
-	// BT-18 Invoiced object identifier 
+	// BT-18 Invoiced object identifier      TODO:
+//	@Override
+//	public void setInvoicedObjectIdentifier(Identifier id) {
+//		if(id==null) return; // optional
+//		setInvoicedObject(id.getContent(), id.getSchemeIdentifier());
+//	}
+//	@Override
+//	public void setInvoicedObject(String name) {
+//		setInvoicedObject(name, null);
+//	}
+//	@Override
+//	public void setInvoicedObject(String name, String code) {
+//		if(name==null) return; // optional
+//		ReferencedDocument referencedDocument = new ReferencedDocument(name, ReferencedDocument.InvoicingDataSheet, code);
+//		addSupportigDocument(referencedDocument);
+//	}
+//	@Override
+//	public Identifier getInvoicedObjectIdentifier() {
+//		List<ReferencedDocument> referencedDocuments = getReferencedDocuments(this);
+//		if(referencedDocuments.isEmpty()) return null;
+//		Identifier result = null;
+//		for(int i=0; i<referencedDocuments.size(); i++) {
+//			ReferencedDocument refDoc = referencedDocuments.get(i);
+//			if(refDoc.isInvoicingDataSheet()) {
+//				// IssuerAssignedID
+//				// TypeCode 130
+//				// 0..1 ReferenceTypeCode
+//				ReferenceCodeType referenceCode = refDoc.getReferenceTypeCode();
+//				result = new ID(refDoc.getIssuerAssignedID().getValue(), referenceCode==null? null : referenceCode.getValue());
+//			}
+//		}
+//		return result;
+//	}
+//	@Override
+//	public String getInvoicedObject() {
+//		Identifier id = getInvoicedObjectIdentifier();
+//		return id==null? null : id.getContent();
+//	}
+	
 	// und BG-24.BT-122 Supporting document reference in
 /*
 

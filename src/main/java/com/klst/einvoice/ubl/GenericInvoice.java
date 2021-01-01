@@ -392,8 +392,13 @@ CII: 02.01a-INVOICE_uncefact.xml :
             </ram:ContractReferencedDocument>
             ...
             <ram:AdditionalReferencedDocument>
-                <ram:IssuerAssignedID>ANG987654321</ram:IssuerAssignedID> <!-- BG-24.BT-17,BT-18 -->
+                <ram:IssuerAssignedID>ANG987654321</ram:IssuerAssignedID> <!-- BT-17 -->
                 <ram:TypeCode>50</ram:TypeCode>
+            </ram:AdditionalReferencedDocument>
+            <ram:AdditionalReferencedDocument>
+                <ram:IssuerAssignedID>Test</ram:IssuerAssignedID>         <!-- BT-18 eigentest -->
+                <ram:TypeCode>130</ram:TypeCode>
+                <ram:ReferenceTypeCode>AAA</ram:ReferenceTypeCode>
             </ram:AdditionalReferencedDocument>
             
 UBL: 
@@ -406,7 +411,7 @@ UBL:
     <cbc:SalesOrderID>ABC123456789</cbc:SalesOrderID>  <!-- BT-14 + 0..1 -->
   </cac:OrderReference>
   <cac:OriginatorDocumentReference>
-    <cbc:ID>ANG987654321</cbc:ID>                      <!-- BG-24.BT-17,BT-18 -->
+    <cbc:ID>ANG987654321</cbc:ID>                      <!-- BT-17 -->
   </cac:OriginatorDocumentReference>
   <cac:ContractDocumentReference>
     <cbc:ID>0000000752</cbc:ID>                        <!-- BT-12 + 0..1 -->

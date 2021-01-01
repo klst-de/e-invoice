@@ -17,6 +17,7 @@ import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.Identifier;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -174,6 +175,10 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		});
 		
 		cii.setTenderOrLotReference(testDoc.getTenderOrLotReference()); // (optional) BT-17
+		// TODO es fehlt ein Testfall, Test:
+//		Identifier identifier = testDoc.getInvoicedObjectIdentifier();
+//		cii.setInvoicedObjectIdentifier(identifier); // (optional) BT-18
+//		cii.setInvoicedObject("Test", "AAA"); // (optional) BT-18
 
 		BusinessParty testPayeeParty = testDoc.getPayee();
 		if(testPayeeParty==null) {

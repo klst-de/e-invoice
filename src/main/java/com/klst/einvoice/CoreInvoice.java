@@ -387,7 +387,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public String getOrderReference();
 
 	// BT-15 Receiving advice reference                                TODO 
-	// BT-16 Despatch advice reference                                 TODO
+	// BT-16 Despatch advice reference                                 TODO UBL: <cac:DespatchDocumentReference>
 	
 	/**
 	 * Tender or lot reference
@@ -405,7 +405,13 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void setTenderOrLotReference(String docRefId);
 	public String getTenderOrLotReference();
 	
-	// BT-18 Invoiced object identifier                                TODO
+	// BT-18 Invoiced object identifier  TODO:                              TODO no testCase provided
+//	public void setInvoicedObjectIdentifier(Identifier id);
+//	public void setInvoicedObject(String name);
+//	public void setInvoicedObject(String name, String schemeID);
+//	public String getInvoicedObject();
+//	public Identifier getInvoicedObjectIdentifier();
+	
 	// BT-19 Buyer accounting reference                                TODO
 
 	// BT-20 @see setPaymentTermsAndDate
