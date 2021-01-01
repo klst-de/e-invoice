@@ -51,7 +51,6 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 	/**
 	 * 
 	 * @param Supporting document reference id, madatory
-//	 * @param code, optional , @see https://github.com/klst-de/e-invoice/issues/10
 	 * @param description, optional
 	 * @param url, optional
 	 */
@@ -62,7 +61,6 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 	
 	void init(String docRefId, String description, String url) {
 		setSupportingDocumentReference(docRefId);
-//		setSupportingDocumentCode(code);
 		setSupportingDocumentDescription(description);
 		setExternalDocumentLocation(url);
 	}
@@ -80,23 +78,6 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 	static String getId(DocumentReferenceType documentReference) {
 		return documentReference.getID().getValue();
 	}
-
-//	@Override
-//	public void setSupportingDocumentCode(String code) {
-//		if(code!=null) {
-//			DocumentTypeCodeType documentTypeCode = new DocumentTypeCodeType();
-//			documentTypeCode.setValue(code);
-//			super.setDocumentTypeCode(documentTypeCode);
-//		}
-//	}
-//
-//	@Override
-//	public String getSupportingDocumentCode() {
-//		return getSupportingDocumentCode(this);
-//	}
-//	static String getSupportingDocumentCode(DocumentReferenceType documentReference) {
-//		return documentReference.getDocumentTypeCode()==null ? null : documentReference.getDocumentTypeCode().getValue();
-//	}
 
 	@Override
 	public void setSupportingDocumentDescription(String text) {
@@ -207,12 +188,6 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		if(attachment==null) return null;
 
 		return attachment.getEmbeddedDocumentBinaryObject();
-	}
-
-	@Override
-	public String getSupportingDocumentCode() {
-		// not defined in UBL
-		return null;
 	}
 
 }
