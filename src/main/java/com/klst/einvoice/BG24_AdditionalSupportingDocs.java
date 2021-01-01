@@ -58,20 +58,6 @@ public interface BG24_AdditionalSupportingDocs {
 	public void setSupportingDocumentReference(String id);
 	public String getSupportingDocumentReference();
 	
-	/**
-	 * BT-122-0 (only in CII, not used in UBL)
-	 * 
-	 * @param code TypeCode
-	 */
-	// siehe ZUGFeRD-2.1.1 - Spezifikation_TA.pdf : BT-122-0
-	/*
-	 * Im Beispiel 01.15a-INVOICE_uncefact.xml wird <ram:TypeCode>916</ram:TypeCode> verwendet (siehe oben)
-	 * Fehlt BT-122-0 (Code) und ist BT-123 vorhanden, so liefert der kosit validator den fehler:
-	 *   CII-DT-021error[CII-DT-021] - Name should not be present
-	 */
-//	public void setSupportingDocumentCode(String code);
-	public String getSupportingDocumentCode();
-	
 	// BT-123 ++ 0..1 Supporting document description
 	public void setSupportingDocumentDescription(String text);
 	public String getSupportingDocumentDescription();
