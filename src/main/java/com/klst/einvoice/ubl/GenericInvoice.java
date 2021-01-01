@@ -475,7 +475,24 @@ UBL:
 
 	// BT-15 + 0..1 Receiving advice reference
 	// BT-16 + 0..1 Despatch advice reference
+	
 	// BT-17 + 0..1 Tender or lot reference
+	@Override
+	public void setTenderOrLotReference(String docRefId) {
+		if(docRefId==null) return; // optional
+		DocumentReferenceType documentReference = new DocumentReferenceType();
+		documentReference.setID(new ID(docRefId));
+		List<DocumentReferenceType> originatorDocumentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
+		originatorDocumentReferenceList.add(documentReference);
+	}
+
+	@Override
+	public String getTenderOrLotReference() {
+		List<DocumentReferenceType> originatorDocumentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
+		if(originatorDocumentReferenceList.isEmpty()) return null;
+		return originatorDocumentReferenceList.get(0).getID().getValue();
+	}
+	
 	// BT-18 + 0..1 Invoiced object identifier
 	// BT-19 + 0..1 Buyer accounting reference
 	
@@ -1289,33 +1306,15 @@ UBL:
 	}
 
 	@Override
-	public void addSupportigDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename) {
-		LOG.warning("Code "+code+" is ignored in UBL");
-		this.addSupportigDocument(docRefId, description, content, mimeCode, filename);
-	}
-
-	@Override
-	public void addSupportigDocument(String docRefId, String code, String description, String uri) {
-		LOG.warning("Code "+code+" is ignored in UBL");
-		addSupportigDocument(docRefId, description, uri);
-	}
-
-	@Override
 	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments() {
 		List<DocumentReferenceType> additionalDocumentReferenceList;
-		List<DocumentReferenceType> originatorDocumentReferenceList;
 		if(isInvoiceType) {
 			additionalDocumentReferenceList = invoice.getAdditionalDocumentReference();
-			originatorDocumentReferenceList = invoice.getOriginatorDocumentReference();
 		} else {
 			additionalDocumentReferenceList = creditNote.getAdditionalDocumentReference();
-			originatorDocumentReferenceList = creditNote.getOriginatorDocumentReference();
 		}
 		List<BG24_AdditionalSupportingDocs> resList = new ArrayList<BG24_AdditionalSupportingDocs>(additionalDocumentReferenceList.size());
 		additionalDocumentReferenceList.forEach(doc -> {
-			resList.add(new AdditionalSupportingDocument(doc));
-		});
-		originatorDocumentReferenceList.forEach(doc -> {
 			resList.add(new AdditionalSupportingDocument(doc));
 		});
 		return resList;
