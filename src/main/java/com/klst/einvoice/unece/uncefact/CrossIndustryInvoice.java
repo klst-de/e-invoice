@@ -196,15 +196,16 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setProjectReference(getProjectReference(doc), getProjectReferenceName(doc)); // optional BT-11
 		setContractReference(getContractReferenceID(doc)); // optional
 		
-		List<BG24_AdditionalSupportingDocs> asd = getAdditionalSupportingDocuments(doc); // 0..n
-		asd.forEach(asdoc -> {
-//			LOG.info("asdoc   Reference="+asdoc.getSupportingDocumentReference());
-			LOG.info("asdoc Description="+asdoc.getSupportingDocumentDescription()); // aka Name
-//			LOG.info("asdoc    Location="+asdoc.getExternalDocumentLocation());
-//			LOG.info("asdoc        Type="+asdoc.getSupportingDocumentCode());
-			ReferencedDocument rd = new ReferencedDocument(asdoc.getSupportingDocumentReference(), asdoc.getSupportingDocumentCode());
-			rd.setSupportingDocumentDescription(asdoc.getSupportingDocumentDescription()); // aka Name
-			rd.setExternalDocumentLocation(asdoc.getExternalDocumentLocation());
+		List<ReferencedDocument> additionalReferencedDocuments = getReferencedDocuments(doc);
+		additionalReferencedDocuments.forEach(rd -> {
+			LOG.info("ReferencedDocument Description="+rd.getSupportingDocumentDescription()); // aka Name
+//			if(rd.isValidatedPricedTender()) { 
+//				// rd ist BT-17				
+//			}
+//			if(rd.isInvoicingDataSheet()) {
+//				// rd ist BT-18				
+//			}
+			// wenn 916 ===> rd ist BG-24
 			addSupportigDocument(rd);
 		});
 
@@ -639,6 +640,42 @@ UBL:
 		ReferencedDocumentType referencedDocument = headerTradeAgreement.getSellerOrderReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
 	}
+	
+	// BT-17 Tender or lot reference
+	@Override
+	public void setTenderOrLotReference(String docRefId) {
+		if(docRefId==null) return; // optional
+		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId, ReferencedDocument.ValidatedPricedTender);
+		addSupportigDocument(referencedDocument);
+	}
+	@Override
+	public String getTenderOrLotReference() {
+		List<ReferencedDocument> referencedDocuments = getReferencedDocuments(this);
+		if(referencedDocuments.isEmpty()) return null;
+		String result = null;
+		for(int i=0; i<referencedDocuments.size(); i++) {
+			ReferencedDocument refDoc = referencedDocuments.get(i);
+			if(refDoc.isValidatedPricedTender()) {
+				result = refDoc.getIssuerAssignedID().getValue();
+			}
+		}
+		return result;
+	}
+
+	// BT-18 Invoiced object identifier 
+	// und BG-24.BT-122 Supporting document reference in
+/*
+
+TypeCode Typ des referenzierten Dokuments
+. Datentyp: qdt:DocumentCodeType
+Hinweis: 
+Der Code 916 "Referenzpapier" wird benutzt, um die Kennung der rechnungsbegründenden Unterlage zu referenzieren. (BT-122)
+Der Code 50 "Price/sales catalogue response" wird benutzt, um die Ausschreibung oder das Los zu referenzieren. (BT-17)
+Der Code 130 "Rechnungsdatenblatt" wird benutzt, um eine vom Verkäufer angegebene Kennung für ein Objekt zu referenzieren. (BT-18)
+
+static List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments(CrossIndustryInvoiceType doc) ...
+
+ */
 
 	/* INVOICE NOTE                                BG-1                        0..*
 	 * Eine Gruppe von Informationselementen für rechnungsrelevante Erläuterungen mit Hinweisen auf den Rechnungsbetreff.
@@ -1307,24 +1344,9 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
  */
 	@Override
 	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
-		this.addSupportigDocument(docRefId, null, description, content, mimeCode, filename);
-	}
-
-	@Override
-	public void addSupportigDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename) {
-		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId, code);
+		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId);
 		referencedDocument.setSupportingDocumentDescription(description);
 		referencedDocument.setAttachedDocument(content, mimeCode, filename);
-		
-		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
-		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
-	}
-
-	@Override
-	public void addSupportigDocument(String docRefId, String code, String description, String uri) {
-		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId, code);
-		referencedDocument.setSupportingDocumentDescription(description);
-		referencedDocument.setExternalDocumentLocation(uri);
 		
 		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
 		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
@@ -1339,7 +1361,12 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 */
 	@Override
 	public void addSupportigDocument(String docRefId, String description, String uri) {
-		this.addSupportigDocument(docRefId, null, description, uri);
+		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId);
+		referencedDocument.setSupportingDocumentDescription(description);
+		referencedDocument.setExternalDocumentLocation(uri);
+		
+		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
+		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
 	}
 	
 	public void addSupportigDocument(ReferencedDocument doc) {
@@ -1349,18 +1376,47 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 
 	@Override
 	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments() {
-		return getAdditionalSupportingDocuments(this);
+		List<ReferencedDocument> referencedDocuments = getReferencedDocuments(this);
+		List<BG24_AdditionalSupportingDocs> result = new ArrayList<BG24_AdditionalSupportingDocs>();
+//		if(referencedDocuments.isEmpty()) return result;
+		referencedDocuments.forEach(refDoc -> {
+			if(refDoc.isRelatedDocument()) {
+				result.add(refDoc);
+			}
+		});
+		return result;
 	}
-	static List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments(CrossIndustryInvoiceType doc) {
+	// BT-17 BT-18 BG-24.BT-122
+	// BT-17 BT-18 haben IssuerAssignedID und (optional) BT-17-0, BT-18-0 TypeCode , BT-18-1 ReferenceTypeCode
+/*
+
+TypeCode Typ des referenzierten Dokuments
+. Datentyp: qdt:DocumentCodeType
+Hinweis: 
+Der Code 916 "Referenzpapier" wird benutzt, um die Kennung der rechnungsbegründenden Unterlage zu referenzieren. (BT-122)
+Der Code  50 "Price/sales catalogue response" wird benutzt, um die Ausschreibung oder das Los zu referenzieren. (BT-17)
+Der Code 130 "Rechnungsdatenblatt" wird benutzt, um eine vom Verkäufer angegebene Kennung für ein Objekt zu referenzieren. (BT-18)
+
+Codeliste: UNTDID 1001 Untermenge
+Code Codename
+.  50 . Validated priced tender
+. 130 . Invoicing data sheet / Rechnungsdatenblatt
+. 916 . Related document / Referenzpapier
+
+ */
+	static List<ReferencedDocument> getReferencedDocuments(CrossIndustryInvoiceType doc) {
 		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		List<ReferencedDocumentType> referencedDocuments = headerTradeAgreement.getAdditionalReferencedDocument();
-		List<BG24_AdditionalSupportingDocs> result = new ArrayList<BG24_AdditionalSupportingDocs>();
+		List<ReferencedDocument> result = new ArrayList<ReferencedDocument>();
 		if(referencedDocuments.isEmpty()) {
 			return result;
 		}
 		referencedDocuments.forEach(refDoc -> {
 			IDType issuerAssignedID = refDoc.getIssuerAssignedID();
-			DocumentCodeType documentCode = refDoc.getTypeCode(); // 916 ?
+			DocumentCodeType documentCode = refDoc.getTypeCode(); 
+			// documentCode.getValue() == 916 ==> BT-122
+			// sonst ist es BT-17 oder BT-18
+			LOG.info("DocumentCode="+documentCode.getValue()+" IssuerAssignedID="+issuerAssignedID.getValue());
 			ReferencedDocument rd = new ReferencedDocument(issuerAssignedID.getValue(), documentCode.getValue());
 			
 			List<TextType> texts = refDoc.getName();
@@ -1377,7 +1433,6 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 				rd.getAttachmentBinaryObject().add(bot);
 			});
 			
-			// ReferencedDocument implements BG24_AdditionalSupportingDocs, daher kann ich einfügen:
 			result.add(rd);
 		});
 		return result;

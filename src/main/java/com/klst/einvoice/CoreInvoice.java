@@ -315,8 +315,10 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * <br>Rule ID: 	BR-DE-15
 	 * <br>Request ID: 	R8
 	 * 
-	 * @param Text
+	 * @param Text / aka Leitweg-ID, PEPPOL-ID 
+	 *               ==> BG-7.BT-47 0..1 Buyer legal registration identifier + Scheme identifier
 	 */
+	// siehe https://www.xoev.de/sixcms/media.php/13/Leitweg-ID-Formatspezifikation-v2.pdf
 	public void setBuyerReference(String reference);
 	public String getBuyerReferenceValue();
 
@@ -386,7 +388,23 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 
 	// BT-15 Receiving advice reference                                TODO 
 	// BT-16 Despatch advice reference                                 TODO
-	// BT-17 Tender or lot reference                                   TODO
+	
+	/**
+	 * Tender or lot reference
+	 * <p>
+	 * The identification of the call for tender or lot the invoice relates to.
+	 * In some countries a reference to the call for tender that has led to the contract shall be provided.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-17
+	 * <br>Rule ID: 	 
+	 * <br>Request ID: 	R7, R4
+	 * 
+	 * @param Document reference
+	 */
+	public void setTenderOrLotReference(String docRefId);
+	public String getTenderOrLotReference();
+	
 	// BT-18 Invoiced object identifier                                TODO
 	// BT-19 Buyer accounting reference                                TODO
 
@@ -501,24 +519,24 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * use this to add an attached document
 	 * 
 	 * @param docRefId - BG-24.BT-122 Supporting document reference
-	 * @param code - BG-24.BT-122-0 TypeCode (CII only)
+//	 * @param code - BG-24.BT-122-0 TypeCode (CII only)
 	 * @param description/name - BG-24.BT-123 Supporting document description
 	 * @param content - BG-24.BT-125 Attached document content
 	 * @param mimeCode
 	 * @param filename
 	 */
-	public void addSupportigDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename);
+//	public void addSupportigDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename);
 	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename);
 	
 	/**
 	 * use this to add an External document
 	 * 
 	 * @param docRefId - BG-24.BT-122 Supporting document reference
-	 * @param code - BG-24.BT-122-0 TypeCode (CII only)
+//	 * @param code - BG-24.BT-122-0 TypeCode (CII only)
 	 * @param description/name - BG-24.BT-123 Supporting document description
 	 * @param uri locationUri
 	 */
-	public void addSupportigDocument(String docRefId, String code, String description, String uri);
+//	public void addSupportigDocument(String docRefId, String code, String description, String uri);
 	public void addSupportigDocument(String docRefId, String description, String uri);
 	
 	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments();

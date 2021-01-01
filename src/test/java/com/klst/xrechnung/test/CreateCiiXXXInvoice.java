@@ -156,25 +156,24 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		// Cardinality: 0..n EN16931-ID: BG-24
 		List<BG24_AdditionalSupportingDocs> additionalSupportingDocs = testDoc.getAdditionalSupportingDocuments();
 		additionalSupportingDocs.forEach(additionalSupportingDoc -> {
-
-//			ReferencedDocument doc = new ReferencedDocument(additionalSupportingDoc.getSupportingDocumentReference()
-//				, additionalSupportingDoc.getSupportingDocumentCode());
-//			cii.addSupportigDocument(doc); // methode nicht in API Core Invoice, nur die zwei:
+//			cii.addSupportigDocument((ReferencedDocument)additionalSupportingDoc); // TODO methode in CoreInvoice
+//			((CrossIndustryInvoice)cii).addSupportigDocument((ReferencedDocument)additionalSupportingDoc);
+			
 			byte[] byteDoc = additionalSupportingDoc.getAttachedDocument();
 			if(byteDoc==null) {
 				cii.addSupportigDocument(additionalSupportingDoc.getSupportingDocumentReference()
-						, additionalSupportingDoc.getSupportingDocumentCode()
 						, additionalSupportingDoc.getSupportingDocumentDescription()
 						, additionalSupportingDoc.getExternalDocumentLocation());
 			} else {
 				cii.addSupportigDocument(additionalSupportingDoc.getSupportingDocumentReference()
-						, additionalSupportingDoc.getSupportingDocumentCode()
 						, additionalSupportingDoc.getSupportingDocumentDescription()
 						, byteDoc
 						, additionalSupportingDoc.getAttachedDocumentMimeCode()
 						, additionalSupportingDoc.getAttachedDocumentFilename());
 			}
 		});
+		
+		cii.setTenderOrLotReference(testDoc.getTenderOrLotReference()); // (optional) BT-17
 
 		BusinessParty testPayeeParty = testDoc.getPayee();
 		if(testPayeeParty==null) {

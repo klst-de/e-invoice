@@ -21,12 +21,15 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 BR-52 Each Additional supporting document (BG-24) shall contain a Supporting document reference (BT-122).
 Additional supporting documents BT-122
 
+ReferencedDocument ist auch für BT-17 und BT-18 geeignet
+6.5.7 Document Reference. Type           -- docRefId
+
  */
 public class ReferencedDocument extends ReferencedDocumentType implements BG24_AdditionalSupportingDocs {
 
-	ReferencedDocument() {
-		super();
-	}
+	static final String ValidatedPricedTender = "50";
+	static final String InvoicingDataSheet = "130";
+	static final String RelatedDocument = "916";
 
 	/**
 	 * ADDITIONAL SUPPORTING DOCUMENT
@@ -38,8 +41,14 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	 * 
 	 * @param docRefId, BG-24.BT-122 (mandatory BT business term) Supporting document reference
 	 */
-	public ReferencedDocument(String docRefId, String code) {
-		this();
+	public ReferencedDocument(String docRefId) {
+		super();
+		setSupportingDocumentReference(docRefId);
+		setSupportingDocumentCode(RelatedDocument);
+	}
+	// nicht public!
+	ReferencedDocument(String docRefId, String code) {
+		super();
 		setSupportingDocumentReference(docRefId);
 		setSupportingDocumentCode(code);
 	}
@@ -129,10 +138,32 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 		super.setTypeCode(documentCode);
 	}
 
-	@Override
-	public String getSupportingDocumentCode() {
+//	@Override // muss? RelatedDocument "916" liefern
+	String getSupportingDocumentCode() {
 		DocumentCodeType documentCode = super.getTypeCode();
-		return documentCode==null? null : documentCode.getValue();
+		if(documentCode==null) {
+			// TODO exception
+		}
+		return documentCode.getValue();
 	}
+	
 
+//	Der Code  50 "Price/sales catalogue response" wird benutzt, 
+//	um die Ausschreibung oder das Los zu referenzieren. (BT-17)
+//	.  50 . Validated priced tender
+	boolean isValidatedPricedTender() {
+		return getSupportingDocumentCode().equals(ValidatedPricedTender);
+	}
+//	Der Code 130 "Rechnungsdatenblatt" wird benutzt, 
+//	um eine vom Verkäufer angegebene Kennung für ein Objekt zu referenzieren. (BT-18)
+//	. 130 . Invoicing data sheet / Rechnungsdatenblatt
+	boolean isInvoicingDataSheet() {
+		return getSupportingDocumentCode().equals(InvoicingDataSheet);
+	}
+//	Der Code 916 "Referenzpapier" wird benutzt, um die Kennung der rechnungsbegründenden Unterlage zu referenzieren. (BT-122)
+//	. 916 . Related document / Referenzpapier
+	boolean isRelatedDocument() {
+		return getSupportingDocumentCode().equals(RelatedDocument);
+	}
+	
 }
