@@ -5,6 +5,7 @@ import java.util.List;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._100.ReferenceCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
@@ -21,8 +22,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 BR-52 Each Additional supporting document (BG-24) shall contain a Supporting document reference (BT-122).
 Additional supporting documents BT-122
 
-ReferencedDocument ist auch für BT-17 und BT-18 geeignet
-6.5.7 Document Reference. Type           -- docRefId
+ReferencedDocument kapselt auch BT-17 und BT-18 
 
  */
 public class ReferencedDocument extends ReferencedDocumentType implements BG24_AdditionalSupportingDocs {
@@ -42,15 +42,17 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	 * @param docRefId, BG-24.BT-122 (mandatory BT business term) Supporting document reference
 	 */
 	public ReferencedDocument(String docRefId) {
-		super();
-		setSupportingDocumentReference(docRefId);
-		setSupportingDocumentCode(RelatedDocument);
+		this(docRefId, RelatedDocument);
 	}
 	// nicht public!
 	ReferencedDocument(String docRefId, String code) {
+		this(docRefId, code, null);
+	}
+	ReferencedDocument(String docRefId, String code, String referenceTypeCode) {
 		super();
 		setSupportingDocumentReference(docRefId);
-		setSupportingDocumentCode(code);
+		setDocumentCode(code);
+		setReferenceCode(referenceTypeCode);
 	}
 	
 	@Override
@@ -60,9 +62,6 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 
 	@Override
 	public String getSupportingDocumentReference() {
-//		Identifier id = new Identifier(super.getIssuerAssignedID());
-//		return id.getValue();
-		// oder direkt:
 		return super.getIssuerAssignedID().getValue();
 	}
 
@@ -131,15 +130,22 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 		return binaryObjects.get(0).getFilename();
 	}
 
-	void setSupportingDocumentCode(String code) {
+	void setDocumentCode(String code) {
 		if(code==null) return;
 		DocumentCodeType documentCode = new DocumentCodeType();
 		documentCode.setValue(code);
 		super.setTypeCode(documentCode);
 	}
 
-//	@Override // muss? RelatedDocument "916" liefern
-	String getSupportingDocumentCode() {
+	// ReferenceTypeCode Kennung des Schemas BT-18-1
+	void setReferenceCode(String code) {
+		if(code==null) return;
+		ReferenceCodeType referenceCode = new ReferenceCodeType();
+		referenceCode.setValue(code);
+		super.setReferenceTypeCode(referenceCode);
+	}
+	
+	private String getSupportingDocumentCode() {
 		DocumentCodeType documentCode = super.getTypeCode();
 		if(documentCode==null) {
 			// TODO exception
