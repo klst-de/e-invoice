@@ -11,7 +11,6 @@ import com.klst.untdid.codelist.TaxTypeCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PercentType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
 
@@ -33,7 +32,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
  * <br>Cardinality: 1..1 (mandatory)
  * <br>Req.ID: R45, R48
  */
-// TODO warum wird es nur in GenericLine verwendet?
 public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 
 //	private static final Logger LOG = Logger.getLogger(TaxCategory.class.getName());
@@ -195,7 +193,6 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 
 	@Override
 	public String toString() {
-		// TODO json
 		List<String> reasonTexts = getTaxExemptionReasons();
 		String joined = String.join("], [", reasonTexts);
 		if(!joined.isEmpty()) {
