@@ -85,7 +85,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 			cnLine = (CreditNoteLineType)t;
 		}
 //		LOG.info("copy ctor isInvoiceLineType:"+isInvoiceLineType);
-		if(getId()!=null) LOG.info("copy ctor "+this);
+		if(getId()!=null) LOG.config("copy ctor "+this);
 	}
 	
 	T get() {
@@ -108,7 +108,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		setUnitPriceAmount(priceAmount);
 		setItemName(itemName);
 		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
-		LOG.info("ctor "+this);
+		LOG.config("ctor "+this);
 	}
 
 	public String toString() {

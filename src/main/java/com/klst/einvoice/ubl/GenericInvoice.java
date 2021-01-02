@@ -115,7 +115,7 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 		} else {
 			creditNote = (CreditNoteType)t;
 		}
-		if(getId()!=null) LOG.info("copy ctor "+this);
+		if(getId()!=null) LOG.config("copy ctor "+this);
 	}
 	
 	public T get() {
@@ -125,7 +125,7 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 	void init(String customization, String profile, DocumentNameCode code) {
 		setProcessControl(customization, profile); // BG-2
 		setTypeCode(code); // BT-3	
-		LOG.info("ctor "+this);
+		LOG.config("ctor "+this);
 	}
 	
 	public String toString() {
@@ -595,7 +595,7 @@ UBL:
 	@Override
 	public String getCustomization() {
 		CustomizationIDType customizationID = isInvoiceType ? invoice.getCustomizationID() : creditNote.getCustomizationID();
-		LOG.info("SchemeAgencyID:"+customizationID.getSchemeAgencyID() +
+		LOG.config("SchemeAgencyID:"+customizationID.getSchemeAgencyID() +
 				" SchemeAgencyName:"+customizationID.getSchemeAgencyName() +
 				" Value:"+customizationID.getValue()
 				);

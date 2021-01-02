@@ -664,59 +664,45 @@ UBL:
 		return result;
 	}
 
-	// BT-18 Invoiced object identifier      TODO:
+	// BT-18 Invoiced object identifier      TODO define in API:
 //	@Override
-//	public void setInvoicedObjectIdentifier(Identifier id) {
-//		if(id==null) return; // optional
-//		setInvoicedObject(id.getContent(), id.getSchemeIdentifier());
-//	}
+	public void setInvoicedObjectIdentifier(Identifier id) {
+		if(id==null) return; // optional
+		setInvoicedObject(id.getContent(), id.getSchemeIdentifier());
+	}
 //	@Override
 //	public void setInvoicedObject(String name) {
 //		setInvoicedObject(name, null);
 //	}
 //	@Override
-//	public void setInvoicedObject(String name, String code) {
-//		if(name==null) return; // optional
-//		ReferencedDocument referencedDocument = new ReferencedDocument(name, ReferencedDocument.InvoicingDataSheet, code);
-//		addSupportigDocument(referencedDocument);
-//	}
+	public void setInvoicedObject(String name, String code) {
+		if(name==null) return; // optional
+		ReferencedDocument referencedDocument = new ReferencedDocument(name, ReferencedDocument.InvoicingDataSheet, code);
+		addSupportigDocument(referencedDocument);
+	}
 //	@Override
-//	public Identifier getInvoicedObjectIdentifier() {
-//		List<ReferencedDocument> referencedDocuments = getReferencedDocuments(this);
-//		if(referencedDocuments.isEmpty()) return null;
-//		Identifier result = null;
-//		for(int i=0; i<referencedDocuments.size(); i++) {
-//			ReferencedDocument refDoc = referencedDocuments.get(i);
-//			if(refDoc.isInvoicingDataSheet()) {
-//				// IssuerAssignedID
-//				// TypeCode 130
-//				// 0..1 ReferenceTypeCode
-//				ReferenceCodeType referenceCode = refDoc.getReferenceTypeCode();
-//				result = new ID(refDoc.getIssuerAssignedID().getValue(), referenceCode==null? null : referenceCode.getValue());
-//			}
-//		}
-//		return result;
-//	}
+	public Identifier getInvoicedObjectIdentifier() {
+		List<ReferencedDocument> referencedDocuments = getReferencedDocuments(this);
+		if(referencedDocuments.isEmpty()) return null;
+		Identifier result = null;
+		for(int i=0; i<referencedDocuments.size(); i++) {
+			ReferencedDocument refDoc = referencedDocuments.get(i);
+			if(refDoc.isInvoicingDataSheet()) {
+				// IssuerAssignedID
+				// TypeCode 130
+				// 0..1 ReferenceTypeCode
+				ReferenceCodeType referenceCode = refDoc.getReferenceTypeCode();
+				result = new ID(refDoc.getIssuerAssignedID().getValue(), referenceCode==null? null : referenceCode.getValue());
+			}
+		}
+		return result;
+	}
 //	@Override
-//	public String getInvoicedObject() {
-//		Identifier id = getInvoicedObjectIdentifier();
-//		return id==null? null : id.getContent();
-//	}
+	public String getInvoicedObject() {
+		Identifier id = getInvoicedObjectIdentifier();
+		return id==null? null : id.getContent();
+	}
 	
-	// und BG-24.BT-122 Supporting document reference in
-/*
-
-TypeCode Typ des referenzierten Dokuments
-. Datentyp: qdt:DocumentCodeType
-Hinweis: 
-Der Code 916 "Referenzpapier" wird benutzt, um die Kennung der rechnungsbegründenden Unterlage zu referenzieren. (BT-122)
-Der Code 50 "Price/sales catalogue response" wird benutzt, um die Ausschreibung oder das Los zu referenzieren. (BT-17)
-Der Code 130 "Rechnungsdatenblatt" wird benutzt, um eine vom Verkäufer angegebene Kennung für ein Objekt zu referenzieren. (BT-18)
-
-static List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments(CrossIndustryInvoiceType doc) ...
-
- */
-
 	/* INVOICE NOTE                                BG-1                        0..*
 	 * Eine Gruppe von Informationselementen für rechnungsrelevante Erläuterungen mit Hinweisen auf den Rechnungsbetreff.
 	 * 
@@ -1116,8 +1102,6 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	@Override
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		// TODO dieser ctor kann BG14_InvoicingPeriod informationen überschreiben ? !!!!
-		LOG.info("???????????"+applicableHeaderTradeSettlement);
 		if(applicableHeaderTradeSettlement==null) {
 			//applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 			createPaymentInstructions(code, paymentMeansText);
