@@ -413,6 +413,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			targetLine.setStartDate(testLine.getStartDateAsTimestamp()); // optional
 			targetLine.setEndDate(testLine.getEndDateAsTimestamp()); // optional
 
+			targetLine.setDescription(testLine.getDescription());   //BT-154 0..1
 			targetLine.setSellerAssignedID(testLine.getSellerAssignedID());   //BT-155 0..1
 			targetLine.setBuyerAssignedID(testLine.getBuyerAssignedID());     //BT-156 0..1
 			targetLine.setStandardIdentifier(testLine.getStandardIdentifier()); //BT-157 0..1 , BT-157-1 required
