@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.klst.einvoice.CoreInvoiceLine;
+import com.klst.einvoice.Identifier;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
@@ -258,6 +259,15 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	 * 0177 : ODETTE 
 	 */
 	@Override // 0 .. 1 BT-157
+	public void setStandardIdentifier(Identifier id) {
+		if(id==null) return;
+		setStandardID(id.getContent(), id.getSchemeIdentifier());
+	}
+	@Override
+	public void setStandardID(String id) {
+		setStandardID(id, null);
+	}
+	@Override
 	public void setStandardID(String id, String schemeID) {
 		if(id==null) return;
 		specifiedTradeProduct.setGlobalID(new ID(id, schemeID));
@@ -265,7 +275,11 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	@Override
-	public String getStandardID() { // ohne schemeID! TODO
+	public Identifier getStandardIdentifier() {
+		return specifiedTradeProduct.getGlobalID()==null ? null : new ID(specifiedTradeProduct.getGlobalID().getValue(), specifiedTradeProduct.getGlobalID().getSchemeID());
+	}
+	@Override
+	public String getStandardID() {
 		return specifiedTradeProduct.getGlobalID()==null ? null : specifiedTradeProduct.getGlobalID().getValue();
 	}
 

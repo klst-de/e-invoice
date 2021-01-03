@@ -338,6 +338,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
         	line.setDescription(testLine.getDescription());
         	line.setSellerAssignedID(testLine.getSellerAssignedID()); // 0..1 BT-128 ram:SellerAssignedID
+        	line.setStandardIdentifier(testLine.getStandardIdentifier()); // 0..1 BT-157 0..1 , BT-157-1 required
         	List<Object> cl = testLine.getClassificationList();
         	cl.forEach(c -> {
         		if(c.getClass() == ProductClassificationType.class) {
