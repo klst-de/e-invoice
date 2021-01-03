@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Licensed under European Union Public Licence (EUPL) version 1.2.
+
+-->
 <Invoice  xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
  xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
  xmlns:qdt="urn:oasis:names:specification:ubl:schema:xsd:QualifiedDataTypes-2"
@@ -102,7 +107,7 @@
         <cac:Item>
             <cbc:Name>IExpress licentiekosten</cbc:Name>
             <cac:ClassifiedTaxCategory>
-                <cbc:ID schemeID="UNCL5305">S</cbc:ID>
+                <cbc:ID>S</cbc:ID>
                 <cbc:Percent>21</cbc:Percent>
                 <cac:TaxScheme>
                     <cbc:ID>VAT</cbc:ID>
