@@ -9,23 +9,24 @@ package com.klst.einvoice;
  * <p>
  * Cardinality: 	0..1
  * <br>EN16931-ID: 	BG-18
- * <br>Rule ID: 	
+ * <br>Rule ID: 	BR-51
  * <br>Request ID: 	R64 information for relating an invoice to a payment card used for settlement
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for (en)EN_16931_1_2017 rule and request IDs
  */
-
-//0 .. 1 ApplicableTradeSettlementFinancialCard Informationen zur Zahlungskarte  BG-18 xs:sequence 
-//1 .. 1 ID Zahlungskartennummer                                                 BT-87 
-//0 .. 1 CardholderName Name des Zahlungskarteninhabers                          BT-88
-
-/*  (de) rules / Geschäftsregel:
+/*   (en) rules
+ * 
+ * BR-51  Target / context: Card information, Business term / group: BT-87
+ * The last 4 to 6 digits of the Payment card primary account number (BT-87) shall be present 
+ * if Payment card information (BG-18) is provided in the Invoice.
+ * 
+ *   (de) rules / Geschäftsregel:
  * 
  * BR-51 Karteninformationen
  * Falls in der Rechnung Informationen zur verwendeten Zahlungskarte (BG-18) angegeben sind, 
  * müssen die letzten 4 bis 6 Ziffern der Zahlungskartennummer (BT-87) angezeigt werden.
+ * 
  */
-
 public interface PaymentCard {
 
 	/**
@@ -39,7 +40,7 @@ public interface PaymentCard {
 	 * <p>
 	 * Cardinality: 	1..1
 	 * <br>EN16931-ID: 	BG-18.BT-87
-	 * <br>Rule ID: 	
+	 * <br>Rule ID: 	BR-51
 	 * <br>Request ID: 	R64 information for relating an invoice to a payment card used for settlement
 	 * 
 	 * @return Text
