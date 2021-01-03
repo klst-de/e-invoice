@@ -414,7 +414,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 
 			targetLine.setSellerAssignedID(testLine.getSellerAssignedID());   //BT-155 0..1
 			targetLine.setBuyerAssignedID(testLine.getBuyerAssignedID());     //BT-156 0..1
-			targetLine.setStandardID(testLine.getStandardID(), "TODOSchema"); //BT-157 0..1 , BT-157-1 required
+			targetLine.setStandardIdentifier(testLine.getStandardIdentifier()); //BT-157 0..1 , BT-157-1 required
         	List<Object> cl = testLine.getClassificationList();                //BT-158 0..n , BT-158-1 1..1 , BT-158-2 0..1
         	cl.forEach(c -> {
         		if(c.getClass() == CommodityClassificationType.class) {

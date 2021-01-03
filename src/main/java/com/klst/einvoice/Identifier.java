@@ -21,11 +21,35 @@ Content                   : Mandatory 		String         | abc:123-DEF
 Scheme identifier         : Conditional 	String         | GLN
 Scheme version identifier : Conditional 	String         | 1.0
 
-Used in 
+Used in
+	 	 BT-1  Invoice number
+	 	 BT-18 Invoiced object identifier
+	BG-2.BT-24 Specification identifier
 	BG-4.BT-29 Seller identifier
-	BG-4.BT-30 Seller legal registration identifier 
+	BG-4.BT-30 Seller legal registration identifier
+	BG-4.BT-31 Seller VAT identifier
+	BG-4.BT-32 Seller tax registration identifier
+	BG-4.BT-34 Seller electronic address
 	BG-7.BT-46 Buyer identifier
 	BG-7.BT-47 Buyer legal registration identifier
+	BG-7.BT-48 Buyer VAT identifier
+	BG-7.BT-49 Buyer electronic address
+	BG-10.BT-60 Payee identifier
+	BG-10.BT-61 Payee legal registration identifier
+	BG-11.BT-63 Seller tax representative VAT identifier
+	BG-17.BT-84 Payment account identifier
+	BG-17.BT-86 Payment service provider identifier
+	BG-19.BT-89 Mandate reference identifier
+	BG-19.BT-90 Bank assigned creditor identifier
+	BG-19.BT-91 Debited account identifier
+	BG-25.BT-126 Invoice line identifier
+	BG-25.BT-128 Invoice line object identifier
+	BG-31.BT-155 Item Seller's identifier
+	BG-31.BT-156 Item Buyer's identifier
+	BG-31.BT-157 Item standard identifier
+	BG-31.BT-158 Item classification identifier
+
+Ausserdem basiert "EN 16931_ Document Reference_ Identifier. Type" auf Identifier, siehe 6.5.7 der Doku
 
  */
 public interface Identifier {

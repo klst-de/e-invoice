@@ -253,7 +253,10 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * @param Identifier
 	 * @param schemeID, The identification scheme shall be identified from the entries of the list published by the ISO/IEC 6523 maintenance agency.
 	 */
-	public void setStandardID(String id, String schemeID);
+	public void setStandardIdentifier(Identifier id);
+	public void setStandardID(String globalID);
+	public void setStandardID(String globalID, String schemeID);
+	public Identifier getStandardIdentifier();
 	public String getStandardID();
 
 	/**

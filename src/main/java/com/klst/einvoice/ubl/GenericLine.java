@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoiceLine;
+import com.klst.einvoice.Identifier;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
@@ -548,6 +549,15 @@ public class GenericLine<T> implements CoreInvoiceLine {
 
 	// BG-31.BT-157 +++ 0..1 Item standard identifier
 	@Override
+	public void setStandardIdentifier(Identifier id) {
+ 		if(id==null) return;
+ 		setStandardID(id.getContent(), id.getSchemeIdentifier());
+	}
+	@Override
+	public void setStandardID(String id) {
+ 		setStandardID(id, null);
+	}
+	@Override
 	public void setStandardID(String id, String schemeID) {
  		if(id==null) return;
 		ItemIdentificationType itemIdentification = new ItemIdentificationType();
@@ -565,11 +575,16 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	}
 
 	@Override
-	public String getStandardID() {  // ohne schemeID! TODO
+	public Identifier getStandardIdentifier() {
 		ItemType item = isInvoiceLineType ? iLine.getItem() : cnLine.getItem();
 		ItemIdentificationType itemIdentification = item.getStandardItemIdentification();
 		if(itemIdentification==null) return null;
-		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
+		return itemIdentification.getID()==null ? null : new ID(itemIdentification.getID().getValue(), itemIdentification.getID().getSchemeID());
+	}
+	@Override
+	public String getStandardID() {
+		Identifier id = getStandardIdentifier();
+		return id==null ? null : id.getContent();
 	}
 	
 	// BG-31.BT-158 +++ 0..n Item classification identifier
