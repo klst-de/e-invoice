@@ -938,8 +938,7 @@ UBL:
 
 	@Override // implements interface PaymentCardFactory
 	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
-		if(cardAccountID==null) return null;
-		return CardAccount.createPaymentCard(cardAccountID, cardHolderName);
+		return CardAccount.create(cardAccountID, cardHolderName);
 	}
 	
 	// BG-16.BG-19 ++ 0..1 DIRECT DEBIT

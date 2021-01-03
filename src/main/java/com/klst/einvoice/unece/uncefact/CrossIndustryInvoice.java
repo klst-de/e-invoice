@@ -8,18 +8,19 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
-import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.PaymentCard;
+import com.klst.einvoice.PaymentCardFactory;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
 import com.klst.untdid.codelist.DateTimeFormats;
@@ -59,7 +60,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 // @see https://www.unece.org/fileadmin/DAM/cefact/rsm/RSM_CrossIndustryInvoice_v2.0.pdf
 //      https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=2ahUKEwijlav-gPjhAhUGU1AKHSv2CIoQFjAAegQIARAC&url=https%3A%2F%2Fwww.unece.org%2Ffileadmin%2FDAM%2Fcefact%2Frsm%2FRSM_CrossIndustryInvoice_v2.0.pdf&usg=AOvVaw0yPVFpbRqJ50xaDMUaYm62
 // ZUGFeRD 2.0 Spezifikation - Technischer Anhang : ZUGFeRD-2.0-Spezifikation-TA.pdf
-public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements CoreInvoice {
+public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements CoreInvoice, PaymentCardFactory {
 
 	private static final Logger LOG = Logger.getLogger(CrossIndustryInvoice.class.getName());
 	
@@ -1139,6 +1140,12 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	}
 	public PaymentInstructions getPaymentInstructions() {
 		return applicableHeaderTradeSettlement; // das implementiert PaymentInstructions!
+	}
+
+
+	@Override // implements interface PaymentCardFactory for BG-18
+	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
+		return FinancialCard.create(cardAccountID, cardHolderName);
 	}
 
 	// BG-20 + BG-21- 0..n

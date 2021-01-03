@@ -326,9 +326,13 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		if(testCard!=null) {
 			LOG.info("testCard.CardAccountID="+testCard.getCardAccountID() +" CardHolderName="+testCard.getCardHolderName());
 			paymentCard = ublInvoice.createPaymentCard(testCard.getCardAccountID(), testCard.getCardHolderName());
-			String nw = ((CardAccount)testCard).getNetwork();
-			if(nw!=null) {
-				((CardAccount)paymentCard).setNetwork(nw);
+//			LOG.info(">>>>>>> testCard:"+testCard);
+			if(testCard instanceof CardAccount) {
+				String nw = ((CardAccount)testCard).getNetwork();
+				if(nw!=null) {
+					LOG.info("wg 03.02a-INVOICE_ubl.xml >>>>>>> testCard.Network="+nw);
+					((CardAccount)paymentCard).setNetwork(nw);
+				}
 			}
 		} else {
 			LOG.warning("paymentCard.isEmpty");

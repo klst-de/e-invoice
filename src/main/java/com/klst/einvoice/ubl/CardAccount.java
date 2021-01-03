@@ -1,6 +1,7 @@
 package com.klst.einvoice.ubl;
 
 import com.klst.einvoice.PaymentCard;
+import com.klst.einvoice.PaymentCardFactory;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CardAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.HolderNameType;
@@ -8,19 +9,19 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NetworkI
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PrimaryAccountNumberIDType;
 
 // implements BG-18 ++ 0..1 PAYMENT CARD INFORMATION
-public class CardAccount extends CardAccountType implements PaymentCard {
+public class CardAccount extends CardAccountType implements PaymentCard, PaymentCardFactory {
 
-	// PaymentCardFactory
-	static public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
-		return new CardAccount(cardAccountID, cardHolderName);
+	// implements PaymentCardFactory
+	@Override
+	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
+		return create(cardAccountID, cardHolderName);
+	}
+	static PaymentCard create(String cardAccountID, String cardHolderName) {
+		return cardAccountID==null? null : new CardAccount(cardAccountID, cardHolderName);
 	}
 
-	CardAccount() {
-		super();
-	}
-	
 	CardAccount(String pan, String name) {
-		this();
+		super();
 		setCardAccountID(pan);
 		setCardHolderName(name);
 	}
