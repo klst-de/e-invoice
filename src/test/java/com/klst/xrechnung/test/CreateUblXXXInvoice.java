@@ -15,6 +15,7 @@ import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.Identifier;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.ubl.CardAccount;
@@ -415,13 +416,10 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			targetLine.setSellerAssignedID(testLine.getSellerAssignedID());   //BT-155 0..1
 			targetLine.setBuyerAssignedID(testLine.getBuyerAssignedID());     //BT-156 0..1
 			targetLine.setStandardIdentifier(testLine.getStandardIdentifier()); //BT-157 0..1 , BT-157-1 required
-        	List<Object> cl = testLine.getClassificationList();                //BT-158 0..n , BT-158-1 1..1 , BT-158-2 0..1
-        	cl.forEach(c -> {
-        		if(c.getClass() == CommodityClassificationType.class) {
-        			ItemClassificationCodeType cc = ((CommodityClassificationType)c).getItemClassificationCode();
-        			targetLine.addClassificationID(cc.getValue(), cc.getListID(), cc.getListVersionID());
-        		}
-        	});
+			List<Identifier> classifications = testLine.getClassifications(); // BG-31.BT-158 0..n
+			classifications.forEach(cl -> {
+				targetLine.addClassificationID(cl);
+			});
 			
         	targetLine.setNote(testLine.getNote());   	
         	targetLine.setOrderLineID(testLine.getOrderLineID());

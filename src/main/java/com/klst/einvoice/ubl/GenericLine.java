@@ -589,6 +589,10 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	
 	// BG-31.BT-158 +++ 0..n Item classification identifier
 	@Override
+	public void addClassificationID(Identifier id) {
+		addClassificationID(id.getContent(), id.getSchemeIdentifier(), id.getSchemeVersion());
+	}
+	@Override
 	public void addClassificationID(String id, String schemeID, String schemeVersion) {
 		if(id==null) return;
 		ItemClassificationCodeType itemClassificationCode = new ItemClassificationCodeType();
@@ -609,6 +613,29 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		}	
 	}
 
+/*
+      <cac:CommodityClassification>
+        <cbc:ItemClassificationCode listID="IB">0721-880X</cbc:ItemClassificationCode>
+      </cac:CommodityClassification>
+ */
+	// BT-158 +++ 0..n Item classification identifier
+	// BT-158-1   1..1 Scheme identifier
+	// BT-158-2   0..1 Scheme version identifier
+	@Override
+	public List<Identifier> getClassifications() {
+		ItemType item = isInvoiceLineType ? iLine.getItem() : cnLine.getItem();
+		List<CommodityClassificationType> commodityClassifications = item.getCommodityClassification();
+		List<Identifier> result = new ArrayList<Identifier>(commodityClassifications.size());
+		commodityClassifications.forEach(cc -> {
+			if(cc.getItemClassificationCode()!=null) {
+				Identifier id = new ID(cc.getItemClassificationCode().getValue(), cc.getItemClassificationCode().getListID()
+						, cc.getItemClassificationCode().getListVersionID());
+				result.add(id);
+			}
+		});
+		return result;
+	}
+	@Deprecated // use getClassifications()
 	@Override
 	public List<Object> getClassificationList() {
 		ItemType item = isInvoiceLineType ? iLine.getItem() : cnLine.getItem();

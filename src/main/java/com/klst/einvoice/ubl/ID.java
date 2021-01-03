@@ -6,14 +6,17 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 
 public class ID extends IDType implements Identifier {
 
-	ID(String content, String schemeID) {
+	ID(String content, String schemeID, String schemeVersionID) {
 		super();
 		setContent(content);
 		setSchemeIdentifier(schemeID);
+		setSchemeVersion(schemeVersionID);
 	}
+	ID(String content, String schemeID) {
+		this(content, schemeID, null);	}
 	
 	ID(String content) {
-		this(content, null);
+		this(content, null, null);
 	}
 
 	@Override

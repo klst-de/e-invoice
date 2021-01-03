@@ -339,13 +339,10 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         	line.setDescription(testLine.getDescription());
         	line.setSellerAssignedID(testLine.getSellerAssignedID()); // 0..1 BT-128 ram:SellerAssignedID
         	line.setStandardIdentifier(testLine.getStandardIdentifier()); // 0..1 BT-157 0..1 , BT-157-1 required
-        	List<Object> cl = testLine.getClassificationList();
-        	cl.forEach(c -> {
-        		if(c.getClass() == ProductClassificationType.class) {
-        			CodeType cc = ((ProductClassificationType)c).getClassCode();
-        			line.addClassificationID(cc.getValue(), cc.getListID(), cc.getListVersionID());
-        		}
-        	});
+        	List<Identifier> classifications = testLine.getClassifications();  // BG-31.BT-158 0..n
+			classifications.forEach(cl -> {
+				line.addClassificationID(cl);
+			});
         	line.setOrderLineID(testLine.getOrderLineID());
         	cii.addLine(line);
         });

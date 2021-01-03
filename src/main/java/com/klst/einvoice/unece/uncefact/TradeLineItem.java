@@ -295,6 +295,10 @@ Bsp.
 
  */
 	@Override // 0 .. n BT-158
+	public void addClassificationID(Identifier id) {
+		addClassificationID(id.getContent(), id.getSchemeIdentifier(), id.getSchemeVersion());
+	}
+	@Override
 	public void addClassificationID(String id, String schemeID, String schemeVersion) {
 		if(id==null) return;
 		CodeType code = new CodeType();
@@ -307,6 +311,20 @@ Bsp.
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
 
+	@Override
+	public List<Identifier> getClassifications() {
+		List<ProductClassificationType> productClassifications = specifiedTradeProduct.getDesignatedProductClassification();
+		List<Identifier> result = new ArrayList<Identifier>(productClassifications.size());
+		productClassifications.forEach(pc -> {
+			CodeType code = pc.getClassCode();
+			if(code!=null) {
+				Identifier id = new ID(code.getValue(), code.getListID(), code.getListVersionID());
+				result.add(id);
+			}
+		});
+		return result;
+	}
+	@Deprecated // use getClassifications()
 	@Override
 	public List<Object> getClassificationList() {
 		List<ProductClassificationType> productClassificatioList = specifiedTradeProduct.getDesignatedProductClassification();
