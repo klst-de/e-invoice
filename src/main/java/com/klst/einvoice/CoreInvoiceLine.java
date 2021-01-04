@@ -2,6 +2,7 @@ package com.klst.einvoice;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Properties;
 
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
@@ -20,7 +21,7 @@ import com.klst.untdid.codelist.TaxCategoryCode;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for EN_16931_1_2017 rule and request IDs
  */
-public interface CoreInvoiceLine extends BG26_InvoiceLinePeriod {
+public interface CoreInvoiceLine extends BG26_InvoiceLinePeriod, BG32_ItemAttributes {
 
 	/**
 	 * Invoice line identifier

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.CoreInvoiceLine;
@@ -19,6 +20,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Coun
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemIdentificationType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemPropertyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderLineReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PeriodType;
@@ -40,6 +42,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PercentType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PriceAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.StartDateType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ValueType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.DateType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.QuantityType;
 
@@ -676,6 +679,41 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		if(country==null) return null;
 		IdentificationCodeType identificationCode = country.getIdentificationCode();
 		return identificationCode==null ? null : identificationCode.getValue();
+	}
+
+	// BG-32.BT-160 + BT-161 0..n
+	@Override
+	public void addItemAttribute(String name, String value) {
+		if(name==null) return; // darf nicht sein, denn BT-160 + BT-161 sind mandatory TODO exception
+
+		NameType nameText = new NameType();
+		nameText.setValue(name);
+		ValueType valueText = new ValueType(); //class ValueType extends TextType extends un.unece.uncefact...TextType
+		valueText.setValue(value);
+		
+		ItemPropertyType itemProperty = new ItemPropertyType();
+		itemProperty.setName(nameText);
+		itemProperty.setValue(valueText);
+		
+		if(isInvoiceLineType) {
+			ItemType item = iLine.getItem();
+			item.getAdditionalItemProperty().add(itemProperty);
+			iLine.setItem(item);
+		} else {
+			ItemType item = cnLine.getItem();
+			item.getAdditionalItemProperty().add(itemProperty);
+			cnLine.setItem(item);
+		}	
+	}
+	@Override
+	public Properties getItemAttributes() {
+		ItemType item = isInvoiceLineType ? iLine.getItem() : cnLine.getItem();
+		List<ItemPropertyType> itemProperties = item.getAdditionalItemProperty();
+		Properties result = new Properties();
+		itemProperties.forEach(ip -> {
+			result.put(ip.getName().getValue(), ip.getValue().getValue());
+		});
+		return result;
 	}
 
 }

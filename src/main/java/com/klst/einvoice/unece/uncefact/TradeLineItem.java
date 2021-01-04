@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.Identifier;
@@ -18,6 +19,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductCharacteristicType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductClassificationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
@@ -356,6 +358,26 @@ Bsp.
 			tradeCountry.getID()==null ? null : tradeCountry.getID().getValue();
 	}
 
+	// 0..n BG-32.BT-160 + BT-161 (both terms mandatory)
+	@Override
+	public void addItemAttribute(String name, String value) {
+		if(name==null) return; // darf nicht sein, denn BT-160 + BT-161 sind mandatory 
+		ProductCharacteristicType productCharacteristics = new ProductCharacteristicType();
+		productCharacteristics.getDescription().add(new Text(name)); //nur eine wg. 1..1
+		productCharacteristics.getValue().add(new Text(value)); //nur eine wg. 1..1
+		specifiedTradeProduct.getApplicableProductCharacteristic().add(productCharacteristics);
+		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+	}
+
+	@Override
+	public Properties getItemAttributes() {
+		List<ProductCharacteristicType> productCharacteristics = specifiedTradeProduct.getApplicableProductCharacteristic();
+		Properties result = new Properties();
+		productCharacteristics.forEach(pc -> {
+			result.put(pc.getDescription().get(0).getValue(), pc.getValue().get(0).getValue());			
+		});
+		return result;
+	}
 
 	// BT-129+BT-130
 	void setQuantity(Quantity quantity) { 

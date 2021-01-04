@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
@@ -422,6 +423,11 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				targetLine.addClassificationID(cl);
 			});
 			targetLine.setCountryOfOrigin(testLine.getCountryOfOrigin());     // BG-31.BT-159 0..1
+			Properties itemAttributes = testLine.getItemAttributes(); // BG-32 0..n
+			itemAttributes.entrySet().forEach(cl -> {
+				LOG.info("itemAttribute: " +cl.getKey().toString() +" "+ cl.getValue().toString());
+				targetLine.addItemAttribute(cl.getKey().toString(), cl.getValue().toString());
+			});
 			
         	targetLine.setNote(testLine.getNote());   	
         	targetLine.setOrderLineID(testLine.getOrderLineID());

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
@@ -344,6 +345,11 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				line.addClassificationID(cl);
 			});
 			line.setCountryOfOrigin(testLine.getCountryOfOrigin());     // BG-31.BT-159 0..1
+			Properties itemAttributes = testLine.getItemAttributes(); // BG-32 0..n
+			itemAttributes.entrySet().forEach(cl -> {
+				LOG.info("itemAttribute: " +cl.getKey().toString() +" "+ cl.getValue().toString());
+				line.addItemAttribute(cl.getKey().toString(), cl.getValue().toString());
+			});
         	line.setOrderLineID(testLine.getOrderLineID());
         	cii.addLine(line);
         });
