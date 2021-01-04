@@ -18,6 +18,7 @@ import com.klst.untdid.codelist.TaxCategoryCode;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CommodityClassificationType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CountryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemIdentificationType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemPropertyType;
@@ -54,8 +55,6 @@ import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.QuantityT
 public class GenericLine<T> implements CoreInvoiceLine {
 
 	private static final Logger LOG = Logger.getLogger(GenericLine.class.getName());
-	
-	private static final String NOT_IMPEMENTED = "NOT IMPEMENTED";
 	
 	T t;
 	boolean isInvoiceLineType = false;
@@ -144,7 +143,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	}
 
 	// BT-127 ++ 0..1 Invoice line note
-	@Override // TODO umbenennen in setNote
+	@Override
 	public void setNote(String text) {
 		if(text==null) return;
 		NoteType note = new NoteType();
@@ -162,32 +161,38 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return noteList.isEmpty() ? null : noteList.get(0).getValue(); // wg. 0..1
 	}
 
-	/* BT-128 ++ 0..1 Invoice line object identifier
-	 * (non-Javadoc)
-	 * @see com.klst.einvoice.CoreInvoiceLine#getIssuerAssignedID()
-	 */
-	public void setIssuerAssignedID(String id, String schemeID) {
-		LOG.warning(NOT_IMPEMENTED); // TODO
+	// BT-128 ++ 0..1 Invoice line object identifier
+	@Override
+	public void setIssuerAssignedID(String id, String schemeID, String schemeCode) {
  		if(id==null) return;
-		ItemIdentificationType itemIdentification = new ItemIdentificationType();
-		itemIdentification.setID(new ID(id, schemeID));
+ 		DocumentReferenceType note = new DocumentReferenceType();
+ 		note.setID(new ID(id, schemeID, schemeCode));
 		
 		if(isInvoiceLineType) {
-			ItemType item = iLine.getItem();
-			item.getAdditionalItemIdentification().add(itemIdentification);
-			iLine.setItem(item);
+			iLine.getDocumentReference().add(note);
 		} else {
-			ItemType item = cnLine.getItem();
-			item.getAdditionalItemIdentification().add(itemIdentification);
-			cnLine.setItem(item);
+			cnLine.getDocumentReference().add(note);
 		}	
 	}
-	public String getIssuerAssignedID() {
-		LOG.warning(NOT_IMPEMENTED); // TODO keine Beispiele              ManufacturersItemIdentification ???????????????????
-		// oder                                                           AdditionalItemIdentification   ????????????????
-		ItemType item = isInvoiceLineType ? iLine.getItem() : cnLine.getItem();
-		List<ItemIdentificationType> list = item.getAdditionalItemIdentification();
-		return list.isEmpty() ? null : list.get(0).getID().getValue(); // wg. 0..1
+
+	public void setIssuerAssignedID(String id, String schemeID) {
+		setIssuerAssignedID(id, schemeID, null);
+	}
+	@Override
+	public void setIssuerAssignedID(String id) {
+		setIssuerAssignedID(id, null, null);
+	}
+
+	@Override
+	public void setIssuerAssignedIdentifier(Identifier id) {
+		if(id==null) return;
+		setIssuerAssignedID(id.getContent(), id.getSchemeIdentifier(), id.getSchemeVersion());
+	}
+
+	@Override
+	public Identifier getIssuerAssignedIdentifier() {
+		List<DocumentReferenceType> documentReference = isInvoiceLineType ? iLine.getDocumentReference() : cnLine.getDocumentReference();
+		return documentReference.isEmpty() ? null : new ID(documentReference.get(0).getID()); // get(0) wg. 0..1
 	}
 
 	// BT-129 ++ 1..1 Invoiced quantity

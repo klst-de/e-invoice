@@ -19,6 +19,11 @@ public class ID extends IDType implements Identifier {
 		this(content, null, null);
 	}
 
+	// copy ctor
+	ID(IDType id) {
+		this(id.getValue(), id.getSchemeID(), id.getSchemeVersionID());
+	}
+	
 	@Override
 	public void setContent(String content) {
 		super.setValue(content);

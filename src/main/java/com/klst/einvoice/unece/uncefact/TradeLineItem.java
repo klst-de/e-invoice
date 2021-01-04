@@ -12,6 +12,8 @@ import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CountryIDType;
+import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._100.ReferenceCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentLineDocumentType;
@@ -141,6 +143,51 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return textList.isEmpty() ? null : textList.get(0).getValue();
 	}
 
+	// 0..1 BT-128  IssuerAssignedID
+	@Override
+	public void setIssuerAssignedID(String id, String schemeID, String schemeCode) {
+		if(id==null) return;
+		ReferencedDocumentType rd = new ReferencedDocumentType();
+		rd.setIssuerAssignedID(new ID(id));
+		if(schemeID!=null) {
+			DocumentCodeType documentCode = new DocumentCodeType();
+			documentCode.setValue(schemeID);
+			rd.setTypeCode(documentCode);
+		}
+		if(schemeCode!=null) {
+			ReferenceCodeType referenceCode = new ReferenceCodeType();
+			referenceCode.setValue(schemeCode);
+			rd.setReferenceTypeCode(referenceCode);
+		}
+		specifiedLineTradeSettlement.getAdditionalReferencedDocument().add(rd);
+		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
+	}
+
+	@Override
+	public void setIssuerAssignedID(String id) {
+		setIssuerAssignedID(id, null, null);
+	}
+
+	@Override
+	public void setIssuerAssignedID(String id, String schemeID) {
+		setIssuerAssignedID(id, schemeID, null);
+	}
+
+	@Override
+	public void setIssuerAssignedIdentifier(Identifier id) {
+		if(id==null) return;
+		setIssuerAssignedID(id.getContent(), id.getSchemeIdentifier(), id.getSchemeVersion());
+	}
+
+	@Override
+	public Identifier getIssuerAssignedIdentifier() {
+		List<ReferencedDocumentType> rds = specifiedLineTradeSettlement.getAdditionalReferencedDocument();
+		if(rds.isEmpty()) return null;
+		ReferencedDocumentType rd = rds.get(0);
+		return new ID(rd.getIssuerAssignedID().getValue(), rd.getTypeCode()==null ? null : rd.getTypeCode().getValue()
+				, rd.getReferenceTypeCode()==null ? null : rd.getReferenceTypeCode().getValue());
+	}
+
 	// 1 .. 1 SpecifiedTradeProduct.Name BT-153
 	void setItemName(String text) {
 		specifiedTradeProduct.getName().add(new Text(text));
@@ -163,8 +210,6 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	public String getDescription() {
 		return specifiedTradeProduct.getDescription()==null ? null : specifiedTradeProduct.getDescription().getValue();
 	}
-
-	// TODO BT-128  IssuerAssignedID
 
 	// BT-134 +++ 0..1 Invoice line period start date
 	@Override

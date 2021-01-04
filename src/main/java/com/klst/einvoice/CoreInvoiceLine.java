@@ -2,7 +2,6 @@ package com.klst.einvoice;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Properties;
 
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
@@ -57,24 +56,31 @@ public interface CoreInvoiceLine extends BG26_InvoiceLinePeriod, BG32_ItemAttrib
 	 * Eine vom Verkäufer angegebene Kennung für einen Gegenstand, auf dem die Rechnungsposition basiert
 	 * EN16931-ID: BT-128-0 1..1 TypeCode = "130" Rechnungsdatenblatt, UNTDID 1001 Untermenge
 	 * EN16931-ID: BT-128-1 0..1 UNTDID 1153
+//	0 .. 1 IssuerAssignedID Objektkennung auf Ebene der Rechnungsposition, Wert             	BT-128
+//	1 .. 1 TypeCode Typ der Kennung für einen Gegenstand, auf dem die Rechnungsposition basiert BT-128-0
+//	0 .. 1 ReferenceTypeCode Kennung des Schemas                                                BT-128-1	
 	 */
-	/*    TODO
+	/*
 	 * Invoice line object identifier
 	 * <p>
 	 * An identifier for an object on which the invoice line is based, given by the Seller.
 	 * It may be a subscription number, telephone number, meter point etc., as applicable.  
 	 * <p>
 	 * Cardinality: 0..1 (optional)
-	 * <br>EN16931-ID: 	BT-128
+	 * <br>EN16931-ID: 	BT-128, BT-128-0, BT-128-1
 	 * <br>Rule ID: 	
 	 * <br>Request ID: 	R33
 	 * 
 	 * @param Identifier
-	 * @param schemeID, (optional) ff it may be not clear for the receiver what scheme is used for the identifier, 
+	 * @param schemeID, (optional) if it may be not clear for the receiver what scheme is used for the identifier, 
 	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.
+	 * @param schemeCode, example AAC :  Documentary credit identifier
 	 */
-//	public void setIssuerAssignedID(String id, String schemeID);
-//	public String getIssuerAssignedID();
+	public void setIssuerAssignedID(String id, String schemeID, String schemeCode);
+	public void setIssuerAssignedID(String id);
+	public void setIssuerAssignedID(String id, String schemeID);
+	public void setIssuerAssignedIdentifier(Identifier id);
+	public Identifier getIssuerAssignedIdentifier();
 
 	/**
 	 * Item name (mandatory part in 1..1 BG-31 ITEM INFORMATION)
@@ -159,6 +165,8 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 */
 	public void setOrderLineID(String id);
 	public String getOrderLineID();
+	
+	// TODO BT-133
 
 	/**
 	 * Item net price (mandatory part in PRICE DETAILS), exclusive of VAT, after subtracting item price discount.

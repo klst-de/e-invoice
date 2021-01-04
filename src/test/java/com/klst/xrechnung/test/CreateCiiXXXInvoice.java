@@ -333,7 +333,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         			, testLine.getTaxCategory(), testLine.getTaxRate() // mandatory, rate can be null
         			);
 
-        	line.setNote(testLine.getNote()); // opt
+        	line.setNote(testLine.getNote()); // opt BT-127
+        	line.setIssuerAssignedIdentifier(testLine.getIssuerAssignedIdentifier()); // opt BT-128
     		line.setStartDate(testLine.getStartDateAsTimestamp()); // BG-26.BT-134
     		line.setEndDate(testLine.getEndDateAsTimestamp()); // BG-26.BT-135
 
