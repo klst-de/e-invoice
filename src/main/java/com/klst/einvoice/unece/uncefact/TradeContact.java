@@ -9,14 +9,12 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class TradeContact extends TradeContactType implements IContact {
 
-	TradeContact() {
-		super();
-	}
-
 	// copy ctor
 	TradeContact(TradeContactType contact) {
-		this();
-		this.setContactPoint(contact.getPersonName().getValue());
+		super();
+		if(contact.getPersonName()!=null) {
+			this.setContactPoint(contact.getPersonName().getValue());
+		}
 		UniversalCommunicationType universalCommunicationType = contact.getTelephoneUniversalCommunication();
 		if(universalCommunicationType==null) {
 			// darf nicht sein

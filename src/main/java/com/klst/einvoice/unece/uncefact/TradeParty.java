@@ -37,7 +37,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	TradeParty(TradePartyType party) {
 		this();
 		LegalOrganizationType legalOrganization = party.getSpecifiedLegalOrganization();
-		init( party.getName().getValue()
+		init( getPartyName(party)
 			, getPostalAddress(party)
 			, getContact(party)
 			);
@@ -205,10 +205,10 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 //	------------------------------------------
 	
 	String getPartyName() {
-		return super.getName().getValue();
+		return getPartyName(this);
 	}
 	static String getPartyName(TradePartyType party) {
-		return party.getName().getValue();
+		return party.getName()==null ? null : party.getName().getValue();
 	}
 
 	void setPartyName(String name) {
