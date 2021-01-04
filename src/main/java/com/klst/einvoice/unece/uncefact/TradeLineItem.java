@@ -145,7 +145,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 	// 0..1 BT-128  IssuerAssignedID
 	@Override
-	public void setIssuerAssignedID(String id, String schemeID, String schemeCode) {
+	public void setLineObjectID(String id, String schemeID, String schemeCode) {
 		if(id==null) return;
 		ReferencedDocumentType rd = new ReferencedDocumentType();
 		rd.setIssuerAssignedID(new ID(id));
@@ -164,23 +164,23 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	@Override
-	public void setIssuerAssignedID(String id) {
-		setIssuerAssignedID(id, null, null);
+	public void setLineObjectID(String id) {
+		setLineObjectID(id, null, null);
 	}
 
 	@Override
-	public void setIssuerAssignedID(String id, String schemeID) {
-		setIssuerAssignedID(id, schemeID, null);
+	public void setLineObjectID(String id, String schemeID) {
+		setLineObjectID(id, schemeID, null);
 	}
 
 	@Override
-	public void setIssuerAssignedIdentifier(Identifier id) {
+	public void setLineObjectIdentifier(Identifier id) {
 		if(id==null) return;
-		setIssuerAssignedID(id.getContent(), id.getSchemeIdentifier(), id.getSchemeVersion());
+		setLineObjectID(id.getContent(), id.getSchemeIdentifier(), id.getSchemeVersion());
 	}
 
 	@Override
-	public Identifier getIssuerAssignedIdentifier() {
+	public Identifier getLineObjectIdentifier() {
 		List<ReferencedDocumentType> rds = specifiedLineTradeSettlement.getAdditionalReferencedDocument();
 		if(rds.isEmpty()) return null;
 		ReferencedDocumentType rd = rds.get(0);

@@ -76,11 +76,11 @@ public interface CoreInvoiceLine extends BG26_InvoiceLinePeriod, BG32_ItemAttrib
 	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.
 	 * @param schemeCode, example AAC :  Documentary credit identifier
 	 */
-	public void setIssuerAssignedID(String id, String schemeID, String schemeCode);
-	public void setIssuerAssignedID(String id);
-	public void setIssuerAssignedID(String id, String schemeID);
-	public void setIssuerAssignedIdentifier(Identifier id);
-	public Identifier getIssuerAssignedIdentifier();
+	public void setLineObjectID(String id, String schemeID, String schemeCode);
+	public void setLineObjectID(String id);
+	public void setLineObjectID(String id, String schemeID);
+	public void setLineObjectIdentifier(Identifier id);
+	public Identifier getLineObjectIdentifier();
 
 	/**
 	 * Item name (mandatory part in 1..1 BG-31 ITEM INFORMATION)

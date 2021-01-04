@@ -161,8 +161,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
         	});
 			
 			targetLine.setNote(testLine.getNote()); // opt BT-127
-			targetLine.setIssuerAssignedIdentifier(
-					testLine.getIssuerAssignedIdentifier()); // opt BT-128
+			targetLine.setLineObjectIdentifier(
+					testLine.getLineObjectIdentifier()); // opt BT-128
 			targetLine.setOrderLineID(testLine.getOrderLineID());
 			
 			ublInvoice.addLine(targetLine);
@@ -432,8 +432,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			});
 			
         	targetLine.setNote(testLine.getNote());   	
-			targetLine.setIssuerAssignedIdentifier(
-					testLine.getIssuerAssignedIdentifier()); // opt BT-128
+			targetLine.setLineObjectIdentifier(
+					testLine.getLineObjectIdentifier()); // opt BT-128
         	targetLine.setOrderLineID(testLine.getOrderLineID());
         	
 			ublDoc.addLine(targetLine);
