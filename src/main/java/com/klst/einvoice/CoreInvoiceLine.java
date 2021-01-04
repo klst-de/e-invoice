@@ -280,4 +280,21 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	public List<Object> getClassificationList();
 	public List<Identifier> getClassifications();
 
+	/**
+	 * Item country of origin (optional part in 1..1 BG-31 ITEM INFORMATION)
+ 	 * <p>
+	 * The code identifying the country from which the item originates.
+	 * The lists of valid countries are registered with the EN ISO 3166-1 Maintenance agency, 
+	 * “Codes for the representation of names of countries and their subdivisions”.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BT-159
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R29 
+	 * 
+	 * @param code
+	 */
+	public void setCountryOfOrigin(String code);
+	public String getCountryOfOrigin();
+
 }

@@ -15,6 +15,7 @@ import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CommodityClassificationType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CountryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.InvoiceLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemIdentificationType;
@@ -29,6 +30,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Credited
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DescriptionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EndDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IdentificationCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InvoicedQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ItemClassificationCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineExtensionAmountType;
@@ -645,6 +647,35 @@ public class GenericLine<T> implements CoreInvoiceLine {
 			resList.add(productClassification);
 		});
 		return resList;
+	}
+
+	// BG-31.BT-159 +++ 0..1 Item country of origin
+	@Override
+	public void setCountryOfOrigin(String code) {
+ 		if(code==null) return;
+ 		IdentificationCodeType identificationCode = new IdentificationCodeType();
+ 		identificationCode.setValue(code);
+ 		CountryType country = new CountryType();
+ 		country.setIdentificationCode(identificationCode);
+		
+		if(isInvoiceLineType) {
+			ItemType item = iLine.getItem();
+			item.setOriginCountry(country);
+			iLine.setItem(item);
+		} else {
+			ItemType item = cnLine.getItem();
+			item.setOriginCountry(country);
+			cnLine.setItem(item);
+		}	
+	}
+
+	@Override
+	public String getCountryOfOrigin() {
+		ItemType item = isInvoiceLineType ? iLine.getItem() : cnLine.getItem();
+		CountryType country = item.getOriginCountry();
+		if(country==null) return null;
+		IdentificationCodeType identificationCode = country.getIdentificationCode();
+		return identificationCode==null ? null : identificationCode.getValue();
 	}
 
 }

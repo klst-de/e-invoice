@@ -343,6 +343,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			classifications.forEach(cl -> {
 				line.addClassificationID(cl);
 			});
+			line.setCountryOfOrigin(testLine.getCountryOfOrigin());     // BG-31.BT-159 0..1
         	line.setOrderLineID(testLine.getOrderLineID());
         	cii.addLine(line);
         });

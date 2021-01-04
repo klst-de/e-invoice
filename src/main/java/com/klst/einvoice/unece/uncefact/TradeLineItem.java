@@ -10,6 +10,7 @@ import com.klst.einvoice.Identifier;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
+import un.unece.uncefact.data.standard.qualifieddatatype._100.CountryIDType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentLineDocumentType;
@@ -21,6 +22,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeCountryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeProductType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementLineMonetarySummationType;
@@ -334,6 +336,26 @@ Bsp.
 		});
 		return resList;
 	}
+
+	// BG-31.BT-159 +++ 0..1 Item country of origin
+	@Override
+	public void setCountryOfOrigin(String code) {
+		if(code==null) return;
+		CountryIDType countryID = new CountryIDType();
+		countryID.setValue(code);
+		TradeCountryType tradeCountry = new TradeCountryType();
+		tradeCountry.setID(countryID);
+		specifiedTradeProduct.setOriginTradeCountry(tradeCountry);
+		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+	}
+
+	@Override
+	public String getCountryOfOrigin() {
+		TradeCountryType tradeCountry = specifiedTradeProduct.getOriginTradeCountry()==null ? null : specifiedTradeProduct.getOriginTradeCountry();
+		return tradeCountry==null ? null : 
+			tradeCountry.getID()==null ? null : tradeCountry.getID().getValue();
+	}
+
 
 	// BT-129+BT-130
 	void setQuantity(Quantity quantity) { 

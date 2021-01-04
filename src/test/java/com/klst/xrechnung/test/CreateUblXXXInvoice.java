@@ -421,6 +421,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			classifications.forEach(cl -> {
 				targetLine.addClassificationID(cl);
 			});
+			targetLine.setCountryOfOrigin(testLine.getCountryOfOrigin());     // BG-31.BT-159 0..1
 			
         	targetLine.setNote(testLine.getNote());   	
         	targetLine.setOrderLineID(testLine.getOrderLineID());
