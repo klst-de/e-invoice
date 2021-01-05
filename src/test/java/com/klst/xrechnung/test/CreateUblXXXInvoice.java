@@ -416,6 +416,12 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			targetLine.setBuyerAccountingReference(testLine.getBuyerAccountingReference()); // BG-26.BT-133
 			targetLine.setStartDate(testLine.getStartDateAsTimestamp()); // optional
 			targetLine.setEndDate(testLine.getEndDateAsTimestamp()); // optional
+			
+			List<AllowancesAndCharges> allowancesAndCharges = testLine.getAllowancesAndCharges();
+			LOG.info("(optional) line AllowancesAndCharges #:"+allowancesAndCharges.size());
+			allowancesAndCharges.forEach(aac -> {
+				targetLine.addAllowanceCharge(aac);
+			});
 
 			targetLine.setDescription(testLine.getDescription());   //BT-154 0..1
 			targetLine.setSellerAssignedID(testLine.getSellerAssignedID());   //BT-155 0..1

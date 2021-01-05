@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.Identifier;
 import com.klst.untdid.codelist.DateTimeFormats;
@@ -27,6 +28,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeCountryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeProductType;
@@ -319,6 +321,31 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
+
+	/*
+	 * BG-27 0..n INVOICE LINE ALLOWANCES
+	 * BG-28 0..n INVOICE LINE CHARGES
+	 */
+	
+	@Override
+	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
+		if(allowanceOrCharge==null) return; // optional
+		// The method add(TradeAllowanceChargeType) in the type List<TradeAllowanceChargeType> 
+		// is not applicable for the arguments (AllowancesAndCharges)
+		// specifiedLineTradeSettlement.getSpecifiedTradeAllowanceCharge().add(allowanceOrCharge);
+		// TradeAllowanceCharge extends TradeAllowanceChargeType implements AllowancesAndCharges !!!
+		specifiedLineTradeSettlement.getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge);
+	}
+
+	@Override
+	public List<AllowancesAndCharges> getAllowancesAndCharges() {
+		List<TradeAllowanceChargeType> allowanceChargeList = specifiedLineTradeSettlement.getSpecifiedTradeAllowanceCharge();
+		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
+		allowanceChargeList.forEach(stac -> {
+			res.add(new TradeAllowanceCharge(stac));
+		});
+		return res;
 	}
 
 	// 1 .. 1 SpecifiedTradeProduct.Name BT-153

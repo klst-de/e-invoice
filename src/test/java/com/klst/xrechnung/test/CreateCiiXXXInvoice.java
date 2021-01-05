@@ -339,6 +339,12 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
     		line.setStartDate(testLine.getStartDateAsTimestamp()); // BG-26.BT-134
     		line.setEndDate(testLine.getEndDateAsTimestamp()); // BG-26.BT-135
 
+			List<AllowancesAndCharges> allowancesAndCharges = testLine.getAllowancesAndCharges();
+			LOG.info("(optional) line AllowancesAndCharges #:"+allowancesAndCharges.size());
+			allowancesAndCharges.forEach(allowanceOrCharge -> {
+				line.addAllowanceCharge(allowanceOrCharge);
+			});
+
         	line.setDescription(testLine.getDescription());
         	line.setSellerAssignedID(testLine.getSellerAssignedID()); // 0..1 BT-128 ram:SellerAssignedID
         	line.setStandardIdentifier(testLine.getStandardIdentifier()); // 0..1 BT-157 0..1 , BT-157-1 required
