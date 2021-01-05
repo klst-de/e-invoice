@@ -83,38 +83,10 @@ public interface CoreInvoiceLine extends BG26_InvoiceLinePeriod, BG32_ItemAttrib
 	public Identifier getLineObjectIdentifier();
 
 	/**
-	 * Item name (mandatory part in 1..1 BG-31 ITEM INFORMATION)
-	 * <p>
-	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BT-153 
-	 * <br>Rule ID: 	BR-25
-	 * <br>Request ID: 	R20, R56
-	 * 
-	 * @param text Text
-	 */
-//	public void setItemName(String text); // use ctor
-	public String getItemName();
-
-	/**
-	 * Item description (optional part in 1..1 BG-31 ITEM INFORMATION)
- 	 * <p>
-	 * The Item description allows for describing the item and its features in more detail than the Item name.
-	 * <p>
-	 * Cardinality: 	0..1 (optional)
-	 * <br>EN16931-ID: 	BT-154
-	 * <br>Rule ID: 	
-	 * <br>Request ID: 	R20, R56
-	 * 
-	 * @param Text
-	 */
-	public void setDescription(String text);
-	public String getDescription();
-
-	/**
 	 * Billed quantity and UoM of items (goods or services) that is charged in the Invoice line.
 	 * <p>
 	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BT-129 BT-130  
+	 * <br>EN16931-ID: 	BT-129 (decimal quantity) + BT-130 (unitCode) 
 	 * <br>Rule ID: 	BR-22
 	 * <br>Request ID: 	R14, R39, R56
 	 * 
@@ -182,13 +154,24 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	public void setBuyerAccountingReference(String text);
 	public String getBuyerAccountingReference();
 
+	// BG-26 0..1 INVOICE LINE PERIOD with 
+	//       BT-134 +++ 0..1 Invoice line period start date
+	//       BT-135 +++ 0..1 Invoice line period end date
+	
+	// BG-27 0..n INVOICE LINE ALLOWANCES with
+	//       BT-136 +++ 1..1 Invoice line allowance amount
+	// TODO bis
+	//       BT-140 +++ 0..1 Invoice line allowance reason code
+	//       BT-145 +++ 0..1 Invoice line charge reason code
+	
+	// BG-29 ++ 1..1 PRICE DETAILS
 	/**
 	 * Item net price (mandatory part in PRICE DETAILS), exclusive of VAT, after subtracting item price discount.
 	 * <p>
 	 * The unit net price has to be equal with the Item gross price less the Item price discount.
 	 * <p>
 	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BG-29, BT-146 
+	 * <br>EN16931-ID: 	BG-29.BT-146 
 	 * <br>Rule ID: 	BR-27
 	 * <br>Request ID: 	R14
 	 * 
@@ -203,6 +186,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	// optional BaseQuantity : BT-149-0 QuantityType 0..1 + BT-150-0 required
 	public Quantity getBaseQuantity();
 	
+	// BG-30 ++ 1..1 LINE VAT INFORMATION
 	/**
 	 * Invoiced item VAT category code
 	 * <p>
@@ -220,6 +204,34 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	// + 0..1 EN16931-ID: BT-152 Invoiced item VAT rate
 //	public void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent); // use ctor
 	public BigDecimal getTaxRate(); 
+
+	/**
+	 * Item name (mandatory part in 1..1 BG-31 ITEM INFORMATION)
+	 * <p>
+	 * Cardinality: 	1..1 (mandatory)
+	 * <br>EN16931-ID: 	BT-153 
+	 * <br>Rule ID: 	BR-25
+	 * <br>Request ID: 	R20, R56
+	 * 
+	 * @param text Text
+	 */
+//	public void setItemName(String text); // use ctor
+	public String getItemName();
+
+	/**
+	 * Item description (optional part in 1..1 BG-31 ITEM INFORMATION)
+ 	 * <p>
+	 * The Item description allows for describing the item and its features in more detail than the Item name.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BT-154
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R20, R56
+	 * 
+	 * @param Text
+	 */
+	public void setDescription(String text);
+	public String getDescription();
 
 	/**
 	 * Item Seller's identifier (optional part in 1..1 BG-31 ITEM INFORMATION)
