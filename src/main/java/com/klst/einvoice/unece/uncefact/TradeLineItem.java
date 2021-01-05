@@ -26,6 +26,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeCountryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeProductType;
@@ -188,27 +189,76 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 				, rd.getReferenceTypeCode()==null ? null : rd.getReferenceTypeCode().getValue());
 	}
 
-	// 1 .. 1 SpecifiedTradeProduct.Name BT-153
-	void setItemName(String text) {
-		specifiedTradeProduct.getName().add(new Text(text));
-		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+	// BT-129+BT-130
+	void setQuantity(Quantity quantity) { 
+		QuantityType qt = new QuantityType();
+		quantity.copyTo(qt);
+		specifiedLineTradeDelivery.setBilledQuantity(qt);
+		super.setSpecifiedLineTradeDelivery(specifiedLineTradeDelivery);
 	}
 
 	@Override
-	public String getItemName() {
-		return specifiedTradeProduct.getName().get(0).getValue();
+	public Quantity getQuantity() {
+		return new Quantity(specifiedLineTradeDelivery.getBilledQuantity().getUnitCode(), specifiedLineTradeDelivery.getBilledQuantity().getValue());
 	}
 
-	@Override // 0 .. 1 SpecifiedTradeProduct.Description BT-154 Bsp: <ram:Description>Zeitschrift Inland</ram:Description>
-	public void setDescription(String text) {
+	// BT-131
+	void setLineTotalAmount(Amount amount) {
+		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
+		AmountType lineTotalAmt = new AmountType();
+		amount.copyTo(lineTotalAmt);
+		tradeSettlementLineMonetarySummation.getLineTotalAmount().add(lineTotalAmt);
+		specifiedLineTradeSettlement.setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
+		super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);
+	}
+
+	@Override
+	public Amount getLineTotalAmount() {
+		return new Amount(specifiedLineTradeSettlement.getSpecifiedTradeSettlementLineMonetarySummation().getLineTotalAmount().get(0).getValue());
+	}
+
+	/*
+Bsp. CII 01.01a-INVOICE_uncefact.xml :
+            <ram:SpecifiedLineTradeAgreement>
+                <ram:BuyerOrderReferencedDocument>
+                    <ram:LineID>6171175.1</ram:LineID>
+                </ram:BuyerOrderReferencedDocument>
+     UBL
+        <cac:OrderLineReference>
+            <cbc:LineID>6171175.1</cbc:LineID>
+        </cac:OrderLineReference>
+
+	 */
+	@Override // BT-132 0..1
+	public void setOrderLineID(String id) {
+		if(id==null) return;
+		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
+		referencedDocument.setLineID(new ID(id)); // No identification scheme is to be used.
+		specifiedLineTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument);
+		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
+	}
+
+	@Override
+	public String getOrderLineID() {
+		ReferencedDocumentType referencedDocument = specifiedLineTradeAgreement.getBuyerOrderReferencedDocument();
+		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
+	}
+
+	@Override  // BT-133 0..1
+	public void setBuyerAccountingReference(String text) {
 		if(text==null) return;
-		specifiedTradeProduct.setDescription(new Text(text));
-		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+		TradeAccountingAccountType taa = new TradeAccountingAccountType();
+		taa.setID(new ID(text));
+
+		specifiedLineTradeSettlement.getReceivableSpecifiedTradeAccountingAccount().add(taa);
+		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
 	}
 
 	@Override
-	public String getDescription() {
-		return specifiedTradeProduct.getDescription()==null ? null : specifiedTradeProduct.getDescription().getValue();
+	public String getBuyerAccountingReference() {
+		List<TradeAccountingAccountType> rds = specifiedLineTradeSettlement.getReceivableSpecifiedTradeAccountingAccount();
+		if(rds.isEmpty()) return null;
+		return rds.get(0).getID().getValue();
 	}
 
 	// BT-134 +++ 0..1 Invoice line period start date
@@ -269,6 +319,29 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+	}
+
+	// 1 .. 1 SpecifiedTradeProduct.Name BT-153
+	void setItemName(String text) {
+		specifiedTradeProduct.getName().add(new Text(text));
+		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+	}
+
+	@Override
+	public String getItemName() {
+		return specifiedTradeProduct.getName().get(0).getValue();
+	}
+
+	@Override // 0 .. 1 SpecifiedTradeProduct.Description BT-154 Bsp: <ram:Description>Zeitschrift Inland</ram:Description>
+	public void setDescription(String text) {
+		if(text==null) return;
+		specifiedTradeProduct.setDescription(new Text(text));
+		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+	}
+
+	@Override
+	public String getDescription() {
+		return specifiedTradeProduct.getDescription()==null ? null : specifiedTradeProduct.getDescription().getValue();
 	}
 
 	@Override // 0 .. 1 BT-155 Bsp: <ram:SellerAssignedID>246</ram:SellerAssignedID>
@@ -422,61 +495,6 @@ Bsp.
 			result.put(pc.getDescription().get(0).getValue(), pc.getValue().get(0).getValue());			
 		});
 		return result;
-	}
-
-	// BT-129+BT-130
-	void setQuantity(Quantity quantity) { 
-		QuantityType qt = new QuantityType();
-		quantity.copyTo(qt);
-		specifiedLineTradeDelivery.setBilledQuantity(qt);
-		super.setSpecifiedLineTradeDelivery(specifiedLineTradeDelivery);
-	}
-
-	@Override
-	public Quantity getQuantity() {
-		return new Quantity(specifiedLineTradeDelivery.getBilledQuantity().getUnitCode(), specifiedLineTradeDelivery.getBilledQuantity().getValue());
-	}
-
-	// BT-131
-	void setLineTotalAmount(Amount amount) {
-		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
-		AmountType lineTotalAmt = new AmountType();
-		amount.copyTo(lineTotalAmt);
-		tradeSettlementLineMonetarySummation.getLineTotalAmount().add(lineTotalAmt);
-		specifiedLineTradeSettlement.setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
-		super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);
-	}
-
-	@Override
-	public Amount getLineTotalAmount() {
-		return new Amount(specifiedLineTradeSettlement.getSpecifiedTradeSettlementLineMonetarySummation().getLineTotalAmount().get(0).getValue());
-	}
-
-	/*
-Bsp. CII 01.01a-INVOICE_uncefact.xml :
-            <ram:SpecifiedLineTradeAgreement>
-                <ram:BuyerOrderReferencedDocument>
-                    <ram:LineID>6171175.1</ram:LineID>
-                </ram:BuyerOrderReferencedDocument>
-     UBL
-        <cac:OrderLineReference>
-            <cbc:LineID>6171175.1</cbc:LineID>
-        </cac:OrderLineReference>
-
-	 */
-	@Override // BT-132 0..1
-	public void setOrderLineID(String id) {
-		if(id==null) return;
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setLineID(new ID(id)); // No identification scheme is to be used.
-		specifiedLineTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument);
-		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
-	}
-
-	@Override
-	public String getOrderLineID() {
-		ReferencedDocumentType referencedDocument = specifiedLineTradeAgreement.getBuyerOrderReferencedDocument();
-		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
 	}
 
 	// 1 .. 1 ChargeAmount BT-146

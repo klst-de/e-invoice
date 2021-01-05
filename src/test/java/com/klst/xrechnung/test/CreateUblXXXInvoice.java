@@ -413,6 +413,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 					);
 			
 			// opt:
+			targetLine.setBuyerAccountingReference(testLine.getBuyerAccountingReference()); // BG-26.BT-133
 			targetLine.setStartDate(testLine.getStartDateAsTimestamp()); // optional
 			targetLine.setEndDate(testLine.getEndDateAsTimestamp()); // optional
 

@@ -262,8 +262,8 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	}
 
 	// BT-133 ++ 0..1 Invoice line Buyer accounting reference
-// TODO	@Override
-	public void setBuyerAccounting(String text) {
+	@Override
+	public void setBuyerAccountingReference(String text) {
 		if(text==null) return;
 		AccountingCostType accountingCost = new AccountingCostType();
 		accountingCost.setValue(text);
@@ -273,8 +273,8 @@ public class GenericLine<T> implements CoreInvoiceLine {
 			cnLine.setAccountingCost(accountingCost);
 		}	
 	}
-// TODO	@Override
-	public String getBuyerAccounting() {
+	@Override
+	public String getBuyerAccountingReference() {
 		AccountingCostType accountingCost = isInvoiceLineType ? iLine.getAccountingCost() : cnLine.getAccountingCost();
 		return accountingCost==null ? null : accountingCost.getValue();
 	}

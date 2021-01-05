@@ -166,7 +166,21 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	public void setOrderLineID(String id);
 	public String getOrderLineID();
 	
-	// TODO BT-133
+	/**
+	 * Invoice line Buyer accounting reference
+	 * <p>
+	 * A textual value that specifies where to book the relevant data into the Buyer's financial accounts.
+	 * If required, this reference shall be provided by the Buyer to the Seller prior to the issuing of the Invoice.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BT-133
+	 * <br>Rule ID: 	 
+	 * <br>Request ID: 	R3
+	 * 
+	 * @param Text
+	 */
+	public void setBuyerAccountingReference(String text);
+	public String getBuyerAccountingReference();
 
 	/**
 	 * Item net price (mandatory part in PRICE DETAILS), exclusive of VAT, after subtracting item price discount.

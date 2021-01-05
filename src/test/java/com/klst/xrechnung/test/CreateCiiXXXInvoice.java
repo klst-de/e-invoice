@@ -335,6 +335,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
         	line.setNote(testLine.getNote()); // opt BT-127
         	line.setLineObjectIdentifier(testLine.getLineObjectIdentifier()); // opt BT-128
+    		line.setBuyerAccountingReference(testLine.getBuyerAccountingReference()); // BG-26.BT-133
     		line.setStartDate(testLine.getStartDateAsTimestamp()); // BG-26.BT-134
     		line.setEndDate(testLine.getEndDateAsTimestamp()); // BG-26.BT-135
 
