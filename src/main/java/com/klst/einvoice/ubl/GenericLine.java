@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -15,6 +16,7 @@ import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AllowanceChargeType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CommodityClassificationType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CountryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
@@ -337,18 +339,31 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
 	}
 	
-	// BG-27 ++ 0..n INVOICE LINE ALLOWANCES  TODO
-	
 	/*
 	 * BG-27 0..n INVOICE LINE ALLOWANCES
-	 * TODO Komplett
+	 * BG-28 0..n INVOICE LINE CHARGES
 	 */
 	
-	/* 
-	 * BG-28 ++ 0..n INVOICE LINE CHARGES
-	 * TODO Komplett
-	 */
-	
+	@Override
+	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
+		if(allowanceOrCharge==null) return; // optional
+		if(isInvoiceLineType) {
+			iLine.getAllowanceCharge().add((AllowanceChargeType)allowanceOrCharge);
+		} else {
+			cnLine.getAllowanceCharge().add((AllowanceChargeType)allowanceOrCharge);
+		}
+	}
+
+	@Override
+	public List<AllowancesAndCharges> getAllowancesAndCharges() {
+		List<AllowanceChargeType> allowanceChargeList = isInvoiceLineType ? iLine.getAllowanceCharge() : cnLine.getAllowanceCharge();
+		List<AllowancesAndCharges> resList = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
+		allowanceChargeList.forEach(doc -> {
+			resList.add(new AllowanceCharge(doc));
+		});
+		return resList;
+	}
+
 	// BG-29 ++ 1..1 PRICE DETAILS
 	// BG-29.BT-146 +++ 1..1 Item net price
 	@Override

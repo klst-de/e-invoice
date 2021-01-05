@@ -6,18 +6,23 @@ import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 /**
- * Common Interface for optional DOCUMENT LEVEL ALLOWANCES (BG-20) and CHARGES (BG-21)
+ * Common Interface for optional DOCUMENT LEVEL ALLOWANCES (BG-20) and CHARGES (BG-21) and
+ *                               INVOICE LINE ALLOWANCES (BG-27) and CHARGES (BG-28)
  * <p>
- * BG-20 + 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+ * BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
  * <br>
- * BG-21 + 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
+ * BG-21 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
+ * <br>
+ * BG-27 0..n INVOICE LINE ALLOWANCES / ABSCHLÄGE
+ * <br>
+ * BG-28 0..n INVOICE LINE CHARGES / ZUSCHLÄGE
  * 
  * <p>
  * <p>
  * Cardinality: 	0..n
- * <br>EN16931-ID: 	BG-20 / BG-21
+ * <br>EN16931-ID: 	BG-20 / BG-21 / BG-27 / BG-28
  * <br>Rule ID: 	
- * <br>Request ID: 	R15
+ * <br>Request ID: 	R15, R18
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
@@ -59,7 +64,9 @@ UBL:
       </cac:TaxScheme>
     </cac:TaxCategory>
   </cac:AllowanceCharge>
-    
+
+ubl-tc434-example5.xml für INVOICE LINE
+
 CII: ApplicableHeaderTradeSettlement ...
             <ram:SpecifiedTradeAllowanceCharge>
                 <ram:ChargeIndicator>

@@ -158,11 +158,18 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	//       BT-134 +++ 0..1 Invoice line period start date
 	//       BT-135 +++ 0..1 Invoice line period end date
 	
-	// BG-27 0..n INVOICE LINE ALLOWANCES with
-	//       BT-136 +++ 1..1 Invoice line allowance amount
-	// TODO bis
-	//       BT-140 +++ 0..1 Invoice line allowance reason code
-	//       BT-145 +++ 0..1 Invoice line charge reason code
+	/**
+	 * add an allowance or charge
+	 * <p>
+	 * BG-27 0..n INVOICE LINE ALLOWANCES / ABSCHLÄGE
+	 * <br>
+	 * BG-28 0..n INVOICE LINE CHARGES / ZUSCHLÄGE
+	 * 
+	 * @param allowanceOrCharge
+	 */
+	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge);
+	public List<AllowancesAndCharges> getAllowancesAndCharges();
+
 	
 	// BG-29 ++ 1..1 PRICE DETAILS
 	/**
