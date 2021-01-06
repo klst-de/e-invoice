@@ -14,7 +14,7 @@ package com.klst.einvoice;
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
 
-/*      subjectCode gibt es in UBL nicht!
+/*      subjectCode BT-21 gibt es in UBL nicht!
 Bsp 05:
 CII:
         <ram:IncludedNote>
@@ -29,7 +29,7 @@ UBL:
 wurde geändert zu:
     <cbc:Note>#ADU#Trainer: Herr […]</cbc:Note>
 
-also ist in UBL effektiv nur ein String da, value
+also ist in UBL effektiv nur ein String da, value - dieser wird per regex in subjectCode und content aufgeteilt
 während in CII mehrere Objekte da sind, nur zwei werden genutzt:
     protected TextType subject;
     protected CodeType contentCode;
@@ -38,20 +38,45 @@ während in CII mehrere Objekte da sind, nur zwei werden genutzt:
     protected IDType id; 
 
  */
-public interface InvoiceNote {
+public interface InvoiceNote extends InvoiceNoteFactory {
 	
-	// InvoiceNoteFactory: 
-//	public InvoiceNote createNote(String subjectCode, String content)
+	@Override // factory method
+	public InvoiceNote createNote(String subjectCode, String content);
 	
-	// BT-21 ++ 0..1 Invoice note subject code
-	public String getCode();
+// setter:
 //	void setCode(String code); // not public ==> use factory
-	
-	// BT-22 ++ 1..1 Invoice note
-	public String getNote();
 //	void setNote(String content); // not public ==> use factory
 	
-	// getter in CoreInvoice:
+// getter in CoreInvoice:
 //	public List<InvoiceNote> getInvoiceNotes();
+	
+	/**
+	 * returns optional Invoice note subject code
+	 * <p>
+	 * To be chosen from the entries in UNTDID 4451
+	 * <p>
+	 * Cardinality: 	0..1
+	 * <br>EN16931-ID: 	BT-21
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R56
+	 * 
+	 * @return Text or null
+	 */
+	public String getCode();
+	
+	/**
+	 * returns Invoice note
+	 * <p>
+	 * A textual note that gives unstructured information that is relevant to the Invoice as a whole.
+	 * Such as the reason for any correction or assignment note in case the invoice has been factored
+	 * <p>
+	 * Cardinality: 	1..1
+	 * <br>EN16931-ID: 	BT-22
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R56
+	 * 
+	 * @return Text
+	 */
+	public String getNote();
 	
 }
