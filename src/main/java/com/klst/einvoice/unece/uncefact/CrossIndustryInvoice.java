@@ -19,6 +19,7 @@ import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
+import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentCardFactory;
 import com.klst.einvoice.PaymentInstructions;
@@ -215,7 +216,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setPurchaseOrderReference(getPurchaseOrderReference(doc)); // optional BT-13
 		setOrderReference(getOrderReferenceID(doc)); // optional BT-14
 
-		addNotes(doc.getExchangedDocument());	
+		addNotes(doc.getExchangedDocument());
 		LOG.info("\n SellerParty:");;
 		setSeller(getSellerParty(doc));
 		LOG.info("\n BuyerParty:");;
@@ -709,10 +710,50 @@ UBL:
 	 * 
 	 */
 	@Override
+	public InvoiceNote createNote(String subjectCode, String content) {
+		// delegieren:
+		return Note.create(subjectCode, content);
+	}
+	@Override
+	public InvoiceNote createNote(String content) {
+		return createNote(null, content);
+	}
+
+	private void addNotes(ExchangedDocumentType ed) {
+		List<InvoiceNote> notes = Note.getInvoiceNotes(ed);
+		notes.forEach(note -> {
+			addNote(note);
+		});
+	}
+	
+	@Override
+	public void addNote(InvoiceNote note) {
+		this.exchangedDocument.getIncludedNote().add((NoteType)note);
+	}
+	@Override
+	public void addNote(String subjectCode, String content) {
+		addNote(createNote(subjectCode, content));
+	}
+	@Override
+	public void addNote(String content) {
+		addNote(createNote(content));
+	}
+
+	// ersetzt List<Object> getNotes()
+	@Override
+	public List<InvoiceNote> getInvoiceNotes() {
+		// delegieren:
+		return Note.getInvoiceNotes(this.exchangedDocument);
+	}
+	
+	// TODO deprecated löschen (auch in interface) - ab rel.2.x
+	@Override
+	@Deprecated
 	public List<Object> getNotes() {
 		return getNotes(this.exchangedDocument);
 	}
-	static List<Object> getNotes(ExchangedDocumentType ed) {
+	@Deprecated
+	private static List<Object> getNotes(ExchangedDocumentType ed) {
 		List<NoteType> noteList = ed.getIncludedNote();
 		List<Object> res = new ArrayList<Object>(noteList.size());
 		noteList.forEach(note -> {
@@ -720,38 +761,16 @@ UBL:
 		});
 		return res;
 	}
-	private void addNotes(ExchangedDocumentType ed) {
-		List<NoteType> noteList = ed.getIncludedNote();
-		noteList.forEach(note -> {
-			String code = note.getSubjectCode()==null? null : note.getSubjectCode().getValue();
-			// die Kardinalität: von BT-22/Content ist 1 .. 1
-			String content = note.getContent().isEmpty()? null : note.getContent().get(0).getValue();
-			this.addNote(code, content);
-		});
-	}
 
+	@Deprecated
 	@Override
 	public void setNote(String subjectCode, String content) {
 		addNote(subjectCode, content);
 	}
+	@Deprecated
 	@Override
 	public void setNote(String content) {
 		setNote(null, content);
-	}
-	public void addNote(String subjectCode, String noteContent) {
-		NoteType note = new NoteType();
-		TextType content = new Text(noteContent);
-		note.getContent().add(content);
-		if(subjectCode!=null) {
-			CodeType code = new CodeType();
-			code.setValue(subjectCode);
-			note.setSubjectCode(code); //  z.B ADU
-		}
-		addNote(note);
-	}
-	public void addNote(Object note) {
-		exchangedDocument.getIncludedNote().add((NoteType)note);
-		super.setExchangedDocument(exchangedDocument);
 	}
 
 	/* PROCESS CONTROL                             BG-2                        1 (mandatory) 
