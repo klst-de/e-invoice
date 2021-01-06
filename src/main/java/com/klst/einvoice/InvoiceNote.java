@@ -54,6 +54,7 @@ public interface InvoiceNote extends InvoiceNoteFactory {
 	 * returns optional Invoice note subject code
 	 * <p>
 	 * To be chosen from the entries in UNTDID 4451
+	 * @see <a href="https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred4451.htm">UNTDID 4451</a>
 	 * <p>
 	 * Cardinality: 	0..1
 	 * <br>EN16931-ID: 	BT-21

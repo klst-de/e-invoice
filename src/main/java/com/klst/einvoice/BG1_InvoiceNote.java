@@ -27,32 +27,33 @@ UBL:
     <cbc:Note>ADU</cbc:Note>
     <cbc:Note>Trainer: Herr […]</cbc:Note>
 
-!!! in CII gehören Content und SubjectCode zusammen, in UBL nicht
+wurde geändert zu:
+    <cbc:Note>#ADU#Trainer: Herr […]</cbc:Note>
 
  */
-// TODO Idee runter zu ubl und cii und public raus ?!
-public interface BG1_InvoiceNote {
+public interface BG1_InvoiceNote extends InvoiceNoteFactory {
 	
-	// BT-21 ++ 0..1 Invoice note subject code
-//	public String getSubjectCode();
+//	TODO delete this >>>>>>>>>>
+	@Deprecated // use List<InvoiceNote> getInvoiceNotes()
+	public List<Object> getNotes();
 	
-	// BT-22 ++ 1..1 Invoice note
-//	public String getNote();
-	
-	public List<Object> getNotes(); // Object == NoteType/CII ist mächtiger als  NoteType/UBL TODO UBL -> CII NoteType mappen
-	
-	/**
-	 * 
-	 * @param subjectCode - To be chosen from the entries in UNTDID 4451, BT-21 / 0..1
-	 * @param content - note Content, BT-22 / 1..1 
-	 * <br> A textual note that gives unstructured information that is relevant to the Invoice as a whole.
- 	 * Such as the reason for any correction or assignment note in case the invoice has been factored.
-	 */
-	// https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred4451.htm
+	@Deprecated
 	void setNote(String subjectCode, String content);
+	@Deprecated
 	void setNote(String content);
+//	<<<<<<<<<<<<<<<<
 
-	// TODO:
-//	Note createNote(String subjectCode, String content); // factory
-//	void addNote(Note note);
+	// getter
+	public List<InvoiceNote> getInvoiceNotes();
+
+	// factory methods
+	@Override
+	public InvoiceNote createNote(String subjectCode, String content);
+	public InvoiceNote createNote(String content);
+
+	// setter
+	public void addNote(InvoiceNote note);
+	public void addNote(String subjectCode, String content);
+	public void addNote(String content);
+	
 }
