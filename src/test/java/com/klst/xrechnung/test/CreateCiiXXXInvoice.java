@@ -19,6 +19,7 @@ import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.Identifier;
+import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -78,15 +79,9 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //		cii.setEndDate(testDoc.getEndDateAsTimestamp()); // BG-14.BT-74
 		cii.setPurchaseOrderReference(testDoc.getPurchaseOrderReference()); // BT-13 + 0..1
 		cii.setOrderReference(testDoc.getOrderReference()); // BT-14 + 0..1
-		List<Object> noteList = testDoc.getNotes();
-		noteList.forEach(n -> {
-			if(n instanceof NoteType) {
-				NoteType note = (NoteType)n;
-				String code = note.getSubjectCode()==null? null : note.getSubjectCode().getValue();
-				// die Kardinalität: von BT-22/Content ist 1 .. 1
-				String content = note.getContent().isEmpty()? null : note.getContent().get(0).getValue();
-				cii.setNote(code, content);
-			}
+		List<InvoiceNote> invoiceNotes = testDoc.getInvoiceNotes();
+		invoiceNotes.forEach(invoiceNote -> {
+			cii.addNote(invoiceNote);
 		});
 
 
