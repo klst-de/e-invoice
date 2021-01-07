@@ -163,7 +163,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		tradeTaxList.forEach(tradeTax -> {
 			DateType date = tradeTax.getTaxPointDate();
 			if(date==null) {
-				LOG.warning("getTaxPointDateAsTimestamp(doc) TaxPointDate is null");
+				LOG.fine("getTaxPointDateAsTimestamp(doc) TaxPointDate is null");
 			} else if(DateTimeFormats.CCYYMMDD_QUALIFIER.equals(date.getDateString().getFormat())) {
 				results.add(taxPointDateAsTimestamp(date));
 			} else {
@@ -345,7 +345,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
 		pmc.setValue(code.getValueAsString());	
 		if(super.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
-			LOG.info("super.getSpecifiedTradeSettlementPaymentMeans().isEmpty() - create it:");
+			LOG.config("super.getSpecifiedTradeSettlementPaymentMeans().isEmpty() - create it:");
 			TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = new TradeSettlementPaymentMeansType();
 			getSpecifiedTradeSettlementPaymentMeans().add(tradeSettlementPaymentMeans);
 		}
@@ -473,7 +473,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 	@Override
 	public DirectDebit getDirectDebit() {
 		ID directDebitMandate = getDirectDebitMandateID(this);
-		LOG.info(">>>>>>>>>>>directDebitMandate="+directDebitMandate);
+		LOG.fine("directDebitMandate="+directDebitMandate);
 		FinancialAccount fa = getFinancialAccount(this);
 		if(fa==null) return null;
 		fa.setMandateReferencetID(directDebitMandate);
@@ -559,12 +559,12 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 // ----------------
 	// 1 .. 1 SpecifiedTradeSettlementHeaderMonetarySummation Gesamtsummen auf Dokumentenebene BG-22
 	void setDocumentTotals(Amount lineExtension, Amount taxExclusive, Amount taxInclusive, Amount payable) {
-		LOG.info("lineExtension:"+lineExtension + " taxExclusive:"+taxExclusive + " taxInclusive:"+taxInclusive + " payable:"+payable);
+		LOG.config("setDocumentTotals: lineExtension:"+lineExtension + " taxExclusive:"+taxExclusive + " taxInclusive:"+taxInclusive + " payable:"+payable);
 		AmountType lineTotalAmt = new AmountType();
 		lineExtension.copyTo(lineTotalAmt);
 		TradeSettlementHeaderMonetarySummationType gesamtsummen = super.getSpecifiedTradeSettlementHeaderMonetarySummation();
 		if(gesamtsummen==null) {
-			LOG.info("gesamtsummen==null ===> erstellen");
+			LOG.fine("gesamtsummen==null ===> erstellen");
 			setSpecifiedTradeSettlementHeaderMonetarySummation(new TradeSettlementHeaderMonetarySummationType());
 		}
 		getSpecifiedTradeSettlementHeaderMonetarySummation().getLineTotalAmount().add(lineTotalAmt); // add to list

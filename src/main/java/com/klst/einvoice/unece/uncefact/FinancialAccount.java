@@ -19,7 +19,7 @@ Bsp: 01.15a:
             <ram:PaymentReference>0000123456</ram:PaymentReference>
             <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
             <ram:SpecifiedTradeSettlementPaymentMeans>
-                <ram:TypeCode>58</ram:TypeCode>                         <!-- BT-81
+                <ram:TypeCode>58</ram:TypeCode>                         <!-- BG-16.BT-81 -->
                 <ram:PayeePartyCreditorFinancialAccount>                <!-- BG-17 0..n CREDIT TRANSFER
                     <ram:IBANID>DE75512108001245126199</ram:IBANID>
                     <ram:AccountName>[Payment account name]</ram:AccountName>
@@ -30,15 +30,19 @@ Bsp: 01.15a:
             </ram:SpecifiedTradeSettlementPaymentMeans>
 
 Testfälle für DIRECT DEBIT
+0 .. 1 DirectDebitMandateID Kennung der Mandatsreferenz               BG-19.BT-89
+0 .. 1 CreditorReferenceID Kennung des Gläubigers                     BG-19.BT-90
+1 .. 1 IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos BG-19.BT-91
+
 Bsp: 03.01a:
         <ram:ApplicableHeaderTradeSettlement>
-            <ram:CreditorReferenceID>[Bank assigned creditor identifier]</ram:CreditorReferenceID>
+            <ram:CreditorReferenceID>[Bank assigned creditor identifier]</ram:CreditorReferenceID>   <!-- BG-19.BT-90 -->
             <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
             <ram:SpecifiedTradeSettlementPaymentMeans>
-                <ram:TypeCode>59</ram:TypeCode>
+                <ram:TypeCode>59</ram:TypeCode>                                                      <!-- BG-16.BT-81 -->
                 <ram:PayerPartyDebtorFinancialAccount>
                     <!-- dies ist eine nicht existerende aber valide IBAN als test dummy -->
-                    <ram:IBANID>DE75512108001245126199</ram:IBANID>
+                    <ram:IBANID>DE75512108001245126199</ram:IBANID>                                  <!-- BG-19.BT-91 -->
                 </ram:PayerPartyDebtorFinancialAccount>
             </ram:SpecifiedTradeSettlementPaymentMeans>
             ...
@@ -47,10 +51,10 @@ Bsp: 03.01a:
                 <ram:DueDateDateTime>
                     <udt:DateTimeString format="102">20190314</udt:DateTimeString>
                 </ram:DueDateDateTime>
-                <ram:DirectDebitMandateID>[Mandate reference identifier]</ram:DirectDebitMandateID>
+                <ram:DirectDebitMandateID>[Mandate reference identifier]</ram:DirectDebitMandateID>  <!-- BG-19.BT-89 -->
             </ram:SpecifiedTradePaymentTerms>
 
-Bsp: 03.04a , 03.04a
+Bsp: 03.04a , 03.05a
  */
 public class FinancialAccount implements CreditTransfer, DirectDebit {
 

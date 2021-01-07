@@ -461,16 +461,12 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	// BT-9 & BT-20 : Payment terms & Payment due date
 	@Override
 	public void setPaymentTermsAndDate(String description, Timestamp ts) {
-		LOG.info("Payment terms description:"+description + " & Payment due date Timestamp:"+ts);
+		LOG.fine("setPaymentTermsAndDate: description:"+description + " & Payment due date Timestamp:"+ts);
 		TradePaymentTermsType tradePaymentTerms = new TradePaymentTermsType();
-		if(description==null) {
-//			LOG.warning("text==null");
-		} else {
+		if(description!=null) {
 			tradePaymentTerms.getDescription().add(new Text(description)); // returns List<TextType>
 		}
-		if(ts==null) {
-//			LOG.warning("Timestamp ts==null");
-		} else {
+		if(ts!=null) {
 			tradePaymentTerms.setDueDateDateTime(newDateTime(ts));
 		}
 		
@@ -1260,7 +1256,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 */
 	@Override
 	public void setDocumentTotals(Amount lineExtension, Amount taxExclusive, Amount taxInclusive, Amount payable) {
-		LOG.info("lineExtension:"+lineExtension + " taxExclusive:"+taxExclusive + " taxInclusive:"+taxInclusive + " payable:"+payable);
+		LOG.config("setDocumentTotals lineExtension:"+lineExtension + " taxExclusive:"+taxExclusive + " taxInclusive:"+taxInclusive + " payable:"+payable);
 		applicableHeaderTradeSettlement.setDocumentTotals(lineExtension, taxExclusive, taxInclusive, payable);
 		// zurückschreiben:
 		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
@@ -1270,7 +1266,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	private Amount getInvoiceTax(boolean sameCurrency) {
 		List<AmountType> list = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxTotalAmount();
 		if(list.isEmpty()) return null;
-		LOG.info("TaxCurrency="+getTaxCurrency() + " DocumentCurrency="+getDocumentCurrency());
+		LOG.fine("getInvoiceTax: TaxCurrency="+getTaxCurrency() + " DocumentCurrency="+getDocumentCurrency());
 		for(int i=0; i<list.size(); i++) {
 			if(sameCurrency && (this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
 				return list.get(i).getCurrencyID()==null ? new Amount(list.get(i).getValue()) : new Amount(list.get(i).getCurrencyID(), list.get(i).getValue());
@@ -1465,7 +1461,7 @@ Code Codename
 			DocumentCodeType documentCode = refDoc.getTypeCode(); 
 			// documentCode.getValue() == 916 ==> BT-122
 			// sonst ist es BT-17 oder BT-18
-			LOG.info("DocumentCode="+documentCode.getValue()+" IssuerAssignedID="+issuerAssignedID.getValue());
+			LOG.fine("referencedDocument DocumentCode="+documentCode.getValue()+" IssuerAssignedID="+issuerAssignedID.getValue());
 			ReferencedDocument rd = new ReferencedDocument(issuerAssignedID.getValue(), documentCode.getValue());
 			
 			List<TextType> texts = refDoc.getName();
@@ -1542,7 +1538,7 @@ Code Codename
 		HeaderTradeAgreementType headerTradeAgreement = supplyChainTradeTransaction.getApplicableHeaderTradeAgreement();
 		if(headerTradeAgreement==null) {
 			headerTradeAgreement = new HeaderTradeAgreementType();
-			LOG.info("new HeaderTradeAgreementType:"+headerTradeAgreement);
+			LOG.config("new HeaderTradeAgreementType:"+headerTradeAgreement);
 		}
 		return headerTradeAgreement;
 	}	

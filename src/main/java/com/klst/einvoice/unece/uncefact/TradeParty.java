@@ -191,7 +191,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	 * then the Buyer is required to withhold the amount of the tax and pay it on behalf of the Seller.
 	 */
 	void addPartyTaxID(String companyId, String schemeID)  {
-		LOG.info("companyId:"+companyId + " schemeID:"+schemeID);
+		LOG.fine("addPartyTaxID: companyId:"+companyId + " schemeID:"+schemeID);
 		if(companyId==null) return;
 		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
 		TaxRegistrationType taxRegistration = new TaxRegistrationType();
