@@ -5,8 +5,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import org.junit.BeforeClass;
@@ -24,7 +30,21 @@ import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UblTest {
 
-	private static final Logger LOG = Logger.getLogger(UblTest.class.getName());
+	static final String RESOURCE_PATH = "src/main/resources/";
+	static LogManager logManager = LogManager.getLogManager(); // Singleton
+	
+	private static Logger LOG = null;
+	static {
+        URL url = UblTest.class.getClassLoader().getResource("testLogging.properties");
+		try {
+	        File file = new File(url.toURI());
+			logManager.readConfiguration(new FileInputStream(file));
+		} catch (IOException | URISyntaxException e) {
+			LOG = Logger.getLogger(UblTest.class.getName());
+			LOG.warning(e.getMessage());
+		}
+		LOG = Logger.getLogger(UblTest.class.getName());
+	}
 	
 	private static final String[] UBL_XML = {
 			"ubl001.xml" ,
@@ -179,7 +199,8 @@ public class UblTest {
 
 	@Test
     public void ublZZZ() {
-    	InvoiceFactory factory = new CreateUblXXXInvoice("02.01a-INVOICE_ubl.xml");
+//    	InvoiceFactory factory = new CreateUblXXXInvoice("01.05a-INVOICE_ubl.xml");
+    	InvoiceFactory factory = new CreateUblXXXInvoice("ubl-tc434-example5.xml");
     	byte[] bytes = factory.toUbl(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
