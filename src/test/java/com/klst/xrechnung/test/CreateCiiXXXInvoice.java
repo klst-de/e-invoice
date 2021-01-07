@@ -63,7 +63,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 	@Override
 	CoreInvoice makeInvoice() {
-		LOG.info("\n\n");
+		LOG.info("\n");
 		CoreInvoice cii = new CrossIndustryInvoice(testDoc.getCustomization(), testDoc.getTypeCode());
 		cii.setId(testDoc.getId());
 		cii.setIssueDate(testDoc.getIssueDateAsTimestamp());
@@ -123,7 +123,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			}
 			sellerParty.setTaxRegistrationId(BT_31, BT_31_0);
 		});
-		LOG.info("?Seller identifier (BT-29):"+sellerParty.getRegistrationName()
+		LOG.info("Seller identifier (BT-29):"+sellerParty.getRegistrationName()
 				+" legal registration identifier (BT-30):"+sellerParty.getCompanyLegalForm()
 				+" VAT identifier (BT-31):"+sellerParty.getTaxRegistrationId()
 				);
@@ -131,7 +131,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 		BG7_Buyer buyerParty = testDoc.getBuyer();
 		if(((TradeParty)buyerParty).getSpecifiedTaxRegistration().isEmpty()) {
-			LOG.warning("buyerParty.SpecifiedTaxRegistration().isEmpty() !!!!!!!!!!!!!" );
+			LOG.warning("BG-7 buyerParty.SpecifiedTaxRegistration().isEmpty() mandatory!" );
 		} else {
 			TradeParty buyerTradeParty = (TradeParty)buyerParty;
 			LOG.info("buyerParty.SpecifiedTaxRegistration#:"+buyerTradeParty.getSpecifiedTaxRegistration().size()
@@ -178,7 +178,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 		BusinessParty testPayeeParty = testDoc.getPayee();
 		if(testPayeeParty==null) {
-			LOG.warning("testPayeeParty==null" );
+			LOG.info("BG-10 (optional) testPayeeParty==null" );
 		} else {
 			LOG.info("testPayeeParty.RegistrationName:"+testPayeeParty.getRegistrationName()
 					+ " Id:"+testPayeeParty.getId()
@@ -189,7 +189,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 		BusinessParty testSellerTaxRepresentativeParty = testDoc.getTaxRepresentative();
 		if(testSellerTaxRepresentativeParty==null) {
-			LOG.warning("testSellerTaxRepresentativeParty==null" );
+			LOG.info("BG-11 (optional) testSellerTaxRepresentativeParty==null" );
 		} else {
 			LOG.info("testSellerTaxRepresentativeParty.Name:"+((TradeParty)testSellerTaxRepresentativeParty).getRegistrationName()
 					+ " Address:"+((TradeParty)testSellerTaxRepresentativeParty).getAddress()
@@ -204,7 +204,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 		BG13_DeliveryInformation delivery = testDoc.getDelivery();
 		if(delivery!=null) {
-			LOG.info("delivery:"+delivery);
+			LOG.info("BG-13 delivery:"+delivery);
 			cii.setDelivery(delivery);
 		}
 
@@ -265,7 +265,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp()); // BT-9 & BT-20 (optional)
 
 		// es ist entscheidend, dass die setter nach cii.setPaymentInstructions ausgeführt werden!!!!!!!!!!!!!!!
-		LOG.info(">>> testDoc.StartDateAsTimestamp "+ testDoc.getStartDateAsTimestamp());
+		LOG.info("testDoc.StartDateAsTimestamp "+ testDoc.getStartDateAsTimestamp());
 		cii.setStartDate(testDoc.getStartDateAsTimestamp());
 		cii.setEndDate(testDoc.getEndDateAsTimestamp());
 

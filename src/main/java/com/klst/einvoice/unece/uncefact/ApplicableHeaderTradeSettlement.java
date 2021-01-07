@@ -223,15 +223,12 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 			PaymentCard paymentCard = tspm0==null? null : 
 				(tspm0.getApplicableTradeSettlementFinancialCard()==null? null : 
 					new FinancialCard(FinancialCard.getCardAccountID(tspm0.getApplicableTradeSettlementFinancialCard()), FinancialCard.getCardHolderName(tspm0.getApplicableTradeSettlementFinancialCard())) );
-			LOG.info("PaymentMeansEnum code ="+code + " copy ctor ahts paymentCard="+paymentCard);
+			LOG.fine("copy ctor: PaymentMeansEnum code ="+code + " copy ctor ahts paymentCard="+paymentCard);
 			List<CreditTransfer> creditTransfer = getCreditTransfer(ahts);
-			LOG.info("PaymentMeansEnum code ="+code + " copy ctor ahts creditTransfer.size="+creditTransfer.size());
-//			creditTransfer.forEach(ct -> { // BG-17
-//				addCreditTransfer(ct);
-//			});
+			LOG.fine("copy ctor: PaymentMeansEnum code ="+code + " copy ctor ahts creditTransfer.size="+creditTransfer.size());
 
 			ID directDebitMandate = getDirectDebitMandateID(ahts);
-			LOG.info("ahts.directDebitMandate="+directDebitMandate);
+			LOG.fine("copy ctor: ahts.directDebitMandate="+directDebitMandate);
 			FinancialAccount directDebit = getFinancialAccount(ahts);
 			directDebit.setMandateReferencetID(directDebitMandate);
 			init(code, getPaymentMeansText(), getRemittanceInformation(), creditTransfer, paymentCard, directDebit);
@@ -251,7 +248,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 
 	private void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation,
 			List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		LOG.info("-----------------PaymentMeansEnum:"+code + ", paymentMeansText:"+paymentMeansText
+		LOG.fine("init: PaymentMeansEnum:"+code + ", paymentMeansText:"+paymentMeansText
 				+ (paymentCard==null? "keine paymentCard" : " paymentCard.CardAccountID="+paymentCard.getCardAccountID())
 				+ (directDebit==null? "" : " MandateReferencetID="+directDebit.getMandateReferencetID()) );
 		if(code==null) return;
