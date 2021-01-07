@@ -288,7 +288,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		if(periodList==null) {
 			periodList = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
 			if(periodList.isEmpty()) {
-				LOG.info("periodList.isEmpty()");
+				LOG.fine("BG-26 0..1 INVOICE LINE PERIOD isEmpty");
 				PeriodType period = new PeriodType();
 				periodList.add(period);
 			}

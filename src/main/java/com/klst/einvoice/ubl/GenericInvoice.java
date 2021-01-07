@@ -714,10 +714,7 @@ UBL:
 		if(!partyLegalEntityList.isEmpty()) {
 			CompanyIDType companyID = partyLegalEntityList.get(0).getCompanyID();
 			if(companyID!=null) {
-//				companyID.getValue();
-//				companyID.getSchemeID();
-				LOG.info(">>>>>>>>>>>>>>>>>>> "+companyID.getValue() + " getSchemeID="+companyID.getSchemeID());
-//				buyer.setCompanyLegalForm(companyID.getValue(), companyID.getSchemeID());
+				LOG.fine("BG7_Buyer companyID="+companyID.getValue() + " SchemeID="+companyID.getSchemeID());
 			}
 		}
 		
@@ -799,7 +796,7 @@ UBL:
 		if(periodList==null) {
 			periodList = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
 			if(periodList.isEmpty()) {
-				LOG.info("periodList.isEmpty()");
+				LOG.fine("BG-14 0..1 INVOICING PERIOD isEmpty");
 				PeriodType period = new PeriodType();
 				periodList.add(period);
 			}
@@ -915,44 +912,10 @@ UBL:
 	PaymentMeansType getPaymentMeans0() {
 		List<PaymentMeansType> list = isInvoiceType ? invoice.getPaymentMeans() : creditNote.getPaymentMeans();
 		if(list.isEmpty()) return null;
-		LOG.info("PaymentMeans.Class:"+list.get(0).getClass());
+		LOG.fine("PaymentMeans.Class:"+list.get(0).getClass());
 		return list.get(0);
 	}
 	
-//	// TODO umbenennen in getPaymentMeansCode, bzw PaymentMeans.getPaymentMeansEnum()
-//	public PaymentMeansEnum getPaymentMeansEnum() {
-//		PaymentMeansType pm = getPaymentMeans0();
-//		if(pm==null) return null;
-//		return PaymentMeans.getPaymentMeansEnum(pm);
-//	}
-//	
-//	// BG-16.BT-82 ++ 0..1 Payment means text , TODO PaymentMeans.getPaymentMeansText()
-//	public String getPaymentMeansText() {
-//		PaymentMeansType pm = getPaymentMeans0();
-//		if(pm==null) return null;
-////		return pm.getID()==null ? null : pm.getID().getValue(); // nein, siehe Bsp: ubl-tc434-example5.xml
-//		List<InstructionNoteType> inList = pm.getInstructionNote();
-//		if(inList.isEmpty()) return null;
-//		return inList.get(0).getValue();
-//	}
-//	
-//	// BG-16.BT-83 ++ 0..1 Remittance information , siehe PaymentMeans.getPaymentRemittanceInformation()
-//	public String getPaymentRemittanceInformation() {
-//		PaymentMeansType pm = getPaymentMeans0();
-//		if(pm==null) return null;
-//		return pm.getPaymentID().isEmpty() ? null : pm.getPaymentID().get(0).getValue();
-//	}
-//	
-//	public List<CreditTransfer> getCreditTransfer() {
-////		List<PaymentMeansType> list = isInvoiceType ? invoice.getPaymentMeans() : creditNote.getPaymentMeans();
-////		if(list.isEmpty()) return null;
-////		LOG.info("PaymentMeans.Class:"+list.get(0).getClass());
-//		PaymentMeansType pm = getPaymentMeans0();
-//		if(pm==null) return null;
-//		PaymentMeans paymentMeans = new PaymentMeans(pm);
-//		return paymentMeans.getCreditTransfer();
-//	}
-
 	//  die factories hier und nicht in class FinancialAccount
 	@Override
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
@@ -1103,7 +1066,7 @@ UBL:
 	TaxTotalType getTaxTotal(boolean sameCurrency) {
 		List<TaxTotalType> list = isInvoiceType ? invoice.getTaxTotal() : creditNote.getTaxTotal();
 		if(list.isEmpty()) return null;
-		LOG.info("TaxCurrency="+getTaxCurrency() + " DocumentCurrency="+getDocumentCurrency());
+		LOG.config("sameCurrency="+sameCurrency + "TaxCurrency="+getTaxCurrency() + " DocumentCurrency="+getDocumentCurrency());
 		for(int i=0; i<list.size(); i++) {
 			TaxTotalType taxTotal = list.get(i);
 			if(sameCurrency && (this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
@@ -1146,7 +1109,7 @@ UBL:
 		} else {
 			list = creditNote.getTaxTotal();
 		}
-		LOG.info("***sollte 1 sein*** List<TaxTotalType> size="+list.size());
+		LOG.fine("***sollte 1 sein*** List<TaxTotalType> size="+list.size());
 		if(list.size()==1) {
 			TaxAmountType taxAmount = new TaxAmountType();
 			amount.copyTo(taxAmount);
@@ -1298,7 +1261,7 @@ UBL:
 
 	public List<TaxSubtotal> getVATBreakDowns() {
 		List<TaxTotalType> taxTotalList = isInvoiceType ? invoice.getTaxTotal() : creditNote.getTaxTotal();
-		LOG.info("List<TaxTotalType> taxTotalList size="+taxTotalList.size());
+		LOG.fine("List<TaxTotalType> taxTotalList size="+taxTotalList.size());
 		taxTotalFirst = getTaxTotalFirst();
 		List<TaxSubtotalType> taxSuptotalList = taxTotalFirst.getTaxSubtotal();
 		List<TaxSubtotal> result = new ArrayList<TaxSubtotal>(taxSuptotalList.size()); // VatBreakdown extends TaxSubtotalType

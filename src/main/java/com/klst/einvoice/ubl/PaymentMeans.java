@@ -121,12 +121,12 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	public PaymentMeans(PaymentMeansType doc) {
 		this();
 		PaymentMeansEnum code = getPaymentMeansEnum(doc);
-		LOG.info("-----------------------getPaymentMeansCode="+code);
+		LOG.fine("copy ctor: PaymentMeansCode="+code);
 		String paymentMeansText = getPaymentMeansText(doc);
 		String remittanceInformation = getRemittanceInformation(doc);
 				// doc.getPaymentID().isEmpty() ? null : doc.getPaymentID().get(0).getValue();
 		init(PaymentMeansEnum.valueOf(doc.getPaymentMeansCode()), paymentMeansText, remittanceInformation);
-		LOG.info("ctor vor new FinancialAccount: "+this.toString() + " remittanceInformation:"+remittanceInformation);
+		LOG.fine("copy ctor: vor new FinancialAccount: "+this.toString() + " remittanceInformation:"+remittanceInformation);
 		if(doc.getPayeeFinancialAccount()==null) {
 			// kann null sein, zB. in ubl-tc434-example5.xml bei DirectDebit
 		} else {
@@ -160,7 +160,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			break;
 		}
 
-		LOG.info("copy ctor fertig: CT.size="+this.getCreditTransfer().size() 
+		LOG.fine("copy ctor fertig: CT.size="+this.getCreditTransfer().size() 
 				+ " PC:"+this.getPaymentCard()
 				+ " DD:"+this.getDirectDebit());
 	}

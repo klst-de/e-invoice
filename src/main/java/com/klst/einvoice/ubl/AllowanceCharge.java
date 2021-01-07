@@ -69,10 +69,9 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 		this.setPercentage(getPercentage(doc));
 		
 		List<TaxCategoryType> list = doc.getTaxCategory();
-//		List<TaxCategory> taxCategpryList = new ArrayList<TaxCategory>(list.size());
 		list.forEach(el -> {
 			taxCategory = TaxCategory.createTaxCategory(el);
-			LOG.info("add taxCategory:"+taxCategory);
+			LOG.fine("add taxCategory:"+taxCategory);
 			super.getTaxCategory().add(taxCategory);
 		});
 		this.setReasonText(getReasonText(doc));

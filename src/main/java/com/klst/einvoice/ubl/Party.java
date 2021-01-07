@@ -53,7 +53,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		List<Map<Object,String>> mapList = getPartyLegalEntities(party);
 		Map<Object,String> map = new HashMap<Object,String>();
 		if(mapList.isEmpty()) {
-			LOG.warning("PartyLegalEntities mapList is empty");
+			LOG.fine("PartyLegalEntities mapList is empty");
 		} else {
 			map = mapList.get(0); // first
 		}
@@ -62,7 +62,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 				, getPostalAddress(party)
 				, getContact(party)
 				);
-		LOG.info("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getRegistrationName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
+		LOG.fine("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getRegistrationName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
 		
 		// BG-4.BT-28 ++ 0..1 Seller trading name / UBL: <cac:PartyName><cbc:Name>
 		// BG-7.BT-45 ++ 0..1 Buyer trading name
@@ -259,7 +259,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	String getObject(Object clazz) {
 		List<Map<Object,String>> mapList = getPartyLegalEntities(this);
 		if(mapList.isEmpty()) {
-			LOG.warning("mapList is empty");
+			LOG.fine("getObject: PartyLegalEntities mapList is empty");
 			return null;
 		} else {
 			Map<Object,String> map = mapList.get(0); // first
@@ -447,9 +447,8 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		partyTaxScheme.setTaxScheme(taxScheme);
 		
 		List<PartyTaxSchemeType> list = super.getPartyTaxScheme();
-		LOG.info("List<PartyTaxSchemeType>#:"+list.size() + " vor add:"+name+"/"+schemeID);
+		LOG.fine("setTaxRegistrationId: List<PartyTaxSchemeType>#:"+list.size() + " vor add:"+name+"/"+schemeID);
 		list.add(partyTaxScheme);
-		LOG.info("List<PartyTaxSchemeType>#:"+list.size() + " nach add:"+name+"/"+schemeID);
 	}
 
 	@Override

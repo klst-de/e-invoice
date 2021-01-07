@@ -87,7 +87,7 @@ wurde geändert zu:
 					+", CONTENT_GROUP="+matcher.group(CONTENT_GROUP) + "<<<<");
 			return matcher.group(group);
 		} else {
-			LOG.warning("no match in '"+content+"´");
+			LOG.config("no match in '"+content+"´");
 			return group==SUBJECT_CODE_GROUP ? null : content;
 		}
 	}

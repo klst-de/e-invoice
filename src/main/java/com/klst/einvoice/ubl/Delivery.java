@@ -63,7 +63,7 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	}
 
 	void init(String name, Timestamp ts, PostalAddress address, String locationId) {
-		LOG.info("BT-70/name:"+name + " BT-72/Timestamp:"+ts + " BG-15 ++ 0..1 DELIVER TO ADDRESS:"+address + " BT-71/locationId:"+locationId);
+		LOG.fine("init: BT-70/name:"+name + " BT-72/Timestamp:"+ts + " BG-15 ++ 0..1 DELIVER TO ADDRESS:"+address + " BT-71/locationId:"+locationId);
 		Party party = new Party(null, null, null);
 		party.setBusinessName(name);  // !!!!!
 		setParty(party);		

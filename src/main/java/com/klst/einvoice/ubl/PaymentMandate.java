@@ -11,6 +11,38 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Paym
 //0 .. 1 DirectDebitMandateID Kennung der Mandatsreferenz               BG-19/ BT-89
 //0 .. 1 CreditorReferenceID Kennung des Gläubigers                     BG-19/ BT-90
 //1 .. 1 IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos BG-19/ BT-91
+/* Gruppe DIRECT DEBIT BG-19
+
+Bsp. 03.01a :
+
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>59</cbc:PaymentMeansCode>        <!-- BG-16.BT-81  59:SEPA direct debit -->
+                                                           <!--              49:Direct debit      -->
+    <cac:PaymentMandate>
+      <cbc:ID>[Mandate reference identifier]</cbc:ID>      <!-- BG-19.BT-89 -->
+      <cac:PayerFinancialAccount>
+        <cbc:ID>DE75512108001245126199</cbc:ID>            <!-- BG-19.BT-91 -->
+      </cac:PayerFinancialAccount>
+    </cac:PaymentMandate>
+  </cac:PaymentMeans>
+
+
+Bsp. ubl-tc434-example5.xml :
+
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>49</cbc:PaymentMeansCode>    <!-- BG-16.BT-81 -->
+        <cbc:InstructionNote>Half prepaid</cbc:InstructionNote>
+        <cbc:PaymentID>Payref1</cbc:PaymentID>             <!-- BG-16.BT-83 0..1 Verwendungszweck -->
+        <cac:PaymentMandate>
+            <cbc:ID>123456</cbc:ID>                        <!-- BG-19.BT-89 -->
+            <cac:PayerFinancialAccount>
+                <cbc:ID>DK1212341234123412</cbc:ID>        <!-- BG-19.BT-91 -->
+            </cac:PayerFinancialAccount>
+        </cac:PaymentMandate>
+    </cac:PaymentMeans>
+
+
+ */
 public class PaymentMandate extends PaymentMandateType implements DirectDebit {
 
 	static DirectDebit createDirectDebit(Object debitedAccountID) {
