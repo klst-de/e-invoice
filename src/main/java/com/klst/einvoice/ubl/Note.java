@@ -1,7 +1,13 @@
 package com.klst.einvoice.ubl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,7 +24,21 @@ import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
  */
 public class Note extends NoteType implements InvoiceNote {
 
-	private static final Logger LOG = Logger.getLogger(Note.class.getName());
+	static final String RESOURCE_PATH = "src/main/resources/";
+	static LogManager logManager = LogManager.getLogManager(); // Singleton
+	
+	private static Logger LOG = null; // Logger.getLogger(Note.class.getName());
+	static {
+        URL url = Note.class.getClassLoader().getResource("testLogging.properties");
+		try {
+	        File file = new File(url.toURI());
+			logManager.readConfiguration(new FileInputStream(file));
+		} catch (IOException | URISyntaxException e) {
+			LOG = Logger.getLogger(Note.class.getName());
+			LOG.warning(e.getMessage());
+		}
+		LOG = Logger.getLogger(Note.class.getName());
+	}
 	
 	@Override // implements NoteFactory
 	public InvoiceNote createNote(String subjectCode, String content) {
@@ -63,11 +83,11 @@ wurde geändert zu:
 	private String getGroup(String content, int group) {
 		Matcher matcher = PATTERN.matcher(content);
 		if (matcher.find()) {
-			LOG.info("getGroup "+ group + ": SUBJECT_CODE_GROUP="+matcher.group(SUBJECT_CODE_GROUP) + "<<<<" 
+			LOG.fine("getGroup "+ group + ": SUBJECT_CODE_GROUP="+matcher.group(SUBJECT_CODE_GROUP) + "<<<<" 
 					+", CONTENT_GROUP="+matcher.group(CONTENT_GROUP) + "<<<<");
 			return matcher.group(group);
 		} else {
-			LOG.warning("no match");
+			LOG.warning("no match in '"+content+"´");
 			return group==SUBJECT_CODE_GROUP ? null : content;
 		}
 	}
@@ -109,19 +129,19 @@ wurde geändert zu:
 
 	// Test:
 	public static void main(String[] args) {
-		LOG.info("\nADU+Trainer: Herr […]");
+		LOG.info("ADU+Trainer: Herr […]");
 		Note note1 = new Note("ADU", "Trainer: Herr […]");
 		LOG.info("Code:"+note1.getCode() + " content:"+note1.getNote());
 		
-		LOG.info("\nnull+#ADU#Trainer: Herr […]");
+		LOG.info("null+#ADU#Trainer: Herr […]");
 		Note note2 = new Note(null, "#ADU#Trainer: Herr […]");
 		LOG.info("Code:"+note2.getCode() + " content:"+note2.getNote());
 		
-		LOG.info("\nnull+#AD#Trainer: Herr […]");
+		LOG.info("null+#AD#Trainer: Herr […]");
 		Note note3 = new Note(null, "#AD#Trainer: Herr […]");
 		LOG.info("Code:"+note3.getCode() + " content:"+note3.getNote());
 		
-		LOG.info("\nADU+null");
+		LOG.info("ADU+null");
 		Note note4 = new Note("ADU", null);
 		LOG.info("Code:"+note4.getCode() + " content:"+note4.getNote());
 	}
