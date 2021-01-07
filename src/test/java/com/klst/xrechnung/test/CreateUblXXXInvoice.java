@@ -268,7 +268,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		
 		List<InvoiceNote> notes = testDoc.getInvoiceNotes();
 		notes.forEach(invoiceNote -> {
-			ublInvoice.addNote(invoiceNote);
+			ublInvoice.addNote(invoiceNote.getCode(), invoiceNote.getNote());
 		});
 		
 //		ublInvoice.setPayeeParty(testDoc.getPayeeParty());
@@ -310,7 +310,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		
 		List<CreditTransfer> creditTransfer = paymentInstructions.getCreditTransfer();
 		if(creditTransfer.isEmpty()) {
-			LOG.warning("creditTransfer.isEmpty");
+			//LOG.info("creditTransfer.isEmpty");
 		} else if(creditTransfer.size()==1){
 			String accountId = creditTransfer.get(0).getPaymentAccountID();
 			String accountName = creditTransfer.get(0).getPaymentAccountName();
