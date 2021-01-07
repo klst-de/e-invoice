@@ -4,8 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import org.junit.Before;
@@ -16,6 +22,7 @@ import org.junit.runners.MethodSorters;
 
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG2_ProcessControl;
+import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
@@ -23,13 +30,25 @@ import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
-
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CiiTest {
 
-	private static final Logger LOG = Logger.getLogger(CiiTest.class.getName());
+	static final String RESOURCE_PATH = "src/main/resources/";
+	static LogManager logManager = LogManager.getLogManager(); // Singleton
 	
+	private static Logger LOG = null;
+	static {
+        URL url = CiiTest.class.getClassLoader().getResource("testLogging.properties");
+		try {
+	        File file = new File(url.toURI());
+			logManager.readConfiguration(new FileInputStream(file));
+		} catch (IOException | URISyntaxException e) {
+			LOG = Logger.getLogger(CiiTest.class.getName());
+			LOG.warning(e.getMessage());
+		}
+		LOG = Logger.getLogger(CiiTest.class.getName());
+	}
+
 	private static final String[] CII_XML = {
 			"01.01a-INVOICE_uncefact.xml" ,
 			"01.02a-INVOICE_uncefact.xml" ,
@@ -91,15 +110,20 @@ public class CiiTest {
 		invoice.setIssueDate(ISSUE_DATE);
     	assertEquals(DateTimeFormats.ymdToTs(ISSUE_DATE), invoice.getIssueDateAsTimestamp());
     	
-		invoice.setNote(SUBJECT_CODE, "Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // 0..n (optional)
-		invoice.setNote(SUBJECT_CODE);
-		invoice.setNote(SUBJECT_CODE, NOTE_CONTENT);
-		invoice.setNote(NOTE_CONTENT);
-		List<Object> notes = invoice.getNotes();
+		invoice.addNote(SUBJECT_CODE, "Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // 0..n (optional)
+		invoice.addNote(SUBJECT_CODE); // SUBJECT_CODE wird als NOTE_CONTENT/aka Note verwendet
+		invoice.addNote(SUBJECT_CODE, NOTE_CONTENT);
+		invoice.addNote(NOTE_CONTENT);
+		List<InvoiceNote> notes = invoice.getInvoiceNotes();
 		assertEquals(4, notes.size());
 		notes.forEach(note -> {
-			LOG.info(""+((NoteType)note).getContent().get(0).getValue());
+			LOG.info(""+note);
 		});
+		assertEquals(SUBJECT_CODE, notes.get(0).getCode());
+		assertNull(                notes.get(1).getCode());
+		assertEquals(SUBJECT_CODE, notes.get(1).getNote());
+		assertEquals(SUBJECT_CODE, notes.get(2).getCode());
+		assertEquals(NOTE_CONTENT, notes.get(3).getNote());
 		
     	assertEquals(ID, invoice.getId());
     	assertEquals(DateTimeFormats.ymdToTs(ISSUE_DATE), invoice.getIssueDateAsTimestamp());
@@ -191,8 +215,9 @@ public class CiiTest {
     
 	@Test
     public void ciixml_last() {
+    	InvoiceFactory factory = new CreateCiiXXXInvoice("CII_business_example_01.xml");
 //    	InvoiceFactory factory = new CreateCiiXXXInvoice("02.01a-INVOICE_uncefact.xml");
-    	InvoiceFactory factory = new CreateCiiXXXInvoice(CII_XML[CII_XML.length-1]);
+//    	InvoiceFactory factory = new CreateCiiXXXInvoice(CII_XML[CII_XML.length-1]);
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
