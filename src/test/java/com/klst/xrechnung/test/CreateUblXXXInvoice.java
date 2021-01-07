@@ -17,6 +17,7 @@ import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.Identifier;
+import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.ubl.CardAccount;
@@ -265,9 +266,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		
 		ublInvoice.setTenderOrLotReference(testDoc.getTenderOrLotReference()); // BT-17 + 0..1
 		
-		List<Object> notes = testDoc.getNotes();
-		notes.forEach(note -> {
-			ublInvoice.setNote(((NoteType)note).getValue());
+		List<InvoiceNote> notes = testDoc.getInvoiceNotes();
+		notes.forEach(invoiceNote -> {
+			ublInvoice.addNote(invoiceNote);
 		});
 		
 //		ublInvoice.setPayeeParty(testDoc.getPayeeParty());

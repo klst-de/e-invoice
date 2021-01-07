@@ -20,6 +20,7 @@ import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentCardFactory;
 import com.klst.einvoice.PaymentInstructions;
@@ -531,17 +532,36 @@ UBL:
 	// BG-1 + 0..n INVOICE NOTE
 	// BG-1.BT-21 ++ 0..1 Invoice note subject code
 	// BG-1.BT-22 ++ 1..1 Invoice note /aka content
-/* 
-    Bei UBL wird der subjectCode vor dem content in ein Note eingefügt.
-    Das geht natürlich nur wenn alle Notes subjectCode + content haben.
-    Bei zwei Elementen in <cbc:Note> kann man nicht entscheiden, ob das erste el ein subjectCode oder content ist
-    
-Bsp 05: das erste el ist subjectCode, das zweite content:
-UBL:
-    <cbc:Note>ADU</cbc:Note>
-    <cbc:Note>Trainer: Herr […]</cbc:Note>
+	// factory methods
+	@Override
+	public InvoiceNote createNote(String subjectCode, String content) {
+		// delegieren:
+		return Note.create(subjectCode, content);
+	}
+	@Override
+	public InvoiceNote createNote(String content) {
+		return createNote(null, content);
+	}
+	
+	@Override
+	public void addNote(InvoiceNote note) {
+		if(note==null) return; // optional
+		if(isInvoiceType) {
+			invoice.getNote().add((NoteType)note);
+		} else {
+			creditNote.getNote().add((NoteType)note);
+		}
+	}
+	@Override
+	public void addNote(String subjectCode, String content) {
+		addNote(createNote(subjectCode, content));
+	}
+	@Override
+	public void addNote(String content) {
+		addNote(createNote(content));
+	}
 
- */
+	@Deprecated
 	@Override
 	public void setNote(String subjectCode, String content) {
 		if(content==null) return; // optional
@@ -553,11 +573,19 @@ UBL:
 			creditNote.getNote().add(note);
 		}
 	}
+	@Deprecated
 	@Override
 	public void setNote(String content) {
 		setNote(null, content);
 	}
 
+	// ersetzt List<Object> getNotes()
+	@Override
+	public List<InvoiceNote> getInvoiceNotes() {
+		// delegieren:
+		return isInvoiceType ? Note.getInvoiceNotes(invoice) : Note.getInvoiceNotes(creditNote);
+	}
+	@Deprecated
 	@Override
 	public List<Object> getNotes() {
 		List<NoteType> list = isInvoiceType ? invoice.getNote() : creditNote.getNote();
