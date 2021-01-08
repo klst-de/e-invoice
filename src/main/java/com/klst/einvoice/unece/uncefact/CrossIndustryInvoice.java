@@ -486,12 +486,13 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		return textList.isEmpty() ? null : textList.get(0).getValue();
 	}
 
-	/* EN16931-ID: 	BT-10
+	/* EN16931-ID: 	BT-10 (optional), but mandatory in CIUS rule BR-DE-15
 	 * (non-Javadoc)
 	 * @see com.klst.cius.CoreInvoice#setBuyerReference(java.lang.String)
 	 */
 	@Override
 	public void setBuyerReference(String reference) {
+		if(reference==null) return;
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
 		headerTradeAgreement.setBuyerReference(new Text(reference));
 		// TODO hier Leitweg-ID

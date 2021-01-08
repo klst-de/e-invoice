@@ -310,7 +310,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * The identifier is defined by the Buyer (e.g. contact ID, department, office id, project code), 
 	 * but provided by the Seller in the Invoice.
 	 * <p>
-	 * Cardinality: 0..1 (optional), but mandatory due to BR-DE-15
+	 * Cardinality: 0..1 (optional), but mandatory in CIUS rule BR-DE-15
 	 * <br>EN16931-ID: 	BT-10
 	 * <br>Rule ID: 	BR-DE-15
 	 * <br>Request ID: 	R8
