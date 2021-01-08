@@ -104,9 +104,9 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		this(customization, null, documentNameCode);
 	}
 	
-	public CrossIndustryInvoice(String customization, String profile, DocumentNameCode documentNameCode) {
+	public CrossIndustryInvoice(String customization, String processType, DocumentNameCode documentNameCode) {
 		this();
-		setProcessControl(customization, profile);
+		setProcessControl(customization, processType);
 		supplyChainTradeTransaction = new SupplyChainTradeTransactionType();
 		
 		applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery();
@@ -125,8 +125,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 
 	// copy-ctor
 	public CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
-		this(getCustomization(doc), getProfile(doc), getTypeCode(doc));
-		LOG.fine("copy-ctor: Customization:"+getCustomization() + ", Profile:"+getProfile() + ", TypeCode:"+getTypeCode());
+		this(getCustomization(doc), getProcessType(doc), getTypeCode(doc));
+		LOG.fine("copy-ctor: Customization:"+getCustomization() + ", ProcessType:"+getProcessType() + ", TypeCode:"+getTypeCode());
 		
 		Object ahtd = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
 		LOG.fine("copy-ctor: ApplicableHeaderTradeDelivery ahtd:"+ahtd);
@@ -769,25 +769,42 @@ UBL:
 	 * ProfileID identifies what business process a given message is part of, 
 	 * and CustomizationID identifies the kind of message and the rules applied.
 	 * 
-	 * @param customization, not null
-	 * @param profile (optional)
+	 * @param BG-2.BT-24 customization, mandatory
+	 * @param BG-2.BT-23 processType (optional)
 	 */
-	void setProcessControl(String customization, String profile) {
+	void setProcessControl(String customization, String processType) {
 		ExchangedDocumentContextType exchangedDocumentContext = new ExchangedDocumentContextType();
 		DocumentContextParameterType documentContextParameter = new DocumentContextParameterType();
 		documentContextParameter.setID(new ID(customization)); // No identification scheme
 
 		exchangedDocumentContext.getGuidelineSpecifiedDocumentContextParameter().add(documentContextParameter);
-		if(profile==null) {
-			// profileIDType ist optional
-		} else { 
+		if(processType!=null) {
 			DocumentContextParameterType dcp = new DocumentContextParameterType();
-			dcp.setID(new ID(profile)); // No identification scheme
+			dcp.setID(new ID(processType)); // No identification scheme
 			exchangedDocumentContext.getBusinessProcessSpecifiedDocumentContextParameter().add(dcp);
 		}
 		this.setExchangedDocumentContext(exchangedDocumentContext);
 	}
 
+	// BG-2.BT-23 ++ 0..1 Business process type
+	@Override
+	public String getProcessType() {
+		return getProcessType(this);
+	}
+	@Deprecated
+	public String getProfile() {
+		return getProcessType(this);
+	}
+	static String getProcessType(CrossIndustryInvoiceType doc) {
+		List<DocumentContextParameterType> documentContextParameterList = doc.getExchangedDocumentContext().getBusinessProcessSpecifiedDocumentContextParameter();
+		List<String> res = new ArrayList<String>(documentContextParameterList.size());
+		documentContextParameterList.forEach(documentContextParameter -> {
+			res.add(documentContextParameter.getID().getValue());
+		});
+		return res.isEmpty() ? null : res.get(0);
+	}
+
+	// BG-2.BT-24 ++ 1..1 Specification identifier
 	@Override
 	public String getCustomization() {
 		return getCustomization(this);
@@ -800,18 +817,7 @@ UBL:
 		});
 		return res.isEmpty() ? null : res.get(0);
 	}
-	public String getProfile() {
-		return getProfile(this);
-	}
-	static String getProfile(CrossIndustryInvoiceType doc) {
-		List<DocumentContextParameterType> documentContextParameterList = doc.getExchangedDocumentContext().getBusinessProcessSpecifiedDocumentContextParameter();
-		List<String> res = new ArrayList<String>(documentContextParameterList.size());
-		documentContextParameterList.forEach(documentContextParameter -> {
-			res.add(documentContextParameter.getID().getValue());
-		});
-		return res.isEmpty() ? null : res.get(0);
-	}
-
+	
 	/* PRECEDING INVOICE REFERENCE                 BG-3                        0..* (optional)
 	 * Eine Gruppe von Informationselementen, die Informationen über eine vorausgegangene Rechnung liefern, 
 	 * die berichtigt oder gutgeschrieben werden soll.

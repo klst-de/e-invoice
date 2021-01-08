@@ -67,7 +67,7 @@ public class ReadmeTest {
 		  ublInvoice.addLine(line);
 		  
 		  assertEquals(CoreInvoice.PROFILE_XRECHNUNG, ublInvoice.getCustomization());
-		  assertThat(ublInvoice.getProfile()).isNull();
+		  assertThat(ublInvoice.getProcessType()).isNull();
 		  assertEquals(DocumentNameCode.CommercialInvoice, ublInvoice.getTypeCode());
 		  
 		  byte[] xml = transformer.fromModel(ublInvoice.get());

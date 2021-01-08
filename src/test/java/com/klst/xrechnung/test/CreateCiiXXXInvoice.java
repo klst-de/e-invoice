@@ -63,8 +63,11 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 	@Override
 	CoreInvoice makeInvoice() {
-		LOG.info("\n");
+		LOG.info("\n (BG-2.BT-24)ProcessTypev="+testDoc.getProcessType() + " (BG-2.BT-24)Customization="+testDoc.getCustomization()
+			+ " (BT-3)TypeCode="+testDoc.getTypeCode());
+		// kein CII Testfile mit ProcessType!!!
 		CoreInvoice cii = new CrossIndustryInvoice(testDoc.getCustomization(), testDoc.getTypeCode());
+
 		cii.setId(testDoc.getId());
 		cii.setIssueDate(testDoc.getIssueDateAsTimestamp());
 //		cii.setDocumentCurrency(testDoc.getDocumentCurrency());                           ---- verschoben hinter pi

@@ -91,19 +91,17 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 	CreditNoteType creditNote = null;
 	
 	// factory
-	public static GenericInvoice<InvoiceType> createInvoice(String customization, String profile, DocumentNameCode code) {
+	public static GenericInvoice<InvoiceType> createInvoice(String customization, String processType, DocumentNameCode code) {
 		InvoiceType invoice = new InvoiceType();
 		GenericInvoice<InvoiceType> gi = new GenericInvoice<InvoiceType>(invoice);
-//		LOG.info("vor gi.init(customization:"+customization);
-		gi.init(customization, profile, code);
+		gi.init(customization, processType, code);
 		return gi;
 	}
 	
-	public static GenericInvoice<CreditNoteType> createCreditNote(String customization, String profile, DocumentNameCode code) {
+	public static GenericInvoice<CreditNoteType> createCreditNote(String customization, String processType, DocumentNameCode code) {
 		CreditNoteType cn = new CreditNoteType();
 		GenericInvoice<CreditNoteType> gi = new GenericInvoice<CreditNoteType>(cn);
-//		LOG.info("vor gi.init(customization:"+customization);
-		gi.init(customization, profile, code);
+		gi.init(customization, processType, code);
 		return gi;
 	}
 	
@@ -123,8 +121,8 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 		return this.t;
 	}
 
-	void init(String customization, String profile, DocumentNameCode code) {
-		setProcessControl(customization, profile); // BG-2
+	void init(String customization, String processType, DocumentNameCode code) {
+		setProcessControl(customization, processType); // BG-2
 		setTypeCode(code); // BT-3	
 		LOG.config("ctor "+this);
 	}
@@ -595,7 +593,7 @@ UBL:
 	}
 
 	// BG-2 + 1..1 PROCESS CONTROL
-	// BG-2.BT-23 ++ 0..1 Business process type / aka profile
+	// BG-2.BT-23 ++ 0..1 Business process type / aka UBL profile
 	// BG-2.BT-24 ++ 1..1 Specification identifier / aka Customization
 	void setProcessControl(String customization, String profile) {
 		CustomizationIDType customizationID = new CustomizationIDType();
@@ -607,9 +605,7 @@ UBL:
 			creditNote.setCustomizationID(customizationID);
 		}
 		
-		if(profile==null) {
-			// profileID ist optional
-		} else {
+		if(profile!=null) {
 			ProfileIDType profileID = new ProfileIDType();
 			profileID.setValue(profile);
 			if(isInvoiceType) {
@@ -630,10 +626,16 @@ UBL:
 		return customizationID.getValue();
 	}
 
+	// BG-2.BT-23 ++ 0..1 Business process type
 	@Override
-	public String getProfile() {
+	public String getProcessType() {
+		// Test in 02.01a
 		ProfileIDType profileID = isInvoiceType ? invoice.getProfileID() : creditNote.getProfileID();
 		return profileID==null ? null : profileID.getValue();
+	}
+	@Deprecated
+	public String getProfile() {
+		return getProcessType();
 	}
 
 	// BG-3 + 0..n PRECEDING INVOICE REFERENCE

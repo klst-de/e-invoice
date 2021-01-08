@@ -75,11 +75,11 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		
 	Object makeCreditNote() {
 		testCN.getCustomization();
-		testCN.getProfile();
+		testCN.getProcessType();
 		testCN.getTypeCode();
 //		CoreInvoice ublInvoice = // in CoreInvoice sind nicht alle Methoden definiert, zB getSellerParty/getSeller , daher:
 		GenericInvoice<CreditNoteType> ublInvoice =
-				GenericInvoice.createCreditNote(testCN.getCustomization(), testCN.getProfile(), testCN.getTypeCode());
+				GenericInvoice.createCreditNote(testCN.getCustomization(), testCN.getProcessType(), testCN.getTypeCode());
 		ublInvoice.setId(testCN.getId());
 		ublInvoice.setIssueDate(testCN.getIssueDateAsTimestamp());
 		ublInvoice.setDocumentCurrency(testCN.getDocumentCurrency());
@@ -178,11 +178,11 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			return makeCreditNote();
 		}
 		testDoc.getCustomization();
-		testDoc.getProfile();
+		testDoc.getProcessType();
 		testDoc.getTypeCode();
 //		CoreInvoice ublInvoice = // in CoreInvoice sind nicht alle Methoden definiert, zB getSellerParty/getSeller , daher:
 		GenericInvoice<InvoiceType> ublInvoice =
-				GenericInvoice.createInvoice(testDoc.getCustomization(), testDoc.getProfile(), testDoc.getTypeCode());
+				GenericInvoice.createInvoice(testDoc.getCustomization(), testDoc.getProcessType(), testDoc.getTypeCode());
 		ublInvoice.setId(testDoc.getId());
 		ublInvoice.setIssueDate(testDoc.getIssueDateAsTimestamp());
 		ublInvoice.setDocumentCurrency(testDoc.getDocumentCurrency());
