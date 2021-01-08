@@ -187,6 +187,7 @@ public class UblTest {
     	InvoiceFactory factory = new CreateUblXXXInvoice("02.01a-INVOICE_ubl.xml");
     	Object o = factory.makeInvoice();
     	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>((InvoiceType)o);
+    	assertEquals("urn:fdc:peppol.eu:2017:poacc:billing:01:1.0", ublInvoice.getProcessType());
     	List<AllowancesAndCharges> list = ublInvoice.getAllowancesAndCharges();
     	assertNotNull(list);
     	assertEquals(2, list.size());
