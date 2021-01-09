@@ -59,6 +59,7 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeTy
  */
 public enum PaymentMeansEnum {
 
+	InstrumentNotDefined 	(1),
 	InCash 				(10),
 	Cheque				(20),
 	CreditTransfer 		(30),
