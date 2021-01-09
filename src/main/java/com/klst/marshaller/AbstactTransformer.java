@@ -23,9 +23,14 @@ import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
 
+import com.klst.einvoice.ubl.GenericInvoice;
 // TODO in jaxb-ri com.sun.xml.bind.marshaller.NamespacePrefixMapper ohne internal
 // Discouraged access: The type 'NamespacePrefixMapper' is not API (restriction on required library ... jdk1.8.0_241\jre\lib\rt.jar')
 import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
+
+import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
+import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
+import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 
 @Named
 /* Notice 
@@ -99,7 +104,11 @@ public abstract class AbstactTransformer {
 		try {
 			Marshaller marshaller = createMarshaller();
 			// TODO : siehe 5.3.3. Marshalling a non-element in file:///C:/proj/jaxb-ri/docs/ch03.html#marshalling
-			marshaller.marshal(document, outputStream);
+			if(document instanceof GenericInvoice<?>) {
+				marshaller.marshal(((GenericInvoice)document).get(), outputStream);
+			} else if(document instanceof CrossIndustryInvoiceType) {
+				marshaller.marshal((CrossIndustryInvoiceType)document, outputStream);
+			}
 		} catch (JAXBException ex) {
 			throw new TransformationException(TransformationException.MARSHALLING_ERROR, ex);
 		}

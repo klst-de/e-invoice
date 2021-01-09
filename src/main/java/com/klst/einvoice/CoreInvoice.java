@@ -31,7 +31,7 @@ Eine andere mögliche Namensgebung wären die Profilnamen mit Hierarhie
 
  */
 public interface CoreInvoice extends BG1_InvoiceNote, BG2_ProcessControl, BG3_PrecedingInvoiceReference, BG14_InvoicingPeriod, 
-	PaymentInstructionsFactory, BG22_DocumentTotals, 
+	PaymentInstructionsFactory, PaymentCardFactory, BG22_DocumentTotals, 
 	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
 
 	/**

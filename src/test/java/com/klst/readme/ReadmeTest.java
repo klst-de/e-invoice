@@ -21,8 +21,6 @@ import com.klst.marshaller.UblInvoiceTransformer;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
-import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
-
 public class ReadmeTest {
 
 	private static final Logger LOG = Logger.getLogger(ReadmeTest.class.getName());
@@ -48,30 +46,29 @@ public class ReadmeTest {
 	
 	@Test
 	public void commercialInvoiceTest() {
-		  GenericInvoice<InvoiceType> ublInvoice =
-				  GenericInvoice.createInvoice(XRECHNUNG_20, null, DocumentNameCode.CommercialInvoice);
-		  LOG.info("ublInvoice.Class:"+ublInvoice.get().getClass());
-		  ublInvoice.setId("123456XX");
-		  ublInvoice.setIssueDate("2016-04-04");
-		  ublInvoice.setNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
-		  ublInvoice.setDocumentCurrency(EUR);
-		  ublInvoice.setOrderReference("1234567890");           // optional
-		  ublInvoice.setBuyerReference("04011000-12345-34");
-		 
-		  CoreInvoiceLine line = GenericLine.createInvoiceLine("1"		// invoice line number
-				  , new Quantity("XPP", new BigDecimal(1))
-				  , new Amount(EUR, new BigDecimal(288.79))				// line net amount
-				  , new UnitPriceAmount(EUR, new BigDecimal(288.79))	// price
-				  , "Zeitschrift [...]"									// itemName
-				  , TaxCategoryCode.StandardRate, new BigDecimal(7));	// VAT category code, rate 7%
-		  ublInvoice.addLine(line);
+		CoreInvoice ublInvoice = 
+				GenericInvoice.createInvoice(XRECHNUNG_20, null, DocumentNameCode.CommercialInvoice);
+		LOG.info("ublInvoice.Class:"+ublInvoice.getClass());
+		ublInvoice.setId("123456XX");
+		ublInvoice.setIssueDate("2016-04-04");
+		ublInvoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
+		ublInvoice.setOrderReference("1234567890");           // optional
+		ublInvoice.setBuyerReference("04011000-12345-34");
+
+		CoreInvoiceLine line = GenericLine.createInvoiceLine("1"		// invoice line number
+		  , new Quantity("XPP", new BigDecimal(1))
+		  , new Amount(EUR, new BigDecimal(288.79))				// line net amount
+		  , new UnitPriceAmount(EUR, new BigDecimal(288.79))	// price
+		  , "Zeitschrift [...]"									// itemName
+		  , TaxCategoryCode.StandardRate, new BigDecimal(7));	// VAT category code, rate 7%
+		ublInvoice.addLine(line);
 		  
-		  assertEquals(CoreInvoice.PROFILE_XRECHNUNG, ublInvoice.getCustomization());
-		  assertThat(ublInvoice.getProcessType()).isNull();
-		  assertEquals(DocumentNameCode.CommercialInvoice, ublInvoice.getTypeCode());
+		assertEquals(CoreInvoice.PROFILE_XRECHNUNG, ublInvoice.getCustomization());
+		assertThat(ublInvoice.getProcessType()).isNull();
+		assertEquals(DocumentNameCode.CommercialInvoice, ublInvoice.getTypeCode());
 		  
-		  byte[] xml = transformer.fromModel(ublInvoice.get());
-		  LOG.info(new String(xml));
+		byte[] xml = transformer.fromModel(ublInvoice);
+		LOG.info(new String(xml));
 	}
 
 }

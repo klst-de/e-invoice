@@ -91,14 +91,14 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 	CreditNoteType creditNote = null;
 	
 	// factory
-	public static GenericInvoice<InvoiceType> createInvoice(String customization, String processType, DocumentNameCode code) {
+	public static CoreInvoice createInvoice(String customization, String processType, DocumentNameCode code) {
 		InvoiceType invoice = new InvoiceType();
 		GenericInvoice<InvoiceType> gi = new GenericInvoice<InvoiceType>(invoice);
 		gi.init(customization, processType, code);
 		return gi;
 	}
 	
-	public static GenericInvoice<CreditNoteType> createCreditNote(String customization, String processType, DocumentNameCode code) {
+	public static CoreInvoice createCreditNote(String customization, String processType, DocumentNameCode code) {
 		CreditNoteType cn = new CreditNoteType();
 		GenericInvoice<CreditNoteType> gi = new GenericInvoice<CreditNoteType>(cn);
 		gi.init(customization, processType, code);

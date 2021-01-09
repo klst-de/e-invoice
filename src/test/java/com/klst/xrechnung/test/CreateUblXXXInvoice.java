@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
+import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG23_VatBreakdown;
@@ -77,8 +78,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		testCN.getCustomization();
 		testCN.getProcessType();
 		testCN.getTypeCode();
-//		CoreInvoice ublInvoice = // in CoreInvoice sind nicht alle Methoden definiert, zB getSellerParty/getSeller , daher:
-		GenericInvoice<CreditNoteType> ublInvoice =
+		CoreInvoice ublInvoice =
 				GenericInvoice.createCreditNote(testCN.getCustomization(), testCN.getProcessType(), testCN.getTypeCode());
 		ublInvoice.setId(testCN.getId());
 		ublInvoice.setIssueDate(testCN.getIssueDateAsTimestamp());
@@ -170,7 +170,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		});
 		LOG.info("LineGroup finished: "+testLines.size() + " lines.");
 
-		return ublInvoice.get();
+		return ublInvoice;
 	}
 	@Override
 	Object makeInvoice() {
@@ -180,8 +180,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		testDoc.getCustomization();
 		testDoc.getProcessType();
 		testDoc.getTypeCode();
-//		CoreInvoice ublInvoice = // in CoreInvoice sind nicht alle Methoden definiert, zB getSellerParty/getSeller , daher:
-		GenericInvoice<InvoiceType> ublInvoice =
+		CoreInvoice ublInvoice =
 				GenericInvoice.createInvoice(testDoc.getCustomization(), testDoc.getProcessType(), testDoc.getTypeCode());
 		ublInvoice.setId(testDoc.getId());
 		ublInvoice.setIssueDate(testDoc.getIssueDateAsTimestamp());
@@ -255,10 +254,10 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		makeVatBreakDownGroup(ublInvoice);
 		makeLineGroup(ublInvoice);
 		LOG.info("finished.");
-		return ublInvoice.get();
+		return ublInvoice;
 	}
 
-	void makeOptionals(GenericInvoice ublInvoice) {	
+	void makeOptionals(CoreInvoice ublInvoice) {	
 		ublInvoice.setProjectReference(testDoc.getProjectReference()); // BT-11 + 0..1
 		ublInvoice.setContractReference(testDoc.getContractReference()); // BT-12 + 0..1
 		ublInvoice.setPurchaseOrderReference(testDoc.getPurchaseOrderReference()); // BT-13 + 0..1
@@ -304,7 +303,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("finished.");
 	}
 	
-	void makePaymentGroup(GenericInvoice ublInvoice) {
+	void makePaymentGroup(CoreInvoice ublInvoice) {
 		PaymentInstructions paymentInstructions = testDoc.getPaymentInstructions();
 		LOG.info("PaymentInstructions "+paymentInstructions + " PaymentMeans="+paymentInstructions.getPaymentMeansEnum());
 		
@@ -374,7 +373,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
  */
 			LOG.info("DirectDebit/Lastschrift MandateReferencetID:"+dd.getMandateReferencetID() 
 			+ " BankAssignedCreditorID:"+dd.getBankAssignedCreditorID() + " DebitedAccountID:"+dd.getDebitedAccountID());
-			directDebit = ublInvoice.createDirectDebit(dd.getMandateReferencetID(), dd.getBankAssignedCreditorID(), dd.getDebitedAccountID());
+			// TODO DirectDebitFactory
+			directDebit = ((GenericInvoice)ublInvoice).createDirectDebit(dd.getMandateReferencetID(), dd.getBankAssignedCreditorID(), dd.getDebitedAccountID());
 		}
 		
 		ublInvoice.setPaymentInstructions(paymentInstructions.getPaymentMeansEnum(), paymentInstructions.getPaymentMeansText(), paymentInstructions.getRemittanceInformation()
@@ -384,7 +384,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("finished.");
 	}
 	
-	void makeVatBreakDownGroup(GenericInvoice ublInvoice) {
+	void makeVatBreakDownGroup(CoreInvoice ublInvoice) {
         List<TaxSubtotal> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
@@ -397,10 +397,10 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
         	vatBreakdown.setTaxExemption(tradeTax.getTaxExemptionReasonText() , tradeTax.getTaxExemptionReasonCode());
         	ublInvoice.addVATBreakDown(vatBreakdown);
         });
-		LOG.info("finished. "+ublInvoice.getVATBreakDowns().size() + " vatBreakDowns.");
+		LOG.info("finished. "+vbdList.size() + " vatBreakDowns.");
 	}
 	
-	void makeLineGroup(GenericInvoice ublDoc) {
+	void makeLineGroup(CoreInvoice ublDoc) {
 		List<?> list = testDoc.getLines();
 		LOG.info("LineGroup started for "+list.size() + " lines.");
 		List<GenericLine<?>> testLines = testDoc.getLines();

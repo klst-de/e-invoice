@@ -30,11 +30,9 @@ import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UblTest {
 
-	static final String RESOURCE_PATH = "src/main/resources/";
-	static LogManager logManager = LogManager.getLogManager(); // Singleton
-	
+	private static LogManager logManager = LogManager.getLogManager(); // Singleton
 	private static Logger LOG = null;
-	static {
+	private static void initLogger() {
         URL url = UblTest.class.getClassLoader().getResource("testLogging.properties");
 		try {
 	        File file = new File(url.toURI());
@@ -45,7 +43,7 @@ public class UblTest {
 		}
 		LOG = Logger.getLogger(UblTest.class.getName());
 	}
-	
+
 	private static final String[] UBL_XML = {
 			"ubl001.xml" ,
 //			"ubl002.xml" , // error tr=val-sch.1.1BR-06error[BR-06]-An Invoice shall contain the Seller name (BT-27).
@@ -79,11 +77,12 @@ public class UblTest {
 	
     @BeforeClass
     public static void staticSetup() {
+    	initLogger();
 		validation = new KositValidation();
     }
 
 	@Test
-    public void ubl0() {
+    public void ubl00() {
     	InvoiceFactory factory = new CreateUblXXXInvoice(UBL_XML[0]);
     	byte[] bytes = factory.toUbl(); // the xml
     	String xml = new String(bytes);
@@ -91,55 +90,12 @@ public class UblTest {
     	assertTrue(validation.check(bytes));
    }
     
-//	@Test 
-    public void ublCreditNote() {
-    	InvoiceFactory factory = new CreateUblXXXInvoice("ubl008.xml");  // Quelle ist nicht valide
-    	byte[] bytes = factory.toUbl(); // the xml
-    	String xml = new String(bytes);
-    	LOG.info("xml=\n"+xml);
-    	assertTrue(validation.check(bytes));
-   }
-    
 	@Test
-    public void ublPEPPOL() {
-//    	InvoiceFactory factory = new CreateUblXXXInvoice("example-peppol-ubl.xml"); // Quelle ist nicht valide
-    	InvoiceFactory factory = new CreateUblXXXInvoice("example-peppol-ubl-creditnote.xml"); // Quelle valide gemacht
-//    	InvoiceFactory factory = new CreateUblXXXInvoice("01.01a-INVOICE_ubl.xml");
-    	byte[] bytes = factory.toUbl(); // the xml
-    	String xml = new String(bytes);
-    	LOG.info("xml=\n"+xml);
-    	assertTrue(validation.check(bytes));
-   }
-    
-	@Test
-    public void ublAll() {
-    	for(int i=0; i<UBL_XML.length; i++) {
-    		String fileName = UBL_XML[i];
-        	InvoiceFactory factory = new CreateUblXXXInvoice(fileName);
-        	byte[] bytes = factory.toUbl(); // the xml
-        	LOG.info("\n-------------------------------- "+fileName);
-        	assertTrue(validation.check(bytes));
-    	}
-    }
-    
-    @Test
-    public void ublAll02() {
-    	for(int i=0; i<UBL_02_XML.length; i++) {
-    		String fileName = UBL_02_XML[i];
-        	InvoiceFactory factory = new CreateUblXXXInvoice(fileName);
-        	byte[] bytes = factory.toUbl(); // the xml
-        	LOG.info("\n-------------------------------- "+fileName);
-        	String xml = new String(bytes);
-        	LOG.info("xml=\n"+xml);
-        	assertTrue(validation.check(bytes));
-    	}
-   }
-
-	@Test
-    public void ubl114_Delivery() {
+    public void ubl0114_Delivery() {
     	InvoiceFactory factory = new CreateUblXXXInvoice("01.14a-INVOICE_ubl.xml");
-    	Object o = factory.makeInvoice();
-    	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>((InvoiceType)o);
+    	Object o = factory.makeInvoice(); // o ist GenericInvoice<?>
+    	GenericInvoice<InvoiceType> ublTest = (GenericInvoice<InvoiceType>)o;
+    	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>(ublTest.get());
     	BG13_DeliveryInformation delivery = ublInvoice.getDelivery();
     	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), delivery.getActualDate());    // 2018-04-13+01:00 "yyyy-[m]m-[d]d hh:mm:ss[.f...]"
     	assertEquals("68", delivery.getId()); 
@@ -151,10 +107,11 @@ public class UblTest {
 	}
 
 	@Test
-    public void ubl115_AdditionalDocs() {
+    public void ubl0201_AdditionalDocs() { // auch möglich mit 01.15a
     	InvoiceFactory factory = new CreateUblXXXInvoice("02.01a-INVOICE_ubl.xml");
     	Object o = factory.makeInvoice();
-    	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>((InvoiceType)o);
+    	GenericInvoice<InvoiceType> ublTest = (GenericInvoice<InvoiceType>)o;
+    	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>(ublTest.get());
     	Timestamp taxPointDate = ublInvoice.getTaxPointDateAsTimestamp();
     	assertNotNull(taxPointDate);
     	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), taxPointDate);
@@ -183,10 +140,11 @@ public class UblTest {
 	}
 	
 	@Test
-    public void ubl201_AllowanceCharge() {
+    public void ubl0201_AllowanceCharge() {
     	InvoiceFactory factory = new CreateUblXXXInvoice("02.01a-INVOICE_ubl.xml");
     	Object o = factory.makeInvoice();
-    	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>((InvoiceType)o);
+    	GenericInvoice<InvoiceType> ublTest = (GenericInvoice<InvoiceType>)o;
+    	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>(ublTest.get());
     	assertEquals("urn:fdc:peppol.eu:2017:poacc:billing:01:1.0", ublInvoice.getProcessType());
     	List<AllowancesAndCharges> list = ublInvoice.getAllowancesAndCharges();
     	assertNotNull(list);
@@ -198,6 +156,48 @@ public class UblTest {
     	assertTrue(list.get(1).isAllowance());
 	}
 
+	@Test
+    public void ublAll() {
+    	for(int i=0; i<UBL_XML.length; i++) {
+    		String fileName = UBL_XML[i];
+        	InvoiceFactory factory = new CreateUblXXXInvoice(fileName);
+        	byte[] bytes = factory.toUbl(); // the xml
+        	LOG.info("\n-------------------------------- "+fileName);
+        	assertTrue(validation.check(bytes));
+    	}
+    }
+    
+    @Test
+    public void ublAll02() {
+    	for(int i=0; i<UBL_02_XML.length; i++) {
+    		String fileName = UBL_02_XML[i];
+        	InvoiceFactory factory = new CreateUblXXXInvoice(fileName);
+        	byte[] bytes = factory.toUbl(); // the xml
+        	LOG.info("\n-------------------------------- "+fileName);
+        	String xml = new String(bytes);
+        	LOG.info("xml=\n"+xml);
+        	assertTrue(validation.check(bytes));
+    	}
+   }
+
+//	@Test 
+    public void ublCreditNote() {
+    	InvoiceFactory factory = new CreateUblXXXInvoice("ubl008.xml");  // Quelle ist nicht valide
+    	byte[] bytes = factory.toUbl(); // the xml
+    	String xml = new String(bytes);
+    	LOG.info("xml=\n"+xml);
+    	assertTrue(validation.check(bytes));
+   }
+    
+	@Test
+    public void ublPEPPOL() {
+    	InvoiceFactory factory = new CreateUblXXXInvoice("example-peppol-ubl-creditnote.xml"); // Quelle valide gemacht
+    	byte[] bytes = factory.toUbl(); // the xml
+    	String xml = new String(bytes);
+    	LOG.info("xml=\n"+xml);
+    	assertTrue(validation.check(bytes));
+   }
+    
 	@Test
     public void ublZZZ() {
 //    	InvoiceFactory factory = new CreateUblXXXInvoice("01.05a-INVOICE_ubl.xml");
