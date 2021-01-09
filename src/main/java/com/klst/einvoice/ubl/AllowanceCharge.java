@@ -113,6 +113,7 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 
 	@Override
 	public void setAssessmentBase(Amount amount) {
+		if(amount==null) return;
 		BaseAmountType baseAmount = new BaseAmountType();
 		amount.copyTo(baseAmount);
 		super.setBaseAmount(baseAmount);

@@ -249,9 +249,17 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makePaymentGroup(CoreInvoice ublInvoice, GenericInvoice<?> testDoc) {
-		PaymentInstructions paymentInstructions = testDoc.getPaymentInstructions();
-		LOG.info("PaymentInstructions "+paymentInstructions + " PaymentMeans="+paymentInstructions.getPaymentMeansEnum());
 		
+		// BT-20 + 0..1 Payment terms
+		ublInvoice.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp());
+		
+		PaymentInstructions paymentInstructions = testDoc.getPaymentInstructions();
+		LOG.info("PaymentInstructions "+paymentInstructions 
+				+ " PaymentMeans="+(paymentInstructions==null ? "nix" : paymentInstructions.getPaymentMeansEnum()));
+		
+		if(paymentInstructions==null) { // optional BG-16 + 0..1 PAYMENT INSTRUCTIONS / Zahlungsanweisungen
+			return;
+		}
 		List<CreditTransfer> creditTransfer = paymentInstructions.getCreditTransfer();
 		if(creditTransfer.isEmpty()) {
 			//LOG.info("creditTransfer.isEmpty");
@@ -325,7 +333,6 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setPaymentInstructions(paymentInstructions.getPaymentMeansEnum(), paymentInstructions.getPaymentMeansText(), paymentInstructions.getRemittanceInformation()
 				, creditTransfer, paymentCard, directDebit); // dd statt directDebit geht auch
 		
-		ublInvoice.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp());
 		LOG.info("finished.");
 	}
 	

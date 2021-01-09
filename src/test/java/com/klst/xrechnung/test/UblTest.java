@@ -75,11 +75,11 @@ public class UblTest {
 	private static final String[] UBL_tc43_XML = {
 			"ubl-tc434-creditnote1.xml" ,
 			"ubl-tc434-example1.xml" ,
-//			"ubl-tc434-example2.xml" , // Fehler untersuchen TODO
-//			"ubl-tc434-example3.xml" ,
+			"ubl-tc434-example2.xml" ,
+			"ubl-tc434-example3.xml" ,
 			"ubl-tc434-example4.xml" ,
 			"ubl-tc434-example5.xml" ,
-//			"ubl-tc434-example6.xml" ,
+			"ubl-tc434-example6.xml" ,
 			"ubl-tc434-example7.xml" ,
 			"ubl-tc434-example8.xml" ,
 			"ubl-tc434-example9.xml" };
@@ -225,7 +225,7 @@ public class UblTest {
 	@Test
     public void ublZZZ() {
 //    	InvoiceFactory factory = new CreateUblXXXInvoice("01.05a-INVOICE_ubl.xml");
-    	InvoiceFactory factory = new CreateUblXXXInvoice("ubl-tc434-example5.xml");
+    	InvoiceFactory factory = new CreateUblXXXInvoice("ubl-tc434-example6.xml");
     	byte[] bytes = factory.toUbl(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
