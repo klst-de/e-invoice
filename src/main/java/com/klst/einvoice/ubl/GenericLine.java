@@ -64,20 +64,18 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	CreditNoteLineType cnLine = null;
 	
 	// factory
-	public static GenericLine<InvoiceLineType> createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
+	public static CoreInvoiceLine createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
 		InvoiceLineType il = new InvoiceLineType();
 		GenericLine<InvoiceLineType> gl = new GenericLine<InvoiceLineType>(il);
-//		LOG.info("vor gl.init(id:"+id);
 		gl.init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 		return gl;
 	}
 	
-	public static GenericLine<CreditNoteLineType> createCreditNoteLine(String id, Quantity quantity, Amount lineTotalAmount, 
+	public static CoreInvoiceLine createCreditNoteLine(String id, Quantity quantity, Amount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
 		CreditNoteLineType cnl = new CreditNoteLineType();
 		GenericLine<CreditNoteLineType> gl = new GenericLine<CreditNoteLineType>(cnl);
-//		LOG.info("vor gl.init(id:"+id);
 		gl.init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 		return gl;
 	}
