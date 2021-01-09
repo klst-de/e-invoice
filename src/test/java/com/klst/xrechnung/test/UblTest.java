@@ -72,6 +72,17 @@ public class UblTest {
 			"03.02a-INVOICE_ubl.xml" ,
 			"04.01a-INVOICE_ubl.xml" ,  // 1 Warnung SubInvoiceLine
 			"04.02a-INVOICE_ubl.xml" }; // 1 Warnung SubInvoiceLine
+	private static final String[] UBL_tc43_XML = {
+			"ubl-tc434-creditnote1.xml" ,
+			"ubl-tc434-example1.xml" ,
+//			"ubl-tc434-example2.xml" , // Fehler untersuchen TODO
+//			"ubl-tc434-example3.xml" ,
+			"ubl-tc434-example4.xml" ,
+			"ubl-tc434-example5.xml" ,
+//			"ubl-tc434-example6.xml" ,
+			"ubl-tc434-example7.xml" ,
+			"ubl-tc434-example8.xml" ,
+			"ubl-tc434-example9.xml" };
 	
 	static private KositValidation validation;
 	
@@ -171,6 +182,19 @@ public class UblTest {
     public void ublAll02() {
     	for(int i=0; i<UBL_02_XML.length; i++) {
     		String fileName = UBL_02_XML[i];
+        	InvoiceFactory factory = new CreateUblXXXInvoice(fileName);
+        	byte[] bytes = factory.toUbl(); // the xml
+        	LOG.info("\n-------------------------------- "+fileName);
+        	String xml = new String(bytes);
+        	LOG.info("xml=\n"+xml);
+        	assertTrue(validation.check(bytes));
+    	}
+   }
+
+    @Test
+    public void ublAll43() {
+    	for(int i=0; i<UBL_tc43_XML.length; i++) {
+    		String fileName = UBL_tc43_XML[i];
         	InvoiceFactory factory = new CreateUblXXXInvoice(fileName);
         	byte[] bytes = factory.toUbl(); // the xml
         	LOG.info("\n-------------------------------- "+fileName);

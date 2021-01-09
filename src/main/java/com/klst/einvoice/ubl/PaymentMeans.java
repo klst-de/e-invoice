@@ -113,13 +113,9 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 
 	private static final Logger LOG = Logger.getLogger(PaymentMeans.class.getName());
 	
-	PaymentMeans() {
-		super();
-	}
-	
 	// copy ctor
 	public PaymentMeans(PaymentMeansType doc) {
-		this();
+		super();
 		PaymentMeansEnum code = getPaymentMeansEnum(doc);
 		LOG.fine("copy ctor: PaymentMeansCode="+code);
 		String paymentMeansText = getPaymentMeansText(doc);
@@ -170,7 +166,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	
 	public PaymentMeans(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation,
 			List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
-		this();
+		super();
 		init(code, paymentMeansText, remittanceInformation);
 		
 		// Eine der Untergruppen BG-17, BG-18, BG-19 muss angegeben werden!

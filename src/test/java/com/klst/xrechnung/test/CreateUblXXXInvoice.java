@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.AllowancesAndCharges;
+import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
-import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.Identifier;
@@ -35,9 +35,6 @@ import com.klst.marshaller.UblInvoiceTransformer;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CommodityClassificationType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ItemClassificationCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
@@ -75,9 +72,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 		
 	Object makeCreditNote() {
-		testCN.getCustomization();
-		testCN.getProcessType();
-		testCN.getTypeCode();
+		LOG.info("\n (BG-2.BT-24)ProcessType="+testCN.getProcessType() + " (BG-2.BT-24)Customization="+testCN.getCustomization()
+			+ " (BT-3)TypeCode="+testCN.getTypeCode());
 		CoreInvoice ublInvoice =
 				GenericInvoice.createCreditNote(testCN.getCustomization(), testCN.getProcessType(), testCN.getTypeCode());
 		ublInvoice.setId(testCN.getId());
@@ -86,34 +82,15 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setTaxCurrency(testCN.getTaxCurrency());
 		ublInvoice.setBuyerReference(testCN.getBuyerReferenceValue());
 		
-		LOG.info("makeOptionals...");	
-			ublInvoice.setOrderReference(testCN.getOrderReference());
-			List<Object> notes = testCN.getNotes();
-			notes.forEach(note -> {
-				ublInvoice.setNote(((NoteType)note).getValue());
-			});
-		LOG.info("finished makeOptionals.");
+		makeOptionals(ublInvoice, testCN);
 		
 		ublInvoice.setSeller(testCN.getSeller());
 		ublInvoice.setBuyer(testCN.getBuyer());
 		ublInvoice.setPayee(testCN.getPayee());
 		ublInvoice.setTaxRepresentative(testCN.getTaxRepresentative());
 
-		PaymentInstructions paymentInstructions = testCN.getPaymentInstructions();
-		LOG.info("PaymentInstructions "+paymentInstructions);
-//		PaymentMeansEnum code = testCN.getPaymentMeansEnum();
-//		String paymentMeansText = testCN.getPaymentMeansText();
-//		String remittanceInformation = testCN.getPaymentRemittanceInformation();
-//		LOG.info("PaymentMeansEnum code:"+code + " paymentMeansText:"+paymentMeansText + " remittanceInformation:"+remittanceInformation);
-		List<CreditTransfer> creditTransfer = paymentInstructions.getCreditTransfer();
-		PaymentCard paymentCard = null;
-		DirectDebit directDebit = null;
-		ublInvoice.setPaymentInstructions(paymentInstructions.getPaymentMeansEnum(), paymentInstructions.getPaymentMeansText(), paymentInstructions.getRemittanceInformation()
-				, creditTransfer, paymentCard, directDebit);
+		makePaymentGroup(ublInvoice, testCN);
 		
-		ublInvoice.setPaymentTermsAndDate(testCN.getPaymentTerm(), testCN.getDueDateAsTimestamp());
-		LOG.info("finished PaymentGroup.");
-
 		ublInvoice.setDocumentTotals(testCN.getInvoiceLineNetTotal(), 
 					testCN.getInvoiceTotalTaxExclusive(), 
 					testCN.getInvoiceTotalTaxInclusive(), 
@@ -136,39 +113,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
         });
 		LOG.info("finished. "+vbdList.size() + " vatBreakDowns.");
 		
-//		LineGroup 
-		List<?> list = testCN.getLines();
-		LOG.info("LineGroup started for "+list.size() + " lines.");
-		List<GenericLine<?>> testLines = testCN.getLines();
-		testLines.forEach(testLine -> {
-			CoreInvoiceLine targetLine = GenericLine.createCreditNoteLine(testLine.getId(), 
-			        testLine.getQuantity(),
-					testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), 
-					testLine.getItemName(),
-					testLine.getTaxCategory(), testLine.getTaxRate()
-					);
-			
-			// opt:
-			targetLine.setUnitPriceAmountAndQuantity(testLine.getUnitPriceAmount(), testLine.getBaseQuantity()); // BT-149-0 + BT-150-0 
-			targetLine.setSellerAssignedID(testLine.getSellerAssignedID());   //BT-155 0..1
-			targetLine.setBuyerAssignedID(testLine.getBuyerAssignedID());     //BT-156 0..1
-			targetLine.setStandardID(testLine.getStandardID(), "TODOSchema"); //BT-157 0..1 , BT-157-1 required
-        	List<Object> cl = testLine.getClassificationList();                //BT-158 0..n , BT-158-1 1..1 , BT-158-2 0..1
-        	cl.forEach(c -> {
-        		if(c.getClass() == CommodityClassificationType.class) {
-        			ItemClassificationCodeType cc = ((CommodityClassificationType)c).getItemClassificationCode();
-        			targetLine.addClassificationID(cc.getValue(), cc.getListID(), cc.getListVersionID());
-        		}
-        	});
-			
-			targetLine.setNote(testLine.getNote()); // opt BT-127
-			targetLine.setLineObjectIdentifier(
-					testLine.getLineObjectIdentifier()); // opt BT-128
-			targetLine.setOrderLineID(testLine.getOrderLineID());
-			
-			ublInvoice.addLine(targetLine);
-		});
-		LOG.info("LineGroup finished: "+testLines.size() + " lines.");
+		makeLineGroup(ublInvoice, testCN);
+		LOG.info("LineGroup finished.");
 
 		return ublInvoice;
 	}
@@ -177,9 +123,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		if(testDoc==null) {
 			return makeCreditNote();
 		}
-		testDoc.getCustomization();
-		testDoc.getProcessType();
-		testDoc.getTypeCode();
+		LOG.info("\n (BG-2.BT-24)ProcessType="+testDoc.getProcessType() + " (BG-2.BT-24)Customization="+testDoc.getCustomization()
+			+ " (BT-3)TypeCode="+testDoc.getTypeCode());
 		CoreInvoice ublInvoice =
 				GenericInvoice.createInvoice(testDoc.getCustomization(), testDoc.getProcessType(), testDoc.getTypeCode());
 		ublInvoice.setId(testDoc.getId());
@@ -198,9 +143,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("Buyer UriUniversalCommunication:" + buyer.getUriUniversalCommunication());
 		LOG.info("Buyer Address and Contact "+ublInvoice.getBuyer().getAddress() + " "+ublInvoice.getBuyer().getIContact());
 		
-		makeOptionals(ublInvoice);
+		makeOptionals(ublInvoice, testDoc);
 		
-		makePaymentGroup(ublInvoice);
+		makePaymentGroup(ublInvoice, testDoc);
 		
 		ublInvoice.setDocumentTotals(testDoc.getInvoiceLineNetTotal(), 
 				testDoc.getInvoiceTotalTaxExclusive(), 
@@ -252,12 +197,12 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		});
 		
 		makeVatBreakDownGroup(ublInvoice);
-		makeLineGroup(ublInvoice);
+		makeLineGroup(ublInvoice, testDoc);
 		LOG.info("finished.");
 		return ublInvoice;
 	}
 
-	void makeOptionals(CoreInvoice ublInvoice) {	
+	void makeOptionals(CoreInvoice ublInvoice, GenericInvoice<?> testDoc) {	
 		ublInvoice.setProjectReference(testDoc.getProjectReference()); // BT-11 + 0..1
 		ublInvoice.setContractReference(testDoc.getContractReference()); // BT-12 + 0..1
 		ublInvoice.setPurchaseOrderReference(testDoc.getPurchaseOrderReference()); // BT-13 + 0..1
@@ -303,7 +248,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("finished.");
 	}
 	
-	void makePaymentGroup(CoreInvoice ublInvoice) {
+	void makePaymentGroup(CoreInvoice ublInvoice, GenericInvoice<?> testDoc) {
 		PaymentInstructions paymentInstructions = testDoc.getPaymentInstructions();
 		LOG.info("PaymentInstructions "+paymentInstructions + " PaymentMeans="+paymentInstructions.getPaymentMeansEnum());
 		
@@ -400,18 +345,27 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("finished. "+vbdList.size() + " vatBreakDowns.");
 	}
 	
-	void makeLineGroup(CoreInvoice ublDoc) {
+	void makeLineGroup(CoreInvoice ublDoc, GenericInvoice<?> testDoc) {
 		List<?> list = testDoc.getLines();
-		LOG.info("LineGroup started for "+list.size() + " lines.");
+		LOG.info("LineGroup started for "+list.size() + " lines. testDoc ist "+testDoc.getClass());
 		List<GenericLine<?>> testLines = testDoc.getLines();
 		testLines.forEach(testLine -> {
-//			GenericLine<InvoiceLineType> targetLine = GenericLine.createInvoiceLine(testLine.getId(), 
-			CoreInvoiceLine targetLine = GenericLine.createInvoiceLine(testLine.getId(), 
-					testLine.getQuantity(), 
-					testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), 
-					testLine.getItemName(),
-					testLine.getTaxCategory(), testLine.getTaxRate()
-					);
+			CoreInvoiceLine targetLine;
+			if(testDoc.get() instanceof InvoiceType) {
+				targetLine = GenericLine.createInvoiceLine(testLine.getId(), 
+						testLine.getQuantity(), 
+						testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), 
+						testLine.getItemName(),
+						testLine.getTaxCategory(), testLine.getTaxRate()
+						);
+			} else {
+				targetLine = GenericLine.createCreditNoteLine(testLine.getId(), 
+						testLine.getQuantity(), 
+						testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), 
+						testLine.getItemName(),
+						testLine.getTaxCategory(), testLine.getTaxRate()
+						);
+			}
 			
 			// opt:
 			targetLine.setBuyerAccountingReference(testLine.getBuyerAccountingReference()); // BG-26.BT-133

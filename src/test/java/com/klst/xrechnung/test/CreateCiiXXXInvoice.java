@@ -24,21 +24,17 @@ import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.ApplicableHeaderTradeSettlement;
+import com.klst.einvoice.unece.uncefact.ApplicableTradeTax;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.FinancialAccount;
 import com.klst.einvoice.unece.uncefact.IBANId;
-import com.klst.einvoice.unece.uncefact.ReferencedDocument;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
-import com.klst.einvoice.unece.uncefact.ApplicableTradeTax;
 import com.klst.marshaller.CiiTransformer;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductClassificationType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 
 public class CreateCiiXXXInvoice extends InvoiceFactory {
 
@@ -63,7 +59,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 	@Override
 	CoreInvoice makeInvoice() {
-		LOG.info("\n (BG-2.BT-24)ProcessTypev="+testDoc.getProcessType() + " (BG-2.BT-24)Customization="+testDoc.getCustomization()
+		LOG.info("\n (BG-2.BT-24)ProcessType="+testDoc.getProcessType() + " (BG-2.BT-24)Customization="+testDoc.getCustomization()
 			+ " (BT-3)TypeCode="+testDoc.getTypeCode());
 		// kein CII Testfile mit ProcessType!!!
 		CoreInvoice cii = new CrossIndustryInvoice(testDoc.getCustomization(), testDoc.getTypeCode());
