@@ -33,12 +33,26 @@ import com.klst.untdid.codelist.PaymentMeansEnum;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CiiTest {
 
-	static final String RESOURCE_PATH = "src/main/resources/";
-	static LogManager logManager = LogManager.getLogManager(); // Singleton
-	
+/*
+
+java.util.logging.ErrorManager: 5
+java.lang.ArrayIndexOutOfBoundsException: 5
+	at my.util.logging.CustomFormatter.format(CustomFormatter.java:158)
+	at java.util.logging.StreamHandler.publish(StreamHandler.java:211)
+	at java.util.logging.ConsoleHandler.publish(ConsoleHandler.java:116)
+	at java.util.logging.Logger.log(Logger.java:738)
+	at java.util.logging.Logger.doLog(Logger.java:765)
+	at java.util.logging.Logger.log(Logger.java:788)
+	at java.util.logging.Logger.info(Logger.java:1490)
+	at com.klst.xrechnung.test.KositValidation.getCheck(KositValidation.java:54)
+	at com.klst.xrechnung.test.KositValidation.<init>(KositValidation.java:70)
+	at com.klst.xrechnung.test.CiiTest.staticSetup(CiiTest.java:118)
+
+ */
+	private static LogManager logManager = LogManager.getLogManager(); // Singleton
 	private static Logger LOG = null;
-	static {
-        URL url = CiiTest.class.getClassLoader().getResource("testLogging.properties");
+	private static void initLogger() {
+    	URL url = CiiTest.class.getClassLoader().getResource("testLogging.properties");
 		try {
 	        File file = new File(url.toURI());
 			logManager.readConfiguration(new FileInputStream(file));
@@ -46,7 +60,7 @@ public class CiiTest {
 			LOG = Logger.getLogger(CiiTest.class.getName());
 			LOG.warning(e.getMessage());
 		}
-		LOG = Logger.getLogger(CiiTest.class.getName());
+		LOG = Logger.getLogger(CiiTest.class.getName());		
 	}
 
 	private static final String[] CII_XML = {
@@ -91,6 +105,9 @@ public class CiiTest {
 	
     @BeforeClass
     public static void staticSetup() {
+    	
+    	initLogger();
+		
     	validation = new KositValidation();
     	testAddress = null; //new Address("CC", "9-PC", "String city", "String street");
     }

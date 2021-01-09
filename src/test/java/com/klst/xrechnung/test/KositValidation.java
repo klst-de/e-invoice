@@ -20,6 +20,8 @@ import de.kosit.validationtool.impl.DefaultCheck;
 
 public class KositValidation {
 
+//	private static LogManager logManager = LogManager.getLogManager(); // Singleton
+//	private static Logger LOG = null;
 	private static final Logger LOG = Logger.getLogger(KositValidation.class.getName());
 	
 	private static Check check = null;
