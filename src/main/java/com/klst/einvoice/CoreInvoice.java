@@ -101,7 +101,16 @@ Einschränkung: Nur Code 326, 380, 384, 381, 389 zulässig
 	 * <p>
 	 * Cardinality: 1..1 (mandatory)
 	 * <br>EN16931-ID: 	BT-3
-	 * <br>Rule ID: 	BR-4, BR-DE-17 
+	 * <br>Rule ID: 	BR-4, BR-DE-17 :  
+	 * Mit dem Element "Invoice type code" sollen ausschließlich folgende Codes aus der Codeliste UNTDID 1001 übermittelt werden: 
+	 *     326 (Partial invoice), 
+	 *     380 (Commercial invoice), 
+	 *     384 (Corrected invoice), 
+	 *     389 (Self-billed invoice) und 
+	 *     381 (Credit note),
+	 *     875 (Partial construction invoice), 
+	 *     876 (Partial final construction invoice), 
+	 *     877 (Final construction invoice)
 	 * <br>Request ID: 	R44
 	 * 
 	 * @param code

@@ -25,6 +25,10 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
  */
 public enum DocumentNameCode {
 	
+	PartialConstructionInvoice 		(875),
+	PartialFinalConstructionInvoice	(876),
+	FinalConstructionInvoice 		(877),
+	
 	PartialInvoice 			(326),
 	CommercialInvoice		(380),
 	CorrectedInvoice 		(384),
