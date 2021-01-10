@@ -1,7 +1,7 @@
 # e-invoice
 
 - "e-" as [electronic invoice](https://en.wikipedia.org/wiki/Electronic_invoicing)
-- "e-" as "€uro invoice" conforming to an european CIUS “Core Invoice Usage Specification” 
+- "e-" as "€uro invoice" conforming to an european CIUS “Core Invoice Usage Specification”. Of course you can use [other currency](src/test/resources/ubl-tc434-example2.xml).
 
 The goal is to have a jar, which can be used to create a valid xml invoice conforming to franco-german [XRechnung](https://de.wikipedia.org/wiki/XRechnung) or european standard [EN16931-1:2017](https://standards.cen.eu/dyn/www/f?p=204:110:0::::FSP_LANG_ID,FSP_PROJECT:25,60602&cs=17E89F8487E3C0558D35491BC876B7E8C).
 
@@ -26,14 +26,13 @@ _A “Core Invoice Usage Specification” (CIUS) is a specification that provide
 this snippet creates a valid ubl invoice [see (xrechnung-testsuite)](https://github.com/itplr-kosit/xrechnung-testsuite/blob/master/src/test/business-cases/standard/01.01a-INVOICE_ubl.xml)
 
 ```java
-  static final String XRECHNUNG_12 = CoreInvoice.PROFILE_XRECHNUNG;
   static final String EUR = "EUR"; 
 ...
-  GenericInvoice<InvoiceType> ublInvoice =
-    GenericInvoice.createInvoice(XRECHNUNG_12, null, DocumentNameCode.CommercialInvoice);
+  CoreInvoice ublInvoice = GenericInvoice.createInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
+    , DocumentNameCode.CommercialInvoice);
   ublInvoice.setId("123456XX");
   ublInvoice.setIssueDate("2016-04-04");
-  ublInvoice.setNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
+  ublInvoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
   ublInvoice.setDocumentCurrency(EUR);
   ublInvoice.setOrderReference("1234567890");           // optional
   ublInvoice.setBuyerReference("04011000-12345-34");
