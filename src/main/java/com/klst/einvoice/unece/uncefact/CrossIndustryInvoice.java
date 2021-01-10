@@ -206,6 +206,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 
 		setPurchaseOrderReference(getPurchaseOrderReference(doc)); // optional BT-13
 		setOrderReference(getOrderReferenceID(doc)); // optional BT-14
+		
+		setDespatchAdviceReference(getDespatchAdviceReference(doc)); // optional BT-16
 
 		addNotes(doc.getExchangedDocument());
 		LOG.fine("copy-ctor: SellerParty ...");;
@@ -630,6 +632,25 @@ UBL:
 		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
 	}
 	
+	// BT-16 + 0..1 Despatch advice reference / Eine Kennung für ein referenziertes Lieferavis
+	@Override
+	public void setDespatchAdviceReference(String docRefId) {
+		if(docRefId==null) return; // optional
+		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
+		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
+		
+		applicableHeaderTradeDelivery.setDespatchAdviceReferencedDocument(referencedDocument);
+	}
+	@Override
+	public String getDespatchAdviceReference() {
+		return getDespatchAdviceReference(this);
+	}
+	static String getDespatchAdviceReference(CrossIndustryInvoiceType doc) {
+		HeaderTradeDeliveryType headerTradeDelivery = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
+		ReferencedDocumentType referencedDocument = headerTradeDelivery.getDespatchAdviceReferencedDocument();
+		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
+	}
+
 	// BT-17 Tender or lot reference
 	@Override
 	public void setTenderOrLotReference(String docRefId) {
@@ -651,23 +672,23 @@ UBL:
 		return result;
 	}
 
-	// BT-18 Invoiced object identifier      TODO define in API:
-//	@Override
+	// BT-18 Invoiced object identifier
+	@Override
 	public void setInvoicedObjectIdentifier(Identifier id) {
 		if(id==null) return; // optional
 		setInvoicedObject(id.getContent(), id.getSchemeIdentifier());
 	}
-//	@Override
-//	public void setInvoicedObject(String name) {
-//		setInvoicedObject(name, null);
-//	}
-//	@Override
+	@Override
+	public void setInvoicedObject(String name) {
+		setInvoicedObject(name, null);
+	}
+	@Override
 	public void setInvoicedObject(String name, String code) {
 		if(name==null) return; // optional
 		ReferencedDocument referencedDocument = new ReferencedDocument(name, ReferencedDocument.InvoicingDataSheet, code);
 		addSupportigDocument(referencedDocument);
 	}
-//	@Override
+	@Override
 	public Identifier getInvoicedObjectIdentifier() {
 		List<ReferencedDocument> referencedDocuments = getReferencedDocuments(this);
 		if(referencedDocuments.isEmpty()) return null;
@@ -684,7 +705,7 @@ UBL:
 		}
 		return result;
 	}
-//	@Override
+	@Override
 	public String getInvoicedObject() {
 		Identifier id = getInvoicedObjectIdentifier();
 		return id==null? null : id.getContent();

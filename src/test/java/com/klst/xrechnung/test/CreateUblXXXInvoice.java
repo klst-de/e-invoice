@@ -208,8 +208,14 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setPurchaseOrderReference(testDoc.getPurchaseOrderReference()); // BT-13 + 0..1
 		ublInvoice.setOrderReference(testDoc.getOrderReference()); // BT-14 + 0..1
 		
+		ublInvoice.setDespatchAdviceReference(testDoc.getDespatchAdviceReference()); // BT-16 + 0..1
 		ublInvoice.setTenderOrLotReference(testDoc.getTenderOrLotReference()); // BT-17 + 0..1
-		
+
+		// Testfall 02.01a:
+		Identifier identifier = testDoc.getInvoicedObjectIdentifier();
+		ublInvoice.setInvoicedObjectIdentifier(identifier); // (optional) BT-18
+//		ublInvoice.setInvoicedObject("Test", "AAA"); // (optional) BT-18  NOT IMPLEMENTED: TODO
+
 		List<InvoiceNote> notes = testDoc.getInvoiceNotes();
 		notes.forEach(invoiceNote -> {
 			ublInvoice.addNote(invoiceNote.getCode(), invoiceNote.getNote());

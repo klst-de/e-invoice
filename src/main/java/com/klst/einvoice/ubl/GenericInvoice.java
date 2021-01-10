@@ -20,6 +20,7 @@ import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentCardFactory;
@@ -97,7 +98,7 @@ public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, P
 		gi.init(customization, processType, code);
 		return gi;
 	}
-	
+	// TODO createGenericInvoice
 	public static CoreInvoice createCreditNote(String customization, String processType, DocumentNameCode code) {
 		CreditNoteType cn = new CreditNoteType();
 		GenericInvoice<CreditNoteType> gi = new GenericInvoice<CreditNoteType>(cn);
@@ -478,7 +479,23 @@ UBL:
 	}
 
 	// BT-15 + 0..1 Receiving advice reference
+	
 	// BT-16 + 0..1 Despatch advice reference
+	@Override
+	public void setDespatchAdviceReference(String docRefId) {
+		if(docRefId==null) return; // optional
+		DocumentReferenceType documentReference = new DocumentReferenceType();
+		documentReference.setID(new ID(docRefId));
+		List<DocumentReferenceType> documentReferenceList = isInvoiceType ? invoice.getDespatchDocumentReference() : creditNote.getDespatchDocumentReference();
+		documentReferenceList.add(documentReference);
+	}
+
+	@Override
+	public String getDespatchAdviceReference() {
+		List<DocumentReferenceType> documentReferenceList = isInvoiceType ? invoice.getDespatchDocumentReference() : creditNote.getDespatchDocumentReference();
+		if(documentReferenceList.isEmpty()) return null;
+		return documentReferenceList.get(0).getID().getValue();
+	}
 	
 	// BT-17 + 0..1 Tender or lot reference
 	@Override
@@ -486,18 +503,40 @@ UBL:
 		if(docRefId==null) return; // optional
 		DocumentReferenceType documentReference = new DocumentReferenceType();
 		documentReference.setID(new ID(docRefId));
-		List<DocumentReferenceType> originatorDocumentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
-		originatorDocumentReferenceList.add(documentReference);
+		List<DocumentReferenceType> documentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
+		documentReferenceList.add(documentReference);
 	}
 
 	@Override
 	public String getTenderOrLotReference() {
-		List<DocumentReferenceType> originatorDocumentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
-		if(originatorDocumentReferenceList.isEmpty()) return null;
-		return originatorDocumentReferenceList.get(0).getID().getValue();
+		List<DocumentReferenceType> documentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
+		if(documentReferenceList.isEmpty()) return null;
+		return documentReferenceList.get(0).getID().getValue();
 	}
 	
 	// BT-18 + 0..1 Invoiced object identifier
+	@Override
+	public void setInvoicedObject(String name, String schemeID) {
+		LOG.warning(NOT_IMPEMENTED);
+	}
+	@Override
+	public void setInvoicedObjectIdentifier(Identifier id) {
+		LOG.warning(NOT_IMPEMENTED);
+	}
+	@Override
+	public void setInvoicedObject(String name) {
+		LOG.warning(NOT_IMPEMENTED);
+	}
+	@Override
+	public String getInvoicedObject() {
+		LOG.warning(NOT_IMPEMENTED);
+		return null;
+	}
+	@Override
+	public Identifier getInvoicedObjectIdentifier() {
+		LOG.warning(NOT_IMPEMENTED);
+		return null;
+	}
 	// BT-19 + 0..1 Buyer accounting reference
 	
 	// BT-20 + 0..1 Payment terms

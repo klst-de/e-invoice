@@ -396,7 +396,22 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public String getOrderReference();
 
 	// BT-15 Receiving advice reference                                TODO 
-	// BT-16 Despatch advice reference                                 TODO UBL: <cac:DespatchDocumentReference>
+	
+	/**
+	 * Despatch advice reference
+	 * <p>
+	 * An identifier of a referenced despatch advice.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-16
+	 * <br>Rule ID: 	 
+	 * <br>Request ID: 	R9, R56
+	 * 
+	 * @param Document reference
+	 */
+	// Eine Kennung für ein referenziertes Lieferavis
+	public void setDespatchAdviceReference(String docRefId);
+	public String getDespatchAdviceReference();
 	
 	/**
 	 * Tender or lot reference
@@ -414,12 +429,35 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void setTenderOrLotReference(String docRefId);
 	public String getTenderOrLotReference();
 	
-	// BT-18 Invoiced object identifier  TODO:                              TODO no testCase provided
-//	public void setInvoicedObjectIdentifier(Identifier id);
-//	public void setInvoicedObject(String name);
-//	public void setInvoicedObject(String name, String schemeID);
-//	public String getInvoicedObject();
-//	public Identifier getInvoicedObjectIdentifier();
+	/* no kosit testCase provided, selber erstellt in 02.01a-uncefact, CII
+            <ram:AdditionalReferencedDocument>
+                <ram:IssuerAssignedID>871694831000290806</ram:IssuerAssignedID>  <!-- BT-18 -->
+                <ram:TypeCode>130</ram:TypeCode>                   <!-- BT-18-0  Code 130 "Rechnungsdatenblatt"-->
+                <ram:ReferenceTypeCode>AAC</ram:ReferenceTypeCode> <!-- BT-18-1 -->     
+            </ram:AdditionalReferencedDocument>
+	 */
+	/**
+	 * BT-18 Invoiced object identifier
+	 * <p>
+	 * An identifier for an object on which the invoice is based, given by the Seller.
+	 * It may be a subscription number, telephone number, meter point, vehicle, person etc., as applicable.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-18
+	 * <br>Rule ID: 	 
+	 * <br>Request ID: 	R33
+	 * 
+	 * @param the identifier name BT-18
+	 * @param scheme identifier BT-18-1
+	 * The identification scheme identifier of the Invoiced object identifier.
+	 * If it may be not clear for the receiver what scheme is used for the identifier, 
+	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.
+	 */
+	public void setInvoicedObject(String name, String schemeID);
+	public void setInvoicedObjectIdentifier(Identifier id);
+	public void setInvoicedObject(String name);
+	public String getInvoicedObject();
+	public Identifier getInvoicedObjectIdentifier();
 	
 	// BT-19 Buyer accounting reference                                TODO
 
