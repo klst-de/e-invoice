@@ -208,6 +208,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setPurchaseOrderReference(testDoc.getPurchaseOrderReference()); // BT-13 + 0..1
 		ublInvoice.setOrderReference(testDoc.getOrderReference()); // BT-14 + 0..1
 		
+		ublInvoice.setReceiptReference(testDoc.getReceiptReference()); // BT-15 + 0..1
 		ublInvoice.setDespatchAdviceReference(testDoc.getDespatchAdviceReference()); // BT-16 + 0..1
 		ublInvoice.setTenderOrLotReference(testDoc.getTenderOrLotReference()); // BT-17 + 0..1
 

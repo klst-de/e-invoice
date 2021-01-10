@@ -395,7 +395,21 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void setOrderReference(String docRefId);
 	public String getOrderReference();
 
-	// BT-15 Receiving advice reference                                TODO 
+	/**
+	 * Receiving advice reference / Receipt document reference
+	 * <p>
+	 * An identifier of a referenced receiving advice.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-15
+	 * <br>Rule ID: 	 
+	 * <br>Request ID: 	R10, R56
+	 * 
+	 * @param Document reference
+	 */
+	// Referenz auf die Wareneingangsmeldung
+	public void setReceiptReference(String docRefId);
+	public String getReceiptReference();
 	
 	/**
 	 * Despatch advice reference
@@ -409,7 +423,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * 
 	 * @param Document reference
 	 */
-	// Eine Kennung für ein referenziertes Lieferavis
+	// Lieferavisreferenz
 	public void setDespatchAdviceReference(String docRefId);
 	public String getDespatchAdviceReference();
 	

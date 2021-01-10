@@ -43,7 +43,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 	private static final String TESTDIR = "src/test/resources/"; // mit Daten aus xrechnung-1.2.0-testsuite-2018-12-14.zip\instances\
 
 	private File testFile;
-	private CrossIndustryInvoice testDoc;
+	private CoreInvoice testDoc;
 
 	// ctor
 	public CreateCiiXXXInvoice() {
@@ -69,7 +69,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //		cii.setDocumentCurrency(testDoc.getDocumentCurrency());                           ---- verschoben hinter pi
 //		cii.setTaxCurrency(testDoc.getTaxCurrency()); // BT-6 + 0..1 (optional)
 		cii.setBuyerReference(testDoc.getBuyerReferenceValue()); // BT-10 + 0..1 (optional)
-		String projectReferenceName = CrossIndustryInvoice.getProjectReferenceName(testDoc);
+		String projectReferenceName = CrossIndustryInvoice.getProjectReferenceName((CrossIndustryInvoice)testDoc);
 		cii.setProjectReference(testDoc.getProjectReference(), projectReferenceName); // BT-11 + 0..1 (optional)
 
 //		makeOptionals(cii);
@@ -169,6 +169,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			}
 		});
 		
+		cii.setReceiptReference(testDoc.getReceiptReference()); // (optional) BT-15
 		cii.setDespatchAdviceReference(testDoc.getDespatchAdviceReference()); // (optional) BT-16
 		cii.setTenderOrLotReference(testDoc.getTenderOrLotReference()); // (optional) BT-17
 		
@@ -270,7 +271,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setStartDate(testDoc.getStartDateAsTimestamp());
 		cii.setEndDate(testDoc.getEndDateAsTimestamp());
 
-        List<ApplicableTradeTax> vbdList = testDoc.getVATBreakDowns();
+        List<ApplicableTradeTax> vbdList = ((CrossIndustryInvoice)testDoc).getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
         	BG23_VatBreakdown vatBreakdown = cii.createVATBreakDown( new Amount(tradeTax.getBasisAmount().get(0).getValue())
@@ -316,7 +317,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 //        cii.setInvoiceTaxInAccountingCurrency(  ...  ist nicht implementiert TODO
 
-        List<TradeLineItem> lines = testDoc.getLines();
+        List<TradeLineItem> lines = ((CrossIndustryInvoice)testDoc).getLines();
         LOG.info("LineGroup starts for "+lines.size() + " lines.");
         lines.forEach(testLine -> {
         	LOG.info("testLine.getTaxCategory() = "+testLine.getTaxCategory() + " , testLine.getTaxRate() = "+testLine.getTaxRate());

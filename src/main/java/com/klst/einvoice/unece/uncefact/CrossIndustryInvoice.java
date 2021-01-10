@@ -207,6 +207,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setPurchaseOrderReference(getPurchaseOrderReference(doc)); // optional BT-13
 		setOrderReference(getOrderReferenceID(doc)); // optional BT-14
 		
+		setReceiptReference(getReceiptReference(doc)); // optional BT-15
 		setDespatchAdviceReference(getDespatchAdviceReference(doc)); // optional BT-16
 
 		addNotes(doc.getExchangedDocument());
@@ -632,7 +633,26 @@ UBL:
 		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
 	}
 	
-	// BT-16 + 0..1 Despatch advice reference / Eine Kennung für ein referenziertes Lieferavis
+	// BT-15 + 0..1 Receiving advice reference / Referenz auf die Wareneingangsmeldung
+	@Override
+	public void setReceiptReference(String docRefId) {
+		if(docRefId==null) return; // optional
+		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
+		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
+		
+		applicableHeaderTradeDelivery.setReceivingAdviceReferencedDocument(referencedDocument);
+	}
+	@Override
+	public String getReceiptReference() {
+		return getReceiptReference(this);
+	}
+	static String getReceiptReference(CrossIndustryInvoiceType doc) {
+		HeaderTradeDeliveryType headerTradeDelivery = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
+		ReferencedDocumentType referencedDocument = headerTradeDelivery.getReceivingAdviceReferencedDocument();
+		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
+	}
+
+	// BT-16 + 0..1 Despatch advice reference / Lieferavisreferenz
 	@Override
 	public void setDespatchAdviceReference(String docRefId) {
 		if(docRefId==null) return; // optional

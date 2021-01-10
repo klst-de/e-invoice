@@ -478,9 +478,24 @@ UBL:
 		return orderRef.getSalesOrderID()==null? null : orderRef.getSalesOrderID().getValue();
 	}
 
-	// BT-15 + 0..1 Receiving advice reference
+	// BT-15 + 0..1 Receiving advice reference / Referenz auf die Wareneingangsmeldung
+	@Override
+	public void setReceiptReference(String docRefId) {
+		if(docRefId==null) return; // optional
+		DocumentReferenceType documentReference = new DocumentReferenceType();
+		documentReference.setID(new ID(docRefId));
+		List<DocumentReferenceType> documentReferenceList = isInvoiceType ? invoice.getReceiptDocumentReference() : creditNote.getReceiptDocumentReference();
+		documentReferenceList.add(documentReference);
+	}
+
+	@Override
+	public String getReceiptReference() {
+		List<DocumentReferenceType> documentReferenceList = isInvoiceType ? invoice.getReceiptDocumentReference() : creditNote.getReceiptDocumentReference();
+		if(documentReferenceList.isEmpty()) return null;
+		return documentReferenceList.get(0).getID().getValue();
+	}
 	
-	// BT-16 + 0..1 Despatch advice reference
+	// BT-16 + 0..1 Despatch advice reference / Lieferavisreferenz
 	@Override
 	public void setDespatchAdviceReference(String docRefId) {
 		if(docRefId==null) return; // optional
