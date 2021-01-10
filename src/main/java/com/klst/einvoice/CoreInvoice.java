@@ -610,5 +610,6 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	
 	// INVOICE LINE  BG-25 1..* (mandatory)
 	public void addLine(CoreInvoiceLine line);
+	public List<CoreInvoiceLine> getLines();
 	
 }

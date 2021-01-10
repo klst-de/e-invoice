@@ -1389,18 +1389,18 @@ UBL:
 		}
 	}
 	
-	public List<GenericLine<?>> getLines() {
-		List<GenericLine<?>> resultLines;
+	public List<CoreInvoiceLine> getLines() {
+		List<CoreInvoiceLine> resultLines;
 		if(isInvoiceType) {
 			List<InvoiceLineType> lines = invoice.getInvoiceLine();
-			resultLines = new ArrayList<GenericLine<?>>(lines.size());
+			resultLines = new ArrayList<CoreInvoiceLine>(lines.size());
 			lines.forEach(line -> {
 				GenericLine<InvoiceLineType> gil = new GenericLine<InvoiceLineType>(line);
 				resultLines.add(gil);
 			});
 		} else {
 			List<CreditNoteLineType> lines = creditNote.getCreditNoteLine();
-			resultLines = new ArrayList<GenericLine<?>>(lines.size());
+			resultLines = new ArrayList<CoreInvoiceLine>(lines.size());
 			lines.forEach(line -> {
 				GenericLine<CreditNoteLineType> gil = new GenericLine<CreditNoteLineType>(line);
 				resultLines.add(gil);

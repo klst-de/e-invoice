@@ -1545,9 +1545,9 @@ Code Codename
 		});
 	}
 
-	public List<TradeLineItem> getLines() {
+	public List<CoreInvoiceLine> getLines() {
 		List<SupplyChainTradeLineItemType> lines = supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem();
-		List<TradeLineItem> resultLines = new ArrayList<TradeLineItem>(lines.size());
+		List<CoreInvoiceLine> resultLines = new ArrayList<CoreInvoiceLine>(lines.size());
 		lines.forEach(line -> {
 			resultLines.add(new TradeLineItem(line));
 		});
