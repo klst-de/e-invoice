@@ -317,7 +317,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 
 //        cii.setInvoiceTaxInAccountingCurrency(  ...  ist nicht implementiert TODO
 
-        List<TradeLineItem> lines = ((CrossIndustryInvoice)testDoc).getLines();
+        List<CoreInvoiceLine> lines = testDoc.getLines();
         LOG.info("LineGroup starts for "+lines.size() + " lines.");
         lines.forEach(testLine -> {
         	LOG.info("testLine.getTaxCategory() = "+testLine.getTaxCategory() + " , testLine.getTaxRate() = "+testLine.getTaxRate());

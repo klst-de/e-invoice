@@ -362,7 +362,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	void makeLineGroup(CoreInvoice ublDoc, GenericInvoice<?> testDoc) {
 		List<?> list = testDoc.getLines();
 		LOG.info("LineGroup started for "+list.size() + " lines. testDoc ist "+testDoc.getClass());
-		List<GenericLine<?>> testLines = testDoc.getLines();
+		List<CoreInvoiceLine> testLines = testDoc.getLines();
 		testLines.forEach(testLine -> {
 			CoreInvoiceLine targetLine;
 			if(testDoc.get() instanceof InvoiceType) {
