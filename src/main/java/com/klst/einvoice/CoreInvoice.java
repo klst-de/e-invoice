@@ -337,7 +337,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * The identification of the project the invoice refers to
 	 * <p>
 	 * Cardinality: 0..1 (optional)
-	 * <br>EN16931-ID: 	BT-11
+	 * <br>EN16931-ID: 	BT-11, (Projektname BT-11-0)
 	 * <br>Rule ID: 	
 	 * <br>Request ID: 	R44
 	 * 
@@ -345,7 +345,8 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 */
 	public void setProjectReference(String id);
 	public void setProjectReference(String id, String name); // name nur in CII Beispielen 05 13 15
-	public String getProjectReference();
+	public void setProjectReference(Reference ref);
+	public Reference getProjectReference();
 	
 	/**
 	 * Contract reference

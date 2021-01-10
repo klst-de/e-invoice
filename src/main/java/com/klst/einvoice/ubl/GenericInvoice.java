@@ -26,6 +26,7 @@ import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentCardFactory;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.Reference;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
@@ -351,11 +352,16 @@ UBL:
 
  */
 	@Override
+	public void setProjectReference(Reference ref) {
+		if(ref==null) return; // optional
+		setProjectReference(ref.getID(), ref.getName());
+	}
+	@Override
 	public void setProjectReference(String id) {
 		setProjectReference(id, null);
 	}
 	@Override
-	public void setProjectReference(String id, String name) {
+	public void setProjectReference(String id, String name) { // Name wird nicht genutzt
 		if(id==null) return; // optional
 		ProjectReferenceType projectReference = new ProjectReferenceType();
 		projectReference.setID(new ID(id));
@@ -367,10 +373,12 @@ UBL:
 	}
 
 	@Override
-	public String getProjectReference() {
+	public Reference getProjectReference() {
 		// creditNote.getProjectReference() undefined
 		List<ProjectReferenceType> list = isInvoiceType ? invoice.getProjectReference() : new ArrayList<ProjectReferenceType>();
-		return list.isEmpty() ? null : list.get(0).getID().getValue(); // wg. 0..1
+		if(list.isEmpty()) return null; // wg. 0..1
+		IDType id = list.get(0).getID();
+		return new ID("", id.getValue());
 	}
 	
 	// BT-12 + 0..1 Contract reference

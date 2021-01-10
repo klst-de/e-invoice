@@ -24,6 +24,7 @@ import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentCardFactory;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.Reference;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -195,8 +196,8 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		}
 		
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional BT-10
-		setProjectReference(getProjectReference(doc), getProjectReferenceName(doc)); // optional BT-11
-		setContractReference(getContractReferenceID(doc)); // optional
+		setProjectReference(getProjectReference(doc)); // optional BT-11
+		setContractReference(getContractReferenceID(doc)); // optional BT-12
 		
 		List<ReferencedDocument> additionalReferencedDocuments = getReferencedDocuments(doc);
 		additionalReferencedDocuments.forEach(rd -> {
@@ -517,6 +518,11 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	
 	// BT-11 + 0..1 Project reference
 	@Override
+	public void setProjectReference(Reference ref) {
+		if(ref==null) return; // optional
+		setProjectReference(ref.getID(), ref.getName());
+	}
+	@Override
 	public void setProjectReference(String docRefId) {
 		setProjectReference(docRefId, null);
 	}
@@ -536,19 +542,15 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	}
 
 	@Override
-	public String getProjectReference() {
+	public Reference getProjectReference() {
 		return getProjectReference(this);
 	}
-	static String getProjectReference(CrossIndustryInvoiceType doc) {
+	static Reference getProjectReference(CrossIndustryInvoiceType doc) {
 		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		ProcuringProjectType referencedDocument = headerTradeAgreement.getSpecifiedProcuringProject();
-		return referencedDocument==null ? null : (referencedDocument.getID()==null? null : referencedDocument.getID().getValue());	
-	}
-	// public wg. test
-	public static String getProjectReferenceName(CrossIndustryInvoiceType doc) {
-		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		ProcuringProjectType referencedDocument = headerTradeAgreement.getSpecifiedProcuringProject();
-		return referencedDocument==null ? null : (referencedDocument.getName()==null? null : referencedDocument.getName().getValue());	
+		if(referencedDocument==null) return null;
+		return new ID(referencedDocument.getName()==null ? "" : referencedDocument.getName().getValue()
+				, referencedDocument.getID()==null ? null : referencedDocument.getID().getValue());	
 	}
 
 	// BT-12 + 0..1 Contract reference

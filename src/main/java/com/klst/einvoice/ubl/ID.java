@@ -1,10 +1,11 @@
 package com.klst.einvoice.ubl;
 
 import com.klst.einvoice.Identifier;
+import com.klst.einvoice.Reference;
 
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 
-public class ID extends IDType implements Identifier {
+public class ID extends IDType implements Identifier, Reference {
 
 	ID(String content, String schemeID, String schemeVersionID) {
 		super();

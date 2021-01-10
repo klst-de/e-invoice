@@ -22,6 +22,7 @@ import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
+import com.klst.einvoice.Reference;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.ApplicableHeaderTradeSettlement;
 import com.klst.einvoice.unece.uncefact.ApplicableTradeTax;
@@ -69,8 +70,11 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //		cii.setDocumentCurrency(testDoc.getDocumentCurrency());                           ---- verschoben hinter pi
 //		cii.setTaxCurrency(testDoc.getTaxCurrency()); // BT-6 + 0..1 (optional)
 		cii.setBuyerReference(testDoc.getBuyerReferenceValue()); // BT-10 + 0..1 (optional)
-		String projectReferenceName = CrossIndustryInvoice.getProjectReferenceName((CrossIndustryInvoice)testDoc);
-		cii.setProjectReference(testDoc.getProjectReference(), projectReferenceName); // BT-11 + 0..1 (optional)
+
+		Reference projRef = testDoc.getProjectReference();
+		if(projRef!=null) {
+			cii.setProjectReference(projRef.getID(), projRef.getName()); // optional BT-11
+		}
 
 //		makeOptionals(cii);
 		cii.setContractReference(testDoc.getContractReference()); // BT-12 + 0..1

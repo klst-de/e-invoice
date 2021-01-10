@@ -1,6 +1,7 @@
 package com.klst.einvoice.unece.uncefact;
 
 import com.klst.einvoice.Identifier;
+import com.klst.einvoice.Reference;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 
@@ -12,7 +13,7 @@ Scheme identifier         : Conditional 	String         | GLN
 Scheme version identifier : Conditional 	String         | 1.0
  
  */
-public class ID extends IDType implements Identifier {
+public class ID extends IDType implements Identifier, Reference {
 
 	public ID(String content, String schemeID, String schemeVersionID) {
 		super();

@@ -203,6 +203,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 
 	void makeOptionals(CoreInvoice ublInvoice, GenericInvoice<?> testDoc) {	
+		LOG.info("testDoc.ProjectReference="+
+				(testDoc.getProjectReference()==null ? "null" : testDoc.getProjectReference().getID()));
 		ublInvoice.setProjectReference(testDoc.getProjectReference()); // BT-11 + 0..1
 		ublInvoice.setContractReference(testDoc.getContractReference()); // BT-12 + 0..1
 		ublInvoice.setPurchaseOrderReference(testDoc.getPurchaseOrderReference()); // BT-13 + 0..1
