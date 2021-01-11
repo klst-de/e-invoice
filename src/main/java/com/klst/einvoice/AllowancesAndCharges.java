@@ -274,6 +274,14 @@ oder einen Code des Grundes für den Zuschlag auf Dokumentenebene (BT-105) haben
 	/*
 
 . Codeliste: UNTDID 7161 Vollständige Liste
+AA    Advertising
+AAA   Telecommunication
+AAC   Technical modification
+...
+ABL   Additional packaging
+...
+ZZZ   Mutually defined
+
 . Codeliste: UNTDID 5189 Eingeschränkt
 Include PEPPOL subset:
 41 - Bonus for works ahead of schedule
