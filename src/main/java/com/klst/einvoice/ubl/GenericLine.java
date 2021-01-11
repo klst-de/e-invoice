@@ -366,7 +366,19 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	// BG-29.BT-146 +++ 1..1 Item net price
 	@Override
 	public UnitPriceAmount getUnitPriceAmount() {
-		PriceAmountType priceAmount = isInvoiceLineType ? iLine.getPrice().getPriceAmount() : cnLine.getPrice().getPriceAmount();
+		PriceType price = isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice();
+		//BT-146 +++ 1..1 Item net price , Unit price amount
+		PriceAmountType priceAmount = price.getPriceAmount();
+		List<AllowanceChargeType> allowanceChargeList = price.getAllowanceCharge();
+		List<AllowancesAndCharges> allowancesCharges = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
+		allowanceChargeList.forEach(doc -> {
+			allowancesCharges.add(new AllowanceCharge(doc));
+		});
+		if(!allowancesCharges.isEmpty()) {
+			// ein setter ist nicht spezifiziert
+			LOG.info("TODO Price allowancesCharges "+allowancesCharges.size());
+		}
+		
 		return new UnitPriceAmount(priceAmount.getCurrencyID(), priceAmount.getValue());
 	}
 
@@ -410,6 +422,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	@Override
 	public Quantity getBaseQuantity() {
 		BaseQuantityType baseQuantity = isInvoiceLineType ? iLine.getPrice().getBaseQuantity() : cnLine.getPrice().getBaseQuantity();
+		if(baseQuantity==null) return null;
 		String unit = baseQuantity.getUnitCode();
 		return baseQuantity==null ? null : (unit==null ? new Quantity(baseQuantity.getValue()) : new Quantity(unit, baseQuantity.getValue()));
 	}

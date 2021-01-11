@@ -30,6 +30,7 @@ import com.klst.einvoice.ubl.TaxSubtotal;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
+import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.marshaller.UblCreditNoteTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -377,15 +378,14 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makeLineGroup(CoreInvoice ublDoc, GenericInvoice<?> testDoc) {
-		List<?> list = testDoc.getLines();
-		LOG.info("LineGroup started for "+list.size() + " lines. testDoc ist "+testDoc.getClass());
 		List<CoreInvoiceLine> testLines = testDoc.getLines();
+		LOG.info("LineGroup started for "+testLines.size() + " lines. testDoc ist "+testDoc.getClass());
 		testLines.forEach(testLine -> {
 			CoreInvoiceLine targetLine;
 			if(testDoc.get() instanceof InvoiceType) {
 				targetLine = GenericLine.createInvoiceLine(testLine.getId(), 
-						testLine.getQuantity(), 
-						testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), 
+						testLine.getQuantity(),                                       // BT-129
+						testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), // BT-131 , BG-29.BT-146 
 						testLine.getItemName(),
 						testLine.getTaxCategory(), testLine.getTaxRate()
 						);
@@ -400,8 +400,16 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			
 			// opt:
 			targetLine.setBuyerAccountingReference(testLine.getBuyerAccountingReference()); // BG-26.BT-133
-			targetLine.setStartDate(testLine.getStartDateAsTimestamp()); // optional
-			targetLine.setEndDate(testLine.getEndDateAsTimestamp()); // optional
+			targetLine.setStartDate(testLine.getStartDateAsTimestamp()); // optional BG-26
+			targetLine.setEndDate(testLine.getEndDateAsTimestamp());     // optional BG-26
+			
+			// BG-29:BT-149-0 0..1 , BT-150-0
+			Quantity baseQuantity = testLine.getBaseQuantity();
+			if(baseQuantity!=null) {
+				LOG.info("PRICE DETAILS BG-29.BT-149 + BT-150 baseQuantity "+baseQuantity);
+				// BG-29.BT-146 + BG-29:BT-149-0 0..1 , BT-150-0
+				targetLine.setUnitPriceAmountAndQuantity(testLine.getUnitPriceAmount(), baseQuantity);
+			}
 			
 			List<AllowancesAndCharges> allowancesAndCharges = testLine.getAllowancesAndCharges();
 			LOG.info("(optional) line AllowancesAndCharges #:"+allowancesAndCharges.size());
@@ -425,8 +433,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			});
 			
         	targetLine.setNote(testLine.getNote());   	
-			targetLine.setLineObjectIdentifier(
-					testLine.getLineObjectIdentifier()); // opt BT-128
+			targetLine.setLineObjectIdentifier(testLine.getLineObjectIdentifier()); // opt BT-128
         	targetLine.setOrderLineID(testLine.getOrderLineID());
         	
 			ublDoc.addLine(targetLine);
