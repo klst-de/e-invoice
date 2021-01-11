@@ -153,8 +153,32 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				testDoc.getDuePayable());
 		
 		Amount invoiceTaxAmount =  testDoc.getInvoiceTax();
+        Amount invoiceTaxIAAmount = testDoc.getInvoiceTaxInAccountingCurrency();
+    	boolean sameCurrency = false;
+    	if(testDoc.getTaxCurrency()==null || testDoc.getDocumentCurrency().equals(testDoc.getTaxCurrency())) {
+    		sameCurrency = true;
+    	}
+    	if(sameCurrency) { 
+        	LOG.info("            VAT+doc same currency       "+testDoc.getDocumentCurrency());
+    	} else {
+        	LOG.info("            VAT+doc diff currency   VAT "+testDoc.getTaxCurrency()+" / Doc "+testDoc.getDocumentCurrency());    		
+    	}
     	LOG.info("----------------------InvoiceTax amount "+invoiceTaxAmount);
-        Amount invoiceATAmount = testDoc.getAllowancesTotal();
+    	LOG.info("--InvoiceTaxInAccountingCurrency amount "+invoiceTaxIAAmount);
+    	if(sameCurrency) {
+    		ublInvoice.setInvoiceTax(invoiceTaxAmount);
+    	} else {
+    		// Bsp. 02.01a:
+    		//  <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
+    		//  <cbc:TaxCurrencyCode>GBP</cbc:TaxCurrencyCode>
+    		// Bsp. ubl-tc434-example5.xml
+    	    //	<cbc:DocumentCurrencyCode>DKK</cbc:DocumentCurrencyCode>
+    	    //	<cbc:TaxCurrencyCode>EUR</cbc:TaxCurrencyCode>
+    		ublInvoice.setInvoiceTax(invoiceTaxAmount);   	
+            ublInvoice.setInvoiceTaxInAccountingCurrency(invoiceTaxIAAmount);
+    	}
+
+    	Amount invoiceATAmount = testDoc.getAllowancesTotal();
     	LOG.info("-----------------AllowancesTotal amount "+invoiceATAmount);
     	if(invoiceATAmount!=null) {
     		ublInvoice.setAllowancesTotal(invoiceATAmount);
@@ -168,16 +192,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
     	LOG.info("------------------------Rounding amount "+invoiceRoundingAmount);
     	if(invoiceRoundingAmount!=null) {
     		ublInvoice.setRounding(invoiceRoundingAmount);
-    	}
-        Amount invoiceTaxIAAmount = testDoc.getInvoiceTaxInAccountingCurrency();
-    	LOG.info("--InvoiceTaxInAccountingCurrency amount "+invoiceTaxIAAmount);
-    	if(invoiceTaxAmount==null) {
-    		// wie im Bsp. 02.01a
-    		ublInvoice.setInvoiceTax(new Amount(testDoc.getDocumentCurrency(), invoiceTaxIAAmount.getValue()));   	
-            ublInvoice.setInvoiceTaxInAccountingCurrency(invoiceTaxIAAmount);
-    	} else {
-    		ublInvoice.setInvoiceTax(invoiceTaxAmount);
-    	}
+    	} 
 		
 		LOG.info("(optional) getPrepaid="+testDoc.getPrepaid());	
 		ublInvoice.setPrepaid(testDoc.getPrepaid());

@@ -1118,7 +1118,7 @@ UBL:
 		return new Amount(amount.getCurrencyID(), amount.getValue());		
 	}
 	
-	// BG-22.BT-110/BT-111
+	// 0..1 BG-22.BT-110/BT-111
 	@Override
 	public void setInvoiceTax(Amount amount) {
 		TaxAmountType taxAmount = new TaxAmountType();
@@ -1130,16 +1130,14 @@ UBL:
 	TaxTotalType getTaxTotal(boolean sameCurrency) {
 		List<TaxTotalType> list = isInvoiceType ? invoice.getTaxTotal() : creditNote.getTaxTotal();
 		if(list.isEmpty()) return null;
-		LOG.config("sameCurrency="+sameCurrency + "TaxCurrency="+getTaxCurrency() + " DocumentCurrency="+getDocumentCurrency());
-		for(int i=0; i<list.size(); i++) {
-			TaxTotalType taxTotal = list.get(i);
-			if(sameCurrency && (this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
-				return taxTotal;
-			} else if(!sameCurrency && !(this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
-				return taxTotal;
-			}
+		LOG.config("TaxTotal listsize="+list.size()+ " sameCurrency="+sameCurrency + " TaxCurrency="+getTaxCurrency() + " DocumentCurrency="+getDocumentCurrency());
+		if(sameCurrency && (this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
+			return list.get(0);
+		} else if(!sameCurrency && !(this.getTaxCurrency()==null || this.getDocumentCurrency().equals(this.getTaxCurrency()))) {
+			return list.get(1);
 		}
-		return null;
+		
+		return list.get(0);
 	}
 	Amount getInvoiceTax(boolean sameCurrency) {
 		TaxTotalType taxTotal = getTaxTotal(sameCurrency);
