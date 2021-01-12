@@ -29,7 +29,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Endpoint
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.RegistrationNameType;
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.IdentifierType;
-import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.TextType;
 
 /*
  * PartyName
@@ -50,34 +49,25 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	// copy ctor
 	Party(PartyType party) {
 		this();
-		List<Map<Object,String>> mapList = getPartyLegalEntities(party);
-		Map<Object,String> map = new HashMap<Object,String>();
-		if(mapList.isEmpty()) {
-			LOG.fine("PartyLegalEntities mapList is empty");
-		} else {
-			map = mapList.get(0); // first
-		}
-		
-		this.init(map.get(RegistrationNameType.class)
-				, getPostalAddress(party)
-				, getContact(party)
-				);
-		LOG.fine("copy ctor Name/BT-27,BT-44,BT-59, ...:"+this.getRegistrationName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
-		
-		// BG-4.BT-28 ++ 0..1 Seller trading name / UBL: <cac:PartyName><cbc:Name>
+		LOG.fine("copy ctor (optional)trading name:"+getBusinessName(party) + " Address:"+getPostalAddress(party) + " Contact:"+getContact(party));
+		this.init(getBusinessName(party), getPostalAddress(party), getContact(party));
+		// BG-4.BT-27  1..1 Seller name
+		// BG-7.BT-44  1..1  Buyer name
+		// BG-10.BT-59 1..1  Payee name
+		setRegistrationName(getRegistrationName(party));
+		LOG.config("copy ctor Name:"+getRegistrationName() +" trading name:"+getBusinessName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
+				
+		// BG-4.BT-28 ++ 0..1 Seller trading name
 		// BG-7.BT-45 ++ 0..1 Buyer trading name
-		setBusinessName(getBusinessName(party ));
+//		setBusinessName(getBusinessName(party));
 		
 		// BG-4.BT-29 ++ 0..n Seller identifier
 		// BG-7.BT-46 ++ 0..1 Buyer identifier
-		List<PartyIdentificationType> partyIdentificationList = party.getPartyIdentification();
-		if(!partyIdentificationList.isEmpty()) {
-			setId(partyIdentificationList.get(0).getID().getValue(), partyIdentificationList.get(0).getID().getSchemeID());
-		}
+		setIdentifier(getIdentifier(party));
 		
 		// BG-4.BT-30 0..1 Seller legal registration ID 
 		// BG-7.BT-47 0..1 Buyer legal registration identifier
-		setCompanyId(map.get(CompanyIDType.class), map.get(String.class));
+		setCompanyIdentifier(getCompanyIdentifier(party));
 
 		// 0..n wg. BT-31 Seller VAT identifier, BT-32 Seller tax registration identifier, 
 		//          BT-31-0, BT-32-0
@@ -85,7 +75,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		addTaxSchemes(taxSchemesList);
 		
 		// BG-4.BT-33 0..1 additional legal info / not used for Buyer
-		setCompanyLegalForm(map.get(CompanyLegalFormType.class));
+		setCompanyLegalForm(getCompanyLegalForm(party));
 		
 		// BG-4.BT-34 ++ 0..1 Seller electronic address
 		// BG-7.BT-49 ++ 0..1 Buyer electronic address
@@ -113,7 +103,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	
 	void init(String name, PostalAddress address, IContact contact) {
 		partyLegalEntity = new PartyLegalEntityType();
-		setRegistrationName(name);
+		this.setBusinessName(name);
 		setAddress(address);
 		setIContact(contact);
 	}
@@ -202,18 +192,18 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		}
 	}
 	// wg copy ctor
-	void addTaxSchemes(List<Map<Object,String>> partyTaxSchemes)  {
+	private void addTaxSchemes(List<Map<Object,String>> partyTaxSchemes)  {
 		partyTaxSchemes.forEach(partyTaxScheme -> {
 			String taxScheme = partyTaxScheme==null ? null : partyTaxScheme.get(TaxSchemeType.class);
 			String companyId = partyTaxScheme==null ? null : partyTaxScheme.get(CompanyIDType.class);
 			setTaxRegistrationId(companyId, taxScheme);
 		});
 	}
-	public List<Map<Object,String>> getTaxSchemes() { 
+	private List<Map<Object,String>> getTaxSchemes() { 
 		return getTaxSchemes(this);
 	}
 	// wg copy ctor
-	static List<Map<Object,String>> getTaxSchemes(PartyType party) { 
+	private static List<Map<Object,String>> getTaxSchemes(PartyType party) { 
 //		LOG.info("party:"+party);
 		List<PartyTaxSchemeType> partyTaxSchemes = party.getPartyTaxScheme();
 		List<Map<Object,String>> resultList = new ArrayList<Map<Object,String>>(partyTaxSchemes.size());
@@ -234,66 +224,72 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		return resultList;
 	}
 
-	/**
-	 * add LegalEntities for seller or buyer party or delivery party
-	 * 
-	 * @param registrationName mandatory, BT-27/BT-44
-	 * @param companyId optional / legal registration identifier, BT-30/BT-45
-	 * @param companyLegalForm optional / additional legal information, BT-33/BT-46
-	 */
-	void addLegalEntities(String registrationName, String companyId, String companyLegalForm)  {
-		setRegistrationName(registrationName);
-		setCompanyId(companyId);
-		setCompanyLegalForm(companyLegalForm);
-	}
-	
-	void addLegalEntities(List<Map<Object,String>> legalEntityList)  {
-		legalEntityList.forEach(legalEntity -> {
-			String registrationName = legalEntity==null ? null : legalEntity.get(RegistrationNameType.class);
-			String companyId = legalEntity==null ? null : legalEntity.get(CompanyIDType.class);
-			String companyLegalForm = legalEntity==null ? null : legalEntity.get(CompanyLegalFormType.class);
-			addLegalEntities(registrationName, companyId, companyLegalForm);
-		});
-	}
-
-	String getObject(Object clazz) {
-		List<Map<Object,String>> mapList = getPartyLegalEntities(this);
-		if(mapList.isEmpty()) {
-			LOG.fine("getObject: PartyLegalEntities mapList is empty");
-			return null;
-		} else {
-			Map<Object,String> map = mapList.get(0); // first
-			return map.get(clazz);
-		}
-	}
-	static List<Map<Object,String>> getPartyLegalEntities(PartyType party) { 
-		List<PartyLegalEntityType> partyLegalEntities = party.getPartyLegalEntity();
-		List<Map<Object,String>> result = new ArrayList<Map<Object,String>>(partyLegalEntities.size());
-		partyLegalEntities.forEach(partyLegalEntity -> {
-			Map<Object,String> map = new HashMap<Object,String>();
-			RegistrationNameType registrationName = partyLegalEntity.getRegistrationName();
-			String name = registrationName==null ? null : registrationName.getValue();
-			map.put(RegistrationNameType.class, name);
-			
-			CompanyIDType companyID = partyLegalEntity.getCompanyID();
-			String companyIDvalue = companyID==null ? null : companyID.getValue();
-//			Identifier companyIdentifier = companyID==null ? null : new ID(companyID.getValue(), companyID.getSchemeID());
-			map.put(CompanyIDType.class, companyIDvalue);
-			String companyIDschema = companyID==null ? null : companyID.getSchemeID();
-			map.put(String.class, companyIDschema);
-			
-			TextType companyLegalForm = partyLegalEntity.getCompanyLegalForm();
-			String companyLegalFormValue = companyLegalForm==null ? null : companyLegalForm.getValue();
-			map.put(CompanyLegalFormType.class, companyLegalFormValue);	
-			result.add(map);
-		});
-		return result;
-	}
+//	/**
+//	 * add LegalEntities for seller or buyer party or delivery party
+//	 * 
+//	 * @param registrationName mandatory, BT-27/BT-44
+//	 * @param companyId optional / legal registration identifier, BT-30/BT-45
+//	 * @param companyLegalForm optional / additional legal information, BT-33/BT-46
+//	 */
+//	private void addLegalEntities(String registrationName, String companyId, String companyLegalForm)  {
+//		setRegistrationName(registrationName);
+//		setCompanyId(companyId);
+//		setCompanyLegalForm(companyLegalForm);
+//	}
+//	
+//	private void addLegalEntities(List<Map<Object,String>> legalEntityList)  {
+//		legalEntityList.forEach(legalEntity -> {
+//			String registrationName = legalEntity==null ? null : legalEntity.get(RegistrationNameType.class);
+//			String companyId = legalEntity==null ? null : legalEntity.get(CompanyIDType.class);
+//			String companyLegalForm = legalEntity==null ? null : legalEntity.get(CompanyLegalFormType.class);
+//			addLegalEntities(registrationName, companyId, companyLegalForm);
+//		});
+//	}
+//
+//	private String getObject(Object clazz) {
+//		List<Map<Object,String>> mapList = getPartyLegalEntities(this);
+//		if(mapList.isEmpty()) {
+//			LOG.fine("getObject: PartyLegalEntities mapList is empty");
+//			return null;
+//		} else {
+//			Map<Object,String> map = mapList.get(0); // first
+//			return map.get(clazz);
+//		}
+//	}
+//	private static List<Map<Object,String>> getPartyLegalEntities(PartyType party) { 
+//		List<PartyLegalEntityType> partyLegalEntities = party.getPartyLegalEntity();
+//		List<Map<Object,String>> result = new ArrayList<Map<Object,String>>(partyLegalEntities.size());
+//		partyLegalEntities.forEach(partyLegalEntity -> {
+//			Map<Object,String> map = new HashMap<Object,String>();
+//			RegistrationNameType registrationName = partyLegalEntity.getRegistrationName();
+//			String name = registrationName==null ? null : registrationName.getValue();
+//			map.put(RegistrationNameType.class, name);
+//			
+//			CompanyIDType companyID = partyLegalEntity.getCompanyID();
+//			String companyIDvalue = companyID==null ? null : companyID.getValue();
+////			Identifier companyIdentifier = companyID==null ? null : new ID(companyID.getValue(), companyID.getSchemeID());
+//			map.put(CompanyIDType.class, companyIDvalue);
+//			String companyIDschema = companyID==null ? null : companyID.getSchemeID();
+//			map.put(String.class, companyIDschema);
+//			
+//			TextType companyLegalForm = partyLegalEntity.getCompanyLegalForm();
+//			String companyLegalFormValue = companyLegalForm==null ? null : companyLegalForm.getValue();
+//			map.put(CompanyLegalFormType.class, companyLegalFormValue);	
+//			result.add(map);
+//		});
+//		return result;
+//	}
 // ----------------------------------------
 
 	@Override
 	public String getRegistrationName() {
-		return getObject(RegistrationNameType.class);
+		return getRegistrationName(this);
+	}
+	static String getRegistrationName(PartyType party) {
+		List<PartyLegalEntityType> partyLegalEntityList = party.getPartyLegalEntity();
+		if(partyLegalEntityList.isEmpty()) return null;
+		RegistrationNameType registrationName = partyLegalEntityList.get(0).getRegistrationName();
+		return registrationName==null ? null : registrationName.getValue();
 	}
 
 	@Override
@@ -307,8 +303,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	@Override
 	public String getBusinessName() {
-		List<PartyNameType> partyNameList = super.getPartyName();
-		return partyNameList.isEmpty() ? null : partyNameList.get(0).getName().getValue();
+		return getBusinessName(this);
 	}
 	static String getBusinessName(PartyType party) {
 		List<PartyNameType> partyNameList = party.getPartyName();
@@ -332,13 +327,17 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 	@Override
 	public Identifier getIdentifier() {
-		List<PartyIdentificationType> partyIdentificationList = super.getPartyIdentification();
+		return getIdentifier(this);
+	}
+	static Identifier getIdentifier(PartyType party) {
+		List<PartyIdentificationType> partyIdentificationList = party.getPartyIdentification();
 		return partyIdentificationList.isEmpty() ? null 
 				: new ID(partyIdentificationList.get(0).getID().getValue(), partyIdentificationList.get(0).getID().getSchemeID());
 	}
 
 	@Override
 	public void setIdentifier(Identifier id) {
+		if(id==null) return;
 		setId(id.getContent(), id.getSchemeIdentifier());
 	}
 	
@@ -357,13 +356,19 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	@Override
 	public String getCompanyId() {
-		return getObject(CompanyIDType.class);
+		Identifier id = getCompanyIdentifier();
+		return id==null? null : id.getContent();
 	}
 	
 	@Override
 	public Identifier getCompanyIdentifier() {
-		// TODO
-		return null;
+		return getCompanyIdentifier(this);
+	}
+	static Identifier getCompanyIdentifier(PartyType party) {
+		List<PartyLegalEntityType> partyLegalEntityList = party.getPartyLegalEntity();
+		if(partyLegalEntityList.isEmpty()) return null;
+		CompanyIDType companyID = partyLegalEntityList.get(0).getCompanyID();
+		return companyID==null ? null : new ID(companyID.getValue(), companyID.getSchemeID());
 	}
 
 	@Override
@@ -373,6 +378,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	@Override
 	public void setCompanyIdentifier(Identifier id) {
+		if(id==null) return;
 		setCompanyId(id.getContent(), id.getSchemeIdentifier());
 	}
 
@@ -453,7 +459,13 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	@Override
 	public String getCompanyLegalForm() {
-		return getObject(CompanyLegalFormType.class);
+		return getCompanyLegalForm(this);
+	}
+	static String getCompanyLegalForm(PartyType party) {
+		List<PartyLegalEntityType> partyLegalEntityList = party.getPartyLegalEntity();
+		if(partyLegalEntityList.isEmpty()) return null;
+		CompanyLegalFormType companyLegalForm = partyLegalEntityList.get(0).getCompanyLegalForm();
+		return companyLegalForm==null ? null : companyLegalForm.getValue();
 	}
 
 	@Override

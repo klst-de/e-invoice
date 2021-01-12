@@ -244,15 +244,22 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		if(payeeParty!=null) { // BT-61 ++ 0..1 Payee legal registration identifier
 			LOG.info("BT-59 Payee.BusinessName (aka Name):"+payeeParty.getBusinessName() // BT-59
 				+ " Payee.Id:"+payeeParty.getId()                                        // BT-60 (ohne schema)
-				+ " Payee.CompanyId:"+payeeParty.getCompanyId()
+				+ " Payee.CompanyId:"+payeeParty.getCompanyId()                          // BT-61
 				+ " Payee.CompanyLegalForm:"+payeeParty.getCompanyLegalForm() 
 				+ " Payee.RegistrationName:"+payeeParty.getRegistrationName() 
 				);
 			Identifier payeePartyId = payeeParty.getIdentifier();
-			ublInvoice.setPayee(payeeParty.getBusinessName() // BT-59
-					, payeeParty.getId()                     // BT-60 (ohne schema)
-					, payeeParty.getCompanyId()              // BT-61 (ohne schema)
-					);
+			if(payeePartyId!=null && payeePartyId.getSchemeIdentifier()!=null) {
+				BusinessParty payee = ublInvoice.createParty(payeeParty.getBusinessName(), null, null);  // BT-59
+				payee.setIdentifier(payeePartyId); // BT-60 mit schema
+				payee.setCompanyIdentifier(payeeParty.getCompanyIdentifier());
+				ublInvoice.setPayee(payee);
+			} else {
+				ublInvoice.setPayee(payeeParty.getBusinessName() // BT-59
+						, payeeParty.getId()                     // BT-60 (ohne schema)
+						, payeeParty.getCompanyId()              // BT-61 (ohne schema)
+						);
+			}
 		}
 		ublInvoice.setTaxRepresentative(testDoc.getTaxRepresentative());
 		ublInvoice.setStartDate(testDoc.getStartDateAsTimestamp());
