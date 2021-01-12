@@ -501,7 +501,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	// BG-9 ++ 0..1 BUYER CONTACT @see IContact
 	
 	// BG-10 + 0..1 PAYEE
-	public void setPayee(String name, String id, String companyLegalForm);
+	public void setPayee(String name, String id, String companyId);
 	public void setPayee(BusinessParty party);
 	public BusinessParty getPayee();
 	

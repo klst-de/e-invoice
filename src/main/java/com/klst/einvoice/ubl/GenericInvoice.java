@@ -540,7 +540,7 @@ UBL:
 	// BT-18 + 0..1 Invoiced object identifier
 	@Override
 	public void setInvoicedObject(String name, String schemeID) {
-		LOG.warning(NOT_IMPEMENTED);
+		LOG.warning(NOT_IMPEMENTED); // TODO
 	}
 	@Override
 	public void setInvoicedObjectIdentifier(Identifier id) {
@@ -787,11 +787,11 @@ UBL:
 	
 	// BG-10 + 0..1 PAYEE
 	@Override
-	public void setPayee(String name, String id, String companyLegalForm) {
+	public void setPayee(String name, String id, String companyId) {
 		BusinessParty party = createParty(null, null, null);
-		party.setBusinessName(name);  // !!!!!
-		party.setCompanyLegalForm(companyLegalForm);
+		party.setBusinessName(name);
 		party.setId(id);
+		party.setCompanyId(companyId);
 		setPayee(party);
 	}
 	@Override

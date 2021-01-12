@@ -9,20 +9,25 @@ package com.klst.einvoice;
  * <p>
  * Cardinality: 	0..1
  * <br>EN16931-ID: 	BG-10
- * <br>Rule ID: 	
+ * <br>Rule ID:     BR-17	
  * <br>Request ID: 	R1, R57
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for (en)EN_16931_1_2017 rule and request IDs
  */
 
-/*  (de) rules / Geschäftsregel:
+/*   (en) rules
+ * 
+ * BR-17  Target / context: Payee, Business term / group: BT-59
+ * The Payee name (BT-59) shall be provided in the Invoice, if the Payee (BG-10) is different 
+ * from the Seller (BG-4).
+ * 
+ *   (de) rules / Geschäftsregel:
  * 
  * BR-17    : Zahlungsempfänger 
  * Falls der Zahlungsempfänger (BG-10) nicht mit dem Verkäufer (BG-4) identisch ist, 
  * muss seine Firmierung/sein Name in der Rechnung (BT-59) angegeben werden.
  * 
  */
-//TODO Idee runter zu ubl und cii und public raus ?!
 public interface BG10_Payee extends BusinessParty {
 	
 /*
@@ -36,19 +41,36 @@ UBL:
         <cac:PartyIdentification>
             <cbc:ID>74</cbc:ID>
         </cac:PartyIdentification>
-        <cac:PartyName>                                     -- BT-59 TradingBusinessName ??????????????
+        <cac:PartyName>                                     -- BT-59 TradingBusinessName
             <cbc:Name>[Payee name]</cbc:Name>
         </cac:PartyName>
     </cac:PayeeParty>
 
+ubl-tc434-example2.xml:
+    <cac:AccountingSupplierParty>                           -- Seller (BG-4) is different!
+        <cac:Party>
+            <cac:PartyIdentification>
+                <cbc:ID schemeID="0088">1238764941386</cbc:ID>
+            </cac:PartyIdentification>
+...
+            <cac:PartyLegalEntity>
+                <cbc:RegistrationName>Salescompany ltd.</cbc:RegistrationName>
+                <cbc:CompanyID>123456789</cbc:CompanyID>
+            </cac:PartyLegalEntity>
+
+...
+    <cac:PayeeParty>
+        <cac:PartyIdentification>
+            <cbc:ID schemeID="0088">2298740918237</cbc:ID>
+        </cac:PartyIdentification>
+        <cac:PartyName>
+            <cbc:Name>Ebeneser Scrooge AS</cbc:Name>
+        </cac:PartyName>
+        <cac:PartyLegalEntity>
+            <cbc:CompanyID>989823401</cbc:CompanyID>
+        </cac:PartyLegalEntity>
+    </cac:PayeeParty>
+
  */
-	// BT-59 ++ 1..1 Payee name / <ram:Name> / UBL: <cac:PartyName><cbc:Name>
-	// das ist seltsam, dass BusinessName in den Beispielen und auch im Validator verwendet wird
-	// BT-27 ++ 1..1 Seller name / ram:Name / UBL: <cac:PartyLegalEntity><cbc:RegistrationName>
-	// BT-44 ++ 1..1 Buyer name / ram:Name / UBL: <cac:PartyLegalEntity><cbc:RegistrationName>
-	
-	// BT-60 ++ 0..1 Payee identifier / <ram:ID> + <ram:GlobalID> / UBL: <cac:PartyIdentification><cbc:ID>
-	
-	// BT-61 ++ 0..1 Payee legal registration identifier / <ram:SpecifiedLegalOrganization><ram:ID>
 
 }
