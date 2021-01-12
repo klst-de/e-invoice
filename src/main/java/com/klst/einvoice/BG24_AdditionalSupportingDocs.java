@@ -58,15 +58,56 @@ public interface BG24_AdditionalSupportingDocs {
 	public void setSupportingDocumentReference(String id);
 	public String getSupportingDocumentReference();
 	
-	// BT-123 ++ 0..1 Supporting document description
+	/**
+	 * Supporting document description
+	 * <p>
+	 * A description of the supporting document. Such as: timesheet, usage report etc.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>ID: 		BG-24.BT-123
+	 * <br>Rule ID: 	 
+	 * <br>Req.ID: 	R36
+	 * 
+	 * @param text
+	 */
 	public void setSupportingDocumentDescription(String text);
 	public String getSupportingDocumentDescription();
 	
-	// BT-124 ++ 0..1 External document location
+	/**
+	 * External document location
+	 * <p>
+	 * The URL (Uniform Resource Locator) that identifies where the external document is located.
+	 * A means of locating the resource including its primary access mechanism, e.g. http:// or ftp://.
+	 * 
+	 * External document location shall be used if the Buyer requires additional information to support the Invoice.
+	 * External documents do not form part of the invoice. Risks can be involved when accessing external documents.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>ID: 		BG-24.BT-124
+	 * <br>Rule ID: 	 
+	 * <br>Req.ID: 	R36
+	 * 
+	 * @param url
+	 */
 	public void setExternalDocumentLocation(String location);
 	public String getExternalDocumentLocation();
 	
-	// BT-125 ++ 0..1 Attached document
+	/**
+	 * Attached document
+	 * An attached document embedded as binary object or sent together with the invoice.
+	 * 
+	 * Attached document is used when documentation shall be stored with the Invoice 
+	 * for future reference or audit purposes.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>ID: 		BG-24.BT-125
+	 * <br>Rule ID: 	 
+	 * <br>Req.ID:  R35
+	 * 
+	 * @param binary content BT-125
+	 * @param mimeCode BT-125-1 The mime code of the attached document
+	 * @param filename BT-125-2 The file name of the attached document
+	 */
 	public void setAttachedDocument(byte[] doc, String mimeCode, String filename);
 	public byte[] getAttachedDocument();
 	public String getAttachedDocumentMimeCode();

@@ -79,6 +79,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		return documentReference.getID().getValue();
 	}
 
+	// BG.24.BT-123 ++ 0..1 Supporting document description
 	@Override
 	public void setSupportingDocumentDescription(String text) {
 		if(text!=null) {
@@ -96,21 +97,28 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		return documentReference.getDocumentDescription().isEmpty() ? null : documentReference.getDocumentDescription().get(0).getValue();
 	}
 
-	/**
-	 * External document location
-	 * <p>
-	 * The URL (Uniform Resource Locator) that identifies where the external document is located.
-	 * A means of locating the resource including its primary access mechanism, e.g. http:// or ftp://.
-	 * 
-	 * External document location shall be used if the Buyer requires additional information to support the Invoice.
-	 * External documents do not form part of the invoice. Risks can be involved when accessing external documents.
-	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>ID: BT-124
-	 * <br>Req.ID: R36
-	 * 
-	 * @param url
+	/*
+	 * Hinweis: Ein Mittel zur Auffindung der Ressource einschließlich des dafür vorgesehenen primären 
+	 * Zugangsverfahrens, z. B. http:// oder ftp://.
+	 * Der Speicherort des externen Dokuments muss dann verwendet werden, 
+	 * wenn der Käufer weitere Informationen als Belege für die in Rechnung gestellten Beträge benötigt.
+	 * Externe Dokumente sind nicht Bestandteil der Rechnung. 
+	 * Der Zugriff auf externe Dokumente kann gewisse Risiken bergen.
+
+Bsp.: ubl-tc434-example2.xml :
+
+    <cac:AdditionalDocumentReference>
+        <cbc:ID>Doc1</cbc:ID>
+        <cbc:DocumentDescription>Timesheet</cbc:DocumentDescription>
+        <cac:Attachment>
+            <cac:ExternalReference>
+                <cbc:URI>http://www.suppliersite.eu/sheet001.html</cbc:URI>
+            </cac:ExternalReference>
+        </cac:Attachment>
+    </cac:AdditionalDocumentReference>
+
 	 */
+	// BT-124 ++ 0..1 External document location
 	@Override
 	public void setExternalDocumentLocation(String url) {
 		if(url==null) return;
@@ -140,19 +148,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		return uri.getValue();
 	}
 
-	/**
-	 * Attached document
-	 * An attached document embedded as binary object or sent together with the invoice.
-	 * 
-	 * Attached document is used when documentation shall be stored with the Invoice 
-	 * for future reference or audit purposes.
-	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>ID: BT-125
-	 * <br>Req.ID: R35
-	 * 
-	 * @param content BT-125
-	 */
+	// BT-125 ++ 0..1 Attached document
 	@Override
 	public void setAttachedDocument(byte[] content, String mimeCode, String filename) {
 		EmbeddedDocumentBinaryObjectType embeddedDocumentBinaryObject = new EmbeddedDocumentBinaryObjectType();

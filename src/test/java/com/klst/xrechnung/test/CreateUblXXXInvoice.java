@@ -260,8 +260,10 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		asDocList.forEach(asDoc -> {
 			LOG.info("SupportingDocumentReference:"+asDoc.getSupportingDocumentReference() + " MimeCode:"+asDoc.getAttachedDocumentMimeCode());
 			byte[] content = asDoc.getAttachedDocument();
-			if(content==null) { // TODO
-				ublInvoice.addSupportigDocument(asDoc.getSupportingDocumentReference(), asDoc.getSupportingDocumentDescription(), null);
+			if(content==null) {
+				LOG.info("SupportingDocumentDescription:"+asDoc.getSupportingDocumentDescription() 
+					+ " ExternalDocumentLocation:"+asDoc.getExternalDocumentLocation());
+				ublInvoice.addSupportigDocument(asDoc.getSupportingDocumentReference(), asDoc.getSupportingDocumentDescription(), asDoc.getExternalDocumentLocation());
 			} else {
 				ublInvoice.addSupportigDocument(asDoc.getSupportingDocumentReference()
 						, asDoc.getSupportingDocumentDescription()
