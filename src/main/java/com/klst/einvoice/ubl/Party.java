@@ -1,9 +1,7 @@
 package com.klst.einvoice.ubl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.BG10_Payee;
@@ -26,9 +24,9 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxS
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyLegalFormType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EndpointIDType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.RegistrationNameType;
-import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.IdentifierType;
 
 /*
  * PartyName
@@ -71,8 +69,10 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 		// 0..n wg. BT-31 Seller VAT identifier, BT-32 Seller tax registration identifier, 
 		//          BT-31-0, BT-32-0
-		List<Map<Object,String>> taxSchemesList = getTaxSchemes(party);
-		addTaxSchemes(taxSchemesList);
+		List<Identifier> taxIdList = getTaxRegistrationIdentifier(party);
+		taxIdList.forEach(id -> {
+			addTaxRegistrationIdentifier(id);
+		});
 		
 		// BG-4.BT-33 0..1 additional legal info / not used for Buyer
 		setCompanyLegalForm(getCompanyLegalForm(party));
@@ -179,107 +179,18 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	 * 
 	 * @param taxRegistrationId Identifier
 	 */
-	public void setTaxRegistrationId(String taxRegistrationId) {
+	public void setTaxRegistrationId(String taxRegistrationId) { // TODO ==> setVATidentifier
 		if(taxRegistrationId==null) return;
 		// countryCode of the party (which is mandatory) as default prefix , see https://github.com/klst-de/e-invoice/issues/1
 		PostalAddress address = getAddress();
 		String countryCode = address==null ? "??" : address.getCountryCode();
 		if(taxRegistrationId.startsWith(countryCode)) {
-			setTaxRegistrationId(taxRegistrationId, DEFAULT_TAX_SCHEME);
+			addTaxRegistrationId(taxRegistrationId, DEFAULT_TAX_SCHEME);
 		} else {
 			LOG.warning("taxRegistrationId does not start with countryCode:"+taxRegistrationId + " - silently done.");
-			setTaxRegistrationId(countryCode+taxRegistrationId, DEFAULT_TAX_SCHEME);
+			addTaxRegistrationId(countryCode+taxRegistrationId, DEFAULT_TAX_SCHEME);
 		}
 	}
-	// wg copy ctor
-	private void addTaxSchemes(List<Map<Object,String>> partyTaxSchemes)  {
-		partyTaxSchemes.forEach(partyTaxScheme -> {
-			String taxScheme = partyTaxScheme==null ? null : partyTaxScheme.get(TaxSchemeType.class);
-			String companyId = partyTaxScheme==null ? null : partyTaxScheme.get(CompanyIDType.class);
-			setTaxRegistrationId(companyId, taxScheme);
-		});
-	}
-	private List<Map<Object,String>> getTaxSchemes() { 
-		return getTaxSchemes(this);
-	}
-	// wg copy ctor
-	private static List<Map<Object,String>> getTaxSchemes(PartyType party) { 
-//		LOG.info("party:"+party);
-		List<PartyTaxSchemeType> partyTaxSchemes = party.getPartyTaxScheme();
-		List<Map<Object,String>> resultList = new ArrayList<Map<Object,String>>(partyTaxSchemes.size());
-//		LOG.info("partyTaxSchemes#:"+partyTaxSchemes.size() + "== resultList#:"+resultList.size());
-		partyTaxSchemes.forEach(partyTaxScheme -> {
-			Map<Object,String> map = new HashMap<Object,String>();
-			TaxSchemeType taxScheme = partyTaxScheme.getTaxScheme();
-			IdentifierType taxSchemeID = null;
-			if(taxScheme!=null) {
-				taxSchemeID = taxScheme.getID();
-			}	
-			map.put(TaxSchemeType.class, taxSchemeID.getValue());
-			IdentifierType companyID = partyTaxScheme.getCompanyID();
-			map.put(CompanyIDType.class, companyID.getValue());
-			resultList.add(map);
-		});
-//		LOG.info("resultList#:"+resultList.size());
-		return resultList;
-	}
-
-//	/**
-//	 * add LegalEntities for seller or buyer party or delivery party
-//	 * 
-//	 * @param registrationName mandatory, BT-27/BT-44
-//	 * @param companyId optional / legal registration identifier, BT-30/BT-45
-//	 * @param companyLegalForm optional / additional legal information, BT-33/BT-46
-//	 */
-//	private void addLegalEntities(String registrationName, String companyId, String companyLegalForm)  {
-//		setRegistrationName(registrationName);
-//		setCompanyId(companyId);
-//		setCompanyLegalForm(companyLegalForm);
-//	}
-//	
-//	private void addLegalEntities(List<Map<Object,String>> legalEntityList)  {
-//		legalEntityList.forEach(legalEntity -> {
-//			String registrationName = legalEntity==null ? null : legalEntity.get(RegistrationNameType.class);
-//			String companyId = legalEntity==null ? null : legalEntity.get(CompanyIDType.class);
-//			String companyLegalForm = legalEntity==null ? null : legalEntity.get(CompanyLegalFormType.class);
-//			addLegalEntities(registrationName, companyId, companyLegalForm);
-//		});
-//	}
-//
-//	private String getObject(Object clazz) {
-//		List<Map<Object,String>> mapList = getPartyLegalEntities(this);
-//		if(mapList.isEmpty()) {
-//			LOG.fine("getObject: PartyLegalEntities mapList is empty");
-//			return null;
-//		} else {
-//			Map<Object,String> map = mapList.get(0); // first
-//			return map.get(clazz);
-//		}
-//	}
-//	private static List<Map<Object,String>> getPartyLegalEntities(PartyType party) { 
-//		List<PartyLegalEntityType> partyLegalEntities = party.getPartyLegalEntity();
-//		List<Map<Object,String>> result = new ArrayList<Map<Object,String>>(partyLegalEntities.size());
-//		partyLegalEntities.forEach(partyLegalEntity -> {
-//			Map<Object,String> map = new HashMap<Object,String>();
-//			RegistrationNameType registrationName = partyLegalEntity.getRegistrationName();
-//			String name = registrationName==null ? null : registrationName.getValue();
-//			map.put(RegistrationNameType.class, name);
-//			
-//			CompanyIDType companyID = partyLegalEntity.getCompanyID();
-//			String companyIDvalue = companyID==null ? null : companyID.getValue();
-////			Identifier companyIdentifier = companyID==null ? null : new ID(companyID.getValue(), companyID.getSchemeID());
-//			map.put(CompanyIDType.class, companyIDvalue);
-//			String companyIDschema = companyID==null ? null : companyID.getSchemeID();
-//			map.put(String.class, companyIDschema);
-//			
-//			TextType companyLegalForm = partyLegalEntity.getCompanyLegalForm();
-//			String companyLegalFormValue = companyLegalForm==null ? null : companyLegalForm.getValue();
-//			map.put(CompanyLegalFormType.class, companyLegalFormValue);	
-//			result.add(map);
-//		});
-//		return result;
-//	}
-// ----------------------------------------
 
 	@Override
 	public String getRegistrationName() {
@@ -393,53 +304,45 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 
 	@Override
-	public String getTaxRegistrationId() {
-		return getTaxRegistrationId("VA");
+	public List<Identifier> getTaxRegistrationIdentifier() {
+		return getTaxRegistrationIdentifier(this);
 	}
-	@Override
-	public String getTaxRegistrationId(String schemeID) {
-		List<Map<Object,String>> mapList = getTaxSchemes();
-		if(mapList.size()==0) {
-			return null;
-		} else if(mapList.size()==1) {
-			Map<Object,String> map = mapList.get(0);
-			String [] val1 = map.values().toArray(new String[0]);
-			LOG.info("mapList.size()==1" + " key#:"+map.keySet().size() + " value.0:"+val1[0]);
-			if(map.keySet().size()==1) {
-				return val1[0];
-			} else {
-				LOG.info(map.get(TaxSchemeType.class)+"=="+schemeID + " ? "+map.get(CompanyIDType.class) + " : "+val1[0]);
-				return map.get(TaxSchemeType.class).equals(schemeID) ? map.get(CompanyIDType.class) : val1[0];
+	static List<Identifier> getTaxRegistrationIdentifier(PartyType party) {
+		List<PartyTaxSchemeType> partyTaxSchemeList = party.getPartyTaxScheme();
+		List<Identifier> result = new ArrayList<Identifier>(partyTaxSchemeList.size());
+		if(partyTaxSchemeList.isEmpty()) return result;
+		partyTaxSchemeList.forEach(partyTaxScheme -> {
+			CompanyIDType companyID = partyTaxScheme.getCompanyID();
+			TaxSchemeType taxScheme = partyTaxScheme.getTaxScheme();
+			IDType taxSchemeID = taxScheme.getID();
+			if(companyID!=null) {
+				result.add(new ID(companyID.getValue(), taxSchemeID==null?null:taxSchemeID.getValue()));
 			}
-// so wurde is in map eingetragen:
-//			map.put(TaxSchemeType.class, taxSchemeID.getValue());
-//			map.put(CompanyIDType.class, companyID.getValue());
-		} else {
-			LOG.info("TODO    mapList.size()="+mapList.size());
-			for(int i=0; i<mapList.size(); i++) {
-				Map<Object,String> map = mapList.get(i);
-				if(map.get(TaxSchemeType.class).equals(schemeID)) {
-					map.get(CompanyIDType.class);  // ????????????????????????????
-				}
-			}
-			Map<Object,String> map = mapList.get(0);
-			String [] val1 = map.values().toArray(new String[0]);
-			LOG.info("return val1[0]:"+val1[0]);
-			return val1[0];
-		}
+		});
+		return result;
 	}
 
 	@Override
-	public void setTaxRegistrationId(String name, String schemeID) { 
+	public void addTaxRegistrationIdentifier(Identifier id) {
+		if(id==null) return;
+		addTaxRegistrationId(id.getContent(), id.getSchemeIdentifier());
+	}
+	@Override
+	public void addTaxRegistrationId(String name, String schemeID) { 
 /*
 
-            <cac:PartyTaxScheme>
-                <cbc:CompanyID>DE123456789</cbc:CompanyID>
-                <cac:TaxScheme>
-                    <cbc:ID>VAT</cbc:ID>
-                </cac:TaxScheme>
-            </cac:PartyTaxScheme>
-
+      <cac:PartyTaxScheme>
+        <cbc:CompanyID>ATU123456789</cbc:CompanyID>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:PartyTaxScheme>
+      <cac:PartyTaxScheme>
+        <cbc:CompanyID>123/456/789</cbc:CompanyID>
+        <cac:TaxScheme>
+          <cbc:ID>FC</cbc:ID>
+        </cac:TaxScheme>
+      </cac:PartyTaxScheme>
 
  */
 		if(name==null) return;
