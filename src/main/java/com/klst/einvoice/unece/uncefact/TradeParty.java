@@ -1,5 +1,6 @@
 package com.klst.einvoice.unece.uncefact;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -60,14 +61,14 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 			}
 		}
 		
-		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration(); // 0..n wg. BT-31, BT-32, BT-31-0, BT-32-0
+		List<Identifier> taxRegistrationList = getTaxRegistrationIdentifier(party); // 0..n wg. BT-31, BT-32, BT-31-0, BT-32-0
 		taxRegistrationList.forEach(taxRegistration -> {
-//			this.getSpecifiedTaxRegistration().add(taxRegistration);
-//			taxRegistration.getID().getValue();
-//			taxRegistration.getID().getSchemeID();
-			this.addPartyTaxID(taxRegistration.getID().getValue(), taxRegistration.getID().getSchemeID());
+			this.addTaxRegistrationIdentifier(taxRegistration);
 		});
-//		addTaxSchemes(getTaxSchemes(party));
+		//		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration(); 
+//		taxRegistrationList.forEach(taxRegistration -> {
+//			this.addPartyTaxID(taxRegistration.getID().getValue(), taxRegistration.getID().getSchemeID());
+//		});
 		
 		// BT-33 0..1 additional legal info / not used for Buyer
 		setCompanyLegalForm(party.getDescription().isEmpty() ? null : party.getDescription().get(0).getValue());
@@ -167,6 +168,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	 *                   VA = Umsatzsteueridentnummer des Verkäufers
 	 *                        Codeliste: UNTDID 1153 Untermenge
 	 * Beispiel: <ram:ID schemeID="VA">DE 123456789</ram:ID>
+	 * Quelle: ZUGFeRD Version 2.1.1 TA
 	 */
 	/**
 	 * VAT/tax identifier and tax registration identifier
@@ -292,25 +294,43 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 
 	@Override
-	public String getTaxRegistrationId() {
-		return getTaxRegistrationId("VA");
+	public List<Identifier> getTaxRegistrationIdentifier() {
+		return getTaxRegistrationIdentifier(this);
 	}
-	@Override
-	public String getTaxRegistrationId(String schemeID) {
-		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
-		if(taxRegistrationList.isEmpty()) return null;
-		if(taxRegistrationList.size()==1) return taxRegistrationList.get(0).getID().getValue(); 
-		// jetzt default:
-		for(int i=0; i<taxRegistrationList.size(); i++) {
-			if(taxRegistrationList.get(i).getID().getSchemeID().equals(schemeID)) {
-				return taxRegistrationList.get(i).getID().getValue();
-			}
-		}
- 		return taxRegistrationList.isEmpty() ? null : taxRegistrationList.get(0).getID().getValue(); // den ersten und ohne Schema
+	static List<Identifier> getTaxRegistrationIdentifier(TradePartyType party) {
+		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration();
+		List<Identifier> result = new ArrayList<Identifier>(taxRegistrationList.size());
+		if(taxRegistrationList.isEmpty()) return result;
+		taxRegistrationList.forEach(taxRegistration -> {
+			result.add(new ID(taxRegistration.getID()));
+		});
+		return result;
 	}
+	
+//	public String getTaxRegistrationId() {
+//		return getTaxRegistrationId("VA");
+//	}
+//	@Override
+//	public String getTaxRegistrationId(String schemeID) {
+//		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
+//		if(taxRegistrationList.isEmpty()) return null;
+//		if(taxRegistrationList.size()==1) return taxRegistrationList.get(0).getID().getValue(); 
+//		// jetzt default:
+//		for(int i=0; i<taxRegistrationList.size(); i++) {
+//			if(taxRegistrationList.get(i).getID().getSchemeID().equals(schemeID)) {
+//				return taxRegistrationList.get(i).getID().getValue();
+//			}
+//		}
+// 		return taxRegistrationList.isEmpty() ? null : taxRegistrationList.get(0).getID().getValue(); // den ersten und ohne Schema
+//	}
 
 	@Override
-	public void setTaxRegistrationId(String name, String schemeID) {
+	public void addTaxRegistrationIdentifier(Identifier id) {
+		if(id==null) return;
+		addTaxRegistrationId(id.getContent(), id.getSchemeIdentifier());
+	}
+	@Override
+	public void addTaxRegistrationId(String name, String schemeID) {
 		addPartyTaxID(name, schemeID);
 	}
 

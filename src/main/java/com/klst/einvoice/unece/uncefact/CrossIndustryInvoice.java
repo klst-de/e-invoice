@@ -1027,8 +1027,8 @@ UBL:
 	
 	// BT-63 ++ 1..1 Seller tax representative VAT identifier
 	public void setTaxRepresentative(String name, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
-		TradeParty party = new TradeParty(name, address, null);
-		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
+		BusinessParty party = new TradeParty(name, address, null);
+		party.addTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
 		setTaxRepresentative(party);
 	}
 	public void setTaxRepresentative(BusinessParty party) {

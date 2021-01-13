@@ -813,7 +813,7 @@ UBL:
 	@Override
 	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
 		BusinessParty party = createParty(registrationName, address, null);
-		party.setTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
+		party.addTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
 		setTaxRepresentative(party);
 	}
 	@Override
