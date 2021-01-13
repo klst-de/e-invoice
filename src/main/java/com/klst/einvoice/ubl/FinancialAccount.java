@@ -88,7 +88,7 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 	static String getPaymentServiceProviderID(FinancialAccountType doc) {
 		BranchType branch = doc.getFinancialInstitutionBranch();
 		if(branch==null) return null;
-		// bei pepol ist noch element FinancialInstitution
+		// bei PEPPOL ist noch element FinancialInstitution
 		return branch.getID()==null ? branch.getFinancialInstitution().getID().getValue() : branch.getID().getValue();
 	}
 

@@ -13,7 +13,7 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeTyp
 schemeID Art der Steuernummer des Verkäufers
 Synonym: Steuernummer, Umsatzsteueridentnummer
 Kardinalität: required
-EN16931-ID: BT-31-0, BT-32-0
+EN16931-ID: BG-4.BT-31-0, BG-4.BT-32-0
 Anwendung: 
      FC = Steuernummer des Verkäufers (BT-32)
      VA = Umsatzsteueridentnummer des Verkäufers (BT-31)
