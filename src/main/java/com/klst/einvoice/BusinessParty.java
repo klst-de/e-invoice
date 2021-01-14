@@ -71,8 +71,10 @@ public interface BusinessParty {
 	 *                  BR-Z-2, BR-Z-3, BR-Z-4, BR-E-2, BR-E-3, BR-E-4
 	 * <br>Request ID: 	R45, R52, R57
 	 * 
-	 * @param name - VAT identification number prefixed by a country code 
-	 * based on EN ISO 3166-1 "Codes for the representation of names of countries and their subdivisions"
+	 * @param name - <A HREF="https://en.wikipedia.org/wiki/VAT_identification_number"">VAT identification number</A>
+	 *  prefixed by a country code based on EN ISO 3166-1 "Codes for the representation of names of countries and their subdivisions"
+	 * 
+	 * @see BG4_Seller#setTaxRegistrationId(String)
 	 */
 	default void setVATRegistrationId(String name) {
 		if(this instanceof PartyType) {
@@ -82,7 +84,7 @@ public interface BusinessParty {
 		}		
 	}
 	
-	// in BG-4 gibt es getTaxRegistrationId() für BT-32 , für alle BP BT-31:
+	// in BG-4 gibt es set/getTaxRegistrationId() für BT-32 , für alle BP BT-31:
 	default String getVATRegistrationId() {
 		List<Identifier> list = getTaxRegistrationIdentifier();
 		if(list.isEmpty()) return null;
