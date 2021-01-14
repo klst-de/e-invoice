@@ -178,10 +178,10 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setDespatchAdviceReference(testDoc.getDespatchAdviceReference()); // (optional) BT-16
 		cii.setTenderOrLotReference(testDoc.getTenderOrLotReference()); // (optional) BT-17
 		
-		// Testfall 02.01a:
-		Identifier identifier = testDoc.getInvoicedObjectIdentifier();
-		cii.setInvoicedObjectIdentifier(identifier); // (optional) BT-18
-		cii.setInvoicedObject("Test", "AAA"); // (optional) BT-18
+		// Testfall 02.01a: (ausschalten)
+//		Identifier identifier = testDoc.getInvoicedObjectIdentifier();
+//		cii.setInvoicedObjectIdentifier(identifier); // (optional) BT-18
+//		cii.setInvoicedObject("Test", "AAA"); // (optional) BT-18
 
 		BusinessParty testPayeeParty = testDoc.getPayee();
 		if(testPayeeParty==null) {
