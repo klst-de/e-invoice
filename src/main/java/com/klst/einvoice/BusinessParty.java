@@ -2,6 +2,8 @@ package com.klst.einvoice;
 
 import java.util.List;
 
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyType;
+
 /**
  * A common interface for
  * 
@@ -57,7 +59,30 @@ public interface BusinessParty {
 	public void addTaxRegistrationIdentifier(Identifier id);
 	public void addTaxRegistrationId(String name, String schemeID);
 	
-	// in BG-4 gibt es getTaxRegistrationId() ohne param für BT-32 und für alle BT-31:
+	/**
+	 * VAT identifier - The VAT identifier (also known as VAT identification number).
+	 * <p>
+	 * A VAT registered Supplier (seller) shall include his VAT ID, except when he uses a tax representative.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BG-4.BT-31 , BG-7.BT-48 , BG-11.BT-63
+	 * <br>Rule ID: 	BR-CO-9, BR-AE-2, BR-AE-3, BR-AE-4, BR-S-2, BR-S-3, BR-S-4,
+	 *                  BR-IC-2, BR-IC-3, BR-IC-4, BR-O-2, BR-O-3, BR-O-4, BR-56, 
+	 *                  BR-Z-2, BR-Z-3, BR-Z-4, BR-E-2, BR-E-3, BR-E-4
+	 * <br>Request ID: 	R45, R52, R57
+	 * 
+	 * @param name - VAT identification number prefixed by a country code 
+	 * based on EN ISO 3166-1 "Codes for the representation of names of countries and their subdivisions"
+	 */
+	default void setVATRegistrationId(String name) {
+		if(this instanceof PartyType) {
+			addTaxRegistrationId(name, "VAT");
+		} else {
+			addTaxRegistrationId(name, "VA");
+		}		
+	}
+	
+	// in BG-4 gibt es getTaxRegistrationId() für BT-32 , für alle BP BT-31:
 	default String getVATRegistrationId() {
 		List<Identifier> list = getTaxRegistrationIdentifier();
 		if(list.isEmpty()) return null;

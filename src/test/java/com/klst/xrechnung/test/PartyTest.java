@@ -216,9 +216,13 @@ public class PartyTest {
     
     @Test
     public void ublParty0Create() {
-    	BG4_Seller party = (BG4_Seller) invoice.createParty("customer", null, null);
+    	String Umsatzsteuernummer = "DE123456789";
+    	PostalAddress address = invoice.createAddress("DE", "plz", "city");
+    	LOG.info("Umsatzsteuernummer:"+ Umsatzsteuernummer);
+    	BG4_Seller party = (BG4_Seller) invoice.createParty("customer", address, null);
     	assertTrue(party.getTaxRegistrationIdentifier().isEmpty());
-    	party.addTaxRegistrationId("DE123456789", "VAT"); // Umsatzsteuernummer
+//    	party.addTaxRegistrationId("DE123456789", "VAT"); // Umsatzsteuernummer
+    	party.setVATRegistrationId("123456789");
     	party.addTaxRegistrationId("andere Steuernummer des Verkäufers", "???"); // andere Steuernummer des Verkäufers
     	assertEquals(2, party.getTaxRegistrationIdentifier().size());
     	assertEquals("DE123456789", party.getVATRegistrationId());

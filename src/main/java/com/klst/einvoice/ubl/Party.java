@@ -170,8 +170,8 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.
-	public static final String DEFAULT_TAX_SCHEME = "VAT";
-	
+	static final String DEFAULT_TAX_SCHEME = "VAT"; // ein möglicher BUG in UBL Spez!
+	static final String NO_CC = "??";
 	/**
 	 * Buyer/Seller VAT identifier - The VAT identifier (also known as VAT identification number).
 	 * <p>
@@ -181,18 +181,20 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	 * <br>ID:      BT-48
 	 * <br>Req.ID:  R45, R52, R57
 	 * 
-	 * @param taxRegistrationId Identifier
+	 * @param registrationId Identifier
 	 */
-	public void setTaxRegistrationId(String taxRegistrationId) { // TODO ==> setVATidentifier
-		if(taxRegistrationId==null) return;
+	@Override
+	public void setVATRegistrationId(String registrationId) {
+		if(registrationId==null) return;
 		// countryCode of the party (which is mandatory) as default prefix , see https://github.com/klst-de/e-invoice/issues/1
+		
 		PostalAddress address = getAddress();
-		String countryCode = address==null ? "??" : address.getCountryCode();
-		if(taxRegistrationId.startsWith(countryCode)) {
-			addTaxRegistrationId(taxRegistrationId, DEFAULT_TAX_SCHEME);
+		String countryCode = address==null ? NO_CC : address.getCountryCode();
+		if(countryCode==NO_CC || registrationId.startsWith(countryCode)) {
+			addTaxRegistrationId(registrationId, DEFAULT_TAX_SCHEME);
 		} else {
-			LOG.warning("taxRegistrationId does not start with countryCode:"+taxRegistrationId + " - silently done.");
-			addTaxRegistrationId(countryCode+taxRegistrationId, DEFAULT_TAX_SCHEME);
+			LOG.warning("registrationId '"+registrationId+"' does not start with countryCode:"+countryCode + " - silently done.");
+			addTaxRegistrationId(countryCode+registrationId, DEFAULT_TAX_SCHEME);
 		}
 	}
 
