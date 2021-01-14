@@ -66,10 +66,6 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		taxRegistrationList.forEach(taxRegistration -> {
 			this.addTaxRegistrationIdentifier(taxRegistration);
 		});
-		//		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration(); 
-//		taxRegistrationList.forEach(taxRegistration -> {
-//			this.addPartyTaxID(taxRegistration.getID().getValue(), taxRegistration.getID().getSchemeID());
-//		});
 		
 		// BT-33 0..1 additional legal info / not used for Buyer
 		setCompanyLegalForm(party.getDescription().isEmpty() ? null : party.getDescription().get(0).getValue());
@@ -151,7 +147,6 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		super.getDefinedTradeContact().add((TradeContact)contact);	
 	}
 
-	
 	@Override
 	public IContact createContact(String contactName, String contactTel, String contactMail) {
 		return new TradeContact(contactName, contactTel, contactMail);
@@ -162,53 +157,6 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		return new TradeContact((TradeContactType)contact);
 	}
 
-
-	/*
-	 * 0..n : SpecifiedTaxRegistration - Detailinformationen zu Steuerangaben des Verkäufers
-	 * 1..1 : ID                       - Steuernummer des Verkäufers, Umsatzsteueridentnummer des Verkäufers
-	 *        schemeID                 - Art der Steuernummer des Verkäufers
-	 *        Anwendung: FC = Steuernummer des Verkäufers
-	 *                   VA = Umsatzsteueridentnummer des Verkäufers
-	 *                        Codeliste: UNTDID 1153 Untermenge
-	 * Beispiel: <ram:ID schemeID="VA">DE 123456789</ram:ID>
-	 * Quelle: ZUGFeRD Version 2.1.1 TA
-	 */
-	/**
-	 * VAT/tax identifier and tax registration identifier
-	 * <p>
-	 * The VAT identifier (also known as VAT identification number).
-	 * <p>
-	 * VAT number prefixed by a country code. A VAT registered Supplier shall include his VAT ID, 
-	 * except when he uses a tax representative.
-	 * <p>
-	 * Cardinality: 	0..1 (optional) 
-	 * <br>EN16931-ID: 	BT-31, BT-32 / BT-31-0, BT-32-0
-	 * <br>Rule ID: 	BR-CO-9, BR-CO-26, BR-DE-16
-	 * <br>Request ID: 	R52, R47
-	 * 
-	 * @param ID companyId
-	 * @param ID schemeID, BT-31-0, BT-32-0, tax registration identifier
-	 * <p>
-	 * The local identification (defined by the Seller’s address) of the Seller for tax purposes 
-	 * or a reference that enables the Seller to state his registered tax status.
-	 * This information may affect how the Buyer settles the payment (such as for social security fees). 
-	 * E.g. in some countries, if the Seller is not registered as a tax paying entity 
-	 * then the Buyer is required to withhold the amount of the tax and pay it on behalf of the Seller.
-	 */
-	void addPartyTaxID(String companyId, String schemeID)  {
-		LOG.fine("addPartyTaxID: companyId:"+companyId + " schemeID:"+schemeID);
-		if(companyId==null) return;
-		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
-		TaxRegistrationType taxRegistration = new TaxRegistrationType();
-		taxRegistration.setID(new ID(companyId, schemeID));
-		taxRegistrationList.add(taxRegistration);
-	}
-	void addPartyTaxID(String companyId)  {
-		addPartyTaxID(companyId, "VA");
-	}
-
-//	------------------------------------------
-	
 	String getPartyName() {
 		return getPartyName(this);
 	}
@@ -316,23 +264,6 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		return result;
 	}
 	
-//	public String getTaxRegistrationId() {
-//		return getTaxRegistrationId("VA");
-//	}
-//	@Override
-//	public String getTaxRegistrationId(String schemeID) {
-//		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
-//		if(taxRegistrationList.isEmpty()) return null;
-//		if(taxRegistrationList.size()==1) return taxRegistrationList.get(0).getID().getValue(); 
-//		// jetzt default:
-//		for(int i=0; i<taxRegistrationList.size(); i++) {
-//			if(taxRegistrationList.get(i).getID().getSchemeID().equals(schemeID)) {
-//				return taxRegistrationList.get(i).getID().getValue();
-//			}
-//		}
-// 		return taxRegistrationList.isEmpty() ? null : taxRegistrationList.get(0).getID().getValue(); // den ersten und ohne Schema
-//	}
-
 	@Override
 	public void addTaxRegistrationIdentifier(Identifier id) {
 		if(id==null) return;
@@ -340,7 +271,11 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 	@Override
 	public void addTaxRegistrationId(String name, String schemeID) {
-		addPartyTaxID(name, schemeID);
+		if(name==null) return;
+		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
+		TaxRegistrationType taxRegistration = new TaxRegistrationType();
+		taxRegistration.setID(new ID(name, schemeID));
+		taxRegistrationList.add(taxRegistration);
 	}
 
 	@Override // 0..1 also genügt der erste
