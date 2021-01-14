@@ -38,7 +38,8 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	TradeParty(TradePartyType party) {
 		this();
 		LegalOrganizationType legalOrganization = party.getSpecifiedLegalOrganization();
-		init( getPartyName(party)
+		init( getPartyName(party) // aka RegistrationName
+			, getBusinessName(party)
 			, getPostalAddress(party)
 			, getContact(party)
 			);
@@ -86,20 +87,22 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	/**
 	 * ctor for BusinessParty - use BusinessPartyFactory method
 	 * 
-	 * @param name             BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
-	 * @param address          BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
-	 * @param contact          BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
+	 * @param (registration)Name BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
+	 * @param businessName       BT-28 0..1 Handelsname des Verkäufers / Seller trading name
+	 * @param address            BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
+	 * @param contact            BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
 	 * 
 	 * @see BusinessPartyFactory
 	 */
-	TradeParty(String name, PostalAddress address, IContact contact) {
+	TradeParty(String name, String businessName, PostalAddress address, IContact contact) {
 		this();
-		init(name, address, contact); //, companyId, companyLegalForm);
+		init(name, businessName, address, contact);
 	}
 	
-	void init(String name, PostalAddress address, IContact contact) { //, String companyId, String companyLegalForm) {
+	void init(String registrationName, String businessName, PostalAddress address, IContact contact) {
 		legalOrganization = new LegalOrganizationType();
-		setRegistrationName(name);
+		setPartyName(registrationName);
+		setBusinessName(businessName);
 		setAddress(address);
 		if(contact!=null) setIContact(contact);
 	}
@@ -230,6 +233,12 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 
 	@Override
 	public String getBusinessName() {
+		TextType text = legalOrganization.getTradingBusinessName();
+		return text==null ? null : text.getValue();
+	}
+	static String getBusinessName(TradePartyType party) {
+		LegalOrganizationType legalOrganization = party.getSpecifiedLegalOrganization();
+		if(legalOrganization==null) return null;
 		TextType text = legalOrganization.getTradingBusinessName();
 		return text==null ? null : text.getValue();
 	}

@@ -19,6 +19,8 @@ public interface BusinessPartyFactory {
 	 * 
 	 * @param registrationName - full formal name by which the BP is registered in the national registry of legal entities 
 	 *                           or as a Taxable person or otherwise trades as a person or persons
+	 * @param tradingName - an optional name by which the BP is known, other than registrationName
+	 *                       (also known as Business name).
 	 * @param PostalAddress address
 	 * @param IContact contact
 	 * 
@@ -26,7 +28,10 @@ public interface BusinessPartyFactory {
 	 * @see PostalAddress
 	 * @see IContact
 	 */
-	public BusinessParty createParty(String name, PostalAddress address, IContact contact);
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact);
+	default BusinessParty createParty(String name, PostalAddress address, IContact contact) {
+		return createParty(name, null, address, contact);
+	}
 	
 	/**
 	 * copy BusinessParty

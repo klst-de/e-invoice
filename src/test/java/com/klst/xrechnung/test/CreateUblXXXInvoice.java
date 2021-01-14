@@ -249,8 +249,9 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				+ " Payee.RegistrationName:"+payeeParty.getRegistrationName() 
 				);
 			Identifier payeePartyId = payeeParty.getIdentifier();
+//			BusinessParty payee = ublInvoice.createParty(payeeParty.getRegistrationName(), payeeParty.getBusinessName(), null, null);  // BT-59
 			if(payeePartyId!=null && payeePartyId.getSchemeIdentifier()!=null) {
-				BusinessParty payee = ublInvoice.createParty(payeeParty.getBusinessName(), null, null);  // BT-59
+				BusinessParty payee = ublInvoice.createParty(payeeParty.getRegistrationName(), payeeParty.getBusinessName(), null, null);  // BT-59
 				payee.setIdentifier(payeePartyId); // BT-60 mit schema
 				payee.setCompanyIdentifier(payeeParty.getCompanyIdentifier());
 				ublInvoice.setPayee(payee);

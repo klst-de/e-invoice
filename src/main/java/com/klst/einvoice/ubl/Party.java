@@ -47,13 +47,15 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	// copy ctor
 	Party(PartyType party) {
 		this();
-		LOG.fine("copy ctor (optional)trading name:"+getBusinessName(party) + " Address:"+getPostalAddress(party) + " Contact:"+getContact(party));
-		this.init(getBusinessName(party), getPostalAddress(party), getContact(party));
+		LOG.fine("copy ctor (mandatory) name:"+getRegistrationName(party) + " (optional)trading name:"+getBusinessName(party)
+			+ " Address:"+getPostalAddress(party) + " Contact:"+getContact(party));
+		// name aka RegistrationName
 		// BG-4.BT-27  1..1 Seller name
 		// BG-7.BT-44  1..1  Buyer name
 		// BG-10.BT-59 1..1  Payee name
-		setRegistrationName(getRegistrationName(party));
-		LOG.config("copy ctor Name:"+getRegistrationName() +" trading name:"+getBusinessName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
+		this.init(getRegistrationName(party), getBusinessName(party), getPostalAddress(party), getContact(party));
+//		setRegistrationName(getRegistrationName(party));
+		LOG.info("copy ctor Name:"+getRegistrationName() +" trading name:"+getBusinessName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
 				
 		// BG-4.BT-28 ++ 0..1 Seller trading name
 		// BG-7.BT-45 ++ 0..1 Buyer trading name
@@ -90,20 +92,22 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	/**
 	 * ctor for BusinessParty - use BusinessPartyFactory method
 	 * 
-	 * @param name             BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
-	 * @param address          BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
-	 * @param contact          BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
+	 * @param (registration)Name BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
+	 * @param businessName       BT-28 0..1 Handelsname des Verkäufers / Seller trading name
+	 * @param address            BG-5  1..1 SELLER POSTAL ADDRESS / BG-8  1..1 BUYER POSTAL ADDRESS
+	 * @param contact            BG-6  0..1 SELLER CONTACT        / BG-9  0..1 BUYER CONTACT
 	 * 
 	 * @see BusinessPartyFactory
 	 */
-	Party(String name, PostalAddress address, IContact contact) {
+	Party(String name, String businessName, PostalAddress address, IContact contact) {
 		this();
-		init(name, address, contact);
+		init(name, businessName, address, contact);
 	}
 	
-	void init(String name, PostalAddress address, IContact contact) {
+	void init(String registrationName, String businessName, PostalAddress address, IContact contact) {
 		partyLegalEntity = new PartyLegalEntityType();
-		this.setBusinessName(name);
+		setRegistrationName(registrationName);
+		setBusinessName(businessName);
 		setAddress(address);
 		setIContact(contact);
 	}

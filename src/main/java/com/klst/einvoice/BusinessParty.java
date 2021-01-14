@@ -17,11 +17,15 @@ public interface BusinessParty {
 	// BG-4.BT-27  1..1 Seller name
 	// BG-7.BT-44  1..1  Buyer name
 	// BG-10.BT-59 1..1  Payee name
-	public String getBusinessName();
-	public void setBusinessName(String name);
-	
+	// BG-11.BT-62 1..1 Seller tax representative name
+	// BG-13.BT-70 0..1 Deliver to party name
 	public String getRegistrationName();
 	public void setRegistrationName(String name);
+	
+	// BG-4.BT-28  0..1 Seller trading name (also known as Business name)
+	// BG-7.BT-45  0..1  Buyer trading name
+	public String getBusinessName();
+	public void setBusinessName(String name);
 	
 	// BG-4.BT-29  0..n Seller identifier
 	// BG-7.BT-46  0..1  Buyer identifier
@@ -45,13 +49,31 @@ public interface BusinessParty {
 	// BG-4.BT-32  0..1 Seller tax registration identifier mit schemeID BT-32-0 "FC"
 	// BG-7.BT-48  0..1  Buyer VAT identifier
 	// BG-11.BT-63 1..1 Seller tax representative VAT identifier
-//	public String getTaxRegistrationId(String schemeID); // TODO raus
-	// TODO nur in BG-4 gibt es getTaxRegistrationId() ohne param und in allen
-//	public String getVATRegistrationId(); 
-	public List<Identifier> getTaxRegistrationIdentifier(); // TODO not public, only for BG4 BT-31+BT-32
+//	public String getTaxRegistrationId(String schemeID); // raus
+	
+	// usually the list contains one element, for BG-4 can be two BT-31+BT-32
 	// in BG-7, BG-11 ist nur ein Eintrag ==> VAT
-	public void addTaxRegistrationIdentifier(Identifier id); // dto
+	public List<Identifier> getTaxRegistrationIdentifier();
+	public void addTaxRegistrationIdentifier(Identifier id);
 	public void addTaxRegistrationId(String name, String schemeID);
+	
+	// in BG-4 gibt es getTaxRegistrationId() ohne param für BT-32 und für alle BT-31:
+	default String getVATRegistrationId() {
+		List<Identifier> list = getTaxRegistrationIdentifier();
+		if(list.isEmpty()) return null;
+		if(list.size()==1) return list.get(0).getContent();
+		for (int i=0; i<list.size(); i++) {
+			Identifier id = list.get(i);
+			if(id.getSchemeIdentifier().startsWith("VA")) return id.getContent();
+			// similar to:
+//			if(this instanceof PartyType) {
+//				if(id.getSchemeIdentifier().equals("VAT")) return id.getContent();
+//			} else {
+//				if(id.getSchemeIdentifier().equals("VA")) return id.getContent();
+//			}		
+		}
+		return null;
+	}
 
 	public String getCompanyLegalForm();
 	public void setCompanyLegalForm(String name);

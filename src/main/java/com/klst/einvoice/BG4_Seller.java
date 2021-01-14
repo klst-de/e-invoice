@@ -1,5 +1,7 @@
 package com.klst.einvoice;
 
+import java.util.List;
+
 /**
  * BG-4 + 1..1 SELLER 
  * <p>
@@ -75,14 +77,24 @@ public interface BG4_Seller extends BusinessParty, PostalAddressFactory, IContac
 	// BT-30 ++ 0..1 Seller legal registration identifier [HRA-Eintrag] / <ram:SpecifiedLegalOrganization><ram:ID> / cbc:CompanyID
 
 	// BT-31 ++ 0..1 Seller VAT identifier z.B. DE 123456789 / <ram:SpecifiedTaxRegistration><ram:ID> / <cac:PartyTaxScheme><cbc:CompanyID>
-//	Steuernummer des Verkäufers            BT-31
 //	Umsatzsteueridentnummer des Verkäufers BT-32
+//	Steuernummer des Verkäufers            BT-31
 //	Die betriebswirtschaftlichen Begriffe werden über einen Scheme identifier unterschieden. 
 //	Code Codename 
-//	FC . Steuernummer 
 //	VA . Umsatzsteuernummer
+//	FC . Steuernummer 	
 
 	// BT-32 ++ 0..1 Seller tax registration identifier , @see BT-31
+	default String getTaxRegistrationId() {
+		List<Identifier> list = getTaxRegistrationIdentifier();
+		if(list.isEmpty()) return null;
+//		if(list.size()==1) return list.get(0).getContent();
+		for (int i=0; i<list.size(); i++) {
+			Identifier id = list.get(i);
+			if(id.getSchemeIdentifier().startsWith("FC")) return id.getContent();
+		}
+		return null;
+	}
 	
 	// BT-33 ++ 0..1 Seller additional legal information / <ram:Description> / <cac:PartyLegalEntity><cbc:CompanyLegalForm>
 	

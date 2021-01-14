@@ -33,6 +33,7 @@ import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.marshaller.CiiTransformer;
 import com.klst.untdid.codelist.PaymentMeansEnum;
+import com.klst.untdid.codelist.ReferenceCode;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
@@ -99,11 +100,12 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		sellerParty.setCompanyLegalForm(testSellerParty.getCompanyLegalForm());
 		// [BR-62]-The Seller electronic address (BT-34) shall have a Scheme identifier :
 		sellerParty.setUriUniversalCommunication(testSellerParty.getUriUniversalCommunication());
-		// BT-31 + BT-32
-		if(((TradeParty)testSellerParty).getSpecifiedTaxRegistration().isEmpty()) {
+		// BT-31 (0..1) + BT-32 (0..1)
+		if(testSellerParty.getTaxRegistrationIdentifier().isEmpty()) {
 			LOG.warning("sellerParty.SpecifiedTaxRegistration().isEmpty() !!!!!!!!!!!!!" );
 		}
-			/* 01.10a-INVOICE_uncefact.xml                      hat zwei Einträge:
+			/* 01.10a nur einen mit schema "FC": also BT-32
+			 * 01.10a-INVOICE_uncefact.xml                      hat zwei Einträge:
                 <ram:SpecifiedTaxRegistration>
                     <ram:ID schemeID="VA">DE123456789</ram:ID>
                 </ram:SpecifiedTaxRegistration>
@@ -112,25 +114,24 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
                 </ram:SpecifiedTaxRegistration>
 
 			 */
-		TradeParty testTradeSellerParty = (TradeParty)testSellerParty;
-		LOG.info("sellerParty.d#:"+testTradeSellerParty.getSpecifiedTaxRegistration().size());
-		testTradeSellerParty.getSpecifiedTaxRegistration().forEach(taxRegistration -> {
-			String BT_31 = taxRegistration.getID().getValue();
-			String BT_31_0 = taxRegistration.getID().getSchemeID();
-			LOG.info("SpecifiedTaxRegistration value ID/BT_31:"+BT_31
-					+" schemeID/BT_31_0:"+BT_31_0
-					);
-			if(BT_31_0.equals("FC") && BT_31.equals("123/456/789") && testTradeSellerParty.getSpecifiedTaxRegistration().size()==1) {
-				// harccoded patch wg. https://github.com/klst-de/e-invoice/issues/5
-				sellerParty.setTaxRegistrationId("DE123456789", "VA");
+		List<Identifier> taxRegistrationList = testSellerParty.getTaxRegistrationIdentifier();
+		taxRegistrationList.forEach(taxReg -> {
+			if(taxReg.getSchemeIdentifier().equals(ReferenceCode.VATRegistrationNumber.getValue())) { //VA
+				LOG.info("BT-31:"+taxReg);
+				sellerParty.addTaxRegistrationIdentifier(taxReg);
+			} else if(taxReg.getSchemeIdentifier().equals(ReferenceCode.FiscalNumber.getValue())) { //FC
+				LOG.info("BT-32:"+taxReg);
+				sellerParty.addTaxRegistrationIdentifier(taxReg);
+			} else {
+				LOG.warning("weder BT-31 noch BT 32:"+taxReg);
+				sellerParty.addTaxRegistrationIdentifier(taxReg);
 			}
-			sellerParty.setTaxRegistrationId(BT_31, BT_31_0);
 		});
 		LOG.info("Seller identifier (BT-29):"+sellerParty.getRegistrationName()
 				+" legal registration identifier (BT-30):"+sellerParty.getCompanyLegalForm()
-				+" VAT identifier (BT-31):"+sellerParty.getTaxRegistrationId()
+//				+" VAT identifier (BT-31):"+sellerParty.getVATRegistrationId()
 				);
-		cii.setSeller((TradeParty)sellerParty);
+		cii.setSeller(sellerParty);
 
 		BG7_Buyer buyerParty = testDoc.getBuyer();
 		if(((TradeParty)buyerParty).getSpecifiedTaxRegistration().isEmpty()) {
@@ -187,9 +188,10 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			LOG.info("BG-10 (optional) testPayeeParty==null" );
 		} else {
 			LOG.info("testPayeeParty.RegistrationName:"+testPayeeParty.getRegistrationName()
-					+ " Id:"+testPayeeParty.getId()
-					+ " CompanyLegalForm:"+testPayeeParty.getCompanyLegalForm()
-					);
+				+ " BusinessName:"+testPayeeParty.getBusinessName()
+				+ " Id:"+testPayeeParty.getId()
+				+ " CompanyLegalForm:"+testPayeeParty.getCompanyLegalForm()
+				);
 			cii.setPayee(testPayeeParty.getRegistrationName(), testPayeeParty.getId(), testPayeeParty.getCompanyLegalForm());
 		}
 
@@ -199,12 +201,11 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		} else {
 			LOG.info("testSellerTaxRepresentativeParty.Name:"+((TradeParty)testSellerTaxRepresentativeParty).getRegistrationName()
 					+ " Address:"+((TradeParty)testSellerTaxRepresentativeParty).getAddress()
-					+ " TaxRegistrationId:"+((TradeParty)testSellerTaxRepresentativeParty).getTaxRegistrationId()
+					+ " TaxRegistrations#:"+((TradeParty)testSellerTaxRepresentativeParty).getTaxRegistrationIdentifier()
 					);
 			cii.setTaxRepresentative(testSellerTaxRepresentativeParty.getRegistrationName()
 					, ((TradeParty)testSellerTaxRepresentativeParty).getAddress()
-					, testSellerTaxRepresentativeParty.getTaxRegistrationId()
-//					, CoreInvoiceVatBreakdown.VAT);
+					, testSellerTaxRepresentativeParty.getTaxRegistrationIdentifier().get(0).getContent()
 					, "VA");
 		}
 

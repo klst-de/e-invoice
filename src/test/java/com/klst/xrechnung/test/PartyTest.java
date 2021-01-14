@@ -3,6 +3,7 @@ package com.klst.xrechnung.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.logging.Logger;
 
@@ -15,7 +16,6 @@ import org.junit.runners.MethodSorters;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
-import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.ubl.Address;
@@ -216,10 +216,15 @@ public class PartyTest {
     
     @Test
     public void ublParty0Create() {
-    	BusinessParty party = invoice.createParty("customer", null, null);
+    	BG4_Seller party = (BG4_Seller) invoice.createParty("customer", null, null);
+    	assertTrue(party.getTaxRegistrationIdentifier().isEmpty());
+    	party.addTaxRegistrationId("DE123456789", "VAT"); // Umsatzsteuernummer
+    	party.addTaxRegistrationId("andere Steuernummer des Verkäufers", "???"); // andere Steuernummer des Verkäufers
+    	assertEquals(2, party.getTaxRegistrationIdentifier().size());
+    	assertEquals("DE123456789", party.getVATRegistrationId());
     	assertNull(party.getTaxRegistrationId());
-    	party.setTaxRegistrationId("DE123456789", "VAT");
-    	assertNotNull(party.getTaxRegistrationId("VAT"));
+    	party.addTaxRegistrationId("Fiscal number", "FC"); // andere Steuernummer des Verkäufers
+    	assertEquals("Fiscal number", party.getTaxRegistrationId());
     }
     
     @Test
@@ -231,15 +236,16 @@ public class PartyTest {
     	assertNotNull(address);
     	assertNotNull(contact);
     	
-    	LOG.info("supplierparty address:" + address + " contact:"+contact + 
-    			" TaxRegistrationId:"+supplierparty.getTaxRegistrationId() +
-    			" VATRegistrationId:"+supplierparty.getTaxRegistrationId("VAT")
-    			);
-    	assertEquals("VAT", supplierparty.getTaxRegistrationId());
-    	assertEquals("DE123456789", supplierparty.getTaxRegistrationId("VAT"));
+    	LOG.info("supplierparty address:" + address + " contact:"+contact
+    		+ " TaxRegistrationId:"+supplierparty.getTaxRegistrationIdentifier().get(0)
+//    			" TaxRegistrationId:"+supplierparty.getTaxRegistrationId("FC") +
+    		+ " VATRegistrationId:"+supplierparty.getVATRegistrationId()
+    		);
+//    	assertEquals("VAT", supplierparty.getTaxRegistrationId("VAT"));
+    	assertEquals("DE123456789", supplierparty.getVATRegistrationId());
     	
-    	supplierparty.setTaxRegistrationId("Umsatzsteuer-Identifikationsnummer des Verkäufers","XXX");
-    	LOG.info("XXX TaxRegistrationId:"+supplierparty.getTaxRegistrationId("XXX"));
+    	supplierparty.addTaxRegistrationId("keine Umsatzsteuer-Identifikationsnummer des Verkäufers","XXX");
+    	assertEquals("DE123456789", supplierparty.getVATRegistrationId());
   	
     	// Seller überschreiben: 
     	invoice.setSeller("sellerRegistrationName", testAddress, null, null, null); //contact, companyId, companyLegalForm);

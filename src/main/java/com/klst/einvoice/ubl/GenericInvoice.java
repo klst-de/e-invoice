@@ -787,9 +787,8 @@ UBL:
 	
 	// BG-10 + 0..1 PAYEE
 	@Override
-	public void setPayee(String name, String id, String companyId) {
-		BusinessParty party = createParty(null, null, null);
-		party.setBusinessName(name);
+	public void setPayee(String businessName, String id, String companyId) {
+		BusinessParty party = createParty(null, businessName, null, null);
 		party.setId(id);
 		party.setCompanyId(companyId);
 		setPayee(party);
@@ -1444,8 +1443,8 @@ UBL:
 
 	// BG-4 , BG-7 , BG-10 , BG-11 , BG-13 : SELLER, BUYER, ...
 	@Override
-	public BusinessParty createParty(String name, PostalAddress address, IContact contact) {
-		return new Party(name, address, contact); 
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+		return new Party(name, tradingName, address, contact); 
 	}
 
 	@Override

@@ -933,7 +933,7 @@ UBL:
 	 */
 	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
 		                               // BT-27 , BG-5   , BG-6          , BT-30    , BT-33
-		TradeParty party = new TradeParty(name, address, contact); //, companyId, companyLegalForm);
+		BusinessParty party = createParty(name, address, contact); //, companyId, companyLegalForm);
 		party.setCompanyId(companyId);
 		party.setCompanyLegalForm(companyLegalForm);
 		setSeller(party);
@@ -961,7 +961,7 @@ UBL:
 	 * Eine Gruppe von Informationselementen, die Informationen über den Erwerber liefern.
 	 */
 	public void setBuyer(String name, PostalAddress address, IContact contact) {
-		TradeParty party = new TradeParty(name, address, contact); // BT-44, BG-8, BG-9
+		BusinessParty party = createParty(name, address, contact); // BT-44, BG-8, BG-9
 		setBuyer(party);
 	}
 	public void setBuyer(BusinessParty party) {
@@ -1005,7 +1005,7 @@ UBL:
             </ram:PayeeTradeParty>
  */
 	public void setPayee(String name, String id, String companyLegalForm) {
-		TradeParty party = new TradeParty(name, null, null);
+		BusinessParty party = createParty(name, null, null, null);
 		party.setId(id);
 		party.setCompanyLegalForm(companyLegalForm);
 		setPayee(party);
@@ -1027,7 +1027,7 @@ UBL:
 	
 	// BT-63 ++ 1..1 Seller tax representative VAT identifier
 	public void setTaxRepresentative(String name, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
-		BusinessParty party = new TradeParty(name, address, null);
+		BusinessParty party = createParty(name, address, null);
 		party.addTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
 		setTaxRepresentative(party);
 	}
@@ -1580,8 +1580,8 @@ Code Codename
 
 	// ----------------- gemeinsam mit TradeParty : delegate
 	@Override
-	public BusinessParty createParty(String name, PostalAddress address, IContact contact) {
-		return new TradeParty(name, address, contact); 
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+		return new TradeParty(name, tradingName, address, contact); 
 	}
 
 	@Override
