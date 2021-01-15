@@ -12,6 +12,7 @@ import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
+import com.klst.einvoice.PaymentInstructionsFactory;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
@@ -140,8 +141,19 @@ in ram:ApplicableHeaderTradeSettlement stecken auch BT-5, BT-6
 
  */
 public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType 
-	implements PaymentInstructions, CreditTransferFactory, DirectDebitFactory {
+	implements PaymentInstructions, PaymentInstructionsFactory, CreditTransferFactory, DirectDebitFactory {
 
+	// implements PaymentInstructionsFactory
+	@Override
+	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		return create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+	}
+	static PaymentInstructions create(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		return new ApplicableHeaderTradeSettlement(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+	}
+	
 	private static final Logger LOG = Logger.getLogger(ApplicableHeaderTradeSettlement.class.getName());
 	
 	SpecifiedPeriodType billingSpecifiedPeriod = null; // BG-14 ++ 0..1 INVOICING PERIOD

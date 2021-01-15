@@ -1,5 +1,7 @@
 package com.klst.einvoice;
 
+import java.util.List;
+
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
 /**
@@ -16,6 +18,11 @@ import com.klst.untdid.codelist.PaymentMeansEnum;
 
 public interface PaymentInstructionsFactory {
 	
-	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText);
+	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit);
+	
+	default PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText) {
+		return createPaymentInstructions(code, paymentMeansText, null, null, null, null);
+	}
 	
 }

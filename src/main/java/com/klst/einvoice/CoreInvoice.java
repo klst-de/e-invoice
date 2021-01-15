@@ -2,6 +2,7 @@ package com.klst.einvoice;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -546,8 +547,12 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 */
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit);
-	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, CreditTransfer creditTransfer, PaymentCard paymentCard, DirectDebit directDebit);
+	default void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, CreditTransfer creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		List<CreditTransfer> ctList = new ArrayList<CreditTransfer>();
+		if(creditTransfer!=null) ctList.add(creditTransfer);
+		setPaymentInstructions(code, paymentMeansText, remittanceInformation, ctList, paymentCard, directDebit);
+	}
 	public void setPaymentInstructions(PaymentInstructions paymentInstructions);
 	public PaymentInstructions getPaymentInstructions();
 	

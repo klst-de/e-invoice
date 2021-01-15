@@ -1135,23 +1135,13 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	ich implemetierte setXXX so, dass PaymentInstructions null sein darf
 
  */
-	@Override // wg. interface PaymentInstructionsFactory
-	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText) {
-		if(applicableHeaderTradeSettlement==null) {
-			applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement();
-		}
-		PaymentInstructions paymentInstructions = (PaymentInstructions)applicableHeaderTradeSettlement;
-		paymentInstructions.setPaymentMeans(code, paymentMeansText);
-		return paymentInstructions;
+	// factory delegate to ApplicableHeaderTradeSettlement
+	@Override
+	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		return ApplicableHeaderTradeSettlement.create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 
-	@Override
-	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, CreditTransfer creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		List<CreditTransfer> ctList = new ArrayList<CreditTransfer>();
-		if(creditTransfer!=null) ctList.add(creditTransfer);
-		setPaymentInstructions(code, paymentMeansText, remittanceInformation, ctList, paymentCard, directDebit);		
-	}
 	@Override
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {

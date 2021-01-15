@@ -913,9 +913,11 @@ UBL:
 	}
 	
 	// BG-16 + 0..1 PAYMENT INSTRUCTIONS / Zahlungsanweisungen
-	// factory
-	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText) {
-		return new PaymentMeans(code, paymentMeansText, null, null, null, null);
+	// factory delegate to PaymentMeans
+	@Override
+	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		return PaymentMeans.create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 	// BG-16.BT-81 ++ 1..1 Payment means type code
 	// BG-16.BT-82 ++ 0..1 Payment means text
@@ -924,12 +926,6 @@ UBL:
 	// BG-16.BG-18 ++ 0..1 PAYMENT CARD INFORMATION
 	// BG-16.BG-19 ++ 0..1 DIRECT DEBIT
 	@Override
-	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, CreditTransfer creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		List<CreditTransfer> ctList = new ArrayList<CreditTransfer>();
-		if(creditTransfer!=null) ctList.add(creditTransfer);
-		setPaymentInstructions(code, paymentMeansText, remittanceInformation, ctList, paymentCard, directDebit);
-	}
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
 // TODO in ubl gibt es keine List<CreditTransfer> !!! ABER mehrere PaymentMeans 
@@ -966,6 +962,7 @@ UBL:
 		}
 	}
 
+	// BG-16 (DE CIUS mandatory) PAYMENT INSTRUCTIONS
 	@Override
 	public PaymentInstructions getPaymentInstructions() {
 		PaymentMeansType paymentMeans = getPaymentMeans0();

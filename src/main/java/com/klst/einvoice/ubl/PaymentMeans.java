@@ -8,6 +8,7 @@ import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
+import com.klst.einvoice.PaymentInstructionsFactory;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CardAccountType;
@@ -109,8 +110,18 @@ Bsp: miad :
     </cac:PaymentMeans>
 
  */
-public class PaymentMeans extends PaymentMeansType implements PaymentInstructions {
+public class PaymentMeans extends PaymentMeansType implements PaymentInstructions, PaymentInstructionsFactory {
 
+	// implements PaymentInstructionsFactory
+	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		return create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+	}
+	static PaymentInstructions create(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		return new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+	}
+	
 	private static final Logger LOG = Logger.getLogger(PaymentMeans.class.getName());
 	
 	// copy ctor

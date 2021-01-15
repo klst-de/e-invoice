@@ -41,7 +41,7 @@ public interface DirectDebit {
 	 * Used in order to pre-notify the Buyer of a SEPA direct debit.
 	 * <p>
 	 * Cardinality: 	0..1
-	 * <br>EN16931-ID: 	BT-89
+	 * <br>EN16931-ID: 	BG-19.BT-89
 	 * <br>Rule ID: 	
 	 * <br>Request ID: 	R69
 	 * 
