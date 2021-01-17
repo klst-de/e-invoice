@@ -21,6 +21,10 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
               An invoice the invoicee is producing instead of the seller.
      381   Credit note
               (1113) Document/message for providing credit information to the relevant party.
+     382   Commission note
+              (1111) Document/message in which a seller specifies the amount of commission, 
+              the percentage of the invoice amount, or some other basis for the calculation of the
+              commission to which a sales agent is entitled.
 
  */
 public enum DocumentNameCode {
@@ -33,7 +37,8 @@ public enum DocumentNameCode {
 	CommercialInvoice		(380),
 	CorrectedInvoice 		(384),
 	SelfbilledInvoice		(389),
-	CreditNote 				(381);
+	CreditNote 				(381),
+	CommissionNote 			(382);
 	
 	/**
 	 * @see <A HREF="http://www.unece.org/trade/untdid/d13b/tred/tred1001.htm">UN/EDIFACT 1001</A>
