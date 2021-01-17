@@ -1120,14 +1120,14 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	@Override
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		return ApplicableHeaderTradeSettlement.create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+		applicableHeaderTradeSettlement.init(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+		return applicableHeaderTradeSettlement;
 	}
 
 	@Override
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		PaymentInstructions pi = ApplicableHeaderTradeSettlement.create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
-		setPaymentInstructions(pi);
+		applicableHeaderTradeSettlement.init(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 
 	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
