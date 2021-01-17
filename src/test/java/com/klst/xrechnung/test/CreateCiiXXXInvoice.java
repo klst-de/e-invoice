@@ -148,12 +148,6 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		LOG.info("buyerParty:"+buyerParty.getBusinessName() + " Address:"+buyerParty.getAddress());
 		cii.setBuyer(buyerParty);
 
-		// BG-20 + BG-21- 0..n
-		List<AllowancesAndCharges> aac = testDoc.getAllowancesAndCharges();
-		aac.forEach(ac ->{
-			cii.addAllowanceCharge(ac);
-		});
-		
 		// Cardinality: 0..n EN16931-ID: BG-24
 		List<BG24_AdditionalSupportingDocs> additionalSupportingDocs = testDoc.getAdditionalSupportingDocuments();
 		additionalSupportingDocs.forEach(additionalSupportingDoc -> {
@@ -256,6 +250,12 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			cii.setPaymentInstructions(paymentInstructions);
 		}
 
+		// BG-20 + BG-21- 0..n // TODO muss nach BG-16 ausgeführt werden TODO
+		List<AllowancesAndCharges> aac = testDoc.getAllowancesAndCharges();
+		aac.forEach(ac ->{
+			cii.addAllowanceCharge(ac);
+		});
+		
 		cii.setDocumentCurrency(testDoc.getDocumentCurrency());
 		if(testDoc.getTaxCurrency()!=null) {
 			cii.setTaxCurrency(testDoc.getTaxCurrency());

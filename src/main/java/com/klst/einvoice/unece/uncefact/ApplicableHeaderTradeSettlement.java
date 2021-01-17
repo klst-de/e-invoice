@@ -203,6 +203,12 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 			this.setRemittanceInformation(getRemittanceInformation(ahts));
 		}
 		
+		// BG-20 + BG-21- 0..n
+		getAllowancesAndCharges(ahts).forEach(aac -> {
+			addAllowanceCharge(aac);
+		});
+
+		
 		// 1 .. 1 SpecifiedTradeSettlementHeaderMonetarySummation Gesamtsummen auf Dokumentenebene BG-22 : nicht null
 		setSpecifiedTradeSettlementHeaderMonetarySummation(ahts.getSpecifiedTradeSettlementHeaderMonetarySummation());
 		
@@ -244,6 +250,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 			case SEPACreditTransfer:
 				FinancialAccount creditTransfer = new FinancialAccount(pm);
 				newPm.setPayeePartyCreditorFinancialAccount(creditTransfer.payeePartyCreditorFinancialAccount);	
+				newPm.setPayeeSpecifiedCreditorFinancialInstitution(creditTransfer.payeeSpecifiedCreditorFinancialInstitution);
 				break;		
 			case BankCard:
 //	TODO
@@ -271,6 +278,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 					= addPaymentMeans(paymentMeansCode, paymentMeansText); // BT-81, BT-82
 				FinancialAccount creditTransfer = new FinancialAccount(pm);
 				newPm.setPayeePartyCreditorFinancialAccount(creditTransfer.payeePartyCreditorFinancialAccount);
+				newPm.setPayeeSpecifiedCreditorFinancialInstitution(creditTransfer.payeeSpecifiedCreditorFinancialInstitution);
 			}
 		}
 	} // copy ctor
@@ -290,11 +298,13 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		 // BG-17 :
 		if(creditTransfer.size()>0) {
 			pm.setPayeePartyCreditorFinancialAccount(((FinancialAccount)creditTransfer.get(0)).payeePartyCreditorFinancialAccount);
+			pm.setPayeeSpecifiedCreditorFinancialInstitution(((FinancialAccount)creditTransfer.get(0)).payeeSpecifiedCreditorFinancialInstitution);
 		}
 		for(int i=1; i<creditTransfer.size(); i++) {
 			TradeSettlementPaymentMeansType newPm 
 				= addPaymentMeans(code, paymentMeansText); // BT-81, BT-82
 			newPm.setPayeePartyCreditorFinancialAccount(((FinancialAccount)creditTransfer.get(i)).payeePartyCreditorFinancialAccount);
+			newPm.setPayeeSpecifiedCreditorFinancialInstitution(((FinancialAccount)creditTransfer.get(i)).payeeSpecifiedCreditorFinancialInstitution);
 		}
 		setPaymentCard(paymentCard); // BG-18
 		setDirectDebit(directDebit); // BG-19
@@ -611,7 +621,10 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		super.getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge); // ram:SpecifiedTradeAllowanceCharge
 	}
 	public List<AllowancesAndCharges> getAllowancesAndCharges() {
-		List<TradeAllowanceChargeType> list = super.getSpecifiedTradeAllowanceCharge();
+		return getAllowancesAndCharges(this);
+	}
+	static List<AllowancesAndCharges> getAllowancesAndCharges(HeaderTradeSettlementType hts) {
+		List<TradeAllowanceChargeType> list = hts.getSpecifiedTradeAllowanceCharge();
 		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>(list.size());
 		list.forEach(stac -> {
 			res.add(new TradeAllowanceCharge(stac));
