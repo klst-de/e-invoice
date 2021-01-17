@@ -203,10 +203,10 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 			this.setRemittanceInformation(getRemittanceInformation(ahts));
 		}
 		
-		// BG-20 + BG-21- 0..n
-		getAllowancesAndCharges(ahts).forEach(aac -> {
-			addAllowanceCharge(aac);
-		});
+//		// BG-20 + BG-21- 0..n
+//		getAllowancesAndCharges(ahts).forEach(aac -> {
+//			addAllowanceCharge(aac);
+//		});
 
 		
 		// 1 .. 1 SpecifiedTradeSettlementHeaderMonetarySummation Gesamtsummen auf Dokumentenebene BG-22 : nicht null
