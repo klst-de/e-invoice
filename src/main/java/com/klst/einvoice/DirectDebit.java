@@ -48,8 +48,8 @@ public interface DirectDebit {
 	 * @return Identifier
 	 */
 	// BT-89 +++ 0..1 Mandate reference identifier, DirectDebitMandateID, Kennung der Mandatsreferenz
-	public String getMandateReferencetID();
-	public void setMandateReferencetID(String id);
+	public String getMandateReferencedID();
+	public void setMandateReferencedID(String id);
 
 	// BT-90 +++ 0..1 Bank assigned creditor identifier, CreditorReferenceID, Kennung des Gläubigers
 	// Hinweis: Wird verwendet, um den Käufer vorweg über eine SEPA-Lastschrift in Kenntnis zu setzen.
