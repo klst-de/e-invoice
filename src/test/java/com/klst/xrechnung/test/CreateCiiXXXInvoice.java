@@ -250,14 +250,14 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			cii.setPaymentInstructions(paymentInstructions);
 		}
 
-		// BG-20 + BG-21- 0..n // TODO muss nach BG-16 ausgeführt werden TODO
+		// BG-20 + BG-21 0..n
 		List<AllowancesAndCharges> aac = testDoc.getAllowancesAndCharges();
 		aac.forEach(ac ->{
 			cii.addAllowanceCharge(ac);
 		});
 		
-		cii.setDocumentCurrency(testDoc.getDocumentCurrency());
-		if(testDoc.getTaxCurrency()!=null) {
+		cii.setDocumentCurrency(testDoc.getDocumentCurrency()); // BT-5
+		if(testDoc.getTaxCurrency()!=null) {                    // BT-6
 			cii.setTaxCurrency(testDoc.getTaxCurrency());
 		}
 		cii.setTaxCurrency(testDoc.getTaxCurrency()); // BT-6 + 0..1 (optional)
