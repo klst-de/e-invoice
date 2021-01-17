@@ -210,7 +210,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		}
 
 		PaymentInstructions pi = testDoc.getPaymentInstructions(); // BG-16 (mandatory) PAYMENT INSTRUCTIONS
-		if(pi==null) {
+		if(pi==null || pi.getPaymentMeansEnum()==null) {
 			LOG.warning("BG-16 (mandatory) PAYMENT INSTRUCTIONS:"+pi);
 		} else {
 			List<CreditTransfer> creditTransferList = pi.getCreditTransfer();

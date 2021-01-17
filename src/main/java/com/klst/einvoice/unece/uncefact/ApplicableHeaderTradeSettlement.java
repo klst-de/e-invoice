@@ -253,7 +253,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 				newPm.setPayeeSpecifiedCreditorFinancialInstitution(creditTransfer.payeeSpecifiedCreditorFinancialInstitution);
 				break;		
 			case BankCard:
-//	TODO
+				this.setPaymentCard(getPaymentCard(ahts));
 				break;
 			case DirectDebit: 
 			case SEPADirectDebit: 
@@ -300,15 +300,17 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		TradeSettlementPaymentMeansType pm = addPaymentMeans(code, paymentMeansText); // BT-81, BT-82
 		setRemittanceInformation(remittanceInformation); // BT-83
 		 // BG-17 :
-		if(creditTransfer.size()>0) {
-			pm.setPayeePartyCreditorFinancialAccount(((FinancialAccount)creditTransfer.get(0)).payeePartyCreditorFinancialAccount);
-			pm.setPayeeSpecifiedCreditorFinancialInstitution(((FinancialAccount)creditTransfer.get(0)).payeeSpecifiedCreditorFinancialInstitution);
-		}
-		for(int i=1; i<creditTransfer.size(); i++) {
-			TradeSettlementPaymentMeansType newPm 
-				= addPaymentMeans(code, paymentMeansText); // BT-81, BT-82
-			newPm.setPayeePartyCreditorFinancialAccount(((FinancialAccount)creditTransfer.get(i)).payeePartyCreditorFinancialAccount);
-			newPm.setPayeeSpecifiedCreditorFinancialInstitution(((FinancialAccount)creditTransfer.get(i)).payeeSpecifiedCreditorFinancialInstitution);
+		if(creditTransfer!=null) {
+			if(creditTransfer.size()>0) {
+				pm.setPayeePartyCreditorFinancialAccount(((FinancialAccount)creditTransfer.get(0)).payeePartyCreditorFinancialAccount);
+				pm.setPayeeSpecifiedCreditorFinancialInstitution(((FinancialAccount)creditTransfer.get(0)).payeeSpecifiedCreditorFinancialInstitution);
+			}
+			for(int i=1; i<creditTransfer.size(); i++) {
+				TradeSettlementPaymentMeansType newPm 
+					= addPaymentMeans(code, paymentMeansText); // BT-81, BT-82
+				newPm.setPayeePartyCreditorFinancialAccount(((FinancialAccount)creditTransfer.get(i)).payeePartyCreditorFinancialAccount);
+				newPm.setPayeeSpecifiedCreditorFinancialInstitution(((FinancialAccount)creditTransfer.get(i)).payeeSpecifiedCreditorFinancialInstitution);
+			}
 		}
 		setPaymentCard(paymentCard); // BG-18
 		setDirectDebit(directDebit); // BG-19
