@@ -8,22 +8,19 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
-import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.DirectDebit;
-import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
-import com.klst.einvoice.PaymentCardFactory;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.Reference;
@@ -81,7 +78,7 @@ import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.DateType;
 
-public class GenericInvoice <T> implements CoreInvoice, CreditTransferFactory, PaymentCardFactory, DirectDebitFactory  {
+public class GenericInvoice <T> implements CoreInvoice  {
 
 	private static final Logger LOG = Logger.getLogger(GenericInvoice.class.getName());
 	

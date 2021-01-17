@@ -58,7 +58,7 @@ public class PaymentMandate extends PaymentMandateType implements DirectDebit {
 	 */
 	public static DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, Object debitedAccountID) {
 		DirectDebit directDebit = createDirectDebit(debitedAccountID); 
-		directDebit.setMandateReferencetID(mandateID);
+		directDebit.setMandateReferencedID(mandateID);
 		directDebit.setBankAssignedCreditorID(bankAssignedCreditorID);
 		return directDebit;
 	}
@@ -70,7 +70,7 @@ public class PaymentMandate extends PaymentMandateType implements DirectDebit {
 	// copy ctor
 	public PaymentMandate(PaymentMandateType doc) {
 		this();
-		setMandateReferencetID(doc.getID()==null ? null : doc.getID().getValue());
+		setMandateReferencedID(doc.getID()==null ? null : doc.getID().getValue());
 //		getBankAssignedCreditorID(doc.getID().getValue()); TODO
 		setDebitedAccountID(getDebitedAccountID(doc));
 	}
@@ -88,12 +88,12 @@ public class PaymentMandate extends PaymentMandateType implements DirectDebit {
 	 * @see com.klst.einvoice.DirectDebit#getMandateReferencetID()
 	 */
 	@Override
-	public String getMandateReferencetID() {
+	public String getMandateReferencedID() {
 		return super.getID()==null ? null : super.getID().getValue();
 	}
 
 	@Override
-	public void setMandateReferencetID(String id) {
+	public void setMandateReferencedID(String id) {
 		super.setID(new ID(id));	
 	}
 
@@ -142,7 +142,7 @@ public class PaymentMandate extends PaymentMandateType implements DirectDebit {
 
 	public String toString() {
 		return "["
-			+"MandateReferencetID="+this.getMandateReferencetID()
+			+"MandateReferencetID="+this.getMandateReferencedID()
 			+", BankAssignedCreditorID="+this.getBankAssignedCreditorID()
 			+", DebitedAccountID="+this.getDebitedAccountID()
 			+ "]";
