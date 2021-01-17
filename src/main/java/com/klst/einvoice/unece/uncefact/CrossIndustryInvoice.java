@@ -144,26 +144,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		LOG.fine("copy-ctor: PayeeParty ...");
 		TradePartyType tradeParty = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getPayeeTradeParty();
 		if(tradeParty!=null) setPayee(new TradeParty(tradeParty));
-		
-		IDType creditorReferenceID = //doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getCreditorReferenceID();
-				applicableHeaderTradeSettlement.getCreditorReferenceID();
-		ID creditorReference = creditorReferenceID==null? null : new ID(creditorReferenceID);
-		LOG.fine("copy-ctor: getPaymentMeansEnum="+applicableHeaderTradeSettlement.getPaymentMeansEnum() 
-		 + " creditorReference:"+ creditorReference
-		 + " PaymentMeansText:"+applicableHeaderTradeSettlement.getPaymentMeansText() 
-		 + " RemittanceInformation:"+applicableHeaderTradeSettlement.getRemittanceInformation());
-		// [BR-DE-13] In der Rechnung müssen Angaben zu genau einer der drei Gruppen 
-		// - "CREDIT TRANSFER" (BG-17), 
-		// - "PAYMENT CARD INFORMATION" (BG-18) oder 
-		// - "DIRECT DEBIT" (BG-19) übermittelt werden.
-		List<CreditTransfer> creditTransferList = applicableHeaderTradeSettlement.getCreditTransfer();
-		LOG.fine("copy-ctor: creditTransferList size="+creditTransferList.size());
-		DirectDebit dd = applicableHeaderTradeSettlement.getDirectDebit();
-		LOG.fine("copy-ctor: DirectDebit ="+dd);
-		setPaymentInstructions(applicableHeaderTradeSettlement.getPaymentMeansEnum()
-				, applicableHeaderTradeSettlement.getPaymentMeansText(), applicableHeaderTradeSettlement.getRemittanceInformation()
-				, creditTransferList, null, dd);
-		
+				
 		setStartDate(getStartDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement()));
 		setEndDate(getEndDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement()));
 		
@@ -1145,40 +1126,12 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	@Override
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		if(applicableHeaderTradeSettlement==null) {
-			//applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
-			createPaymentInstructions(code, paymentMeansText);
-		}
-		//setPaymentInstructions(applicableHeaderTradeSettlement);
-		if(code==null) {
-			LOG.warning("PaymentMeansEnum code ist nicht vorhanden!!!!!! code="+code);
-			return;
-		}
-		applicableHeaderTradeSettlement.setPaymentMeans(code, paymentMeansText);
-		applicableHeaderTradeSettlement.setRemittanceInformation(remittanceInformation);
-		switch(code) { 
-		case CreditTransfer:
-		case SEPACreditTransfer:
-			creditTransfer.forEach(ct -> {
-				applicableHeaderTradeSettlement.addCreditTransfer(ct);
-			});
-			break;		
-		case BankCard:
-			applicableHeaderTradeSettlement.setPaymentCard(paymentCard);
-			break;
-		case DirectDebit: 
-		case SEPADirectDebit: 
-			applicableHeaderTradeSettlement.setDirectDebit(directDebit);
-			break;
-		default:
-			LOG.warning(NOT_IMPEMENTED + ": PaymentMeans "+code);
-			break;
-		}
+		PaymentInstructions pi = ApplicableHeaderTradeSettlement.create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+		setPaymentInstructions(pi);
 	}
 
 	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
-		LOG.info("// TODO ?brauche ich es? im ctor: applicableHeaderTradeSettlement = new ...");
-		applicableHeaderTradeSettlement.setPaymentInstructions(paymentInstructions);
+		applicableHeaderTradeSettlement = (ApplicableHeaderTradeSettlement)paymentInstructions;
 	}
 	public PaymentInstructions getPaymentInstructions() {
 		return applicableHeaderTradeSettlement; // das implementiert PaymentInstructions!

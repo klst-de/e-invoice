@@ -215,52 +215,46 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 			cii.setDelivery(delivery);
 		}
 
-		PaymentInstructions pi = testDoc.getPaymentInstructions();
-		ApplicableHeaderTradeSettlement ats = (ApplicableHeaderTradeSettlement)pi;
-		PaymentMeansEnum code = ats.getPaymentMeansEnum();
-		if(code!=null) {
-			LOG.info("testDoc.PaymentInstructions RemittanceInformation:"+ats.getRemittanceInformation() +
-					" CreditorReferenceID:" + ats.getCreditorReferenceID() +
-					" PaymentMeansEnum:"+code + " PaymentMeansText:"+ats.getPaymentMeansText());
+		PaymentInstructions pi = testDoc.getPaymentInstructions(); // BG-16 (mandatory) PAYMENT INSTRUCTIONS
+		if(pi==null) {
+			LOG.warning("BG-16 (mandatory) PAYMENT INSTRUCTIONS:"+pi);
+		} else {
 			List<CreditTransfer> creditTransferList = pi.getCreditTransfer();
-			CreditTransfer creditTransferAccount = null;
-			PaymentCard paymentCard = null;
-			DirectDebit directDebitAccount = null; // getMandateReferencetID : direct debit authorisation == Einzugsermächtigung
-			DirectDebit dd = pi.getDirectDebit(); // interface DirectDebit
-			switch(code) {
+			PaymentMeansEnum paymentMeansCode = pi.getPaymentMeansEnum();
+			LOG.info("paymentMeansCode="+paymentMeansCode
+				+ " paymentMeansText:"+pi.getPaymentMeansText()
+				+ " BT-83 remittanceInformation:"+pi.getRemittanceInformation()
+				+ "\n BG-17 CreditTransfer:"+creditTransferList.size()
+				+ "\n BG-18 PaymentCard:"+pi.getPaymentCard()
+				+ "\n BG-19 DirectDebit:"+pi.getDirectDebit()
+				);
+			PaymentInstructions paymentInstructions = null;
+//			paymentInstructions = cii.createPaymentInstructions(pi.getPaymentMeansEnum(), pi.getPaymentMeansText(), pi.getRemittanceInformation()
+//				, creditTransferList, pi.getPaymentCard(), pi.getDirectDebit() );
+			// oder:
+			switch(paymentMeansCode) {
 			case CreditTransfer:
 			case SEPACreditTransfer:
-				if(creditTransferList.isEmpty()) {
-					// no CreditTransfer
-				} else {
-					creditTransferList.forEach(testCT -> {
-						LOG.info("interface CreditTransfer "+testCT);
-					});
-					creditTransferAccount = creditTransferList.get(0);
-				}
+				paymentInstructions = cii.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText()
+						, pi.getRemittanceInformation(), creditTransferList );
 				break;
 			case BankCard:
-				paymentCard = pi.getPaymentCard();
-				LOG.info("paymentCard.Account"+paymentCard.getCardAccountID());
+				paymentInstructions = cii.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText()
+						, pi.getRemittanceInformation(), pi.getPaymentCard() );
 				break;
 			case DirectDebit:
 			case SEPADirectDebit:
-				if(dd==null) {
-					// no DirectDebit
-				} else {
-					IBANId iban = new IBANId(dd.getDebitedAccountID());
-					LOG.info("interface DirectDebit "+dd + " IBAN="+iban);
-					directDebitAccount = new FinancialAccount(iban);
-				}
+				paymentInstructions = cii.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText()
+						, pi.getRemittanceInformation(), pi.getDirectDebit() );
 				break;
 			default:
-				LOG.warning("[BR-DE-13] In der Rechnung müssen Angaben zu genau einer der drei Gruppen sein: CREDIT TRANSFER, PAYMENT CARD INFORMATION, DIRECT DEBIT - Ist:"+code);
+				LOG.warning("[BR-DE-13] In der Rechnung müssen Angaben zu genau einer der drei Gruppen sein: CREDIT TRANSFER, PAYMENT CARD INFORMATION, DIRECT DEBIT - Ist:"
+						+ paymentMeansCode);
+				paymentInstructions = cii.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText());
 				break;
 			}
-			cii.setPaymentInstructions(ats.getPaymentMeansEnum(), ats.getPaymentMeansText(), ats.getRemittanceInformation()
-					, creditTransferAccount, paymentCard, directDebitAccount);
+			cii.setPaymentInstructions(paymentInstructions);
 		}
-
 
 		cii.setDocumentCurrency(testDoc.getDocumentCurrency());
 		if(testDoc.getTaxCurrency()!=null) {

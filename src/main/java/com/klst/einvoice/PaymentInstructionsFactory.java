@@ -18,11 +18,28 @@ import com.klst.untdid.codelist.PaymentMeansEnum;
 
 public interface PaymentInstructionsFactory {
 	
-	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText
+			, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit);
 	
 	default PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText) {
 		return createPaymentInstructions(code, paymentMeansText, null, null, null, null);
 	}
 	
+	/*
+	 * BR-DE-13: In der Rechnung müssen Angaben zu genau einer der drei Gruppen sein: 
+	 * CREDIT TRANSFER, PAYMENT CARD INFORMATION, DIRECT DEBIT 
+	 */
+	default PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText
+			, String remittanceInformation, List<CreditTransfer> creditTransfer) {
+		return createPaymentInstructions(code, paymentMeansText, remittanceInformation, creditTransfer, null, null);
+	}
+	default PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText
+			, String remittanceInformation, PaymentCard paymentCard) {
+		return createPaymentInstructions(code, paymentMeansText, remittanceInformation, null, paymentCard, null);
+	}
+	default PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText
+			, String remittanceInformation, DirectDebit directDebit) {
+		return createPaymentInstructions(code, paymentMeansText, remittanceInformation, null, null, directDebit);
+	}
 }
