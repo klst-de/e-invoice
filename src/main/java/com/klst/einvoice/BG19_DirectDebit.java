@@ -31,7 +31,7 @@ import com.klst.einvoice.unece.uncefact.IBANId;
  * 
  */
 
-public interface DirectDebit {
+public interface BG19_DirectDebit extends DirectDebit {
 	
 	/**
 	 * Mandate reference identifier
@@ -47,14 +47,14 @@ public interface DirectDebit {
 	 * 
 	 * @return Identifier
 	 */
-//	// BT-89 +++ 0..1 Mandate reference identifier, DirectDebitMandateID, Kennung der Mandatsreferenz
-//	public String getMandateReferencedID();
-//	public void setMandateReferencedID(String id);
-//
-//	// BT-90 +++ 0..1 Bank assigned creditor identifier, CreditorReferenceID, Kennung des Gläubigers
-//	// Hinweis: Wird verwendet, um den Käufer vorweg über eine SEPA-Lastschrift in Kenntnis zu setzen.
-//	public String getBankAssignedCreditorID();
-//	public void setBankAssignedCreditorID(String id);
+	// BT-89 +++ 0..1 Mandate reference identifier, DirectDebitMandateID, Kennung der Mandatsreferenz
+	public String getMandateReferencedID();
+	public void setMandateReferencedID(String id);
+
+	// BT-90 +++ 0..1 Bank assigned creditor identifier, CreditorReferenceID, Kennung des Gläubigers
+	// Hinweis: Wird verwendet, um den Käufer vorweg über eine SEPA-Lastschrift in Kenntnis zu setzen.
+	public String getBankAssignedCreditorID();
+	public void setBankAssignedCreditorID(String id);
 	
 	// BT-91 +++ 0..1 Debited account identifier
 	// IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos

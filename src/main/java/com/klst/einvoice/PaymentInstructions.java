@@ -149,7 +149,7 @@ public interface PaymentInstructions {
 	public PaymentCard getPaymentCard();
 	
 	// BG-19 (optional) DIRECT DEBIT
-	public void setDirectDebit(DirectDebit directDebit);
-	public DirectDebit getDirectDebit();
+	public void setDirectDebit(BG19_DirectDebit directDebit);
+	public BG19_DirectDebit getDirectDebit();
 	
 }
