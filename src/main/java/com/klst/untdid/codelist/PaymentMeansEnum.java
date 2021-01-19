@@ -112,4 +112,22 @@ public enum PaymentMeansEnum {
         return valueOf(code);
     }
 
+    public static boolean isCreditTransfer(PaymentMeansEnum code) {
+		if(code==null) return false;
+		return(code==CreditTransfer 
+			|| code==SEPACreditTransfer);
+	}
+
+    public static boolean isBankCard(PaymentMeansEnum code) {
+		if(code==null) return false;
+		return (code==BankCard);
+	}
+	
+    public static boolean isDirectDebit(PaymentMeansEnum code) {
+		if(code==null) return false;
+		return(code==DebitTransfer
+			|| code==DirectDebit
+			|| code==SEPADirectDebit);
+	}
+
 }

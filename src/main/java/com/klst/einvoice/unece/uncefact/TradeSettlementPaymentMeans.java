@@ -150,29 +150,15 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 	}
 	
 	boolean isCreditTransfer() {
-		return isCreditTransfer(getPaymentMeansEnum());
-	}
-	static boolean isCreditTransfer(PaymentMeansEnum code) {
-		if(code==null) return false;
-		return(code==PaymentMeansEnum.CreditTransfer 
-			|| code==PaymentMeansEnum.SEPACreditTransfer);
+		return PaymentMeansEnum.isCreditTransfer(getPaymentMeansEnum());
 	}
 	
 	boolean isBankCard() {
-		return isBankCard(getPaymentMeansEnum());
-	}
-	static boolean isBankCard(PaymentMeansEnum code) {
-		if(code==null) return false;
-		return (code==PaymentMeansEnum.BankCard);
+		return PaymentMeansEnum.isBankCard(getPaymentMeansEnum());
 	}
 	
 	boolean isDirectDebit() {
-		return isDirectDebit(getPaymentMeansEnum());
-	}
-	static boolean isDirectDebit(PaymentMeansEnum code) {
-		if(code==null) return false;
-		return(code==PaymentMeansEnum.DirectDebit 
-			|| code==PaymentMeansEnum.SEPADirectDebit);
+		return PaymentMeansEnum.isDirectDebit(getPaymentMeansEnum());
 	}
 	
 	// BT-82 
