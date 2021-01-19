@@ -21,7 +21,6 @@ import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
-import com.klst.einvoice.PaymentCardFactory;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.Reference;
@@ -61,7 +60,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 // @see https://www.unece.org/fileadmin/DAM/cefact/rsm/RSM_CrossIndustryInvoice_v2.0.pdf
 //      https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=2ahUKEwijlav-gPjhAhUGU1AKHSv2CIoQFjAAegQIARAC&url=https%3A%2F%2Fwww.unece.org%2Ffileadmin%2FDAM%2Fcefact%2Frsm%2FRSM_CrossIndustryInvoice_v2.0.pdf&usg=AOvVaw0yPVFpbRqJ50xaDMUaYm62
 // ZUGFeRD 2.0 Spezifikation - Technischer Anhang : ZUGFeRD-2.0-Spezifikation-TA.pdf
-public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements CoreInvoice, PaymentCardFactory {
+public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements CoreInvoice {
 
 	private static final Logger LOG = Logger.getLogger(CrossIndustryInvoice.class.getName());
 	
@@ -433,19 +432,17 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	}
 
 	// BT-9 0..1 & BT-20 0..1 : Payment terms & Payment due date
-	// TODO auch <ram:DirectDebitMandateID> BG-19.BT-89 ist darin
+	// auch <ram:DirectDebitMandateID> BG-19.BT-89 ist in TradePaymentTermsType
 	@Override
 	public void setPaymentTermsAndDate(String description, Timestamp ts) {
 		LOG.fine("setPaymentTermsAndDate: description:"+description + " & Payment due date Timestamp:"+ts);
 		TradePaymentTermsType tradePaymentTerms = applicableHeaderTradeSettlement.getPaymentTerms();
-//		TradePaymentTermsType tradePaymentTerms = new TradePaymentTermsType();
 		if(description!=null) {
 			tradePaymentTerms.getDescription().add(new Text(description)); // returns List<TextType>
 		}
 		if(ts!=null) {
 			tradePaymentTerms.setDueDateDateTime(newDateTime(ts));
-		}
-		
+		}	
 		applicableHeaderTradeSettlement.setPaymentTerms(tradePaymentTerms);
 	}
 	
