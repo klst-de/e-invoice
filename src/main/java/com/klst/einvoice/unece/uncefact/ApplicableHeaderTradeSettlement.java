@@ -234,66 +234,46 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 		} else {
 			// anhand von code ergibt sich, welcher der drei verwendet wird
 			TradeSettlementPaymentMeansType pm = tradeSettlementPaymentMeans.get(0);
-			PaymentMeansEnum paymentMeansCode = getPaymentMeansEnum(pm);
-			String paymentMeansText = getPaymentMeansText(pm);
-//			TradeSettlementPaymentMeansType newPm 
-//				= addPaymentMeans(paymentMeansCode, paymentMeansText); // BT-81, BT-82
-			switch(paymentMeansCode) { 
-/*
-	InstrumentNotDefined 	(1),
-	InCash 				(10),
-	Cheque				(20),
-	CreditTransfer 		(30),
-	DebitTransfer 		(31),
-	PaymentToBankAccount 	(42),
-	BankCard 			(48),
-	DirectDebit 		(49),
-	StandingAgreement 	(57),
-	SEPACreditTransfer 	(58),
-	SEPADirectDebit 	(59),
-	ClearingBetweenPartners (97);
- */
-			case CreditTransfer:
-			case SEPACreditTransfer:
-//				FinancialAccount creditTransfer = new FinancialAccount(pm);
-//				newPm.setPayeePartyCreditorFinancialAccount(creditTransfer.payeePartyCreditorFinancialAccount);	
-//				newPm.setPayeeSpecifiedCreditorFinancialInstitution(creditTransfer.payeeSpecifiedCreditorFinancialInstitution);
-				TradeSettlementPaymentMeans newPm = new TradeSettlementPaymentMeans(pm);
-				getSpecifiedTradeSettlementPaymentMeans().add(newPm);
-				break;		
-			case BankCard:
-//				TradeSettlementFinancialCardType card = pm.getApplicableTradeSettlementFinancialCard();
-//				this.setPaymentCard(card);
-				TradeSettlementPaymentMeans cardPm = new TradeSettlementPaymentMeans(pm);
-				getSpecifiedTradeSettlementPaymentMeans().add(cardPm);
-//				new TradeSettlementPaymentMeans(pm);
-				break;
-			case DirectDebit: 
-			case SEPADirectDebit: 
-//				FinancialAccount directDebit = new FinancialAccount(pm);
-//				newPm.setPayerPartyDebtorFinancialAccount(directDebit.payerPartyDebtorFinancialAccount);	
-//				super.getSpecifiedTradeSettlementPaymentMeans().add(newPm);
-				TradeSettlementPaymentMeans directDebit = new TradeSettlementPaymentMeans(pm);
-				getSpecifiedTradeSettlementPaymentMeans().add(directDebit);
-				break;
-			default:
-				LOG.warning("[BR-DE-13] In der Rechnung müssen Angaben zu genau einer der drei Gruppen sein: CREDIT TRANSFER, PAYMENT CARD INFORMATION, DIRECT DEBIT - Ist:"
-						+ paymentMeansCode);
-				break;
-			}
-
+//			PaymentMeansEnum paymentMeansCode = getPaymentMeansEnum(pm);
+//			String paymentMeansText = getPaymentMeansText(pm);
+//			switch(paymentMeansCode) { 
+///*
+//	InstrumentNotDefined 	(1),
+//	InCash 				(10),
+//	Cheque				(20),
+//	CreditTransfer 		(30),
+//	DebitTransfer 		(31),
+//	PaymentToBankAccount 	(42),
+//	BankCard 			(48),
+//	DirectDebit 		(49),
+//	StandingAgreement 	(57),
+//	SEPACreditTransfer 	(58),
+//	SEPADirectDebit 	(59),
+//	ClearingBetweenPartners (97);
+// */
+//			case CreditTransfer:
+//			case SEPACreditTransfer:
+//				getSpecifiedTradeSettlementPaymentMeans().add(new TradeSettlementPaymentMeans(pm));
+//				break;		
+//			case BankCard:
+//				getSpecifiedTradeSettlementPaymentMeans().add(new TradeSettlementPaymentMeans(pm));
+//				break;
+//			case DirectDebit: 
+//			case SEPADirectDebit: 
+//				getSpecifiedTradeSettlementPaymentMeans().add(new TradeSettlementPaymentMeans(pm));
+//				break;
+//			default:
+//				LOG.warning("[BR-DE-13] In der Rechnung müssen Angaben zu genau einer der drei Gruppen sein: CREDIT TRANSFER, PAYMENT CARD INFORMATION, DIRECT DEBIT - Ist:"
+//						+ paymentMeansCode);
+//				break;
+//			}
+			getSpecifiedTradeSettlementPaymentMeans().add(new TradeSettlementPaymentMeans(pm));
 		}
 		if(tradeSettlementPaymentMeans.size()>1) {
 			// mehrere PaymentInstructions bei CreditTransfer:
 			for(int i=1; i<tradeSettlementPaymentMeans.size(); i++) {
 				TradeSettlementPaymentMeansType pm = tradeSettlementPaymentMeans.get(i);
-//				PaymentMeansEnum paymentMeansCode = getPaymentMeansEnum(pm);
-//				String paymentMeansText = getPaymentMeansText(pm);
-//				TradeSettlementPaymentMeansType newPm 
-//					= addPaymentMeans(paymentMeansCode, paymentMeansText); // BT-81, BT-82
 				TradeSettlementPaymentMeans creditTransfer = new TradeSettlementPaymentMeans(pm);
-//				newPm.setPayeePartyCreditorFinancialAccount(creditTransfer.payeePartyCreditorFinancialAccount);
-//				newPm.setPayeeSpecifiedCreditorFinancialInstitution(creditTransfer.payeeSpecifiedCreditorFinancialInstitution);
 				getSpecifiedTradeSettlementPaymentMeans().add(creditTransfer);
 			}
 		}
