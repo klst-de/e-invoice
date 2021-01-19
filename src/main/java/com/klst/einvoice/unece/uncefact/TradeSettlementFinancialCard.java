@@ -3,6 +3,7 @@ package com.klst.einvoice.unece.uncefact;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.PaymentCard;
+import com.klst.einvoice.PaymentCardFactory;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementFinancialCardType;
 
@@ -21,15 +22,16 @@ Bsp: 03.02a:
           </ram:SpecifiedTradeSettlementPaymentMeans>
 
 */
-public class TradeSettlementFinancialCard extends TradeSettlementFinancialCardType implements PaymentCard {
+public class TradeSettlementFinancialCard extends TradeSettlementFinancialCardType 
+	implements PaymentCard, PaymentCardFactory {
 
 	private static final Logger LOG = Logger.getLogger(TradeSettlementFinancialCard.class.getName());
 	
 	// implements PaymentCardFactory
-//	@Override
-//	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
-//		return create(cardAccountID, cardHolderName);
-//	}
+	@Override
+	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
+		return create(cardAccountID, cardHolderName);
+	}
 	static PaymentCard create(String cardAccountID, String cardHolderName) {
 		return cardAccountID==null? null : new TradeSettlementFinancialCard(cardAccountID, cardHolderName);
 	}
@@ -63,21 +65,6 @@ public class TradeSettlementFinancialCard extends TradeSettlementFinancialCardTy
 		setCardHolderName(name);
 	}
 
-//	TradeSettlementFinancialCard(IDType pan) {
-//		this(pan==null? null : pan.getValue(), null);
-//	}
-	
-	// copy ctor:
-//	TradeSettlementFinancialCard(TradeSettlementFinancialCardType tradeSettlementFinancialCard) {
-//		this(tradeSettlementFinancialCard==null? null : tradeSettlementFinancialCard.getID());
-//		if(tradeSettlementFinancialCard==null) return;
-//		TextType cardholderName = tradeSettlementFinancialCard.getCardholderName();
-//		this.setCardHolderName(cardholderName==null? null : cardholderName.getValue());
-//	}
-//	// copy ctor:
-//	TradeSettlementFinancialCard(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
-//		this(tradeSettlementPaymentMeans==null? null : tradeSettlementPaymentMeans.getApplicableTradeSettlementFinancialCard());
-//	}
 
 	// BG-18.BT-87
 	@Override
