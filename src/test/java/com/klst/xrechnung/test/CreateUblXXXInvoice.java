@@ -9,6 +9,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
+import com.klst.einvoice.BG19_DirectDebit;
 import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG7_Buyer;
@@ -16,7 +17,6 @@ import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
@@ -333,8 +333,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			LOG.warning("paymentCard.isEmpty");
 		}
 		
-		DirectDebit directDebit = null;
-		DirectDebit dd = testDoc.getDirectDebit();
+		BG19_DirectDebit directDebit = null;
+		BG19_DirectDebit dd = testDoc.getDirectDebit();
 		if(dd==null) {
 			LOG.warning("dd.isEmpty");
 		} else {
@@ -362,10 +362,14 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
   </cac:PaymentMeans>
 
  */
-			LOG.info("DirectDebit/Lastschrift MandateReferencetID:"+dd.getMandateReferencetID() 
+			LOG.info("DirectDebit/Lastschrift MandateReferencetID:"+dd.getMandateReferencedID() 
 			+ " BankAssignedCreditorID:"+dd.getBankAssignedCreditorID() + " DebitedAccountID:"+dd.getDebitedAccountID());
-			// TODO DirectDebitFactory
-			directDebit = ((GenericInvoice)ublInvoice).createDirectDebit(dd.getMandateReferencetID(), dd.getBankAssignedCreditorID(), dd.getDebitedAccountID());
+			dd.getMandateReferencedID();
+			dd.getBankAssignedCreditorID();
+			dd.getDebitedAccountID();
+			directDebit = (BG19_DirectDebit)(
+					ublInvoice.createDirectDebit(dd.getMandateReferencedID(), dd.getBankAssignedCreditorID(), dd.getDebitedAccountID())
+					);
 		}
 		
 		ublInvoice.setPaymentInstructions(paymentInstructions.getPaymentMeansEnum(), paymentInstructions.getPaymentMeansText(), paymentInstructions.getRemittanceInformation()

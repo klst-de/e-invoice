@@ -1,6 +1,6 @@
 package com.klst.einvoice.ubl;
 
-import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.BG19_DirectDebit;
 import com.klst.einvoice.unece.uncefact.IBANId;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
@@ -26,11 +26,12 @@ Bsp. 03.01a :
     </cac:PaymentMandate>
   </cac:PaymentMeans>
 
+Bsp. 04.02a : ähnlich wie 03.01a
 
 Bsp. ubl-tc434-example5.xml :
 
     <cac:PaymentMeans>
-        <cbc:PaymentMeansCode>49</cbc:PaymentMeansCode>    <!-- BG-16.BT-81 -->
+        <cbc:PaymentMeansCode>49</cbc:PaymentMeansCode>    <!-- BG-16.BT-81 --> 49:Direct debit NONSEPA
         <cbc:InstructionNote>Half prepaid</cbc:InstructionNote>
         <cbc:PaymentID>Payref1</cbc:PaymentID>             <!-- BG-16.BT-83 0..1 Verwendungszweck -->
         <cac:PaymentMandate>
@@ -43,9 +44,9 @@ Bsp. ubl-tc434-example5.xml :
 
 
  */
-public class PaymentMandate extends PaymentMandateType implements DirectDebit {
+public class PaymentMandate extends PaymentMandateType implements BG19_DirectDebit {
 
-	static DirectDebit createDirectDebit(Object debitedAccountID) {
+	static BG19_DirectDebit createDirectDebit(Object debitedAccountID) {
 		return debitedAccountID.getClass()==IBANId.class ? new PaymentMandate((IBANId)debitedAccountID) : new PaymentMandate((String)debitedAccountID);
 	}
 	/**
@@ -56,8 +57,8 @@ public class PaymentMandate extends PaymentMandateType implements DirectDebit {
 	 * @param debitedAccountID
 	 * @return DirectDebit if object
 	 */
-	public static DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, Object debitedAccountID) {
-		DirectDebit directDebit = createDirectDebit(debitedAccountID); 
+	public static BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, Object debitedAccountID) {
+		BG19_DirectDebit directDebit = createDirectDebit(debitedAccountID); 
 		directDebit.setMandateReferencedID(mandateID);
 		directDebit.setBankAssignedCreditorID(bankAssignedCreditorID);
 		return directDebit;

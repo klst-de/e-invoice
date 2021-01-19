@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.BG19_DirectDebit;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.PaymentCard;
@@ -119,7 +120,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	}
 	static PaymentInstructions create(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		return new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+		return new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, (BG19_DirectDebit)directDebit);
 	}
 	
 	private static final Logger LOG = Logger.getLogger(PaymentMeans.class.getName());
@@ -197,7 +198,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			this.setCardAccount((CardAccount)paymentCard);
 		}
 		if(directDebit!=null) {
-			setDirectDebit(directDebit);
+			setDirectDebit((BG19_DirectDebit)directDebit);
 		}
 	}
 
@@ -316,12 +317,12 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	
 	// DirectDebit ist Interface, kein List da BG-19 die Kardinalität 0..1 hat
 	@Override
-	public void setDirectDebit(DirectDebit directDebit) {
+	public void setDirectDebit(BG19_DirectDebit directDebit) {
 		paymentMandate = (PaymentMandate)directDebit;
 		super.setPaymentMandate(paymentMandate);
 	}
 
-	public DirectDebit getDirectDebit() {
+	public BG19_DirectDebit getDirectDebit() {
 		if(paymentMandate==null) return null;
 		// class PaymentMandate extends PaymentMandateType implements DirectDebit
 		PaymentMandate directDebit = new PaymentMandate(paymentMandate);

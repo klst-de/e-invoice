@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.BG19_DirectDebit;
 import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
@@ -1000,7 +1001,7 @@ UBL:
 		return PaymentMandate.createDirectDebit(mandateID, bankAssignedCreditorID, debitedAccountID);
 	}
 
-	public DirectDebit getDirectDebit() {
+	public BG19_DirectDebit getDirectDebit() {
 		PaymentMeansType pm = getPaymentMeans0();
 		if(pm==null) return null;
 		PaymentMeans paymentMeans = new PaymentMeans(pm);
