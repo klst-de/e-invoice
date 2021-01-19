@@ -93,11 +93,6 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		return new TradeSettlementPaymentMeans(accountId, accountName, bic);
 	}
 
-//	@Override
-//	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
-//		TradeSettlementFinancialCard paymentCard = new TradeSettlementFinancialCard(cardAccountID, cardHolderName);
-//		return new TradeSettlementPaymentMeans(accountId, accountName, bic);
-//	}
 	static TradeSettlementPaymentMeans create(String cardAccountID, String cardHolderName) {
 		TradeSettlementFinancialCard paymentCard = new TradeSettlementFinancialCard(cardAccountID, cardHolderName);
 		return new TradeSettlementPaymentMeans(paymentCard);
@@ -206,7 +201,8 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		}
 		if(isBankCard()) {
 			stringBuilder.append(", PAYMENT CARD INFORMATION CardAccountID (BG-18.BT-87):");
-//			stringBuilder.append(getCardAccountID()==null ? "null" : getCardAccountID());
+			stringBuilder.append(getApplicableTradeSettlementFinancialCard()==null ? "null" 
+					: TradeSettlementFinancialCard.getCardAccountID(getApplicableTradeSettlementFinancialCard()));
 		}	
 		if(isDirectDebit()) {
 			stringBuilder.append(", DIRECT DEBIT DebitedAccountID (BG-19.BT-91):");

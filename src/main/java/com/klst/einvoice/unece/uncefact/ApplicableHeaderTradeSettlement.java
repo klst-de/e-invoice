@@ -333,6 +333,11 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 			setPaymentCard(paymentCard); // BG-18
 			setDirectDebit((BG19_DirectDebit)directDebit); // BG-19
 		}
+		if(getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
+			LOG.warning("no PaymentMeans");
+		} else {
+			LOG.info(this.getSpecifiedTradeSettlementPaymentMeans().get(0).toString());
+		}
 	}
 
 	// BT-5 + 1..1 Invoice currency code
