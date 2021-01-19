@@ -3,12 +3,8 @@ package com.klst.einvoice.unece.uncefact;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.PaymentCard;
-import com.klst.einvoice.PaymentCardFactory;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementFinancialCardType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 //Gruppe PAYMENT CARD                      BG-18
 /*
@@ -25,46 +21,63 @@ Bsp: 03.02a:
           </ram:SpecifiedTradeSettlementPaymentMeans>
 
 */
-public class FinancialCard extends TradeSettlementFinancialCardType implements PaymentCard, PaymentCardFactory {
+public class TradeSettlementFinancialCard extends TradeSettlementFinancialCardType implements PaymentCard {
 
-	private static final Logger LOG = Logger.getLogger(FinancialCard.class.getName());
+	private static final Logger LOG = Logger.getLogger(TradeSettlementFinancialCard.class.getName());
 	
 	// implements PaymentCardFactory
-	@Override
-	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
-		return create(cardAccountID, cardHolderName);
-	}
+//	@Override
+//	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
+//		return create(cardAccountID, cardHolderName);
+//	}
 	static PaymentCard create(String cardAccountID, String cardHolderName) {
-		return cardAccountID==null? null : new FinancialCard(cardAccountID, cardHolderName);
+		return cardAccountID==null? null : new TradeSettlementFinancialCard(cardAccountID, cardHolderName);
 	}
 
+	TradeSettlementFinancialCard(TradeSettlementFinancialCardType financialCard) {
+		super();
+		if(financialCard!=null) {
+			super.setMicrochipIndicator(financialCard.getMicrochipIndicator());
+			super.setID(financialCard.getID());
+			super.setTypeCode(financialCard.getTypeCode());
+			super.setCardholderName(financialCard.getCardholderName());
+			super.setExpiryDate(financialCard.getExpiryDate());
+			super.setVerificationNumeric(financialCard.getVerificationNumeric());
+			super.setValidFromDateTime(financialCard.getValidFromDateTime());
+			super.creditLimitAmount = financialCard.getCreditLimitAmount();
+			super.creditAvailableAmount = financialCard.getCreditAvailableAmount();
+			super.setInterestRatePercent(financialCard.getInterestRatePercent());
+			super.setIssuingCompanyName(financialCard.getIssuingCompanyName());
+			super.setDescription(financialCard.getDescription());
+		}
+	}
 	/**
 	 * BG-18 PAYMENT CARD INFORMATION
 	 * 
 	 * @param @param pan - (mandatory) Payment card primary account number (pan)
 	 * @param name - (optional) name of the payment card holder
 	 */
-	public FinancialCard(String pan, String name) {
+	public TradeSettlementFinancialCard(String pan, String name) {
 		super();
 		setCardAccountID(pan);
 		setCardHolderName(name);
 	}
 
-	FinancialCard(IDType pan) {
-		this(pan==null? null : pan.getValue(), null);
-	}
+//	TradeSettlementFinancialCard(IDType pan) {
+//		this(pan==null? null : pan.getValue(), null);
+//	}
 	
 	// copy ctor:
-	FinancialCard(TradeSettlementFinancialCardType tradeSettlementFinancialCard) {
-		this(tradeSettlementFinancialCard==null? null : tradeSettlementFinancialCard.getID());
-		if(tradeSettlementFinancialCard==null) return;
-		TextType cardholderName = tradeSettlementFinancialCard.getCardholderName();
-		this.setCardHolderName(cardholderName==null? null : cardholderName.getValue());
-	}
-	// copy ctor:
-	FinancialCard(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
-		this(tradeSettlementPaymentMeans==null? null : tradeSettlementPaymentMeans.getApplicableTradeSettlementFinancialCard());
-	}
+//	TradeSettlementFinancialCard(TradeSettlementFinancialCardType tradeSettlementFinancialCard) {
+//		this(tradeSettlementFinancialCard==null? null : tradeSettlementFinancialCard.getID());
+//		if(tradeSettlementFinancialCard==null) return;
+//		TextType cardholderName = tradeSettlementFinancialCard.getCardholderName();
+//		this.setCardHolderName(cardholderName==null? null : cardholderName.getValue());
+//	}
+//	// copy ctor:
+//	TradeSettlementFinancialCard(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
+//		this(tradeSettlementPaymentMeans==null? null : tradeSettlementPaymentMeans.getApplicableTradeSettlementFinancialCard());
+//	}
 
 	// BG-18.BT-87
 	@Override
@@ -74,6 +87,7 @@ public class FinancialCard extends TradeSettlementFinancialCardType implements P
 	static String getCardAccountID(TradeSettlementFinancialCardType card) {
 		if(card.getID()==null) {
 			LOG.warning("(mandatory) Payment card primary account number (pan) is not set.");
+			return null;
 		}
 		return card.getID().getValue();
 	}

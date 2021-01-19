@@ -14,10 +14,11 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementPaymentMeansType;
 
 //Gruppe CREDIT TRANSFER                   BG-17
+//Gruppe PAYMENT CARD INFORMATION          BG-18
 //Gruppe DIRECT DEBIT                      BG-19
 /*
 Bsp: 01.15a:
-
+...
         <ram:ApplicableHeaderTradeSettlement>
             <ram:PaymentReference>0000123456</ram:PaymentReference>
             <ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>
@@ -31,6 +32,18 @@ Bsp: 01.15a:
                     <ram:BICID>[BIC]</ram:BICID>
                 </ram:PayeeSpecifiedCreditorFinancialInstitution>              bis hierhin -->
             </ram:SpecifiedTradeSettlementPaymentMeans>
+
+Testfälle für PAYMENT CARD INFORMATION
+03.02a-INVOICE_uncefact.xml :
+...
+            <ram:SpecifiedTradeSettlementPaymentMeans>
+                <ram:TypeCode>48</ram:TypeCode>
+                <ram:ApplicableTradeSettlementFinancialCard>
+                    <ram:ID>41234</ram:ID>
+                    <ram:CardholderName>[Payment card holder name]</ram:CardholderName>
+                </ram:ApplicableTradeSettlementFinancialCard>
+            </ram:SpecifiedTradeSettlementPaymentMeans>
+
 
 Testfälle für DIRECT DEBIT
 0 .. 1 DirectDebitMandateID Kennung der Mandatsreferenz               BG-19.BT-89
@@ -59,42 +72,47 @@ Bsp: 03.01a:
 
 Bsp: 03.04a , 03.05a
  */
-public class FinancialAccount extends TradeSettlementPaymentMeansType implements CreditTransfer, CreditTransferFactory, DirectDebit {
-//DirectDebitFactory {
+public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType 
+	implements CreditTransfer, CreditTransferFactory, DirectDebit {
+//DirectDebitFactory PaymentCardFactory, {
 
 	// factory:
 	@Override
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
-		return FinancialAccount.create(iban, accountName, bic);
+		return TradeSettlementPaymentMeans.create(iban, accountName, bic);
 	}
 	static CreditTransfer create(IBANId iban, String accountName, BICId bic) {
-		return new FinancialAccount(iban, accountName, bic);
+		return new TradeSettlementPaymentMeans(iban, accountName, bic);
 	}
 
 	@Override
 	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic) {
-		return FinancialAccount.create(accountId, accountName, bic);
+		return TradeSettlementPaymentMeans.create(accountId, accountName, bic);
 	}
 	static CreditTransfer create(String accountId, String accountName, BICId bic) {
-		return new FinancialAccount(accountId, accountName, bic);
+		return new TradeSettlementPaymentMeans(accountId, accountName, bic);
 	}
 
-	static FinancialAccount create(IBANId debitedIban) {
-		return new FinancialAccount(debitedIban);
-	}
-	static FinancialAccount create(String debitedAccount, BICId bic) {
-		return new FinancialAccount(debitedAccount, bic);
+//	@Override
+//	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
+//		TradeSettlementFinancialCard paymentCard = new TradeSettlementFinancialCard(cardAccountID, cardHolderName);
+//		return new TradeSettlementPaymentMeans(accountId, accountName, bic);
+//	}
+	static TradeSettlementPaymentMeans create(String cardAccountID, String cardHolderName) {
+		TradeSettlementFinancialCard paymentCard = new TradeSettlementFinancialCard(cardAccountID, cardHolderName);
+		return new TradeSettlementPaymentMeans(paymentCard);
 	}
 
-	private static final Logger LOG = Logger.getLogger(FinancialAccount.class.getName());
+	static TradeSettlementPaymentMeans create(IBANId debitedIban) {
+		return new TradeSettlementPaymentMeans(debitedIban);
+	}
+	static TradeSettlementPaymentMeans create(String debitedAccount, BICId bic) {
+		return new TradeSettlementPaymentMeans(debitedAccount, bic);
+	}
 
-//	PaymentMeansCodeType paymentMeansCode = null;
-//	CreditorFinancialAccountType payeePartyCreditorFinancialAccount = null;
-//	CreditorFinancialInstitutionType payeeSpecifiedCreditorFinancialInstitution = null;
-//	DebtorFinancialAccountType payerPartyDebtorFinancialAccount = null;
-//	
-//	// ram:SpecifiedTradeSettlementPaymentMeans
-	FinancialAccount(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
+	private static final Logger LOG = Logger.getLogger(TradeSettlementPaymentMeans.class.getName());
+
+	TradeSettlementPaymentMeans(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
 		super();
 		if(tradeSettlementPaymentMeans!=null) {
 			super.setPaymentChannelCode(tradeSettlementPaymentMeans.getPaymentChannelCode());
@@ -112,20 +130,15 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 
 			super.setPayerSpecifiedDebtorFinancialInstitution(tradeSettlementPaymentMeans.getPayerSpecifiedDebtorFinancialInstitution());
 			super.setPayeeSpecifiedCreditorFinancialInstitution(tradeSettlementPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution());
-//			paymentMeansCode = tradeSettlementPaymentMeans.getTypeCode();
-//			payeePartyCreditorFinancialAccount = tradeSettlementPaymentMeans.getPayeePartyCreditorFinancialAccount();
-//			payeeSpecifiedCreditorFinancialInstitution = tradeSettlementPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution();
-//			payerPartyDebtorFinancialAccount = tradeSettlementPaymentMeans.getPayerPartyDebtorFinancialAccount();
-			//tradeSettlementPaymentMeans.getPayerSpecifiedDebtorFinancialInstitution();
 		}
 	}
 	
-	FinancialAccount(PaymentMeansEnum code, String text) {
+	TradeSettlementPaymentMeans(PaymentMeansEnum code, String text) {
 		super();
 		this.setTypeCode(code);
 		this.setPaymentMeansText(text);
 	}
-	FinancialAccount(PaymentMeansEnum code) {
+	TradeSettlementPaymentMeans(PaymentMeansEnum code) {
 		this(code, null);
 	}
 
@@ -141,6 +154,23 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 		return PaymentMeansEnum.valueOf(pmc);
 	}
 	
+	boolean isCreditTransfer() {
+		return isCreditTransfer(getPaymentMeansEnum());
+	}
+	static boolean isCreditTransfer(PaymentMeansEnum code) {
+		if(code==null) return false;
+		return(code==PaymentMeansEnum.CreditTransfer 
+			|| code==PaymentMeansEnum.SEPACreditTransfer);
+	}
+	
+	boolean isBankCard() {
+		return isBankCard(getPaymentMeansEnum());
+	}
+	static boolean isBankCard(PaymentMeansEnum code) {
+		if(code==null) return false;
+		return (code==PaymentMeansEnum.BankCard);
+	}
+	
 	boolean isDirectDebit() {
 		return isDirectDebit(getPaymentMeansEnum());
 	}
@@ -148,13 +178,6 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 		if(code==null) return false;
 		return(code==PaymentMeansEnum.DirectDebit 
 			|| code==PaymentMeansEnum.SEPADirectDebit);
-	}
-	
-	boolean isCreditTransfer() {
-		PaymentMeansEnum code = getPaymentMeansEnum();
-		if(code==null) return false;
-		return(code==PaymentMeansEnum.CreditTransfer 
-			|| code==PaymentMeansEnum.SEPACreditTransfer);
 	}
 	
 	// BT-82 
@@ -181,6 +204,10 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 			stringBuilder.append(", PaymentServiceProviderID:");
 			stringBuilder.append(getPaymentServiceProviderID()==null ? "null" : getPaymentServiceProviderID());
 		}
+		if(isBankCard()) {
+			stringBuilder.append(", PAYMENT CARD INFORMATION CardAccountID (BG-18.BT-87):");
+//			stringBuilder.append(getCardAccountID()==null ? "null" : getCardAccountID());
+		}	
 		if(isDirectDebit()) {
 			stringBuilder.append(", DIRECT DEBIT DebitedAccountID (BG-19.BT-91):");
 			stringBuilder.append(getDebitedAccountID()==null ? "null" : getDebitedAccountID());
@@ -189,36 +216,31 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 		return stringBuilder.toString();
 	}
 
-//	FinancialAccount(boolean isDirectDebit) {
-//		super();
-//		if(isDirectDebit) {
-//			payerPartyDebtorFinancialAccount = new DebtorFinancialAccountType();
-//		} else {
-//			payeePartyCreditorFinancialAccount = new CreditorFinancialAccountType();
-//			payeeSpecifiedCreditorFinancialInstitution = new CreditorFinancialInstitutionType();
-//		}
-//	}
-	
-	public FinancialAccount(IBANId iban, String accountName, BICId bic) {
+	public TradeSettlementPaymentMeans(IBANId iban, String accountName, BICId bic) {
 		this(PaymentMeansEnum.SEPACreditTransfer);
 		setPaymentAccountID(iban);
 		setPaymentAccountName(accountName);
 		setPaymentServiceProviderID(bic);
 	}
 
-	public FinancialAccount(String accountId, String accountName, BICId bic) {
+	public TradeSettlementPaymentMeans(String accountId, String accountName, BICId bic) {
 		this(PaymentMeansEnum.CreditTransfer);
 		setPaymentAccountID(accountId);
 		setPaymentAccountName(accountName);
 		setPaymentServiceProviderID(bic);
 	}
 
-	public FinancialAccount(IBANId debitedIban) {
+	public TradeSettlementPaymentMeans(TradeSettlementFinancialCard financialCard) {
+		this(PaymentMeansEnum.BankCard);
+		super.setApplicableTradeSettlementFinancialCard(financialCard);
+	}
+
+	public TradeSettlementPaymentMeans(IBANId debitedIban) {
 		this(PaymentMeansEnum.SEPADirectDebit);
 		setDebitedAccountID(debitedIban);
 	}
 
-	public FinancialAccount(String accountId, BICId bic) {
+	public TradeSettlementPaymentMeans(String accountId, BICId bic) {
 		this(PaymentMeansEnum.DirectDebit);
 		setDebitedAccountID(accountId);
 //		setDebtorServiceProviderID(bic); // TODO
@@ -233,11 +255,6 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 			return cfa==null ? null : (cfa.getIBANID()==null ? cfa.getProprietaryID().getValue() : cfa.getIBANID().getValue());
 		}
 		return null;
-//		if(payeePartyCreditorFinancialAccount==null) return null;
-//		if(payeePartyCreditorFinancialAccount.getIBANID()!=null) {
-//			return payeePartyCreditorFinancialAccount.getIBANID().getValue();
-//		}
-//		return payeePartyCreditorFinancialAccount.getProprietaryID()==null ? null : payeePartyCreditorFinancialAccount.getProprietaryID().getValue();
 	}
 
 	@Override
@@ -248,7 +265,6 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 			creditorFinancialAccount.setIBANID(new ID(iban.getValue(), iban.getSchemeID()));		
 			super.setPayeePartyCreditorFinancialAccount(creditorFinancialAccount);
 		}
-//		payeePartyCreditorFinancialAccount.setIBANID(new ID(iban.getValue(), iban.getSchemeID()));		
 	}
 
 	@Override
@@ -259,7 +275,6 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 			creditorFinancialAccount.setProprietaryID(new ID(accountId));		
 			super.setPayeePartyCreditorFinancialAccount(creditorFinancialAccount);
 		}
-//		payeePartyCreditorFinancialAccount.setProprietaryID(new ID(accountId));		
 	}
 
 	@Override
@@ -269,8 +284,6 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 			return cfa==null ? null : (cfa.getAccountName()==null ? null : cfa.getAccountName().getValue());
 		}
 		return null;
-//		if(payeePartyCreditorFinancialAccount==null) return null;
-//		return payeePartyCreditorFinancialAccount.getAccountName()==null ? null : payeePartyCreditorFinancialAccount.getAccountName().getValue();
 	}
 
 	@Override
@@ -279,7 +292,6 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 		if(this.isCreditTransfer()) {
 			super.getPayeePartyCreditorFinancialAccount().setAccountName(new Text(name));	
 		}
-//		payeePartyCreditorFinancialAccount.setAccountName(new Text(name));		
 	}
 
 	@Override
@@ -289,8 +301,6 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 			return cfi==null ? null : (cfi.getBICID()==null ? null : cfi.getBICID().getValue());
 		}
 		return null;
-//		if(payeeSpecifiedCreditorFinancialInstitution==null) return null;
-//		return payeeSpecifiedCreditorFinancialInstitution.getBICID()==null ? null : payeeSpecifiedCreditorFinancialInstitution.getBICID().getValue();
 	}
 
 	@Override
@@ -301,7 +311,6 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 			cfi.setBICID(new ID(bic.getValue(), bic.getSchemeID()));
 			super.setPayeeSpecifiedCreditorFinancialInstitution(cfi);
 		}
-//		payeeSpecifiedCreditorFinancialInstitution.setBICID(new ID(bic.getValue(), bic.getSchemeID()));
 	}
 
 	@Override
@@ -312,43 +321,11 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 			cfi.setBICID(new ID(id));
 			super.setPayeeSpecifiedCreditorFinancialInstitution(cfi);
 		}
-//		payeeSpecifiedCreditorFinancialInstitution.setBICID(new ID(id));	
 	}
 
 // ---------------- implements DirectDebit:
-//	BG-19.BT-89 TODO eine Ebene höher
-//	BG-19.BT-90 TODO eine Ebene höher
-//	ID directDebitMandate = null;
-	
-//	// BG-19.BT-89
-//	@Override
-//	public String getMandateReferencedID() { // TODO eine Ebene höher
-////		LOG.info("TODO Auto-generated method stub");
-//		return directDebitMandate==null? null : directDebitMandate.getValue();
-//	}
-//
-//	@Override
-//	public void setMandateReferencedID(String id) {
-//		directDebitMandate = new ID(id);
-//	}
-//	public void setMandateReferencetID(ID id) {
-//		directDebitMandate = id;
-//	}
-//
-//	// BG-19.BT-90 +++ 0..1 Bank assigned creditor identifier, CreditorReferenceID, Kennung des Gläubigers
-//	// Hinweis: Wird verwendet, um den Käufer vorweg über eine SEPA-Lastschrift in Kenntnis zu setzen.
-//	@Override
-//	public String getBankAssignedCreditorID() {
-//		LOG.info("TODO Auto-generated method stub");
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	@Override
-//	public void setBankAssignedCreditorID(String id) {
-//		// TODO Auto-generated method stub
-//		
-//	}
+//	BG-19.BT-89 eine Ebene höher
+//	BG-19.BT-90 eine Ebene höher
 
 	// BG-19.BT-91
 	@Override
@@ -358,11 +335,6 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 			return dfa==null ? null : (dfa.getIBANID()==null ? dfa.getProprietaryID().getValue() : dfa.getIBANID().getValue());
 		}
 		return null;
-//		if(payerPartyDebtorFinancialAccount==null) return null;
-//		if(payerPartyDebtorFinancialAccount.getIBANID()!=null) {
-//			return payerPartyDebtorFinancialAccount.getIBANID().getValue();
-//		}
-//		return payerPartyDebtorFinancialAccount.getProprietaryID()==null ? null : payerPartyDebtorFinancialAccount.getProprietaryID().getValue();
 	}
 
 	@Override
@@ -373,7 +345,6 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 			debtorFinancialAccount.setProprietaryID(new ID(accountId));		
 			super.setPayerPartyDebtorFinancialAccount(debtorFinancialAccount);
 		}
-//		payerPartyDebtorFinancialAccount.setIBANID(new ID(id));		
 	}
 
 	@Override
@@ -384,8 +355,6 @@ public class FinancialAccount extends TradeSettlementPaymentMeansType implements
 			debtorFinancialAccount.setIBANID(new ID(debitedIban.getValue(), debitedIban.getSchemeID()));		
 			super.setPayerPartyDebtorFinancialAccount(debtorFinancialAccount);
 		}
-//		if(iban==null) return;
-//		payerPartyDebtorFinancialAccount.setIBANID(new ID(iban.getValue(), iban.getSchemeID()));		
 	}
 
 }

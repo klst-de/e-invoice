@@ -432,11 +432,13 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		setPaymentTermsAndDate(description, DateTimeFormats.ymdToTs(ymd));
 	}
 
-	// BT-9 & BT-20 : Payment terms & Payment due date
+	// BT-9 0..1 & BT-20 0..1 : Payment terms & Payment due date
+	// TODO auch <ram:DirectDebitMandateID> BG-19.BT-89 ist darin
 	@Override
 	public void setPaymentTermsAndDate(String description, Timestamp ts) {
 		LOG.fine("setPaymentTermsAndDate: description:"+description + " & Payment due date Timestamp:"+ts);
-		TradePaymentTermsType tradePaymentTerms = new TradePaymentTermsType();
+		TradePaymentTermsType tradePaymentTerms = applicableHeaderTradeSettlement.getPaymentTerms();
+//		TradePaymentTermsType tradePaymentTerms = new TradePaymentTermsType();
 		if(description!=null) {
 			tradePaymentTerms.getDescription().add(new Text(description)); // returns List<TextType>
 		}
@@ -444,7 +446,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 			tradePaymentTerms.setDueDateDateTime(newDateTime(ts));
 		}
 		
-		applicableHeaderTradeSettlement.addPaymentTerms(tradePaymentTerms);
+		applicableHeaderTradeSettlement.setPaymentTerms(tradePaymentTerms);
 	}
 	
 	static DateTimeType newDateTime(Timestamp ts) {
@@ -1137,10 +1139,29 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		return applicableHeaderTradeSettlement; // das implementiert PaymentInstructions!
 	}
 
+	@Override // implements interface CreditTransferFactory for BG-17
+	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
+		return applicableHeaderTradeSettlement.createCreditTransfer(iban, accountName, bic);
+	}
+	
+	@Override // implements interface CreditTransferFactory for BG-17
+	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic) {
+		return applicableHeaderTradeSettlement.createCreditTransfer(accountId, accountName, bic);
+	}
 
 	@Override // implements interface PaymentCardFactory for BG-18
 	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
-		return FinancialCard.create(cardAccountID, cardHolderName);
+		return TradeSettlementFinancialCard.create(cardAccountID, cardHolderName);
+	}
+
+	@Override // implements interface DirectDebitFactory for BG-19
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
+		return applicableHeaderTradeSettlement.createDirectDebit(mandateID, bankAssignedCreditorID, iban);
+	}
+
+	@Override // implements interface DirectDebitFactory for BG-19
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
+		return applicableHeaderTradeSettlement.createDirectDebit(mandateID, bankAssignedCreditorID, debitedAccountID);
 	}
 
 	// BG-20 + BG-21- 0..n

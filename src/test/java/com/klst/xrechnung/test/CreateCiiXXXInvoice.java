@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.BG19_DirectDebit;
 import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
@@ -17,18 +18,13 @@ import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
-import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.Reference;
 import com.klst.einvoice.unece.uncefact.Amount;
-import com.klst.einvoice.unece.uncefact.ApplicableHeaderTradeSettlement;
 import com.klst.einvoice.unece.uncefact.ApplicableTradeTax;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
-import com.klst.einvoice.unece.uncefact.FinancialAccount;
-import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.marshaller.CiiTransformer;
@@ -238,6 +234,13 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				break;
 			case DirectDebit:
 			case SEPADirectDebit:
+				BG19_DirectDebit dd = pi.getDirectDebit();
+				LOG.info("DirectDebit Creditor:"+dd.getBankAssignedCreditorID()
+					+" Account="+dd.getDebitedAccountID()+" MandateReference:"+dd.getMandateReferencedID());
+//				dd.getBankAssignedCreditorID();
+//				dd.getDebitedAccountID();
+//				dd.getMandateReferencetID();
+//				cii.createDirectDebit(TESTDIR, TESTDIR, null)
 				paymentInstructions = cii.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText()
 						, pi.getRemittanceInformation(), pi.getDirectDebit() );
 				break;
