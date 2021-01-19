@@ -114,7 +114,8 @@ public enum PaymentMeansEnum {
 
     public static boolean isCreditTransfer(PaymentMeansEnum code) {
 		if(code==null) return false;
-		return(code==CreditTransfer 
+		return(code==DebitTransfer
+			|| code==CreditTransfer 
 			|| code==SEPACreditTransfer);
 	}
 
@@ -125,8 +126,7 @@ public enum PaymentMeansEnum {
 	
     public static boolean isDirectDebit(PaymentMeansEnum code) {
 		if(code==null) return false;
-		return(code==DebitTransfer
-			|| code==DirectDebit
+		return(code==DirectDebit
 			|| code==SEPADirectDebit);
 	}
 

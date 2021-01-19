@@ -223,6 +223,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //				, creditTransferList, pi.getPaymentCard(), pi.getDirectDebit() );
 			// oder:
 			switch(paymentMeansCode) {
+			case DebitTransfer:
 			case CreditTransfer:
 			case SEPACreditTransfer:
 				paymentInstructions = cii.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText()
