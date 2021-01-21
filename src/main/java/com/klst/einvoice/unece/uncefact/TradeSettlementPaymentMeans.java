@@ -132,6 +132,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		super();
 		this.setTypeCode(code);
 		this.setPaymentMeansText(text);
+		LOG.config("done:"+this);
 	}
 	TradeSettlementPaymentMeans(PaymentMeansEnum code) {
 		this(code, null);
