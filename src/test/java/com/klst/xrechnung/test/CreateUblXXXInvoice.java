@@ -291,90 +291,55 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		// BT-20 + 0..1 Payment terms
 		ublInvoice.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp());
 		
-		PaymentInstructions paymentInstructions = testDoc.getPaymentInstructions();
-		LOG.info("PaymentInstructions "+paymentInstructions 
-				+ " PaymentMeans="+(paymentInstructions==null ? "nix" : paymentInstructions.getPaymentMeansEnum()));
-		
-		if(paymentInstructions==null) { // optional BG-16 + 0..1 PAYMENT INSTRUCTIONS / Zahlungsanweisungen
+		PaymentInstructions pi = testDoc.getPaymentInstructions(); // BG-16 (mandatory) PAYMENT INSTRUCTIONS
+		if(pi==null || pi.getPaymentMeansEnum()==null) {
+			LOG.warning("BG-16 (mandatory) PAYMENT INSTRUCTIONS:"+pi);
+			// in ubl-tc434-example6.xml !
 			return;
-		}
-		List<CreditTransfer> creditTransfer = paymentInstructions.getCreditTransfer();
-		if(creditTransfer.isEmpty()) {
-			//LOG.info("creditTransfer.isEmpty");
-		} else if(creditTransfer.size()==1){
-			String accountId = creditTransfer.get(0).getPaymentAccountID();
-			String accountName = creditTransfer.get(0).getPaymentAccountName();
-			BICId bic = new BICId(creditTransfer.get(0).getPaymentServiceProviderID());
-			if(paymentInstructions.getPaymentMeansEnum()==PaymentMeansEnum.SEPACreditTransfer) {
-				IBANId iban = new IBANId(accountId);
-				LOG.info("SEPACreditTransfer iban:"+iban + " accountName:"+accountName + " bic:"+bic);
-			} else if(paymentInstructions.getPaymentMeansEnum()==PaymentMeansEnum.CreditTransfer) {
-				FinancialAccount account = new FinancialAccount(accountId, accountName, bic);
-				LOG.info("NON SEPA Überweisung kto:"+account + "// accountName:"+accountName + " bic:"+bic);
+		} else {
+			List<CreditTransfer> creditTransferList = pi.getCreditTransfer();
+			PaymentMeansEnum paymentMeansCode = pi.getPaymentMeansEnum();
+			LOG.info("paymentMeansCode="+paymentMeansCode
+				+ " paymentMeansText:"+pi.getPaymentMeansText()
+				+ " BT-83 remittanceInformation:"+pi.getRemittanceInformation()
+				+ "\n BG-17 CreditTransfer #:"+creditTransferList.size()
+				+ "\n BG-18 PaymentCard:"+pi.getPaymentCard()
+				+ "\n BG-19 DirectDebit:"+pi.getDirectDebit()
+				);
+			creditTransferList.forEach(ct -> {
+				LOG.info("... CreditTransfer:"+ct);
+			});
+			PaymentInstructions paymentInstructions = null;
+//			paymentInstructions = ublInvoice.createPaymentInstructions(pi.getPaymentMeansEnum(), pi.getPaymentMeansText(), pi.getRemittanceInformation()
+//				, creditTransferList, pi.getPaymentCard(), pi.getDirectDebit() );
+			// oder:
+			switch(paymentMeansCode) {
+			case DebitTransfer:
+			case CreditTransfer:
+			case SEPACreditTransfer:
+				paymentInstructions = ublInvoice.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText()
+						, pi.getRemittanceInformation(), creditTransferList );
+				break;
+			case BankCard:
+				paymentInstructions = ublInvoice.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText()
+						, pi.getRemittanceInformation(), pi.getPaymentCard() );
+				break;
+			case DirectDebit:
+			case SEPADirectDebit:
+				BG19_DirectDebit dd = pi.getDirectDebit();
+				LOG.info("DirectDebit Creditor:"+dd.getBankAssignedCreditorID()
+					+" Account="+dd.getDebitedAccountID()+" MandateReference:"+dd.getMandateReferencedID());
+				paymentInstructions = ublInvoice.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText()
+						, pi.getRemittanceInformation(), pi.getDirectDebit() );
+				break;
+			default:
+				LOG.warning("[BR-DE-13] In der Rechnung müssen Angaben zu genau einer der drei Gruppen sein: CREDIT TRANSFER, PAYMENT CARD INFORMATION, DIRECT DEBIT - Ist:"
+						+ paymentMeansCode);
+				paymentInstructions = ublInvoice.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText());
+				break;
 			}
-		} else {
-			LOG.warning("!!!!!!!!! mehrere "+creditTransfer.size()+" creditTransfer Einträge");
+			ublInvoice.setPaymentInstructions(paymentInstructions);
 		}
-		
-		PaymentCard testCard = paymentInstructions.getPaymentCard();
-		PaymentCard paymentCard = null;
-		if(testCard!=null) {
-			LOG.info("testCard.CardAccountID="+testCard.getCardAccountID() +" CardHolderName="+testCard.getCardHolderName());
-			paymentCard = ublInvoice.createPaymentCard(testCard.getCardAccountID(), testCard.getCardHolderName());
-//			LOG.info(">>>>>>> testCard:"+testCard);
-			if(testCard instanceof CardAccount) {
-				String nw = ((CardAccount)testCard).getNetwork();
-				if(nw!=null) {
-					LOG.info("wg 03.02a-INVOICE_ubl.xml >>>>>>> testCard.Network="+nw);
-					((CardAccount)paymentCard).setNetwork(nw);
-				}
-			}
-		} else {
-			LOG.warning("paymentCard.isEmpty");
-		}
-		
-		BG19_DirectDebit directDebit = null;
-		BG19_DirectDebit dd = testDoc.getDirectDebit();
-		if(dd==null) {
-			LOG.warning("dd.isEmpty");
-		} else {
-			// nur test:
-			// ctor () not visible : gut
-			// (interne) public copy ctor mit PaymentMeansType 
-			// public PaymentMeans(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation,
-			//		List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
-			PaymentInstructions zahlungsanweisungen = new PaymentMeans(PaymentMeansEnum.DirectDebit,
-					"paymentMeansText", "remittanceInformation", null, null, dd
-					);
-			zahlungsanweisungen.setDirectDebit(dd);
-			LOG.info(""+zahlungsanweisungen.getDirectDebit());
-/* 03.01a-INVOICE_ubl.xml :
-...
-  <cac:PaymentMeans>
-    <cbc:PaymentMeansCode>59</cbc:PaymentMeansCode>
-  
-    <cac:PaymentMandate>
-      <cbc:ID>[Mandate reference identifier]</cbc:ID>
-      <cac:PayerFinancialAccount>
-        <cbc:ID>DE75512108001245126199</cbc:ID>
-      </cac:PayerFinancialAccount>
-    </cac:PaymentMandate>
-  </cac:PaymentMeans>
-
- */
-			LOG.info("DirectDebit/Lastschrift MandateReferencetID:"+dd.getMandateReferencedID() 
-			+ " BankAssignedCreditorID:"+dd.getBankAssignedCreditorID() + " DebitedAccountID:"+dd.getDebitedAccountID());
-			dd.getMandateReferencedID();
-			dd.getBankAssignedCreditorID();
-			dd.getDebitedAccountID();
-			directDebit = (BG19_DirectDebit)(
-					ublInvoice.createDirectDebit(dd.getMandateReferencedID(), dd.getBankAssignedCreditorID(), dd.getDebitedAccountID())
-					);
-		}
-		
-		ublInvoice.setPaymentInstructions(paymentInstructions.getPaymentMeansEnum(), paymentInstructions.getPaymentMeansText(), paymentInstructions.getRemittanceInformation()
-				, creditTransfer, paymentCard, directDebit); // dd statt directDebit geht auch
-		
 		LOG.info("finished.");
 	}
 	

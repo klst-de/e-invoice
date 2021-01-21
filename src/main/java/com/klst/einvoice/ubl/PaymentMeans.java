@@ -136,7 +136,10 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	static PaymentInstructions create(List<PaymentMeansType> list) {
 		if(list.isEmpty()) return null;
 		PaymentMeans paymentMeans = new PaymentMeans(list.get(0), null);
-		if(list.size()==1) return paymentMeans;
+		if(list.size()==1) {
+			paymentMeans.pmList.add(paymentMeans);
+			return paymentMeans;
+		}
 		LOG.info("// bei mehreren Einträgen paymentMeans neu berechnen: ...");
 		paymentMeans = new PaymentMeans(list);
 //		paymentMeans.pmList.forEach(pm -> {
@@ -155,7 +158,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	private PaymentMeans() {
 		pmList = new ArrayList<PaymentMeans>();
 	}
-	private PaymentMeans(PaymentMeansType doc, List<PaymentMeans> paymentMeans) {
+	private PaymentMeans(PaymentMeansType doc, List<PaymentMeans> pmList) {
 		this();
 		if(doc!=null) {
 			super.setID(doc.getID());
@@ -172,10 +175,13 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			super.setPaymentMandate(doc.getPaymentMandate());
 			super.setTradeFinancing(doc.getTradeFinancing());
 		}
-		if(paymentMeans!=null) {
-			this.pmList = paymentMeans;
-			super.setPayeeFinancialAccount(new FinancialAccount(this));
+		if(pmList!=null) {
+			this.pmList = pmList;
 		}
+		if(this.isCreditTransfer()) {
+			super.setPayeeFinancialAccount(new FinancialAccount(this));			
+		}
+
 		LOG.info("ctor:"+this);
 	}
 
@@ -264,7 +270,10 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	@Override
 	public PaymentMeansEnum getPaymentMeansEnum() {
 		CodeType paymentMeansCode = super.getPaymentMeansCode();
-		return PaymentMeansEnum.valueOf(paymentMeansCode);
+		return paymentMeansCode==null ? null : PaymentMeansEnum.valueOf(paymentMeansCode);
+	}
+	boolean isCreditTransfer() {
+		return PaymentMeansEnum.isCreditTransfer(getPaymentMeansEnum());
 	}
 
 	@Override
