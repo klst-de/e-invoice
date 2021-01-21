@@ -78,7 +78,8 @@
     </cac:PaymentMeans>
     <cac:PaymentMeans>
         <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
-        <cbc:PaymentID>Deb. 10202 / Fact. 12115118</cbc:PaymentID>
+ <!-- WARN: [UBL-SR-44]-Payment ID shall occur maximum once - daher raus: 
+        <cbc:PaymentID>Deb. 10202 / Fact. 12115118</cbc:PaymentID>                  -->
         <cac:PayeeFinancialAccount>
             <cbc:ID>NL03 INGB 0004489902</cbc:ID>
         </cac:PayeeFinancialAccount>
