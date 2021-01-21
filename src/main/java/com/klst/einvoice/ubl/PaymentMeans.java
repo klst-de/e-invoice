@@ -110,7 +110,7 @@ Bsp: miad :
  */
 public class PaymentMeans extends PaymentMeansType implements PaymentInstructions, PaymentInstructionsFactory {
 	
-	// factory:
+	// factories:
 	@Override
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText,
 			String remittanceInformation, List<CreditTransfer> creditTransfer, PaymentCard paymentCard,
@@ -123,9 +123,8 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			List<PaymentMeansType> list = new ArrayList<PaymentMeansType>();
 			creditTransfer.forEach(ct -> {
 				FinancialAccount fa = (FinancialAccount)ct;
-				LOG.info("+++create PaymentInstructions ct:"+ct);
-				LOG.info("+++create PaymentInstructions pm:"+fa.getPaymentMeans());
-//				fa.getPaymentMeans();
+//				LOG.info("+++create PaymentInstructions ct:"+ct);
+//				LOG.info("+++create PaymentInstructions pm:"+fa.getPaymentMeans());
 				list.add(fa.getPaymentMeans());
 			});
 			return create(list);
@@ -138,13 +137,13 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		if(list.isEmpty()) return null;
 		PaymentMeans paymentMeans = new PaymentMeans(list.get(0), null);
 		if(list.size()==1) return paymentMeans;
-		LOG.info("// bei mehreren Einträgen pm verwerfen!");
+		LOG.info("// bei mehreren Einträgen paymentMeans neu berechnen: ...");
 		paymentMeans = new PaymentMeans(list);
-		paymentMeans.pmList.forEach(pm -> {
-			int i = pm.pmList.indexOf(pm);
-			LOG.info("i="+i+">>>>>>>>>>> pm:"+pm);
-		});
-		LOG.info(">>>>>>>>>>> das erste el zurück");
+//		paymentMeans.pmList.forEach(pm -> {
+//			int i = pm.pmList.indexOf(pm);
+//			LOG.info("i="+i+">>>>>>>>>>> pm:"+pm);
+//		});
+//		LOG.info(">>>>>>>>>>> das erste el zurück");
 		return paymentMeans.pmList.get(0);
 	}
 
@@ -175,27 +174,11 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		}
 		if(paymentMeans!=null) {
 			this.pmList = paymentMeans;
-//			if(!paymentMeans.isEmpty()) {
-//				LOG.info("sollte fa so sein?"+paymentMeans.get(paymentMeans.size()-1).getPayeeFinancialAccount().getID().getValue());
-//			}
 			super.setPayeeFinancialAccount(new FinancialAccount(this));
 		}
 		LOG.info("ctor:"+this);
-//		LOG.info("ctor:"+getPayeeFinancialAccount());
 	}
-	// ctor für mehrere BG-17 CreditTransfer, used in Generic.Invoice.getPaymentInstructions()
-//	PaymentMeans(List<PaymentMeansType> list) {
-//		this(list.get(0), null);
-//		LOG.info("ctor für mehrere "+list.size()+" BG-17 CreditTransfer/PaymentMeans");
-////		paymentMeans = new ArrayList<PaymentMeansType>(list.size());
-//		list.forEach(pm -> {
-//			LOG.info("PaymentMeans:"+pm);
-////			new PaymentMeans(pm);
-//			pmList.add(new PaymentMeans(pm, pmList));
-//			LOG.info("paymentMeans.last:"+pmList.get(pmList.size()-1));
-////			paymentMeans.add(pm);
-//		});	
-//	}
+
 	private PaymentMeans(List<PaymentMeansType> list) {
 		this();
 		LOG.info("ctor für mehrere "+list.size()+" BG-17 CreditTransfer/PaymentMeans");
@@ -203,7 +186,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			LOG.info("PaymentMeans:"+pm);
 			pmList.add(new PaymentMeans(pm, pmList));
 		});
-		LOG.info("ctor für mehrere "+list.size()+" fertig.:"+this.pmList.size());
+//		LOG.info("ctor für mehrere "+list.size()+" fertig.:"+this.pmList.size());
 	}
 	
 	PaymentMeans(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation,
@@ -222,14 +205,10 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		// BG-17
 		creditTransfer.forEach(ct -> {
 			LOG.info("init add BG-17:"+ct);
-			// List<PaymentMeansType> paymentMeans;
-			FinancialAccount fa = (FinancialAccount)ct;
-//			LOG.info("init add BG-17.PaymentMeans:"+fa.getPaymentMeans());
-			// ??? super.setPayerFinancialAccount
-			LOG.info("fa.pm                      :"+fa.getPaymentMeans());
-			LOG.info("fa.pm.PayerFinancialAccount:"+fa.getPaymentMeans().getPayerFinancialAccount());
-			LOG.info("super.PayerFinancialAccount:"+super.getPayerFinancialAccount());
-//			paymentMeans.add(fa.getPaymentMeans()); // das wird in addCreditTransfer gemacht
+//			FinancialAccount fa = (FinancialAccount)ct;
+//			LOG.info("fa.pm                      :"+fa.getPaymentMeans());
+//			LOG.info("fa.pm.PayerFinancialAccount:"+fa.getPaymentMeans().getPayerFinancialAccount());
+//			LOG.info("super.PayerFinancialAccount:"+super.getPayerFinancialAccount());
 			this.addCreditTransfer(ct);
 		});
 		setPaymentCard(paymentCard); // BG-18
@@ -328,7 +307,6 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		if(creditTransfer==null) return;
 		FinancialAccount fa = (FinancialAccount)creditTransfer;
 		pmList.add(fa.getPaymentMeans());
-//		super.setPayeeFinancialAccount(fa.getPaymentMeans().getPayeeFinancialAccount());
 		super.setPayeeFinancialAccount(new FinancialAccount(fa.getPaymentMeans()));
 	}
 
@@ -338,7 +316,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		if(i<0) return null;
 		return new FinancialAccount(pmList.get(i));
 	}
-// TODO in ubl gibt es keine List<CreditTransfer> !!! ABER mehrere PaymentMeans 
+// in ubl gibt es keine List<CreditTransfer> !!! ABER mehrere PaymentMeans 
 /* siehe ubl-tc434-example1.xml :
     <cac:PaymentMeans>
         <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
@@ -359,16 +337,8 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	@Override
 	public List<CreditTransfer> getCreditTransfer() { 
 		List<CreditTransfer> result = new ArrayList<CreditTransfer>();
-//		pmList.forEach(pm -> {
-//			LOG.info("getCreditTransfer pm:"+pm);
-//			if(pm.getPayeeFinancialAccount()!=null) {
-//				// FinancialAccount extends FinancialAccountType implements CreditTransfer
-//				result.add(new FinancialAccount(this));
-//			}
-//		});
-//		return result;
 		pmList.forEach(pm -> {
-			LOG.info("??????????? getCreditTransfer pm:"+pm);
+			LOG.info("getCreditTransfer pm:"+pm);
 			result.add(new FinancialAccount(pm));
 		});
 		return result;
@@ -401,6 +371,5 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		PaymentMandate directDebit = new PaymentMandate(getPaymentMandate());
 		return directDebit;
 	}
-
 
 }

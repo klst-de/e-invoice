@@ -1,10 +1,13 @@
 package com.klst.einvoice.ubl;
 
 import com.klst.einvoice.BG19_DirectDebit;
+import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.unece.uncefact.IBANId;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMandateType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 
 // Gruppe DIRECT DEBIT BG-19
 // CII:
@@ -44,50 +47,56 @@ Bsp. ubl-tc434-example5.xml :
 
 
  */
-public class PaymentMandate extends PaymentMandateType implements BG19_DirectDebit {
+public class PaymentMandate extends PaymentMandateType implements BG19_DirectDebit, DirectDebitFactory {
 
-	static BG19_DirectDebit createDirectDebit(Object debitedAccountID) {
-		return debitedAccountID.getClass()==IBANId.class ? new PaymentMandate((IBANId)debitedAccountID) : new PaymentMandate((String)debitedAccountID);
+	// implements PaymentCardFactory
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
+		return create(mandateID, bankAssignedCreditorID, iban);
 	}
-	/**
-	 * Factory method
-	 * 
-	 * @param mandateID
-	 * @param bankAssignedCreditorID
-	 * @param debitedAccountID
-	 * @return DirectDebit if object
-	 */
-	public static BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, Object debitedAccountID) {
-		BG19_DirectDebit directDebit = createDirectDebit(debitedAccountID); 
-		directDebit.setMandateReferencedID(mandateID);
-		directDebit.setBankAssignedCreditorID(bankAssignedCreditorID);
-		return directDebit;
+	static DirectDebit create(String mandateID, String bankAssignedCreditorID, IBANId iban) {
+		return new PaymentMandate(mandateID, bankAssignedCreditorID, iban);
 	}
 	
-	PaymentMandate() {
-		super();
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
+		return create(mandateID, bankAssignedCreditorID, debitedAccountID);
 	}
-	
-	// copy ctor
+	static DirectDebit create(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
+		return new PaymentMandate(mandateID, bankAssignedCreditorID, debitedAccountID);
+	}
+
 	public PaymentMandate(PaymentMandateType doc) {
-		this();
-		setMandateReferencedID(doc.getID()==null ? null : doc.getID().getValue());
-//		getBankAssignedCreditorID(doc.getID().getValue()); TODO
-		setDebitedAccountID(getDebitedAccountID(doc));
+		super();
+		if(doc!=null) {
+			super.setID(doc.getID());
+			super.setMandateTypeCode(doc.getMandateTypeCode());
+			super.setMaximumPaymentInstructionsNumeric(doc.getMaximumPaymentInstructionsNumeric());
+			super.setMaximumPaidAmount(doc.getMaximumPaidAmount());
+			super.setSignatureID(doc.getSignatureID());
+			super.setPayerParty(doc.getPayerParty());
+			super.setPayerFinancialAccount(doc.getPayerFinancialAccount());
+			super.setValidityPeriod(doc.getValidityPeriod());
+			super.setPaymentReversalPeriod(doc.getPaymentReversalPeriod());
+			super.clause = doc.getClause();
+		}
 	}
 	
-	public PaymentMandate(IBANId iban) {
+	public PaymentMandate(String mandateID, String bankAssignedCreditorID, IBANId iban) {
+		setMandateReferencedID(mandateID);
+		setBankAssignedCreditorID(bankAssignedCreditorID);
 		setDebitedAccountID(iban);
 	}
 
-	public PaymentMandate(String accountId) {
-		setDebitedAccountID(accountId);
+	public PaymentMandate(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
+		setMandateReferencedID(mandateID);
+		setBankAssignedCreditorID(bankAssignedCreditorID);
+		setDebitedAccountID(debitedAccountID);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.klst.einvoice.DirectDebit#getMandateReferencetID()
 	 */
+	// BG-19.BT-89 0..1
 	@Override
 	public String getMandateReferencedID() {
 		return super.getID()==null ? null : super.getID().getValue();
@@ -95,13 +104,17 @@ public class PaymentMandate extends PaymentMandateType implements BG19_DirectDeb
 
 	@Override
 	public void setMandateReferencedID(String id) {
-		super.setID(new ID(id));	
+		if(id==null) return;
+		IDType iDType = new IDType();
+		iDType.setValue(id);
+		super.setID(iDType);	
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.klst.einvoice.DirectDebit#getBankAssignedCreditorID()
 	 */
+	// BG-19.BT-90 0..1
 	@Override
 	public String getBankAssignedCreditorID() {
 		// TODO Auto-generated method stub
@@ -110,6 +123,7 @@ public class PaymentMandate extends PaymentMandateType implements BG19_DirectDeb
 
 	@Override
 	public void setBankAssignedCreditorID(String id) {
+		if(id==null) return;
 		// TODO Auto-generated method stub  ??? setPayerParty
 	}
 
@@ -117,6 +131,7 @@ public class PaymentMandate extends PaymentMandateType implements BG19_DirectDeb
 	 * (non-Javadoc)
 	 * @see com.klst.einvoice.DirectDebit#getDebitedAccountID()
 	 */
+	// BG-19.BT-91 0..1
 	@Override
 	public String getDebitedAccountID() {
 		return getDebitedAccountID(this);
@@ -129,6 +144,7 @@ public class PaymentMandate extends PaymentMandateType implements BG19_DirectDeb
 
 	@Override
 	public void setDebitedAccountID(String id) {
+		if(id==null) return;
 		FinancialAccountType fa = new FinancialAccountType();
 		fa.setID(new ID(id));
 		super.setPayerFinancialAccount(fa);

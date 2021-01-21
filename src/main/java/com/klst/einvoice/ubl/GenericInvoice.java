@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.BG19_DirectDebit;
 import com.klst.einvoice.BG23_VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
@@ -914,8 +913,10 @@ UBL:
 	// factory delegate to PaymentMeans
 	@Override
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		return PaymentMeans.create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
+
+		LOG.info("creditTransferList:"+creditTransferList);	
+		return PaymentMeans.create(code, paymentMeansText, remittanceInformation, creditTransferList, paymentCard, directDebit);
 	}
 	// BG-16.BT-81 ++ 1..1 Payment means type code
 	// BG-16.BT-82 ++ 0..1 Payment means text
@@ -926,24 +927,9 @@ UBL:
 	@Override
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
-// TODO in ubl gibt es keine List<CreditTransfer> !!! ABER mehrere PaymentMeans 
-/* siehe ubl-tc434-example1.xml :
-    <cac:PaymentMeans>
-        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
-        <cbc:PaymentID>Deb. 10202 / Fact. 12115118</cbc:PaymentID>
-        <cac:PayeeFinancialAccount>
-            <cbc:ID>NL57 RABO 0107307510</cbc:ID>
-        </cac:PayeeFinancialAccount>
-    </cac:PaymentMeans>
-    <cac:PaymentMeans>
-        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
-        <cac:PayeeFinancialAccount>
-            <cbc:ID>NL03 INGB 0004489902</cbc:ID>
-        </cac:PayeeFinancialAccount>
-    </cac:PaymentMeans>
-
- */
-		PaymentMeansType paymentMeans = new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransferList, paymentCard, directDebit);
+		
+		PaymentMeansType paymentMeans 
+		= new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransferList, paymentCard, directDebit);
 		if(isInvoiceType) {
 			invoice.getPaymentMeans().add(paymentMeans);
 		} else {
@@ -953,38 +939,47 @@ UBL:
 
 	@Override
 	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
+		PaymentMeans paymentMeans = (PaymentMeans)paymentInstructions;
+		LOG.info("paymentMeans:"+paymentMeans);
 		if(isInvoiceType) {
-			invoice.getPaymentMeans().add((PaymentMeansType) paymentInstructions);
+			paymentMeans.pmList.forEach(pm -> {
+//				int i = paymentMeans.pmList.indexOf(pm);
+//				LOG.info("i="+i +" add:"+((PaymentMeans)pm).getFinancialAccount());
+				invoice.getPaymentMeans().add(pm);
+			});
 		} else {
-			creditNote.getPaymentMeans().add((PaymentMeansType) paymentInstructions);
+			paymentMeans.pmList.forEach(pm -> {
+				creditNote.getPaymentMeans().add(pm);
+			});
 		}
 	}
 
 	// BG-16 (DE CIUS mandatory) PAYMENT INSTRUCTIONS
 	@Override
 	public PaymentInstructions getPaymentInstructions() {
-		PaymentMeansType paymentMeans = getPaymentMeans0();
-		return paymentMeans==null ? null : new PaymentMeans(paymentMeans);
+		List<PaymentMeansType> list = isInvoiceType ? invoice.getPaymentMeans() : creditNote.getPaymentMeans();
+		return PaymentMeans.create(list);
 	}
 
-	PaymentMeansType getPaymentMeans0() {
-		List<PaymentMeansType> list = isInvoiceType ? invoice.getPaymentMeans() : creditNote.getPaymentMeans();
-		if(list.isEmpty()) return null;
-		LOG.fine("PaymentMeans.Class:"+list.get(0).getClass());
-		return list.get(0);
-	}
-	
-	//  die factories hier und nicht in class FinancialAccount
+	//  die factories sind in class FinancialAccount
 	@Override
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
-		return new FinancialAccount(iban, accountName, bic);
+		CreditTransfer fa = new FinancialAccount(iban, accountName, bic);
+		return addCreditTransfer(fa);
 	}
 
 	@Override
 	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic) {
-		return new FinancialAccount(accountId, accountName, bic);
+		CreditTransfer fa = new FinancialAccount(accountId, accountName, bic);
+		return addCreditTransfer(fa);
 	}
-
+	private CreditTransfer addCreditTransfer(CreditTransfer fa) {
+		PaymentMeans pm = (PaymentMeans)getPaymentInstructions();
+		pm.addCreditTransfer(fa);
+		return fa;
+		
+	}
+	
 	@Override // implements interface PaymentCardFactory
 	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
 		return CardAccount.create(cardAccountID, cardHolderName);
@@ -993,21 +988,14 @@ UBL:
 	// BG-16.BG-19 ++ 0..1 DIRECT DEBIT
 	@Override
 	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
-		return PaymentMandate.createDirectDebit(mandateID, bankAssignedCreditorID, iban);
+		return PaymentMandate.create(mandateID, bankAssignedCreditorID, iban);
 	}
 
 	@Override
 	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
-		return PaymentMandate.createDirectDebit(mandateID, bankAssignedCreditorID, debitedAccountID);
+		return PaymentMandate.create(mandateID, bankAssignedCreditorID, debitedAccountID);
 	}
 
-	public BG19_DirectDebit getDirectDebit() {
-		PaymentMeansType pm = getPaymentMeans0();
-		if(pm==null) return null;
-		PaymentMeans paymentMeans = new PaymentMeans(pm);
-		return paymentMeans.getDirectDebit();
-	}
-	
 	// BG-20 + 0..n DOCUMENT LEVEL ALLOWANCES                          TODO
 	public void setDocumentLevelAllowence(Object todo) {
 		LOG.warning(NOT_IMPEMENTED);

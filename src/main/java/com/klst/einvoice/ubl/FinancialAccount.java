@@ -33,8 +33,8 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 	}
 	FinancialAccount(PaymentMeans pm) {
 		this(pm.getPayeeFinancialAccount());
-		LOG.info("pm"+pm);
-		LOG.info("PaymentAccountID:"+this.getPaymentAccountID());
+		LOG.config("pm"+pm);
+//		LOG.info("PaymentAccountID:"+this.getPaymentAccountID());
 		paymentMeans = pm;
 	}
 	
@@ -50,27 +50,13 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 		return paymentMeans;
 	}
 	
-//	FinancialAccount() {
-//		super();
-//	}
-//	
-//	// copy ctor
-//	public FinancialAccount(FinancialAccountType doc) {
-//		this();
-//		setPaymentAccountID(doc.getID().getValue());
-//		setPaymentAccountName(doc.getName()==null ? null : doc.getName().getValue());
-//		setPaymentServiceProviderID(getPaymentServiceProviderID(doc));
-//	}
-//	
 	public FinancialAccount(IBANId iban, String accountName, BICId bic) {
-//		this(null);
 		setPaymentAccountID(iban);
 		setPaymentAccountName(accountName);
 		setPaymentServiceProviderID(bic);
 	}
 	
 	public FinancialAccount(String accountId, String accountName, BICId bic) {
-//		this(null);
 		setPaymentAccountID(accountId);
 		setPaymentAccountName(accountName);
 		setPaymentServiceProviderID(bic);
