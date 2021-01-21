@@ -129,6 +129,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			});
 			return create(list);
 		}
+//		LOG.info(">>>>>>>>>>>> paymentCard:"+paymentCard + " oder directDebit:"+directDebit);
 		return new PaymentMeans(code, paymentMeansText, remittanceInformation, 
 			creditTransfer, paymentCard, directDebit);
 	}
@@ -137,7 +138,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		if(list.isEmpty()) return null;
 		PaymentMeans paymentMeans = new PaymentMeans(list.get(0), null);
 		if(list.size()==1) {
-			paymentMeans.pmList.add(paymentMeans);
+//			paymentMeans.pmList.add(paymentMeans);
 			return paymentMeans;
 		}
 		LOG.info("// bei mehreren Einträgen paymentMeans neu berechnen: ...");
@@ -175,7 +176,9 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			super.setPaymentMandate(doc.getPaymentMandate());
 			super.setTradeFinancing(doc.getTradeFinancing());
 		}
-		if(pmList!=null) {
+		if(pmList==null) {
+			this.pmList.add(this);
+		} else {
 			this.pmList = pmList;
 		}
 		if(this.isCreditTransfer()) {
@@ -209,16 +212,16 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		if(getPaymentMeansEnum()==null) return;
 		
 		// BG-17
-		creditTransfer.forEach(ct -> {
-			LOG.info("init add BG-17:"+ct);
-//			FinancialAccount fa = (FinancialAccount)ct;
-//			LOG.info("fa.pm                      :"+fa.getPaymentMeans());
-//			LOG.info("fa.pm.PayerFinancialAccount:"+fa.getPaymentMeans().getPayerFinancialAccount());
-//			LOG.info("super.PayerFinancialAccount:"+super.getPayerFinancialAccount());
-			this.addCreditTransfer(ct);
-		});
-		setPaymentCard(paymentCard); // BG-18
-		setDirectDebit((BG19_DirectDebit)directDebit); // BG-19
+		if(creditTransfer!=null) {
+			creditTransfer.forEach(ct -> {
+				LOG.info("init add BG-17:"+ct);
+				this.addCreditTransfer(ct);
+			});
+		} else {
+			pmList.add(this);
+			setPaymentCard(paymentCard);                   // BG-18
+			setDirectDebit((BG19_DirectDebit)directDebit); // BG-19
+		}
 	}
 	
 	public String toString() {

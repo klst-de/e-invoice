@@ -70,7 +70,7 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 	 */
 	@Override
 	public String getPaymentAccountID() {
-		return super.getID().getValue();
+		return super.getID()==null ? null : getID().getValue();
 	}
 
 	@Override
