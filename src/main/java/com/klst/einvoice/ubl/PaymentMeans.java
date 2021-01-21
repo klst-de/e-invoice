@@ -12,9 +12,6 @@ import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PaymentInstructionsFactory;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CardAccountType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMandateType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InstructionNoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PaymentIDType;
@@ -112,99 +109,95 @@ Bsp: miad :
 
  */
 public class PaymentMeans extends PaymentMeansType implements PaymentInstructions, PaymentInstructionsFactory {
-
-	// implements PaymentInstructionsFactory
-	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+	
+	// factory:
+	@Override
+	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText,
+			String remittanceInformation, List<CreditTransfer> creditTransfer, PaymentCard paymentCard,
+			DirectDebit directDebit) {
 		return create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
-	static PaymentInstructions create(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		return new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, (BG19_DirectDebit)directDebit);
+	static PaymentInstructions create(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation, 
+			List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		return new PaymentMeans(code, paymentMeansText, remittanceInformation, 
+			creditTransfer, paymentCard, directDebit);
 	}
-	
+
 	private static final Logger LOG = Logger.getLogger(PaymentMeans.class.getName());
-	
-	// copy ctor
-	public PaymentMeans(PaymentMeansType doc) {
-		super();
-		PaymentMeansEnum code = getPaymentMeansEnum(doc);
-		LOG.fine("copy ctor: PaymentMeansCode="+code);
-		String paymentMeansText = getPaymentMeansText(doc);
-		String remittanceInformation = getRemittanceInformation(doc);
-				// doc.getPaymentID().isEmpty() ? null : doc.getPaymentID().get(0).getValue();
-		init(PaymentMeansEnum.valueOf(doc.getPaymentMeansCode()), paymentMeansText, remittanceInformation);
-		LOG.fine("copy ctor: vor new FinancialAccount: "+this.toString() + " remittanceInformation:"+remittanceInformation);
-		if(doc.getPayeeFinancialAccount()==null) {
-			// kann null sein, zB. in ubl-tc434-example5.xml bei DirectDebit
-		} else {
-			payeeFinancialAccount = new FinancialAccount(doc.getPayeeFinancialAccount());
-			super.setPayeeFinancialAccount(payeeFinancialAccount);
-		}
-		if(doc.getPaymentMandate()==null) {
-			// kein DirectDebit
-		} else {
-			paymentMandate = new PaymentMandate(doc.getPaymentMandate());
-			super.setPaymentMandate(paymentMandate);
-		}
-		switch(code) { 
-		case CreditTransfer:
-		case SEPACreditTransfer:
-			// TODO
-//			creditTransfer.forEach(ct -> {
-//				applicableHeaderTradeSettlement.addCreditTransfer(ct);
-//			});
-			break;		
-		case BankCard:
-			CardAccountType ca = doc.getCardAccount();
-			this.setPaymentCard(new CardAccount(ca));
-			break;
-		case DirectDebit: 
-		case SEPADirectDebit: 
-			this.setDirectDebit(getDirectDebit());
-			break;
-		default:
-			LOG.warning("NOT_IMPEMENTED + : PaymentMeans "+code);
-			break;
-		}
 
-		LOG.fine("copy ctor fertig: CT.size="+this.getCreditTransfer().size() 
-				+ " PC:"+this.getPaymentCard()
-				+ " DD:"+this.getDirectDebit());
+	List<PaymentMeansType> paymentMeans; // TODO besser Map
+	
+	private PaymentMeans() {
+		paymentMeans = new ArrayList<PaymentMeansType>();
+	}
+	private PaymentMeans(PaymentMeansType doc, List<PaymentMeansType> paymentMeans) {
+		this();
+		if(doc!=null) {
+			super.setID(doc.getID());
+			super.setPaymentMeansCode(doc.getPaymentMeansCode());
+			super.setPaymentDueDate(doc.getPaymentDueDate());
+			super.setPaymentChannelCode(doc.getPaymentChannelCode());
+			super.setInstructionID(doc.getInstructionID());
+			super.instructionNote = doc.getInstructionNote();
+			super.paymentID = doc.getPaymentID();
+			super.setCardAccount(doc.getCardAccount());
+			super.setPayerFinancialAccount(doc.getPayerFinancialAccount());
+			super.setPayeeFinancialAccount(doc.getPayeeFinancialAccount());
+			super.setCreditAccount(doc.getCreditAccount());
+			super.setPaymentMandate(doc.getPaymentMandate());
+			super.setTradeFinancing(doc.getTradeFinancing());
+		}
+		if(paymentMeans!=null) {
+			this.paymentMeans = paymentMeans;
+			if(!paymentMeans.isEmpty()) {
+				LOG.info("sollte fa so sein?"+paymentMeans.get(paymentMeans.size()-1).getPayeeFinancialAccount().getID().getValue());
+			}
+//			super.setPayeeFinancialAccount(new FinancialAccount(fa.getPaymentMeans()));
+		}
+		LOG.info("ctor:"+this);
+	}
+	// ctor für mehrere BG-17 CreditTransfer
+	PaymentMeans(List<PaymentMeansType> list) {
+		this(list.get(0), null);
+		LOG.info("ctor für mehrere "+list.size()+" BG-17 CreditTransfer/PaymentMeans");
+//		paymentMeans = new ArrayList<PaymentMeansType>(list.size());
+		list.forEach(pm -> {
+			LOG.info("PaymentMeans:"+pm);
+//			new PaymentMeans(pm);
+			paymentMeans.add(new PaymentMeans(pm, paymentMeans));
+			LOG.info("paymentMeans.last:"+paymentMeans.get(paymentMeans.size()-1));
+//			paymentMeans.add(pm);
+		});	
 	}
 	
-	FinancialAccountType payeeFinancialAccount;
-	PaymentMandateType paymentMandate;
-	
-	public PaymentMeans(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation,
-			List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
-		super();
-		init(code, paymentMeansText, remittanceInformation);
+	PaymentMeans(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation,
+			List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+		this();
+		init(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+	}
+	void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		
-		// Eine der Untergruppen BG-17, BG-18, BG-19 muss angegeben werden!
-		if((creditTransferList==null || creditTransferList.isEmpty()) 
-			&& paymentCard==null && directDebit==null) {
-			LOG.warning("No Group specified. Specify a creditTransferList/BG-17 or paymentCard/BG-18 or directDebit/BG-19.");
-			return;
-		}
+		setPaymentMeans(code, paymentMeansText); // BT-81, BT-82
+		setRemittanceInformation(remittanceInformation); // BT-83
 		
-		payeeFinancialAccount = new FinancialAccount();
-		paymentMandate = new PaymentMandate();
-		if(creditTransferList!=null) creditTransferList.forEach(creditTransfer -> {
-			payeeFinancialAccount = (FinancialAccount)creditTransfer;
-			super.setPayeeFinancialAccount(payeeFinancialAccount);
+		if(getPaymentMeansEnum()==null) return;
+		
+		// BG-17
+		creditTransfer.forEach(ct -> {
+			LOG.info("init add BG-17:"+ct);
+			// List<PaymentMeansType> paymentMeans;
+			FinancialAccount fa = (FinancialAccount)ct;
+//			LOG.info("init add BG-17.PaymentMeans:"+fa.getPaymentMeans());
+			// ??? super.setPayerFinancialAccount
+			LOG.info("fa.pm                      :"+fa.getPaymentMeans());
+			LOG.info("fa.pm.PayerFinancialAccount:"+fa.getPaymentMeans().getPayerFinancialAccount());
+			LOG.info("super.PayerFinancialAccount:"+super.getPayerFinancialAccount());
+//			paymentMeans.add(fa.getPaymentMeans()); // das wird in addCreditTransfer gemacht
+			this.addCreditTransfer(ct);
 		});
-		if(paymentCard!=null) {
-			this.setCardAccount((CardAccount)paymentCard);
-		}
-		if(directDebit!=null) {
-			setDirectDebit((BG19_DirectDebit)directDebit);
-		}
-	}
-
-	void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation) {
-		setPaymentMeans(code, paymentMeansText);
-		setRemittanceInformation(remittanceInformation);
+		setPaymentCard(paymentCard); // BG-18
+		setDirectDebit((BG19_DirectDebit)directDebit); // BG-19
 	}
 	
 	public String toString() {
@@ -213,6 +206,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		stringBuilder.append(getPaymentMeansEnum()==null ? "null" : getPaymentMeansEnum().getValueAsString());
 		stringBuilder.append(", PaymentMeansText:");
 		stringBuilder.append(getPaymentMeansText()==null ? "null" : getPaymentMeansText());
+		stringBuilder.append(", paymentMeans#:"+this.paymentMeans.size());
 		stringBuilder.append(", RemittanceInformation:");
 		stringBuilder.append(getRemittanceInformation()==null ? "null" : getRemittanceInformation());
 		stringBuilder.append("]");
@@ -249,24 +243,8 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	}
 	
 	@Override
-	// BT-83 0..1 Verwendungszweck
-	public void setRemittanceInformation(String text) {
-		if(text==null) return; // optional, Bsp in 
-		// 01.14a-INVOICE_ubl.xml : <cbc:PaymentID>Deb. 12345 / Fact. 9876543</cbc:PaymentID>
-		// 01.15a-INVOICE_ubl.xml : <cbc:PaymentID>0000123456</cbc:PaymentID>
-		List<PaymentIDType> paymentIDs = super.getPaymentID();
-		PaymentIDType paymentID = new PaymentIDType();
-		paymentID.setValue(text);
-		paymentIDs.add(paymentID);
-	}
-	
-	@Override
 	public PaymentMeansEnum getPaymentMeansEnum() {
 		CodeType paymentMeansCode = super.getPaymentMeansCode();
-		return PaymentMeansEnum.valueOf(paymentMeansCode);
-	}
-	static PaymentMeansEnum getPaymentMeansEnum(PaymentMeansType doc) {
-		CodeType paymentMeansCode = doc.getPaymentMeansCode();
 		return PaymentMeansEnum.valueOf(paymentMeansCode);
 	}
 
@@ -279,6 +257,18 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	}
 
 	@Override
+	// BT-83 0..1 Verwendungszweck
+	public void setRemittanceInformation(String text) {
+		if(text==null) return; // optional, Bsp in 
+		// 01.14a-INVOICE_ubl.xml : <cbc:PaymentID>Deb. 12345 / Fact. 9876543</cbc:PaymentID>
+		// 01.15a-INVOICE_ubl.xml : <cbc:PaymentID>0000123456</cbc:PaymentID>
+		List<PaymentIDType> paymentIDs = super.getPaymentID();
+		PaymentIDType paymentID = new PaymentIDType();
+		paymentID.setValue(text);
+		paymentIDs.add(paymentID);
+	}
+	
+	@Override
 	public String getRemittanceInformation() {
 		return super.getPaymentID().isEmpty() ? null : getRemittanceInformationList().get(0);
 	}
@@ -290,55 +280,76 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		});
 		return result;
 	}
-	static String getRemittanceInformation(PaymentMeansType doc) {
-		return doc.getPaymentID().isEmpty() ? null : doc.getPaymentID().get(0).getValue();
-	}
 	
 	// CreditTransfer ist Interface, List da BG-17 CREDIT TRANSFER die Kardinalität 0..n hat
+	// class FinancialAccount extends FinancialAccountType implements CreditTransfer
 	@Override
 	public void addCreditTransfer(CreditTransfer creditTransfer) {
-		// TODO Auto-generated method stub
-		
+		if(creditTransfer==null) return;
+		FinancialAccount fa = (FinancialAccount)creditTransfer;
+		paymentMeans.add(fa.getPaymentMeans());
+//		super.setPayeeFinancialAccount(fa.getPaymentMeans().getPayeeFinancialAccount());
+		super.setPayeeFinancialAccount(new FinancialAccount(fa.getPaymentMeans()));
 	}
+
+// TODO in ubl gibt es keine List<CreditTransfer> !!! ABER mehrere PaymentMeans 
+/* siehe ubl-tc434-example1.xml :
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+        <cbc:PaymentID>Deb. 10202 / Fact. 12115118</cbc:PaymentID>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID>NL57 RABO 0107307510</cbc:ID>
+        </cac:PayeeFinancialAccount>
+    </cac:PaymentMeans>
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID>NL03 INGB 0004489902</cbc:ID>
+        </cac:PayeeFinancialAccount>
+    </cac:PaymentMeans>
+
+ */
 
 	@Override
 	public List<CreditTransfer> getCreditTransfer() { 
 		List<CreditTransfer> result = new ArrayList<CreditTransfer>();
-		if(payeeFinancialAccount==null) {
-			// LOG
-		} else {
-			// add interface CreditTransfer
-			// FinancialAccount extends FinancialAccountType implements CreditTransfer
-//			LOG.info("PaymentMeansCode:"+getPaymentMeansCode() + " ID:"+payeeFinancialAccount.getID());
-			result.add((FinancialAccount)payeeFinancialAccount);
-		}
+		paymentMeans.forEach(pm -> {
+			LOG.info("pm:"+pm);
+			if(pm.getPayeeFinancialAccount()!=null) {
+				// FinancialAccount extends FinancialAccountType implements CreditTransfer
+				result.add(new FinancialAccount(this));
+			}
+		});
 		return result;
 	}
 	
-	// DirectDebit ist Interface, kein List da BG-19 die Kardinalität 0..1 hat
-	@Override
-	public void setDirectDebit(BG19_DirectDebit directDebit) {
-		paymentMandate = (PaymentMandate)directDebit;
-		super.setPaymentMandate(paymentMandate);
-	}
-
-	public BG19_DirectDebit getDirectDebit() {
-		if(paymentMandate==null) return null;
-		// class PaymentMandate extends PaymentMandateType implements DirectDebit
-		PaymentMandate directDebit = new PaymentMandate(paymentMandate);
-		return directDebit;
-	}
-
 	// BG-18 (optional) PAYMENT CARD INFORMATION
 	@Override
 	public void setPaymentCard(PaymentCard paymentCard) {
 		if(paymentCard==null) return;
-		super.setCardAccount((CardAccount)paymentCard);
+		// CardAccount extends CardAccountType implements PaymentCard
+		CardAccount cardAccount = (CardAccount)paymentCard;
+		super.setCardAccount(cardAccount);
 	}
 
 	@Override
 	public PaymentCard getPaymentCard() {
 		return super.getCardAccount()==null? null : new CardAccount(getCardAccount());
 	}
+	
+	// DirectDebit ist Interface, kein List da BG-19 die Kardinalität 0..1 hat
+	// class PaymentMandate extends PaymentMandateType implements BG19_DirectDebit
+	@Override
+	public void setDirectDebit(BG19_DirectDebit directDebit) {
+		if(directDebit==null) return;
+		super.setPaymentMandate((PaymentMandate)directDebit);
+	}
+
+	public BG19_DirectDebit getDirectDebit() {
+		if(super.getPaymentMandate()==null) return null;
+		PaymentMandate directDebit = new PaymentMandate(getPaymentMandate());
+		return directDebit;
+	}
+
 
 }
