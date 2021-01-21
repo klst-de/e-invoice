@@ -123,13 +123,10 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			List<PaymentMeansType> list = new ArrayList<PaymentMeansType>();
 			creditTransfer.forEach(ct -> {
 				FinancialAccount fa = (FinancialAccount)ct;
-//				LOG.info("+++create PaymentInstructions ct:"+ct);
-//				LOG.info("+++create PaymentInstructions pm:"+fa.getPaymentMeans());
 				list.add(fa.getPaymentMeans());
 			});
 			return create(list);
 		}
-//		LOG.info(">>>>>>>>>>>> paymentCard:"+paymentCard + " oder directDebit:"+directDebit);
 		return new PaymentMeans(code, paymentMeansText, remittanceInformation, 
 			creditTransfer, paymentCard, directDebit);
 	}
@@ -138,15 +135,10 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		if(list.isEmpty()) return null;
 		PaymentMeans paymentMeans = new PaymentMeans(list.get(0), null);
 		if(list.size()==1) {
-//			paymentMeans.pmList.add(paymentMeans);
 			return paymentMeans;
 		}
-		LOG.info("// bei mehreren Einträgen paymentMeans neu berechnen: ...");
+		LOG.config("// bei mehreren Einträgen paymentMeans neu berechnen: ...");
 		paymentMeans = new PaymentMeans(list);
-//		paymentMeans.pmList.forEach(pm -> {
-//			int i = pm.pmList.indexOf(pm);
-//			LOG.info("i="+i+">>>>>>>>>>> pm:"+pm);
-//		});
 //		LOG.info(">>>>>>>>>>> das erste el zurück");
 		return paymentMeans.pmList.get(0);
 	}
@@ -154,7 +146,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	private static final Logger LOG = Logger.getLogger(PaymentMeans.class.getName());
 
 	List<PaymentMeans> pmList; // mit indexOf(Object o) this finden
-//	List<PaymentMeansType> get...
+//	List<PaymentMeansType> get... TODO
 	
 	private PaymentMeans() {
 		pmList = new ArrayList<PaymentMeans>();
@@ -185,14 +177,14 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			super.setPayeeFinancialAccount(new FinancialAccount(this));			
 		}
 
-		LOG.info("ctor:"+this);
+//		LOG.info("ctor:"+this);
 	}
 
 	private PaymentMeans(List<PaymentMeansType> list) {
 		this();
 		LOG.info("ctor für mehrere "+list.size()+" BG-17 CreditTransfer/PaymentMeans");
 		list.forEach(pm -> {
-			LOG.info("PaymentMeans:"+pm);
+			LOG.info("CreditTransfer/PaymentMeans:"+pm);
 			pmList.add(new PaymentMeans(pm, pmList));
 		});
 //		LOG.info("ctor für mehrere "+list.size()+" fertig.:"+this.pmList.size());
@@ -203,7 +195,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		this();
 		init(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
-	void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+	private void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		
 		setPaymentMeans(code, paymentMeansText); // BT-81, BT-82
@@ -234,8 +226,8 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		stringBuilder.append(", RemittanceInformation:");
 		stringBuilder.append(getRemittanceInformation()==null ? "null" : getRemittanceInformation());
 		
-		stringBuilder.append(", PayeeFinancialAccount:");
-		stringBuilder.append(getPayeeFinancialAccount()==null ? "null" : getPayeeFinancialAccount());
+//		stringBuilder.append(", PayeeFinancialAccount:");
+//		stringBuilder.append(getPayeeFinancialAccount()==null ? "null" : getPayeeFinancialAccount());
 		
 		stringBuilder.append("]");
 		return stringBuilder.toString();
