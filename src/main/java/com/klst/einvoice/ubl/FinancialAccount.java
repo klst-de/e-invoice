@@ -1,5 +1,7 @@
 package com.klst.einvoice.ubl;
 
+import java.util.logging.Logger;
+
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
@@ -11,27 +13,64 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType
 // Gruppe CREDIT TRANSFER                   BG-17
 public class FinancialAccount extends FinancialAccountType implements CreditTransfer {
 
-	FinancialAccount() {
+	private static final Logger LOG = Logger.getLogger(FinancialAccount.class.getName());
+
+	PaymentMeans paymentMeans;
+
+	private FinancialAccount(FinancialAccountType doc) {
 		super();
+		if(doc!=null) {
+			super.setID(doc.getID());
+			super.setName(doc.getName());
+			super.setAliasName(doc.getAliasName());
+			super.setAccountTypeCode(doc.getAccountTypeCode());
+			super.setAccountFormatCode(doc.getAccountFormatCode());
+			super.setCurrencyCode(doc.getCurrencyCode());
+			super.paymentNote = doc.getPaymentNote();
+			super.setFinancialInstitutionBranch(doc.getFinancialInstitutionBranch());
+			super.setCountry(doc.getCountry());
+		}
+	}
+	FinancialAccount(PaymentMeans pm) {
+		this(pm.getPayeeFinancialAccount());
+		LOG.info("pm"+pm);
+		LOG.info("PaymentAccountID:"+this.getPaymentAccountID());
+		paymentMeans = pm;
 	}
 	
-	// copy ctor
-	public FinancialAccount(FinancialAccountType doc) {
-		this();
-		setPaymentAccountID(doc.getID().getValue());
-		setPaymentAccountName(doc.getName()==null ? null : doc.getName().getValue());
-		setPaymentServiceProviderID(getPaymentServiceProviderID(doc));
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[");
+		stringBuilder.append(getPaymentAccountID()==null ? "null" : getPaymentAccountID());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
+	}
+
+	public PaymentMeans getPaymentMeans() {
+		return paymentMeans;
 	}
 	
+//	FinancialAccount() {
+//		super();
+//	}
+//	
+//	// copy ctor
+//	public FinancialAccount(FinancialAccountType doc) {
+//		this();
+//		setPaymentAccountID(doc.getID().getValue());
+//		setPaymentAccountName(doc.getName()==null ? null : doc.getName().getValue());
+//		setPaymentServiceProviderID(getPaymentServiceProviderID(doc));
+//	}
+//	
 	public FinancialAccount(IBANId iban, String accountName, BICId bic) {
-		this();
+//		this(null);
 		setPaymentAccountID(iban);
 		setPaymentAccountName(accountName);
 		setPaymentServiceProviderID(bic);
 	}
 	
 	public FinancialAccount(String accountId, String accountName, BICId bic) {
-		this();
+//		this(null);
 		setPaymentAccountID(accountId);
 		setPaymentAccountName(accountName);
 		setPaymentServiceProviderID(bic);
