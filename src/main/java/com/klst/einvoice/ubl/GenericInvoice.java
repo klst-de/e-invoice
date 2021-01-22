@@ -986,10 +986,11 @@ UBL:
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
 		FinancialAccount fa = new FinancialAccount(iban, accountName, bic);
 		List<CreditTransfer> creditTransferList = new ArrayList<CreditTransfer>();
-		creditTransferList.add(fa);
+		creditTransferList.add(fa); // dieset fa hat kein pm!
 		PaymentInstructions pi = getPaymentInstructions();
 		if(pi==null) {
-			pi = createPaymentInstructions(PaymentMeansEnum.SEPACreditTransfer, null, null, creditTransferList);
+			pi = createPaymentInstructions(PaymentMeansEnum.SEPACreditTransfer, null, null, null, null, null);
+			fa.paymentMeans = (PaymentMeans)pi;
 		}
 		((PaymentMeans)pi).addCreditTransfer(fa);
 		this.setPaymentInstructions(pi);
@@ -1002,7 +1003,8 @@ UBL:
 		creditTransferList.add(fa);
 		PaymentInstructions pi = getPaymentInstructions();
 		if(pi==null) {
-			pi = createPaymentInstructions(PaymentMeansEnum.CreditTransfer, null, null, creditTransferList);
+			pi = createPaymentInstructions(PaymentMeansEnum.SEPACreditTransfer, null, null, null, null, null);
+			fa.paymentMeans = (PaymentMeans)pi;
 		}
 		((PaymentMeans)pi).addCreditTransfer(fa);
 		this.setPaymentInstructions(pi);

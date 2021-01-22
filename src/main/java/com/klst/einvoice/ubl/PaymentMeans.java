@@ -123,7 +123,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			List<PaymentMeansType> list = new ArrayList<PaymentMeansType>();
 			creditTransfer.forEach(ct -> {
 				FinancialAccount fa = (FinancialAccount)ct;
-				list.add(fa.getPaymentMeans());
+				if(fa.getPaymentMeans()!=null) list.add(fa.getPaymentMeans());
 			});
 			return create(list);
 		}
@@ -151,6 +151,10 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 
 	List<PaymentMeans> pmList; // mit indexOf(Object o) this finden
 //	List<PaymentMeansType> get... TODO
+	private void addToPmList(PaymentMeans pm) {
+		int i = pmList.indexOf(pm);
+		if(i<0) pmList.add(pm);
+	}
 	
 	private PaymentMeans() {
 		pmList = new ArrayList<PaymentMeans>();
@@ -189,10 +193,10 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 
 	private PaymentMeans(List<PaymentMeansType> list) {
 		this();
-		LOG.info("ctor für mehrere "+list.size()+" BG-17 CreditTransfer/PaymentMeans");
+		LOG.info("more "+list.size()+" BG-17 CreditTransfer/PaymentMeans");
 		list.forEach(pm -> {
 			LOG.info("CreditTransfer/PaymentMeans:"+pm);
-			pmList.add(new PaymentMeans(pm, pmList));
+			addToPmList(new PaymentMeans(pm, pmList));
 		});
 //		LOG.info("ctor für mehrere "+list.size()+" fertig.:"+this.pmList.size());
 	}
@@ -217,7 +221,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 				this.addCreditTransfer(ct);
 			});
 		} else {
-			pmList.add(this);
+			addToPmList(this);
 			setPaymentCard(paymentCard);                   // BG-18
 			setDirectDebit((BG19_DirectDebit)directDebit); // BG-19
 		}
@@ -327,7 +331,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	public void addCreditTransfer(CreditTransfer creditTransfer) {
 		if(creditTransfer==null) return;
 		FinancialAccount fa = (FinancialAccount)creditTransfer;
-		pmList.add(fa.getPaymentMeans());
+		addToPmList(fa.getPaymentMeans());
 		super.setPayeeFinancialAccount(fa);
 	}
 
