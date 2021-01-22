@@ -549,8 +549,11 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit);
 	default void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, CreditTransfer creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		List<CreditTransfer> ctList = new ArrayList<CreditTransfer>();
-		if(creditTransfer!=null) ctList.add(creditTransfer);
+		List<CreditTransfer> ctList = null;
+		if(creditTransfer!=null) {
+			ctList = new ArrayList<CreditTransfer>();
+			ctList.add(creditTransfer);
+		}
 		setPaymentInstructions(code, paymentMeansText, remittanceInformation, ctList, paymentCard, directDebit);
 	}
 	public void setPaymentInstructions(PaymentInstructions paymentInstructions);
