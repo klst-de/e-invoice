@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -24,12 +26,14 @@ import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.CoreInvoice;
+import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
 import com.klst.untdid.codelist.DocumentNameCode;
+import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
@@ -119,9 +123,20 @@ public class UblTest {
 		// ...
 		IBANId payeeIban = new IBANId("NL57RABO0107307510");
 		BICId bicId = null; // SwiftCode (optional)
-		ublInvoice.createCreditTransfer(payeeIban, "RaboBank account", bicId);
+		CreditTransfer ct = ublInvoice.createCreditTransfer(payeeIban, "RaboBank account", bicId);
+		// implizit wird ein Objekt SEPACreditTransfer für BG-16 PAYMENT INSTRUCTIONS in ublInvoice erstellt
+		
+		List<CreditTransfer> ctList = new ArrayList<CreditTransfer>(Arrays.asList(ct));
+		// create liefert ein BG-16 Objekt, aber bindet es nicht an ublInvoice - das macht setXXX
+//		ublInvoice.createPaymentInstructions(PaymentMeansEnum.CreditTransfer, "paymentMeansText"
+//				, "PaymentReference Verwendungszweck", ctList);
+		ublInvoice.setPaymentInstructions(PaymentMeansEnum.CreditTransfer, "paymentMeansText"
+				, "PaymentReference Verwendungszweck", ctList, null, null);
+		
 		bicId = new BICId("INGBNL2AXXX");
 		ublInvoice.createCreditTransfer("NL03 INGB 0004489902", "ING account", bicId);
+		
+		// TODO PaymentReference Verwendungszweck geht nur über BG-16, dann ist aber BG-16 zwei mal da
 		
 		bytes = transformer.fromModel(ublInvoice);
     	xml = new String(bytes);
