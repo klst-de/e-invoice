@@ -131,6 +131,10 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			creditTransfer, paymentCard, directDebit);
 	}
 	
+	static PaymentInstructions create(PaymentMeansType pm) {
+		return new PaymentMeans(pm, null);
+	}
+	
 	static PaymentInstructions create(List<PaymentMeansType> list) {
 		if(list.isEmpty()) return null;
 		PaymentMeans paymentMeans = new PaymentMeans(list.get(0), null);
@@ -175,6 +179,9 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		}
 		if(this.isCreditTransfer()) {
 			super.setPayeeFinancialAccount(new FinancialAccount(this));			
+		}
+		if(this.isDirectDebit()) {
+			super.setPayerFinancialAccount(new FinancialAccount(this));			
 		}
 
 //		LOG.info("ctor:"+this);
@@ -264,11 +271,21 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	
 	@Override
 	public PaymentMeansEnum getPaymentMeansEnum() {
-		CodeType paymentMeansCode = super.getPaymentMeansCode();
+		return getPaymentMeansEnum(this);
+	}
+	static PaymentMeansEnum getPaymentMeansEnum(PaymentMeansType pm) {
+		CodeType paymentMeansCode = pm.getPaymentMeansCode();
 		return paymentMeansCode==null ? null : PaymentMeansEnum.valueOf(paymentMeansCode);
 	}
+	
 	boolean isCreditTransfer() {
 		return PaymentMeansEnum.isCreditTransfer(getPaymentMeansEnum());
+	}
+	boolean isBankCard() {
+		return PaymentMeansEnum.isBankCard(getPaymentMeansEnum());
+	}
+	boolean isDirectDebit() {
+		return PaymentMeansEnum.isDirectDebit(getPaymentMeansEnum());
 	}
 
 	@Override
@@ -311,7 +328,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		if(creditTransfer==null) return;
 		FinancialAccount fa = (FinancialAccount)creditTransfer;
 		pmList.add(fa.getPaymentMeans());
-		super.setPayeeFinancialAccount(new FinancialAccount(fa.getPaymentMeans()));
+		super.setPayeeFinancialAccount(fa);
 	}
 
 	public FinancialAccount getFinancialAccount() {

@@ -23,7 +23,13 @@ import org.junit.runners.MethodSorters;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
+import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.ubl.GenericInvoice;
+import com.klst.einvoice.unece.uncefact.BICId;
+import com.klst.einvoice.unece.uncefact.IBANId;
+import com.klst.marshaller.AbstactTransformer;
+import com.klst.marshaller.UblInvoiceTransformer;
+import com.klst.untdid.codelist.DocumentNameCode;
 
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
@@ -85,11 +91,13 @@ public class UblTest {
 			"ubl-tc434-example9.xml" };
 	
 	static private KositValidation validation;
+	static private AbstactTransformer transformer;
 	
     @BeforeClass
     public static void staticSetup() {
     	initLogger();
 		validation = new KositValidation();
+		transformer = UblInvoiceTransformer.getInstance();
     }
 
 	@Test
@@ -99,6 +107,26 @@ public class UblTest {
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
     	assertTrue(validation.check(bytes));
+    	
+		CoreInvoice ublInvoice = GenericInvoice.createInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
+				, DocumentNameCode.CommercialInvoice);
+		LOG.info("ublInvoice.Class:"+ublInvoice.getClass());
+		ublInvoice.setId("123456XX");
+		ublInvoice.setIssueDate("2016-04-04");
+		ublInvoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
+		ublInvoice.setOrderReference("1234567890");           // optional
+		ublInvoice.setBuyerReference("04011000-12345-34");
+		// ...
+		IBANId payeeIban = new IBANId("NL57RABO0107307510");
+		BICId bicId = null; // SwiftCode (optional)
+		ublInvoice.createCreditTransfer(payeeIban, "RaboBank account", bicId);
+		bicId = new BICId("INGBNL2AXXX");
+		ublInvoice.createCreditTransfer("NL03 INGB 0004489902", "ING account", bicId);
+		
+		bytes = transformer.fromModel(ublInvoice);
+    	xml = new String(bytes);
+    	LOG.info("xml=\n"+xml);
+    	//assertTrue(validation.check(bytes));
    }
     
 	@Test

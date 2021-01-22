@@ -942,15 +942,23 @@ UBL:
 		PaymentMeans paymentMeans = (PaymentMeans)paymentInstructions;
 		LOG.info("paymentMeans:"+paymentMeans);
 		if(isInvoiceType) {
-			paymentMeans.pmList.forEach(pm -> {
-//				int i = paymentMeans.pmList.indexOf(pm);
-//				LOG.info("i="+i +" add:"+((PaymentMeans)pm).getFinancialAccount());
-				invoice.getPaymentMeans().add(pm);
-			});
+			if(paymentMeans.isCreditTransfer()) {
+				paymentMeans.pmList.forEach(pm -> {
+//					int i = paymentMeans.pmList.indexOf(pm);
+//					LOG.info("i="+i +" add:"+((PaymentMeans)pm).getFinancialAccount());
+					invoice.getPaymentMeans().add(pm);
+				});
+			} else { // assert paymentMeans==paymentMeans.pmList.get(0)
+				invoice.getPaymentMeans().add(paymentMeans); 
+			}
 		} else {
-			paymentMeans.pmList.forEach(pm -> {
-				creditNote.getPaymentMeans().add(pm);
-			});
+			if(paymentMeans.isCreditTransfer()) {
+				paymentMeans.pmList.forEach(pm -> {
+					creditNote.getPaymentMeans().add(pm);
+				});
+			} else {
+				creditNote.getPaymentMeans().add(paymentMeans); 
+			}
 		}
 	}
 
@@ -958,26 +966,47 @@ UBL:
 	@Override
 	public PaymentInstructions getPaymentInstructions() {
 		List<PaymentMeansType> list = isInvoiceType ? invoice.getPaymentMeans() : creditNote.getPaymentMeans();
-		return PaymentMeans.create(list);
+		if(list==null) return null;
+		if(list.isEmpty()) return null;
+		PaymentMeansType pm = (PaymentMeansType)(list.get(0));
+		PaymentMeansEnum pmCode = PaymentMeans.getPaymentMeansEnum(pm);
+		if(PaymentMeansEnum.isCreditTransfer(pmCode)) {
+			return PaymentMeans.create(list); // BG-17
+		} else if(PaymentMeansEnum.isBankCard(pmCode)) {
+			PaymentMeans.create(pm); // BG-18
+		} else if(PaymentMeansEnum.isDirectDebit(pmCode)) {
+			PaymentMeans.create(pm); // BG-19
+		}
+		LOG.warning("BG-16 (DE CIUS mandatory) PAYMENT INSTRUCTIONS");
+		return PaymentMeans.create(pm);
 	}
 
-	//  die factories sind in class FinancialAccount
+	//  die factories sind in class FinancialAccount, aber ich brauche noch ein BG-16 PaymentInstructions
 	@Override
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
-		CreditTransfer fa = new FinancialAccount(iban, accountName, bic);
-		return addCreditTransfer(fa);
+		FinancialAccount fa = new FinancialAccount(iban, accountName, bic);
+		List<CreditTransfer> creditTransferList = new ArrayList<CreditTransfer>();
+		creditTransferList.add(fa);
+		PaymentInstructions pi = getPaymentInstructions();
+		if(pi==null) {
+			pi = createPaymentInstructions(PaymentMeansEnum.SEPACreditTransfer, null, null, creditTransferList);
+		}
+		((PaymentMeans)pi).addCreditTransfer(fa);
+		this.setPaymentInstructions(pi);
+		return fa;
 	}
-
 	@Override
 	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic) {
-		CreditTransfer fa = new FinancialAccount(accountId, accountName, bic);
-		return addCreditTransfer(fa);
-	}
-	private CreditTransfer addCreditTransfer(CreditTransfer fa) {
-		PaymentMeans pm = (PaymentMeans)getPaymentInstructions();
-		pm.addCreditTransfer(fa);
+		FinancialAccount fa = new FinancialAccount(accountId, accountName, bic);
+		List<CreditTransfer> creditTransferList = new ArrayList<CreditTransfer>();
+		creditTransferList.add(fa);
+		PaymentInstructions pi = getPaymentInstructions();
+		if(pi==null) {
+			pi = createPaymentInstructions(PaymentMeansEnum.CreditTransfer, null, null, creditTransferList);
+		}
+		((PaymentMeans)pi).addCreditTransfer(fa);
+		this.setPaymentInstructions(pi);
 		return fa;
-		
 	}
 	
 	@Override // implements interface PaymentCardFactory
