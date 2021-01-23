@@ -15,20 +15,26 @@ Im [Vertriebsprozess](https://klst.gitbook.io/adempiere/usr/2.3-sales) gibt es z
 
 Beide Geschäftspartner sind i.A. umsatzsteuerpflichtig. Der Verkäufer darf seine Rolle an einen **Steuerbevollmächtigten** delegieren, der die Umsatzsteuer in seinem Namen ausweist und bezahlt.
 
-Die Rolle des Zahlungsempfängers darf an einen weiteren Geschäftspartner delegiert werden [Factoring](https://de.wikipedia.org/wiki/Factoring).
+Die Rolle des Zahlungsempfängers darf an einen weiteren Geschäftspartner delegiert werden ([Factoring](https://de.wikipedia.org/wiki/Factoring)).
 
 ![](../image/PartiesAndRoles.PNG)
 
-### Geschäftsregeln
-
-- BR-6: Eine Rechnung muss den Namen des Verkäufers (BT-27) enthalten.
-- BR-7: Eine Rechnung muss den Namen des Käufers (BT-44) enthalten.
+### Die Geschäftspartner im Modell
 
 ![](../image/CoreInvoice_BP-de.PNG)
 
+### Geschäftsregeln für Rechnungen
+
+siehe auch [rechtliche Anforderungen an eine Rechnung](https://de.wikipedia.org/wiki/Fakturierung#Mindestanforderungen)
+
+- BR-6: Eine Rechnung muss den Namen des Verkäufers (BT-27) enthalten.
+- BR-7: Eine Rechnung muss den Namen des Käufers (BT-44) enthalten.
+- BR-8: Eine Rechnung muss die Postanschrift des Verkäufers (BG-5) enthalten.
+- BR-9: Eine Postanschrift des Verkäufers (BG-5) muss einen Ländercode der Verkäuferanschrift (BT-40) enthalten.
+
 ### Beispiel Verkäufer und Käufer
 
-Das folgende Beispiel definiert den Verkäufer und den Käufer.
+Das folgende Beispiel definiert den Verkäufer und den Käufer und damit erfüllt es die ersten zwei Regeln. Auch BR-9 ist erfüllt, jedoch **nicht BR-8**
 
 ```java
   static final String DE = "DE";  // country code 
