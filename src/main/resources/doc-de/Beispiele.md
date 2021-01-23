@@ -10,7 +10,7 @@ Das Einführungsbeispiel gab es bereits im [README](https://github.com/klst-de/e
 
 Im [Vertriebsprozess](https://klst.gitbook.io/adempiere/usr/2.3-sales) gibt es zwei Geschäftspartner, den Verkäufer (Seller/Supplier) und den Käufer (Buyer/Customer). Jeder Partner kann im Prozess mehrere Rollen ausüben.
 
-- der **Verkäufer** ist i.A. auch der Lieferant und der **Zahlungsempfänger**
+- der **Verkäufer** ist i.A. auch der Lieferant und der **Zahlungsempfänger** (Payee)
 - der **Käufer/Kunde** kann auch Empfänger der Waren oder Dienstleistungen sein
 
 Beide Geschäftspartner sind i.A. umsatzsteuerpflichtig. Der Verkäufer darf seine Rolle an einen **Steuerbevollmächtigten** delegieren, der die Umsatzsteuer in seinem Namen ausweist und bezahlt.
@@ -66,3 +66,24 @@ Die Adresse der Käufers ist einfach zu vervollständigen: `setAddressLine1(...)
 ...
 ```
 
+### Beispiel Factoring
+
+Die Rolle des Zahlungsempfängers darf auch von einem anderen Geschäftspartner als dem Verkäufer, z. B. von einem Factoringdienst, ausgeübt werden.
+
+- BR-17: Falls der Zahlungsempfänger (BG-10) nicht mit dem Verkäufer (BG-4) identisch ist, muss seine Firmierung/sein Name in der Rechnung (BT-59) angegeben werden
+
+Die facturx API hat dafür die Methode `setPayee`:
+
+	public interface CoreInvoice ...
+	public void setPayee(String name, String id, String companyId);
+
+
+### Beispiel Steuerbevollmächtigte
+
+Der Verkäufer darf seine Rolle an einen Steuerbevollmächtigten delegieren, der die Umsatzsteuer in seinem Namen ausweist und bezahlt. In der Rechnung müssen weitere Regeln beachtet werden:
+
+- BR-18: Falls sich der Verkäufer (BG-4) durch einen Steuerbevollmächtigten (BG-11) vertreten lässt, muss dessen Name (BT-62) in der Rechnung angegeben werden.
+- BR-19: Falls sich der Verkäufer (BG-4) durch einen Steuerbevollmächtigten (BG-11) vertreten lässt, muss die Postanschrift des Steuerbevollmächtigten des Verkäufers (BG-12) in der Rechnung angegeben werden.
+- BR-20 Falls sich der Verkäufer (BG-4) durch einen Steuerbevollmächtigten (BG-11) vertreten lässt, muss die Postanschrift des Steuerbevollmächtigten des Verkäufers (BG-12) den Ländercode der Steuerbevollmächtigtenanschrift (BT-69) enthalten.
+
+Ähnlich wie bei Payee gibt es auch dafür eine Methode `setTaxRepresentative`.
