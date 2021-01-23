@@ -50,7 +50,8 @@ public class DateTimeFormats {
 		} catch (IllegalArgumentException e) {
 			try {
 				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-				ts = new Timestamp(((java.util.Date)df.parse(ymd)).getTime());
+				java.util.Date date = df.parse(ymd);
+				return new Timestamp(date.getTime());
 			} catch (ParseException ex) {
 				// try UNTDID 2379 Format "102" : yyyyMMddToTs
 			}
