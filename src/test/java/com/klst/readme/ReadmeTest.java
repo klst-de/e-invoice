@@ -64,7 +64,11 @@ public class ReadmeTest {
 		  , TaxCategoryCode.StandardRate, new BigDecimal(7));	// VAT category code, rate 7%
 		ublInvoice.addLine(line);
 		  
-		// BusinessParty Seller aka Supplier TODO
+		// BusinessParty Seller aka Supplier
+		PostalAddress sellerAddress = ublInvoice.createAddress(DE, "12345", "[Seller city]");
+		IContact sellerContact = null;                           // (optional)
+		ublInvoice.setSeller("[Seller name]", sellerAddress, sellerContact, 
+				"[HRA-Eintrag]", "123/456/7890, HRA-Eintrag in […]");
 		  
 		// BusinessParty Buyer aka Customer 
 		PostalAddress buyerAddress = ublInvoice.createAddress(DE, "12345", "[Buyer city]");
@@ -84,7 +88,8 @@ public class ReadmeTest {
 		assertEquals(1, ublInvoice.getInvoiceNotes().size());
 		assertEquals(ADU, ublInvoice.getInvoiceNotes().get(0).getCode());
 		  
-		assertEquals(DE, ublInvoice.getBuyer().getAddress().getCountryCode());
+		assertEquals(DE, ublInvoice.getSeller().getAddress().getCountryCode());
+		assertEquals(DE, ublInvoice.getBuyer() .getAddress().getCountryCode());
 		
 		byte[] xml = transformer.fromModel(ublInvoice);
 		LOG.info(new String(xml));
