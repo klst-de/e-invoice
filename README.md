@@ -47,7 +47,7 @@ this snippet creates a valid ubl invoice [see (xrechnung-testsuite)](https://git
 ...
   transformer.fromModel(ublInvoice);  // returns byte[] xml
 ```
-- more [de-examples)(src/main/resources/doc-de/Beispiele.md)
+- more [de-examples](src/main/resources/doc-de/Beispiele.md)
 - in [AD-e-invoice](https://github.com/adempiere/adempiere/pull/3257) the jar is used to create invoices within an ERP-System.
 
 ## Core Invoice Overview
