@@ -747,40 +747,12 @@ UBL:
 		addNote(createNote(content));
 	}
 
-	// ersetzt List<Object> getNotes()
 	@Override
 	public List<InvoiceNote> getInvoiceNotes() {
 		// delegieren:
 		return Note.getInvoiceNotes(this.exchangedDocument);
 	}
 	
-	// TODO deprecated löschen (auch in interface) - ab rel.2.x
-	@Override
-	@Deprecated
-	public List<Object> getNotes() {
-		return getNotes(this.exchangedDocument);
-	}
-	@Deprecated
-	private static List<Object> getNotes(ExchangedDocumentType ed) {
-		List<NoteType> noteList = ed.getIncludedNote();
-		List<Object> res = new ArrayList<Object>(noteList.size());
-		noteList.forEach(note -> {
-			res.add(note);
-		});
-		return res;
-	}
-
-	@Deprecated
-	@Override
-	public void setNote(String subjectCode, String content) {
-		addNote(subjectCode, content);
-	}
-	@Deprecated
-	@Override
-	public void setNote(String content) {
-		setNote(null, content);
-	}
-
 	/* PROCESS CONTROL                             BG-2                        1 (mandatory) 
 	 * Eine Gruppe von Informationselementen, 
 	 * die Informationen über den Geschäftsprozess und für die Rechnung geltende Regeln liefern.

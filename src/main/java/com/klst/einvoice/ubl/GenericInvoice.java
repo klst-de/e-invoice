@@ -618,37 +618,10 @@ UBL:
 		addNote(createNote(content));
 	}
 
-	@Deprecated
-	@Override
-	public void setNote(String subjectCode, String content) {
-		if(content==null) return; // optional
-		NoteType note = new NoteType();
-		note.setValue(content);
-		if(isInvoiceType) {
-			invoice.getNote().add(note);
-		} else {
-			creditNote.getNote().add(note);
-		}
-	}
-	@Deprecated
-	@Override
-	public void setNote(String content) {
-		setNote(null, content);
-	}
-
-	// ersetzt List<Object> getNotes()
 	@Override
 	public List<InvoiceNote> getInvoiceNotes() {
 		// delegieren:
 		return isInvoiceType ? Note.getInvoiceNotes(invoice) : Note.getInvoiceNotes(creditNote);
-	}
-	@Deprecated
-	@Override
-	public List<Object> getNotes() {
-		List<NoteType> list = isInvoiceType ? invoice.getNote() : creditNote.getNote();
-		List<Object> res = new ArrayList<Object>(list.size());
-		list.forEach(note -> res.add(note));
-		return res;
 	}
 
 	// BG-2 + 1..1 PROCESS CONTROL

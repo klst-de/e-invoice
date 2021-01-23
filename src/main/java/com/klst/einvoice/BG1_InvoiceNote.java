@@ -33,16 +33,6 @@ wurde geändert zu:
  */
 public interface BG1_InvoiceNote extends InvoiceNoteFactory {
 	
-//	TODO delete this >>>>>>>>>>
-	@Deprecated // use List<InvoiceNote> getInvoiceNotes()
-	public List<Object> getNotes();
-	
-	@Deprecated
-	void setNote(String subjectCode, String content);
-	@Deprecated
-	void setNote(String content);
-//	<<<<<<<<<<<<<<<<
-
 	// getter
 	public List<InvoiceNote> getInvoiceNotes();
 
