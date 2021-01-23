@@ -1,6 +1,6 @@
 # Beispiele (de)
 
-Das Einführungsbeispiel gab es bereits im [README](https://github.com/klst-de/e-invoice). Zum Verständnis Der Beispiele verweise ich auf die DIN-EN16931-1, dem "€uro invoice" Standard.
+Das Einführungsbeispiel gab es bereits im [README](https://github.com/klst-de/e-invoice#example). Zum Verständnis Der Beispiele verweise ich auf die DIN-EN16931-1, dem "€uro invoice" Standard.
 
 ## Übersicht über das EN16931 Modell
 
