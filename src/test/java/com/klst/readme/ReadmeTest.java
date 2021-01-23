@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.logging.Logger;
 
 import org.junit.Before;
@@ -25,32 +26,28 @@ public class ReadmeTest {
 
 	private static final Logger LOG = Logger.getLogger(ReadmeTest.class.getName());
 	
-	static final String EUR = "EUR"; 
+	static final String EUR = "EUR";
+	/**
+	 * ADU   Note
+	 * Text subject is note.  chosen from the entries in UNTDID 4451 
+	 */
+	static final String ADU = "ADU"; 
 	
 	static private AbstactTransformer transformer;
 	
 	@Before 
     public void setup() {
 		transformer = UblInvoiceTransformer.getInstance();
-//    	ublTransformer = UblInvoiceTransformer.getInstance();
-//    	
-//    	ublCreditNoteTransformer = UblCreditNoteTransformer.getInstance();
-//    	ciiTransformer = CiiTransformer.getInstance();
     }
 
-//	@Test
-//	public void test() {
-//		fail("Not yet implemented");
-//	}
-	
 	@Test
 	public void commercialInvoiceTest() {
 		CoreInvoice ublInvoice = GenericInvoice.createInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
 				, DocumentNameCode.CommercialInvoice);
 		LOG.info("ublInvoice.Class:"+ublInvoice.getClass());
 		ublInvoice.setId("123456XX");
-		ublInvoice.setIssueDate("2016-04-04");
-		ublInvoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
+		ublInvoice.setIssueDate("2016-12-04");
+		ublInvoice.addNote(ADU, "Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
 		ublInvoice.setOrderReference("1234567890");           // optional
 		ublInvoice.setBuyerReference("04011000-12345-34");
 
@@ -65,6 +62,14 @@ public class ReadmeTest {
 		assertEquals(CoreInvoice.PROFILE_XRECHNUNG, ublInvoice.getCustomization());
 		assertThat(ublInvoice.getProcessType()).isNull();
 		assertEquals(DocumentNameCode.CommercialInvoice, ublInvoice.getTypeCode());
+		
+		Timestamp ts = ublInvoice.getIssueDateAsTimestamp();
+		LOG.info("IssueDate (LocalDateTime):"+ts.toLocalDateTime().getYear());
+		assertEquals(2016, ts.toLocalDateTime().getYear());
+		assertEquals(12, ts.toLocalDateTime().getMonthValue());
+		
+		assertEquals(1, ublInvoice.getInvoiceNotes().size());
+		assertEquals(ADU, ublInvoice.getInvoiceNotes().get(0).getCode());
 		  
 		byte[] xml = transformer.fromModel(ublInvoice);
 		LOG.info(new String(xml));
