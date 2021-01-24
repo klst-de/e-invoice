@@ -28,14 +28,14 @@ this snippet creates a valid ubl invoice [see (xrechnung-testsuite)](https://git
 ```java
   static final String EUR = "EUR"; 
 ...
-  CoreInvoice ublInvoice = GenericInvoice.createInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
+  CoreInvoice invoice = GenericInvoice.createInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
     , DocumentNameCode.CommercialInvoice);
-  ublInvoice.setId("123456XX");
-  ublInvoice.setIssueDate("2016-04-04");
-  ublInvoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
-  ublInvoice.setDocumentCurrency(EUR);
-  ublInvoice.setOrderReference("1234567890");           // optional
-  ublInvoice.setBuyerReference("04011000-12345-34");
+  invoice.setId("123456XX");
+  invoice.setIssueDate("2016-04-04");
+  invoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
+  invoice.setDocumentCurrency(EUR);
+  invoice.setOrderReference("1234567890");           // optional
+  invoice.setBuyerReference("04011000-12345-34");
 ...
   CoreInvoiceLine line = GenericLine.createInvoiceLine("1"  // invoice line number
     , new Quantity("XPP", new BigDecimal(1))
@@ -43,9 +43,9 @@ this snippet creates a valid ubl invoice [see (xrechnung-testsuite)](https://git
     , new UnitPriceAmount(EUR, new BigDecimal(288.79))      // price
     , "Zeitschrift [...]"                                   // itemName
     , TaxCategoryCode.StandardRate, new BigDecimal(7));     // VAT category code, rate 7%
-  ublInvoice.addLine(line);
+  invoice.addLine(line);
 ...
-  transformer.fromModel(ublInvoice);  // returns byte[] xml
+  transformer.fromModel(invoice);  // returns byte[] xml
 ```
 - more [de-examples](src/main/resources/doc-de/Beispiele.md)
 - in [AD-e-invoice](https://github.com/adempiere/adempiere/pull/3257) the jar is used to create invoices within an ERP-System.

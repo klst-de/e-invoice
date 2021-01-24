@@ -42,16 +42,16 @@ Das folgende Beispiel definiert den Verkäufer und den Käufer und damit erfüll
   static final String DE = "DE";  // country code 
 ...
 	// BusinessParty Seller aka Supplier
-	PostalAddress sellerAddress = ublInvoice.createAddress(DE, "12345", "[Seller city]");
+	PostalAddress sellerAddress = invoice.createAddress(DE, "12345", "[Seller city]");
 	sellerAddress.setAddressLine1("[Seller address line 1]");
 	IContact sellerContact = null;                           // (optional)
-	ublInvoice.setSeller("[Seller name]", sellerAddress, sellerContact, 
+	invoice.setSeller("[Seller name]", sellerAddress, sellerContact, 
 		"[HRA-Eintrag]", "123/456/7890, HRA-Eintrag in […]");
 		  
 	// BusinessParty Buyer aka Customer 
-	PostalAddress buyerAddress = ublInvoice.createAddress(DE, "12345", "[Buyer city]");
+	PostalAddress buyerAddress = invoice.createAddress(DE, "12345", "[Buyer city]");
 	IContact buyerContact = null;                           // (optional)
-	ublInvoice.setBuyer("[Buyer name]", buyerAddress, buyerContact);
+	invoice.setBuyer("[Buyer name]", buyerAddress, buyerContact);
 ...
 ```
 
@@ -62,7 +62,7 @@ Die Adresse der Käufers ist einfach zu vervollständigen: `setAddressLine1(...)
 	String contactName = "nicht vorhanden";
 	String contactTel  = "+49 1234-5678";
 	String contactMail = "seller@email.de";
-	IContact sellerContact = ublInvoice.createContact(contactName, contactTel, contactMail);
+	IContact sellerContact = invoice.createContact(contactName, contactTel, contactMail);
 ...
 ```
 
