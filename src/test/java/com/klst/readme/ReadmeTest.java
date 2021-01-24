@@ -49,9 +49,9 @@ public class ReadmeTest {
 
 	@Test
 	public void commercialInvoiceTest() {
-//		CoreInvoice invoice = GenericInvoice.createInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
+//		CoreInvoice invoice = new CrossIndustryInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
 //				, DocumentNameCode.CommercialInvoice);
-		CoreInvoice invoice = new CrossIndustryInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
+		CoreInvoice invoice = GenericInvoice.createInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
 				, DocumentNameCode.CommercialInvoice);
 		LOG.info("ublInvoice.Class:"+invoice.getClass());
 		invoice.setId("123456XX");
