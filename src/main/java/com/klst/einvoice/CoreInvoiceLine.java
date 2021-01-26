@@ -318,8 +318,6 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 */
 	public void addClassificationID(String id, String schemeID, String schemeVersion);
 	public void addClassificationID(Identifier id);
-	@Deprecated
-	public List<Object> getClassificationList();
 	public List<Identifier> getClassifications();
 
 	/**
