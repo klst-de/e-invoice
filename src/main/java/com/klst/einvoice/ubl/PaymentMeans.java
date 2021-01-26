@@ -125,7 +125,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 				FinancialAccount fa = (FinancialAccount)ct;
 				if(fa.getPaymentMeans()!=null) list.add(fa.getPaymentMeans());
 			});
-			return create(list);
+			if(!list.isEmpty()) create(list);
 		}
 		return new PaymentMeans(code, paymentMeansText, remittanceInformation, 
 			creditTransfer, paymentCard, directDebit);
@@ -135,13 +135,14 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		return new PaymentMeans(pm, null);
 	}
 	
+	// wegen der 0..n Beziehung zwischen BG-16 und BG-17 in EN16931!
 	static PaymentInstructions create(List<PaymentMeansType> list) {
 		if(list.isEmpty()) return null;
 		PaymentMeans paymentMeans = new PaymentMeans(list.get(0), null);
 		if(list.size()==1) {
 			return paymentMeans;
 		}
-		LOG.config("// bei mehreren Einträgen paymentMeans neu berechnen: ...");
+		LOG.info("// bei mehreren Einträgen paymentMeans neu berechnen: ...");
 		paymentMeans = new PaymentMeans(list);
 //		LOG.info(">>>>>>>>>>> das erste el zurück");
 		return paymentMeans.pmList.get(0);
@@ -152,6 +153,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	List<PaymentMeans> pmList; // mit indexOf(Object o) this finden
 //	List<PaymentMeansType> get... TODO
 	private void addToPmList(PaymentMeans pm) {
+		if(pm==null) return;
 		int i = pmList.indexOf(pm);
 		if(i<0) pmList.add(pm);
 	}
@@ -188,7 +190,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			super.setPayerFinancialAccount(new FinancialAccount(this));			
 		}
 
-//		LOG.info("ctor:"+this);
+		LOG.info("ctor:"+this);
 	}
 
 	private PaymentMeans(List<PaymentMeansType> list) {
@@ -230,7 +232,8 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("[");
-		stringBuilder.append(getPaymentMeansEnum()==null ? "null" : getPaymentMeansEnum().getValueAsString());
+		stringBuilder.append("@").append(Integer.toHexString(hashCode()));
+		stringBuilder.append(", ").append(getPaymentMeansEnum()==null ? "null" : getPaymentMeansEnum().getValueAsString());
 		stringBuilder.append(", PaymentMeansText:");
 		stringBuilder.append(getPaymentMeansText()==null ? "null" : getPaymentMeansText());
 		stringBuilder.append(", paymentMeans#:"+this.pmList.size());
@@ -363,7 +366,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	public List<CreditTransfer> getCreditTransfer() { 
 		List<CreditTransfer> result = new ArrayList<CreditTransfer>();
 		pmList.forEach(pm -> {
-			LOG.info("getCreditTransfer pm:"+pm);
+			LOG.config("getCreditTransfer pm:"+pm);
 			result.add(new FinancialAccount(pm));
 		});
 		return result;

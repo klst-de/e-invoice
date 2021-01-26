@@ -3,6 +3,7 @@ package com.klst.einvoice.ubl;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -934,6 +935,28 @@ UBL:
 			}
 		}
 	}
+	private void mergePaymentInstructions(PaymentMeans pmToMerge) {
+		List<PaymentMeansType> list = isInvoiceType ? invoice.getPaymentMeans() : creditNote.getPaymentMeans();
+		if(list==null) return;
+		if(list.isEmpty()) return;
+		PaymentMeansType pm = (PaymentMeansType)(list.get(0));
+		PaymentMeansEnum pmCode = PaymentMeans.getPaymentMeansEnum(pm);
+		if(PaymentMeansEnum.isCreditTransfer(pmCode)) {
+			LOG.info("merge to "+list.size()+" elements paymentMeans:"+pmToMerge);
+			list.add(pmToMerge); // TODO funktioniert nicht richtig
+		}
+	}
+	private void removePaymentInstructions() {
+		List<PaymentMeansType> list = isInvoiceType ? invoice.getPaymentMeans() : creditNote.getPaymentMeans();
+		if(list==null) return;
+		if(list.isEmpty()) return;
+		PaymentMeansType pm = (PaymentMeansType)(list.get(0));
+		PaymentMeansEnum pmCode = PaymentMeans.getPaymentMeansEnum(pm);
+		if(PaymentMeansEnum.isCreditTransfer(pmCode)) {
+			LOG.info("remove "+list.size()+" paymentMeans:"+pmCode);
+			list.clear();
+		}
+	}
 
 	// BG-16 (DE CIUS mandatory) PAYMENT INSTRUCTIONS
 	@Override
@@ -943,6 +966,8 @@ UBL:
 		if(list.isEmpty()) return null;
 		PaymentMeansType pm = (PaymentMeansType)(list.get(0));
 		PaymentMeansEnum pmCode = PaymentMeans.getPaymentMeansEnum(pm);
+		// create bei get? : wegen der 0..n Beziehung zwischen BG-16 und BG-17 in EN16931!
+		// UBL kann nur 0..1 darstellen: set/get PayeeFinancialAccount
 		if(PaymentMeansEnum.isCreditTransfer(pmCode)) {
 			return PaymentMeans.create(list); // BG-17
 		} else if(PaymentMeansEnum.isBankCard(pmCode)) {
@@ -959,14 +984,15 @@ UBL:
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
 		FinancialAccount fa = new FinancialAccount(iban, accountName, bic);
 		List<CreditTransfer> creditTransferList = new ArrayList<CreditTransfer>();
-		creditTransferList.add(fa); // dieset fa hat kein pm!
+		creditTransferList.add(fa); // diese fa hat kein pm!
 		PaymentInstructions pi = getPaymentInstructions();
 		if(pi==null) {
-			pi = createPaymentInstructions(PaymentMeansEnum.SEPACreditTransfer, null, null, null, null, null);
+			pi = createPaymentInstructions(bic==null? PaymentMeansEnum.CreditTransfer : PaymentMeansEnum.SEPACreditTransfer, null, null
+					, creditTransferList, null, null);
 			fa.paymentMeans = (PaymentMeans)pi;
 		}
 		((PaymentMeans)pi).addCreditTransfer(fa);
-		this.setPaymentInstructions(pi);
+//		this.setPaymentInstructions(pi); // damit wird auch ein BG-16 PI erstellt
 		return fa;
 	}
 	@Override
@@ -976,12 +1002,91 @@ UBL:
 		creditTransferList.add(fa);
 		PaymentInstructions pi = getPaymentInstructions();
 		if(pi==null) {
-			pi = createPaymentInstructions(PaymentMeansEnum.SEPACreditTransfer, null, null, null, null, null);
+			pi = createPaymentInstructions(PaymentMeansEnum.CreditTransfer, null, null
+					, creditTransferList, null, null);
 			fa.paymentMeans = (PaymentMeans)pi;
 		}
 		((PaymentMeans)pi).addCreditTransfer(fa);
-		this.setPaymentInstructions(pi);
+//		this.setPaymentInstructions(pi); // damit wird auch ein BG-16 PI erstellt
 		return fa;
+	}
+	@Override
+	public CreditTransfer addCreditTransfer(IBANId iban, String accountName, BICId bic) {
+		PaymentMeansEnum code = bic==null ? PaymentMeansEnum.SEPACreditTransfer : PaymentMeansEnum.CreditTransfer;
+		FinancialAccount fa = new FinancialAccount(iban, accountName, bic);
+		return this.addFinancialAccount(fa, code);
+//		List<CreditTransfer> creditTransferList = new ArrayList<CreditTransfer>(Arrays.asList(fa));
+//		PaymentInstructions pi = getPaymentInstructions();
+//		if(pi==null) { // Fall 1
+//			pi = createPaymentInstructions(code, null, null, creditTransferList, null, null);
+//			fa.paymentMeans = (PaymentMeans)pi;
+//			((PaymentMeans)pi).addCreditTransfer(fa);
+//			return fa;
+//		}
+//		
+//		if(pi.getCreditTransfer().isEmpty()) { // Fall 2
+//			LOG.warning("NO CreditTransfers in PaymentInstructions "+pi);
+//			// TODO wenn code OK fa einfügen
+//			return null;
+//		}
+//
+//		PaymentInstructions newPi = null;
+//		if(pi.getPaymentMeansEnum()==code) { // Fall 3
+//			newPi = createPaymentInstructions(code, null, null, creditTransferList, null, null);
+//			fa.paymentMeans = (PaymentMeans)newPi;
+//			((PaymentMeans)newPi).pmList = ((PaymentMeans)pi).pmList;
+//			((PaymentMeans)newPi).addCreditTransfer(fa);
+//			LOG.info("eingefügt in"+newPi);
+//			this.removePaymentInstructions();
+//			this.setPaymentInstructions(newPi);
+//			return fa;
+//		} else {
+//			LOG.warning("Cannot mix "+code+" Payment means type code with "+pi.getPaymentMeansEnum());
+//		}
+//		return null;
+	}
+	@Override
+	public CreditTransfer addCreditTransfer(String accountId, String accountName, BICId bic) {
+		FinancialAccount fa = new FinancialAccount(accountId, accountName, bic);
+		return this.addFinancialAccount(fa, PaymentMeansEnum.CreditTransfer);
+	}
+	private CreditTransfer addFinancialAccount(FinancialAccount fa, PaymentMeansEnum code) {
+		// 3 Fälle:
+		// - PI existiert nicht
+		// - PI existiert , keine CTs
+		// - PI existiert , mehrere CTs (z.B. 2 in 01.05a
+		List<CreditTransfer> creditTransferList = new ArrayList<CreditTransfer>(Arrays.asList(fa));
+		PaymentInstructions pi = getPaymentInstructions();
+		if(pi==null) { // Fall 1
+			pi = createPaymentInstructions(code, null, null, creditTransferList, null, null);
+			fa.paymentMeans = (PaymentMeans)pi;
+			((PaymentMeans)pi).addCreditTransfer(fa);
+			this.setPaymentInstructions(pi);
+			return fa;
+		}
+		
+		if(pi.getCreditTransfer().isEmpty()) { // Fall 2
+			LOG.warning("NO CreditTransfers in PaymentInstructions "+pi);
+			// TODO wenn code OK fa einfügen
+			return null;
+		}
+
+		PaymentInstructions newPi = null;
+		if(pi.getPaymentMeansEnum()==code) { // Fall 3
+			newPi = createPaymentInstructions(code, null, null, creditTransferList, null, null);
+			fa.paymentMeans = (PaymentMeans)newPi;
+			((PaymentMeans)newPi).pmList = ((PaymentMeans)pi).pmList;
+			((PaymentMeans)newPi).addCreditTransfer(fa);
+			LOG.info("eingefügt in"+newPi);
+			
+			this.removePaymentInstructions();
+			this.setPaymentInstructions(newPi);
+//			this.mergePaymentInstructions((PaymentMeans)newPi); // TODO
+			return fa;
+		} else {
+			LOG.warning("Cannot mix "+code+" Payment means type code with "+pi.getPaymentMeansEnum());
+		}
+		return null;
 	}
 	
 	@Override // implements interface PaymentCardFactory

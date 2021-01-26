@@ -36,12 +36,16 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 		LOG.config("pm"+pm);
 //		LOG.info("PaymentAccountID:"+this.getPaymentAccountID());
 		paymentMeans = pm;
+		LOG.info("ctor:"+this);
 	}
 	
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("[");
 		stringBuilder.append(getPaymentAccountID()==null ? "null" : getPaymentAccountID());
+		
+		stringBuilder.append(", paymentMeans:").append(paymentMeans);
+
 		stringBuilder.append("]");
 		return stringBuilder.toString();
 	}
