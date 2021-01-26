@@ -27,6 +27,8 @@ package com.klst.einvoice;
 
 /*  (de) rules / Geschäftsregel:
  * 
+ * BR-1 An Invoice shall have a Specification identifier (BT-24).
+ * 
  * BR-1 Prozesssteuerung 
  * Eine Rechnung muss eine Spezifikationskennung (BT-24) haben.
  * 
@@ -58,11 +60,9 @@ public interface BG2_ProcessControl {
 	 * @return Textstring identifying the business process context
 	 */
 	public String getProcessType();
-//	@Deprecated
-//	public String getProfile();
 	
 	/**
-	 * Specification identifier
+	 * Specification identifier aka PROFILE
 	 * <p>
 	 * An identification of the specification containing the total set of rules regarding semantic content,
 	 * cardinalities and business rules to which the data contained in the instance document conforms.
@@ -78,34 +78,13 @@ public interface BG2_ProcessControl {
 	 * <br>Req.ID:      R44
 	 * 
 	 * @return PROFILE Identifier String, f.i. PROFILE_EN_16931
+	 * 
+	 * This BT maps to ubl: CustomizationID , cii: GuidelineSpecifiedDocumentContextParameter:ID
 	 */
 	public String getCustomization();
-	
-	/**
-	 * PROCESS CONTROL
-	 * <p>
-	 * A group of business terms providing information on the business process and rules applicable to the Invoice document.
-	 * Contains ProfileID (BT-23 0..1) and CustomizationID/Specification identifier (BT-24 1..1)
-	 * <br>
-	 * ProfileID identifies what business process a given message is part of, 
-	 * and CustomizationID identifies the kind of message and the rules applied.
-	 * <p>
-	 * Cardinality: 	1..1 (mandatory)
-	 * <br>EN16931-ID: 	BG-2 , BT-23 , BT-24
-	 * <br>Rule ID: 	BR-1
-	 * <br>Req.ID: R44
-	 * <p>
-	 * ProfileID/Business process type - Identifies the business process context in which the transaction appears, 
-	 * to enable the Buyer to process the Invoice in an appropriate way.
-	 * <p>
-	 * Specification identifier - An identification of the specification containing the total set of rules regarding semantic content,
-	 * cardinalities and business rules to which the data contained in the instance document conforms.
-	 * This identifies compliance or conformance to this document. 
-	 * Compliant invoices specify: urn:cen.eu:en16931:2017. Invoices, compliant to a user specification may identify that user specification here.
-	 * No identification scheme is to be used.
-	 * 
-	 * @param customization, not null
-	 * @param profile (optional)
-	 */
+
+	default String getProfile() {
+		return getCustomization();
+	}
 
 }
