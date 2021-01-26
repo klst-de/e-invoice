@@ -47,4 +47,8 @@ public interface CreditTransferFactory {
 	 * @return CreditTransfer object
 	 */
 	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic); // non SEPA
+	
+	// create BG-17 object and add it to BG-16
+	public CreditTransfer addCreditTransfer(IBANId iban, String accountName, BICId bic);
+	public CreditTransfer addCreditTransfer(String accountId, String accountName, BICId bic);
 }
