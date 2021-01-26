@@ -15,11 +15,9 @@ import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.ubl.GenericInvoice;
-import com.klst.einvoice.ubl.GenericLine;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.Quantity;
-import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CiiTransformer;
@@ -31,6 +29,8 @@ public class ReadmeTest {
 
 	private static final Logger LOG = Logger.getLogger(ReadmeTest.class.getName());
 	
+	static final String PROFILE_XRECHNUNG = CoreInvoice.PROFILE_XRECHNUNG;
+	static final DocumentNameCode CommercialInvoice = DocumentNameCode.CommercialInvoice;
 	static final String EUR = "EUR";
 	static final String  DE = "DE";  // country code
 	/**
@@ -39,20 +39,36 @@ public class ReadmeTest {
 	 */
 	static final String ADU = "ADU"; 
 	
+	static private AbstactTransformer ciiTransformer;
+	static private AbstactTransformer ublTransformer;
+	// UblCreditNoteTransformer for CreditNote!!! bot used
+//	static private AbstactTransformer ublCNTransformer;
 	static private AbstactTransformer transformer;
+	
+	CoreInvoice invoice;
 	
 	@Before 
     public void setup() {
-//		transformer = CiiTransformer.getInstance();  // for UN/CEFACT Cross Industry Invoice XML
-		transformer = UblInvoiceTransformer.getInstance();
+		ciiTransformer = CiiTransformer.getInstance();  // for UN/CEFACT Cross Industry Invoice XML
+		ublTransformer = UblInvoiceTransformer.getInstance();
+		invoice = null;
     }
 
 	@Test
-	public void commercialInvoiceTest() {
-//		CoreInvoice invoice = new CrossIndustryInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
-//				, DocumentNameCode.CommercialInvoice);
-		CoreInvoice invoice = GenericInvoice.createInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
-				, DocumentNameCode.CommercialInvoice);
+	public void ciiTest() {
+		invoice = CrossIndustryInvoice.getFactory().createInvoice(PROFILE_XRECHNUNG, CommercialInvoice);
+		transformer = ciiTransformer;
+		commercialInvoiceTest();
+	}
+	
+	@Test
+	public void ublTest() {
+		invoice = GenericInvoice.getFactory().createInvoice(PROFILE_XRECHNUNG, CommercialInvoice);
+		transformer = ublTransformer;
+		commercialInvoiceTest();
+	}
+
+	void commercialInvoiceTest() {
 		LOG.info("ublInvoice.Class:"+invoice.getClass());
 		invoice.setId("123456XX");
 		invoice.setIssueDate("2016-12-04");
@@ -62,8 +78,7 @@ public class ReadmeTest {
 		invoice.setTaxCurrency(EUR);                         // optional
 		invoice.setOrderReference("1234567890");             // optional
 
-//		CoreInvoiceLine line = new TradeLineItem("1"		// invoice line number
-		CoreInvoiceLine line = GenericLine.createInvoiceLine("1"		// invoice line number
+		CoreInvoiceLine line = invoice.createInvoiceLine("1"    // invoice line number
 		  , new Quantity("XPP", new BigDecimal(1))
 		  , new Amount(EUR, new BigDecimal(288.79))				// line net amount
 		  , new UnitPriceAmount(EUR, new BigDecimal(288.79))	// price

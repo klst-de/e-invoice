@@ -26,10 +26,11 @@ _A “Core Invoice Usage Specification” (CIUS) is a specification that provide
 this snippet creates a valid ubl invoice [see (xrechnung-testsuite)](https://github.com/itplr-kosit/xrechnung-testsuite/blob/master/src/test/business-cases/standard/01.01a-INVOICE_ubl.xml)
 
 ```java
+  static final String PROFILE_XRECHNUNG = CoreInvoice.PROFILE_XRECHNUNG;
+  static final DocumentNameCode CommercialInvoice = DocumentNameCode.CommercialInvoice;
   static final String EUR = "EUR"; 
 ...
-  CoreInvoice invoice = GenericInvoice.createInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
-    , DocumentNameCode.CommercialInvoice);
+  CoreInvoice invoice = GenericInvoice.getFactory().createInvoice(PROFILE_XRECHNUNG, CommercialInvoice);
   invoice.setId("123456XX");
   invoice.setIssueDate("2016-04-04");
   invoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
@@ -37,7 +38,7 @@ this snippet creates a valid ubl invoice [see (xrechnung-testsuite)](https://git
   invoice.setOrderReference("1234567890");           // optional
   invoice.setBuyerReference("04011000-12345-34");
 ...
-  CoreInvoiceLine line = GenericLine.createInvoiceLine("1"  // invoice line number
+  CoreInvoiceLine line = invoice.createInvoiceLine("1"      // invoice line number
     , new Quantity("XPP", new BigDecimal(1))
     , new Amount(EUR, new BigDecimal(288.79))               // line net amount
     , new UnitPriceAmount(EUR, new BigDecimal(288.79))      // price
