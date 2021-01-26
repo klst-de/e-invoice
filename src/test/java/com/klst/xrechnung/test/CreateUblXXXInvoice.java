@@ -121,7 +121,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("\n (BG-2.BT-24)ProcessType="+testDoc.getProcessType() + " (BG-2.BT-24)Customization="+testDoc.getCustomization()
 			+ " (BT-3)TypeCode="+testDoc.getTypeCode());
 		CoreInvoice ublInvoice =
-				GenericInvoice.createInvoice(testDoc.getCustomization(), testDoc.getProcessType(), testDoc.getTypeCode());
+				GenericInvoice.create(testDoc.getCustomization(), testDoc.getProcessType(), testDoc.getTypeCode());
 		ublInvoice.setId(testDoc.getId());
 		ublInvoice.setIssueDate(testDoc.getIssueDateAsTimestamp());
 		ublInvoice.setDocumentCurrency(testDoc.getDocumentCurrency());
@@ -359,7 +359,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		testLines.forEach(testLine -> {
 			CoreInvoiceLine targetLine;
 			if(testDoc.get() instanceof InvoiceType) {
-				targetLine = GenericLine.createInvoiceLine(testLine.getId(), 
+				targetLine = ublDoc.createInvoiceLine(testLine.getId(), 
 						testLine.getQuantity(),                                       // BT-129
 						testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), // BT-131 , BG-29.BT-146 
 						testLine.getItemName(),

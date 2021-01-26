@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -27,6 +28,7 @@ import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
@@ -54,6 +56,13 @@ public class UblTest {
 		LOG = Logger.getLogger(UblTest.class.getName());
 	}
 
+	private static final String TESTDIR = "src/test/resources/";
+	private File getTestFile(String filename) {
+		File file = new File(TESTDIR + filename);
+		LOG.info("test file "+file.getAbsolutePath() + " canRead:"+file.canRead());
+		return file;
+	}
+	
 	private static final String[] UBL_XML = {
 			"ubl001.xml" ,
 //			"ubl002.xml" , // error tr=val-sch.1.1BR-06error[BR-06]-An Invoice shall contain the Seller name (BT-27).
@@ -97,6 +106,20 @@ public class UblTest {
 	static private KositValidation validation;
 	static private AbstactTransformer transformer;
 	
+	private GenericInvoice<InvoiceType> toModel(File xmlfile) {
+		InvoiceType invoice;
+		GenericInvoice<InvoiceType> genericInvoice = null;
+		try {
+			InputStream is = new FileInputStream(xmlfile);
+			invoice = transformer.toModel(is);
+			genericInvoice = new GenericInvoice<InvoiceType>(invoice);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			LOG.severe(ex.getMessage());			
+		}
+		return genericInvoice;
+	}
+
     @BeforeClass
     public static void staticSetup() {
     	initLogger();
@@ -106,14 +129,13 @@ public class UblTest {
 
 	@Test
     public void ubl00() {
-    	InvoiceFactory factory = new CreateUblXXXInvoice(UBL_XML[0]);
-    	byte[] bytes = factory.toUbl(); // the xml
-    	String xml = new String(bytes);
-    	LOG.info("xml=\n"+xml);
-    	assertTrue(validation.check(bytes));
+//    	InvoiceFactory factory = new CreateUblXXXInvoice(UBL_XML[0]);
+//    	byte[] bytes = factory.toUbl(); // the xml
+//    	String xml = new String(bytes);
+//    	LOG.info("xml=\n"+xml);
+//    	assertTrue(validation.check(bytes));
     	
-		CoreInvoice ublInvoice = GenericInvoice.createInvoice(CoreInvoice.PROFILE_XRECHNUNG, null
-				, DocumentNameCode.CommercialInvoice);
+		CoreInvoice ublInvoice = GenericInvoice.getFactory().createInvoice(CoreInvoice.PROFILE_XRECHNUNG, DocumentNameCode.CommercialInvoice);
 		LOG.info("ublInvoice.Class:"+ublInvoice.getClass());
 		ublInvoice.setId("123456XX");
 		ublInvoice.setIssueDate("2016-04-04");
@@ -123,27 +145,63 @@ public class UblTest {
 		// ...
 		IBANId payeeIban = new IBANId("NL57RABO0107307510");
 		BICId bicId = null; // SwiftCode (optional)
-		CreditTransfer ct = ublInvoice.createCreditTransfer(payeeIban, "RaboBank account", bicId);
+		CreditTransfer ct = ublInvoice.addCreditTransfer(payeeIban, "RaboBank account", bicId);
 		// implizit wird ein Objekt SEPACreditTransfer für BG-16 PAYMENT INSTRUCTIONS in ublInvoice erstellt
+		assertEquals(PaymentMeansEnum.SEPACreditTransfer, ublInvoice.getPaymentInstructions().getPaymentMeansEnum());
+
+		// TODO auch damit nur ein BG-17 in BG-16
+		bicId = new BICId("INGBNL2AXXX");
+		CreditTransfer ct2 = ublInvoice.createCreditTransfer("NL03 INGB 0004489902", "ING account", bicId); // TODO addCreditTransfer
 		
-		List<CreditTransfer> ctList = new ArrayList<CreditTransfer>(Arrays.asList(ct));
+		List<CreditTransfer> ctList = new ArrayList<CreditTransfer>(Arrays.asList(ct,ct2));
 		// create liefert ein BG-16 Objekt, aber bindet es nicht an ublInvoice - das macht setXXX
 //		ublInvoice.createPaymentInstructions(PaymentMeansEnum.CreditTransfer, "paymentMeansText"
 //				, "PaymentReference Verwendungszweck", ctList);
 		ublInvoice.setPaymentInstructions(PaymentMeansEnum.CreditTransfer, "paymentMeansText"
 				, "PaymentReference Verwendungszweck", ctList, null, null);
 		
-		bicId = new BICId("INGBNL2AXXX");
-		ublInvoice.createCreditTransfer("NL03 INGB 0004489902", "ING account", bicId);
+//		bicId = new BICId("INGBNL2AXXX");
+//		ublInvoice.addCreditTransfer("NL03 INGB 0004489902", "ING account", bicId); // TODO addCreditTransfer
 		
 		// TODO PaymentReference Verwendungszweck geht nur über BG-16, dann ist aber BG-16 zwei mal da
 		
-		bytes = transformer.fromModel(ublInvoice);
-    	xml = new String(bytes);
+		byte[] bytes = transformer.fromModel(ublInvoice);
+		String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
     	//assertTrue(validation.check(bytes));
    }
     
+	@Test
+	public void ubl0105_FinancialAccount() {  // zwei IBANs
+		File testFile = getTestFile("01.05a-INVOICE_ubl.xml");
+		GenericInvoice<?> testDoc = null;
+		if(transformer.isValid(testFile)) {
+			testDoc = toModel(testFile);
+		} else {
+			LOG.severe("NOT VALID :"+testFile);
+			assertNotNull("NOT VALID "+testFile , testDoc);
+		}
+		PaymentInstructions pi = testDoc.getPaymentInstructions();
+		assertEquals(PaymentMeansEnum.SEPACreditTransfer, pi.getPaymentMeansEnum());
+		List<CreditTransfer> creditTransferList = pi.getCreditTransfer();
+		assertEquals(2, creditTransferList.size());
+		assertEquals("DE75512108001245126199", creditTransferList.get(0).getPaymentAccountID());
+		assertEquals("DE12500105170648489890", creditTransferList.get(1).getPaymentAccountID());
+		
+		String accountName = "ING account";
+		BICId bicId = new BICId("INGBNL2AXXX");
+		CreditTransfer ct = testDoc.addCreditTransfer(new IBANId("NL03 INGB 0004489902"), accountName, bicId);
+		assertNull(ct);
+		LOG.info("add accountName:"+accountName +"\n");
+		ct = testDoc.addCreditTransfer(new IBANId("NL03 INGB 0004489902"), "ING account", null);
+		LOG.info("new ct:"+ct);
+		assertEquals(2, pi.getCreditTransfer().size()); // die "alte" PI wurde geändert!!! TODO
+		creditTransferList = testDoc.getPaymentInstructions().getCreditTransfer();
+		assertEquals(3, creditTransferList.size());
+		assertEquals("DE12500105170648489890", creditTransferList.get(1).getPaymentAccountID());
+		assertEquals(accountName, creditTransferList.get(2).getPaymentAccountName());
+	}
+	
 	@Test
     public void ubl0114_Delivery() {
     	InvoiceFactory factory = new CreateUblXXXInvoice("01.14a-INVOICE_ubl.xml");
