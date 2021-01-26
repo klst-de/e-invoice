@@ -28,6 +28,8 @@ import com.klst.einvoice.Reference;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
+import com.klst.einvoice.unece.uncefact.Quantity;
+import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -91,30 +93,52 @@ public class GenericInvoice <T> implements CoreInvoice  {
 	CreditNoteType creditNote = null;
 	
 	// factory
-	public static CoreInvoice createInvoice(String customization, String processType, DocumentNameCode code) {
+	public static CoreInvoice getFactory() {
+		return new GenericInvoice<InvoiceType>((InvoiceType)null);
+	}
+	@Override
+	public CoreInvoice createInvoice(String profile, String processType, DocumentNameCode code) {
+		if(DocumentNameCode.CreditNote==code) {
+			return createCreditNote(profile, processType, code);
+		}
+		return create(profile, processType, code);
+	}
+	@Override
+	public CoreInvoiceLine createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
+			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
+		if(isInvoiceType) {
+			return GenericLine.createInvoiceLine(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+		}
+		return GenericLine.createCreditNoteLine(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+	}
+
+	// TODO not public:
+	public static CoreInvoice create(String profile, String processType, DocumentNameCode code) {
 		InvoiceType invoice = new InvoiceType();
 		GenericInvoice<InvoiceType> gi = new GenericInvoice<InvoiceType>(invoice);
-		gi.init(customization, processType, code);
+		gi.init(profile, processType, code);
 		return gi;
 	}
-	// TODO createGenericInvoice
-	public static CoreInvoice createCreditNote(String customization, String processType, DocumentNameCode code) {
+	// TODO not public:
+	public static CoreInvoice createCreditNote(String profile, String processType, DocumentNameCode code) {
 		CreditNoteType cn = new CreditNoteType();
 		GenericInvoice<CreditNoteType> gi = new GenericInvoice<CreditNoteType>(cn);
-		gi.init(customization, processType, code);
+		gi.init(profile, processType, code);
 		return gi;
 	}
 	
 	// ctor mit type parameter
 	public GenericInvoice(T t) {
-		this.t = t;
-		isInvoiceType = this.t instanceof InvoiceType;
-		if(isInvoiceType) {
-			invoice = (InvoiceType)t;
-		} else {
-			creditNote = (CreditNoteType)t;
+		if(t!=null) {
+			this.t = t;
+			isInvoiceType = this.t instanceof InvoiceType;
+			if(isInvoiceType) {
+				invoice = (InvoiceType)t;
+			} else {
+				creditNote = (CreditNoteType)t;
+			}
+			if(getId()!=null) LOG.config("copy ctor "+this);
 		}
-		if(getId()!=null) LOG.config("copy ctor "+this);
 	}
 	
 	public T get() {

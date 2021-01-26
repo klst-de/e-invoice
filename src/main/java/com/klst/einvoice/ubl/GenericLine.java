@@ -49,11 +49,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ValueTyp
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.DateType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.QuantityType;
 
-//ohne von T abzuleiten habe ich keinen Zugtiff auf die protected Member:
-//protected IDType id;
-// ...
-//protected ItemType item;
-//protected PriceType price;
 public class GenericLine<T> implements CoreInvoiceLine {
 
 	private static final Logger LOG = Logger.getLogger(GenericLine.class.getName());
@@ -64,6 +59,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	CreditNoteLineType cnLine = null;
 	
 	// factory
+	// TODO not public:
 	public static CoreInvoiceLine createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
 		InvoiceLineType il = new InvoiceLineType();
@@ -71,7 +67,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		gl.init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 		return gl;
 	}
-	
+	// TODO not public:
 	public static CoreInvoiceLine createCreditNoteLine(String id, Quantity quantity, Amount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
 		CreditNoteLineType cnl = new CreditNoteLineType();
@@ -670,17 +666,6 @@ public class GenericLine<T> implements CoreInvoiceLine {
 			}
 		});
 		return result;
-	}
-	@Deprecated // use getClassifications()
-	@Override
-	public List<Object> getClassificationList() {
-		ItemType item = isInvoiceLineType ? iLine.getItem() : cnLine.getItem();
-		List<CommodityClassificationType> commodityClassificationList = item.getCommodityClassification();
-		List<Object> resList = new ArrayList<Object>(commodityClassificationList.size());
-		commodityClassificationList.forEach(productClassification -> {
-			resList.add(productClassification);
-		});
-		return resList;
 	}
 
 	// BG-31.BT-159 +++ 0..1 Item country of origin
