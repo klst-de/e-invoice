@@ -56,9 +56,14 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  */
 public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreInvoiceLine {
 
+	static CoreInvoiceLine createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
+			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
+		return new TradeLineItem(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+	}
+
 //	private static final Logger LOG = Logger.getLogger(TradeLineItem.class.getName());
 
-	public TradeLineItem() {
+	TradeLineItem() {
 		super();
 	}
 	
@@ -472,16 +477,6 @@ Bsp.
 			}
 		});
 		return result;
-	}
-	@Deprecated // use getClassifications()
-	@Override
-	public List<Object> getClassificationList() {
-		List<ProductClassificationType> productClassificatioList = specifiedTradeProduct.getDesignatedProductClassification();
-		List<Object> resList = new ArrayList<Object>(productClassificatioList.size());
-		productClassificatioList.forEach(productClassification -> {
-			resList.add(productClassification);
-		});
-		return resList;
 	}
 
 	// BG-31.BT-159 +++ 0..1 Item country of origin

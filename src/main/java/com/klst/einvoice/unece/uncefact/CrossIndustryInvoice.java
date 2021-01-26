@@ -64,6 +64,20 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 
 	private static final Logger LOG = Logger.getLogger(CrossIndustryInvoice.class.getName());
 	
+	// factory
+	public static CoreInvoice getFactory() {
+		return new CrossIndustryInvoice();
+	}
+	@Override
+	public CoreInvoice createInvoice(String profile, String processType, DocumentNameCode code) {
+		return new CrossIndustryInvoice(profile, processType, code);
+	}
+	@Override
+	public CoreInvoiceLine createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
+			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
+		return TradeLineItem.createInvoiceLine(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+	}
+
 	private static final String NOT_IMPEMENTED = "NOT IMPEMENTED";
 	
 /*
