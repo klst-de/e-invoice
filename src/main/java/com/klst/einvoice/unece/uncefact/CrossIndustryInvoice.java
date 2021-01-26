@@ -1108,13 +1108,21 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		return applicableHeaderTradeSettlement; // das implementiert PaymentInstructions!
 	}
 
-	@Override // implements interface CreditTransferFactory for BG-17
+	// implements interface CreditTransferFactory for BG-17 , delegator:
+	@Override
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
 		return applicableHeaderTradeSettlement.createCreditTransfer(iban, accountName, bic);
 	}
-	
-	@Override // implements interface CreditTransferFactory for BG-17
+	@Override
 	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic) {
+		return applicableHeaderTradeSettlement.createCreditTransfer(accountId, accountName, bic);
+	}
+	@Override
+	public CreditTransfer addCreditTransfer(IBANId iban, String accountName, BICId bic) {
+		return applicableHeaderTradeSettlement.createCreditTransfer(iban, accountName, bic);
+	}
+	@Override
+	public CreditTransfer addCreditTransfer(String accountId, String accountName, BICId bic) {
 		return applicableHeaderTradeSettlement.createCreditTransfer(accountId, accountName, bic);
 	}
 

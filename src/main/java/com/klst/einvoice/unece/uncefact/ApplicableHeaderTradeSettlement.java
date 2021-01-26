@@ -568,6 +568,24 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		return TradeSettlementPaymentMeans.create(accountId, accountName, bic);
 	}
 	
+	// der Unterschied zwischen createXXX und addXXX:
+	// bei add wird das ct-Objekt in PM eingetragen,
+	// bei create nicht
+	
+	@Override
+	public CreditTransfer addCreditTransfer(IBANId iban, String accountName, BICId bic) {
+		CreditTransfer ct = TradeSettlementPaymentMeans.create(iban, accountName, bic);
+		addCreditTransfer(ct);
+		return ct;
+	}
+
+	@Override
+	public CreditTransfer addCreditTransfer(String accountId, String accountName, BICId bic) {
+		CreditTransfer ct =  TradeSettlementPaymentMeans.create(accountId, accountName, bic);
+		addCreditTransfer(ct);
+		return ct;
+	}
+	
 // ---------------- implements DirectDebit + Factory:
 	// BG19_DirectDebit methods
 	@Override

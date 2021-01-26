@@ -3,7 +3,6 @@ package com.klst.einvoice.unece.uncefact;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.DirectDebit;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
@@ -73,22 +72,13 @@ Bsp: 03.01a:
 Bsp: 03.04a , 03.05a
  */
 public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType 
-	implements CreditTransfer, CreditTransferFactory, DirectDebit {
-//DirectDebitFactory PaymentCardFactory, {
+	implements CreditTransfer, DirectDebit {
 
 	// factory:
-	@Override
-	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
-		return TradeSettlementPaymentMeans.create(iban, accountName, bic);
-	}
 	static CreditTransfer create(IBANId iban, String accountName, BICId bic) {
 		return new TradeSettlementPaymentMeans(iban, accountName, bic);
 	}
 
-	@Override
-	public CreditTransfer createCreditTransfer(String accountId, String accountName, BICId bic) {
-		return TradeSettlementPaymentMeans.create(accountId, accountName, bic);
-	}
 	static CreditTransfer create(String accountId, String accountName, BICId bic) {
 		return new TradeSettlementPaymentMeans(accountId, accountName, bic);
 	}
@@ -199,14 +189,14 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		return stringBuilder.toString();
 	}
 
-	public TradeSettlementPaymentMeans(IBANId iban, String accountName, BICId bic) {
+	TradeSettlementPaymentMeans(IBANId iban, String accountName, BICId bic) {
 		this(PaymentMeansEnum.SEPACreditTransfer);
 		setPaymentAccountID(iban);
 		setPaymentAccountName(accountName);
 		setPaymentServiceProviderID(bic);
 	}
 
-	public TradeSettlementPaymentMeans(String accountId, String accountName, BICId bic) {
+	TradeSettlementPaymentMeans(String accountId, String accountName, BICId bic) {
 		this(PaymentMeansEnum.CreditTransfer);
 		setPaymentAccountID(accountId);
 		setPaymentAccountName(accountName);
