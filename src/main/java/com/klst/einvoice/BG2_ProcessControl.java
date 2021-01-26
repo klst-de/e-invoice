@@ -38,8 +38,10 @@ public interface BG2_ProcessControl {
 	public static final String PROFILE_COMFORT   = PROFILE_EN_16931;
 	public static final String PROFILE_BASIC     = "urn:cen.eu:en16931:2017#compliant#urn:factur-x.eu:1p0:basic";
 	public static final String PROFILE_XRECHNUNG     = "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.0";
-	@Deprecated
-	public static final String PROFILE_XRECHNUNG_2p0 = "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2";	                                                
+//	@Deprecated
+//	public static final String PROFILE_XRECHNUNG_2p0 = "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.0";	                                                
+//	@Deprecated
+//	public static final String PROFILE_XRECHNUNG_1p2 = "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_1.2";	                                                
 	
 	/**
 	 * Business process type
@@ -53,11 +55,11 @@ public interface BG2_ProcessControl {
 	 * <br>Rule ID:
 	 * <br>Req.ID:      R44
 	 * 
-	 * @return Textstring identifieng the business process context
+	 * @return Textstring identifying the business process context
 	 */
 	public String getProcessType();
-	@Deprecated
-	public String getProfile();
+//	@Deprecated
+//	public String getProfile();
 	
 	/**
 	 * Specification identifier
@@ -105,7 +107,5 @@ public interface BG2_ProcessControl {
 	 * @param customization, not null
 	 * @param profile (optional)
 	 */
-	// non public - use ctor
-//	void setProcessControl(String customization, String profile);
 
 }
