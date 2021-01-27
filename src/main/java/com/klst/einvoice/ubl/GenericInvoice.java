@@ -943,7 +943,7 @@ UBL:
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
 
-		LOG.info("creditTransferList:"+creditTransferList + " paymentCard:"+paymentCard + " directDebit:"+directDebit);	
+		LOG.config("creditTransferList:"+creditTransferList + " paymentCard:"+paymentCard + " directDebit:"+directDebit);	
 		return PaymentMeans.create(code, paymentMeansText, remittanceInformation, creditTransferList, paymentCard, directDebit);
 	}
 	// BG-16.BT-81 ++ 1..1 Payment means type code
@@ -968,7 +968,7 @@ UBL:
 	@Override
 	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
 		PaymentMeans paymentMeans = (PaymentMeans)paymentInstructions;
-		LOG.info("paymentMeans:"+paymentMeans);
+		LOG.config("paymentMeans:"+paymentMeans);
 		if(isInvoiceType) {
 			if(paymentMeans.isCreditTransfer()) {
 				paymentMeans.pmList.forEach(pm -> {
@@ -1103,7 +1103,7 @@ UBL:
 			fa.paymentMeans = (PaymentMeans)newPi;
 			((PaymentMeans)newPi).pmList = ((PaymentMeans)pi).pmList;
 			((PaymentMeans)newPi).addCreditTransfer(fa);
-			LOG.info("eingefügt in"+newPi);
+			LOG.info("FinancialAccount inserted into "+newPi);
 			
 			this.removePaymentInstructions();
 			this.setPaymentInstructions(newPi);

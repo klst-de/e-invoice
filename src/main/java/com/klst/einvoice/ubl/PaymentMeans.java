@@ -142,7 +142,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		if(list.size()==1) {
 			return paymentMeans;
 		}
-		LOG.info("// bei mehreren Einträgen paymentMeans neu berechnen: ...");
+		LOG.fine("// bei mehreren Einträgen paymentMeans neu berechnen: ...");
 		paymentMeans = new PaymentMeans(list);
 //		LOG.info(">>>>>>>>>>> das erste el zurück");
 		return paymentMeans.pmList.get(0);
@@ -190,14 +190,14 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 			super.setPayerFinancialAccount(new FinancialAccount(this));			
 		}
 
-		LOG.info("ctor:"+this);
+		LOG.config("ctor:"+this);
 	}
 
 	private PaymentMeans(List<PaymentMeansType> list) {
 		this();
-		LOG.info("more "+list.size()+" BG-17 CreditTransfer/PaymentMeans");
+		LOG.config("more "+list.size()+" BG-17 CreditTransfer/PaymentMeans");
 		list.forEach(pm -> {
-			LOG.info("CreditTransfer/PaymentMeans:"+pm);
+			LOG.config("CreditTransfer/PaymentMeans:"+pm);
 			addToPmList(new PaymentMeans(pm, pmList));
 		});
 //		LOG.info("ctor für mehrere "+list.size()+" fertig.:"+this.pmList.size());
@@ -219,7 +219,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		// BG-17
 		if(creditTransfer!=null) {
 			creditTransfer.forEach(ct -> {
-				LOG.info("init add BG-17:"+ct);
+				LOG.config("init add BG-17:"+ct);
 				this.addCreditTransfer(ct);
 			});
 		} else {
@@ -340,7 +340,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 
 	public FinancialAccount getFinancialAccount() {
 		int i = pmList.indexOf(this);
-		LOG.info("gefunden? i="+i);
+		LOG.fine("gefunden? i="+i);
 		if(i<0) return null;
 		return new FinancialAccount(pmList.get(i));
 	}

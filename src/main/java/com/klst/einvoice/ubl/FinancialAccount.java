@@ -34,9 +34,8 @@ public class FinancialAccount extends FinancialAccountType implements CreditTran
 	FinancialAccount(PaymentMeans pm) {
 		this(pm.getPayeeFinancialAccount());
 		LOG.config("pm"+pm);
-//		LOG.info("PaymentAccountID:"+this.getPaymentAccountID());
 		paymentMeans = pm;
-		LOG.info("ctor:"+this);
+		LOG.config("ctor:"+this);
 	}
 	
 	public String toString() {
