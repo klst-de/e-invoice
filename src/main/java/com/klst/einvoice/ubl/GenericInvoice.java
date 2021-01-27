@@ -36,6 +36,7 @@ import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AllowanceChargeType;
+import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.BillingReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CreditNoteLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CustomerPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;
@@ -706,16 +707,52 @@ UBL:
 	}
 	@Override
 	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts) {
-		LOG.warning(NOT_IMPEMENTED);
+		DocumentReferenceType docRef = new DocumentReferenceType();
+		docRef.setID(new ID(docRefId));
+		if(ts!=null) {
+			IssueDateType date = new IssueDateType();
+			date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
+			docRef.setIssueDate(date);
+		}
+		BillingReferenceType billingReference = new BillingReferenceType();
+		billingReference.setInvoiceDocumentReference(docRef);
+		List<BillingReferenceType> billingReferenceList = isInvoiceType ? invoice.getBillingReference() : creditNote.getBillingReference();
+		billingReferenceList.add(billingReference);
 	}
 	
 	@Override
 	public String getPrecedingInvoiceReference() {
-		// es fehlen testdaten
-		List<DocumentReferenceType> originatorDocumentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
-		if(originatorDocumentReferenceList.isEmpty()) return null;
-		originatorDocumentReferenceList.get(0).getIssueDate(); // das optionale datum
-		return originatorDocumentReferenceList.get(0).getID().getValue();	
+//		List<DocumentReferenceType> originatorDocumentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
+//		if(originatorDocumentReferenceList.isEmpty()) return null;
+//		originatorDocumentReferenceList.get(0).getIssueDate(); // das optionale datum
+//		return originatorDocumentReferenceList.get(0).getID().getValue();
+		
+		// es fehlen testdaten, oder ist es cac:BillingReference + cac:InvoiceDocumentReference ?
+/* ubl-tc434-example5.xml :
+
+    <cac:BillingReference>
+        <cac:InvoiceDocumentReference>
+            <cbc:ID>TOSL109</cbc:ID>
+            <cbc:IssueDate>2013-03-10</cbc:IssueDate>
+        </cac:InvoiceDocumentReference>
+    </cac:BillingReference>
+
+
+ */
+		List<BillingReferenceType> billingReferenceList = isInvoiceType ? invoice.getBillingReference() : creditNote.getBillingReference();
+		if(billingReferenceList.isEmpty()) return null;
+		List<DocumentReferenceType> docRefList = new ArrayList<DocumentReferenceType>();
+		billingReferenceList.forEach(billingRef -> {
+			DocumentReferenceType docRef = billingRef.getInvoiceDocumentReference();
+			docRefList.add(docRef);
+		});
+		if(docRefList.isEmpty()) return null;
+		// TODO vorerst nur einen
+		if(docRefList.size()>1) {
+			LOG.warning(NOT_IMPEMENTED + " for more then one docs. Found "+ docRefList.size());
+		}
+		Reference docRef = new ID(docRefList.get(0).getID());
+		return docRef.getName();
 	}
 	
 	// BG-4 + 1..1 SELLER

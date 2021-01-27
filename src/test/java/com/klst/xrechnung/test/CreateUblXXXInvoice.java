@@ -222,6 +222,14 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setDespatchAdviceReference(testDoc.getDespatchAdviceReference()); // BT-16 + 0..1
 		ublInvoice.setTenderOrLotReference(testDoc.getTenderOrLotReference()); // BT-17 + 0..1
 
+		// 0..n BG3_PrecedingInvoiceReference:
+		String precedingInvoiceReference = testDoc.getPrecedingInvoiceReference();
+		if(precedingInvoiceReference!=null) {
+			LOG.info("BG3_PrecedingInvoiceReference: "+precedingInvoiceReference);
+			// Datum erfunden TODO
+			ublInvoice.setPrecedingInvoiceReference(precedingInvoiceReference, "2013-03-10");
+		}
+
 		// Testfall 02.01a:
 		Identifier identifier = testDoc.getInvoicedObjectIdentifier();
 		ublInvoice.setInvoicedObjectIdentifier(identifier); // (optional) BT-18
