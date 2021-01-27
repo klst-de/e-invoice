@@ -1074,35 +1074,6 @@ UBL:
 		PaymentMeansEnum code = bic==null ? PaymentMeansEnum.SEPACreditTransfer : PaymentMeansEnum.CreditTransfer;
 		FinancialAccount fa = new FinancialAccount(iban, accountName, bic);
 		return this.addFinancialAccount(fa, code);
-//		List<CreditTransfer> creditTransferList = new ArrayList<CreditTransfer>(Arrays.asList(fa));
-//		PaymentInstructions pi = getPaymentInstructions();
-//		if(pi==null) { // Fall 1
-//			pi = createPaymentInstructions(code, null, null, creditTransferList, null, null);
-//			fa.paymentMeans = (PaymentMeans)pi;
-//			((PaymentMeans)pi).addCreditTransfer(fa);
-//			return fa;
-//		}
-//		
-//		if(pi.getCreditTransfer().isEmpty()) { // Fall 2
-//			LOG.warning("NO CreditTransfers in PaymentInstructions "+pi);
-//			// TODO wenn code OK fa einfügen
-//			return null;
-//		}
-//
-//		PaymentInstructions newPi = null;
-//		if(pi.getPaymentMeansEnum()==code) { // Fall 3
-//			newPi = createPaymentInstructions(code, null, null, creditTransferList, null, null);
-//			fa.paymentMeans = (PaymentMeans)newPi;
-//			((PaymentMeans)newPi).pmList = ((PaymentMeans)pi).pmList;
-//			((PaymentMeans)newPi).addCreditTransfer(fa);
-//			LOG.info("eingefügt in"+newPi);
-//			this.removePaymentInstructions();
-//			this.setPaymentInstructions(newPi);
-//			return fa;
-//		} else {
-//			LOG.warning("Cannot mix "+code+" Payment means type code with "+pi.getPaymentMeansEnum());
-//		}
-//		return null;
 	}
 	@Override
 	public CreditTransfer addCreditTransfer(String accountId, String accountName, BICId bic) {
