@@ -112,15 +112,13 @@ public class GenericInvoice <T> implements CoreInvoice  {
 		return GenericLine.createCreditNoteLine(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 	}
 
-	// TODO not public:
-	public static CoreInvoice create(String profile, String processType, DocumentNameCode code) {
+	static CoreInvoice create(String profile, String processType, DocumentNameCode code) {
 		InvoiceType invoice = new InvoiceType();
 		GenericInvoice<InvoiceType> gi = new GenericInvoice<InvoiceType>(invoice);
 		gi.init(profile, processType, code);
 		return gi;
 	}
-	// TODO not public:
-	public static CoreInvoice createCreditNote(String profile, String processType, DocumentNameCode code) {
+	static CoreInvoice createCreditNote(String profile, String processType, DocumentNameCode code) {
 		CreditNoteType cn = new CreditNoteType();
 		GenericInvoice<CreditNoteType> gi = new GenericInvoice<CreditNoteType>(cn);
 		gi.init(profile, processType, code);
@@ -1516,15 +1514,13 @@ UBL:
 			List<InvoiceLineType> lines = invoice.getInvoiceLine();
 			resultLines = new ArrayList<CoreInvoiceLine>(lines.size());
 			lines.forEach(line -> {
-				GenericLine<InvoiceLineType> gil = new GenericLine<InvoiceLineType>(line);
-				resultLines.add(gil);
+				resultLines.add(new GenericLine<InvoiceLineType>(line));
 			});
 		} else {
 			List<CreditNoteLineType> lines = creditNote.getCreditNoteLine();
 			resultLines = new ArrayList<CoreInvoiceLine>(lines.size());
 			lines.forEach(line -> {
-				GenericLine<CreditNoteLineType> gil = new GenericLine<CreditNoteLineType>(line);
-				resultLines.add(gil);
+				resultLines.add(new GenericLine<CreditNoteLineType>(line));
 			});
 		}
 		return resultLines;

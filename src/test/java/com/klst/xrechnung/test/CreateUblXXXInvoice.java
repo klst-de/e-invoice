@@ -69,8 +69,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	Object makeCreditNote() {
 		LOG.info("\n (BG-2.BT-24)ProcessType="+testCN.getProcessType() + " (BG-2.BT-24)Customization="+testCN.getCustomization()
 			+ " (BT-3)TypeCode="+testCN.getTypeCode());
-		CoreInvoice ublInvoice =
-				GenericInvoice.createCreditNote(testCN.getCustomization(), testCN.getProcessType(), testCN.getTypeCode());
+		CoreInvoice ublInvoice = GenericInvoice.getFactory().createInvoice(testCN.getCustomization(), testCN.getProcessType(), testCN.getTypeCode());
 		ublInvoice.setId(testCN.getId());
 		ublInvoice.setIssueDate(testCN.getIssueDateAsTimestamp());
 		ublInvoice.setDocumentCurrency(testCN.getDocumentCurrency());
@@ -120,8 +119,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		}
 		LOG.info("\n (BG-2.BT-24)ProcessType="+testDoc.getProcessType() + " (BG-2.BT-24)Customization="+testDoc.getCustomization()
 			+ " (BT-3)TypeCode="+testDoc.getTypeCode());
-		CoreInvoice ublInvoice =
-				GenericInvoice.create(testDoc.getCustomization(), testDoc.getProcessType(), testDoc.getTypeCode());
+		CoreInvoice ublInvoice = GenericInvoice.getFactory().createInvoice(testDoc.getCustomization(), testDoc.getProcessType(), testDoc.getTypeCode());
 		ublInvoice.setId(testDoc.getId());
 		ublInvoice.setIssueDate(testDoc.getIssueDateAsTimestamp());
 		ublInvoice.setDocumentCurrency(testDoc.getDocumentCurrency());
