@@ -129,35 +129,29 @@ public class UblTest {
 
 	@Test
     public void ubl00() {
-//    	InvoiceFactory factory = new CreateUblXXXInvoice(UBL_XML[0]);
-//    	byte[] bytes = factory.toUbl(); // the xml
-//    	String xml = new String(bytes);
-//    	LOG.info("xml=\n"+xml);
-//    	assertTrue(validation.check(bytes));
-    	
-		CoreInvoice ublInvoice = GenericInvoice.getFactory().createInvoice(CoreInvoice.PROFILE_XRECHNUNG, DocumentNameCode.CommercialInvoice);
-		LOG.info("ublInvoice.Class:"+ublInvoice.getClass());
-		ublInvoice.setId("123456XX");
-		ublInvoice.setIssueDate("2016-04-04");
-		ublInvoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
-		ublInvoice.setOrderReference("1234567890");           // optional
-		ublInvoice.setBuyerReference("04011000-12345-34");
+		CoreInvoice invoice = GenericInvoice.getFactory().createInvoice(CoreInvoice.PROFILE_XRECHNUNG, DocumentNameCode.CommercialInvoice);
+		LOG.info("ublInvoice.Class:"+invoice.getClass());
+		invoice.setId("123456XX");
+		invoice.setIssueDate("2016-04-04");
+		invoice.addNote("Es gelten unsere Allgem. Geschäftsbedingungen, die Sie unter […] finden."); // optional
+		invoice.setOrderReference("1234567890");           // optional
+		invoice.setBuyerReference("04011000-12345-34");
 		// ...
 		IBANId payeeIban = new IBANId("NL57RABO0107307510");
 		BICId bicId = null; // SwiftCode (optional)
-		CreditTransfer ct = ublInvoice.addCreditTransfer(payeeIban, "RaboBank account", bicId);
+		CreditTransfer ct = invoice.addCreditTransfer(payeeIban, "RaboBank account", bicId);
 		// implizit wird ein Objekt SEPACreditTransfer für BG-16 PAYMENT INSTRUCTIONS in ublInvoice erstellt
-		assertEquals(PaymentMeansEnum.SEPACreditTransfer, ublInvoice.getPaymentInstructions().getPaymentMeansEnum());
+		assertEquals(PaymentMeansEnum.SEPACreditTransfer, invoice.getPaymentInstructions().getPaymentMeansEnum());
 
 		// TODO auch damit nur ein BG-17 in BG-16
 		bicId = new BICId("INGBNL2AXXX");
-		CreditTransfer ct2 = ublInvoice.createCreditTransfer("NL03 INGB 0004489902", "ING account", bicId); // TODO addCreditTransfer
+		CreditTransfer ct2 = invoice.createCreditTransfer("NL03 INGB 0004489902", "ING account", bicId); // TODO addCreditTransfer
 		
 		List<CreditTransfer> ctList = new ArrayList<CreditTransfer>(Arrays.asList(ct,ct2));
 		// create liefert ein BG-16 Objekt, aber bindet es nicht an ublInvoice - das macht setXXX
 //		ublInvoice.createPaymentInstructions(PaymentMeansEnum.CreditTransfer, "paymentMeansText"
 //				, "PaymentReference Verwendungszweck", ctList);
-		ublInvoice.setPaymentInstructions(PaymentMeansEnum.CreditTransfer, "paymentMeansText"
+		invoice.setPaymentInstructions(PaymentMeansEnum.CreditTransfer, "paymentMeansText"
 				, "PaymentReference Verwendungszweck", ctList, null, null);
 		
 //		bicId = new BICId("INGBNL2AXXX");
@@ -165,7 +159,7 @@ public class UblTest {
 		
 		// TODO PaymentReference Verwendungszweck geht nur über BG-16, dann ist aber BG-16 zwei mal da
 		
-		byte[] bytes = transformer.fromModel(ublInvoice);
+		byte[] bytes = transformer.fromModel(invoice);
 		String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
     	//assertTrue(validation.check(bytes));
@@ -174,7 +168,7 @@ public class UblTest {
 	@Test
 	public void ubl0105_FinancialAccount() {  // zwei IBANs
 		File testFile = getTestFile("01.05a-INVOICE_ubl.xml");
-		GenericInvoice<?> testDoc = null;
+		CoreInvoice testDoc = null;
 		if(transformer.isValid(testFile)) {
 			testDoc = toModel(testFile);
 		} else {

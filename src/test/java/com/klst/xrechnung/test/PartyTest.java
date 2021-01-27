@@ -16,6 +16,7 @@ import org.junit.runners.MethodSorters;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
+import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.ubl.Address;
@@ -53,7 +54,7 @@ public class PartyTest {
 			"01.14a-INVOICE_ubl.xml" ,
 			"01.15a-INVOICE_ubl.xml" };
 
-	GenericInvoice<InvoiceType> invoice;
+	CoreInvoice invoice;
 	private SupplierPartyType supplierParty;
 	private BG4_Seller supplierparty; // BG4_Seller extends BusinessParty
 	private CustomerPartyType customerParty;
@@ -102,7 +103,8 @@ public class PartyTest {
     	InvoiceFactory factory = new CreateUblXXXInvoice(UBL_XML[5]);
     	invoice = factory.getTestDoc();
     	supplierparty = null;
-		supplierParty = invoice.get().getAccountingSupplierParty();
+    	Object o = ((GenericInvoice)invoice).get();
+		supplierParty = ((InvoiceType)o).getAccountingSupplierParty();
 		if(supplierParty!=null) {
 			supplierparty = invoice.getSeller();
 			LOG.info("supplierparty.RegistrationName:"+ (supplierparty.getRegistrationName())
@@ -111,7 +113,7 @@ public class PartyTest {
 			testAddress.setCountrySubdivision("subDivision"); // kein Setter für , "String street"
 		}
 		customerparty = null;
-		customerParty = invoice.get().getAccountingCustomerParty();
+		customerParty = ((InvoiceType)o).getAccountingCustomerParty();
 		if(customerParty!=null) {
 			customerparty = invoice.getBuyer();
 			LOG.info("customerparty.RegistrationName:"+ (customerparty.getRegistrationName()) 

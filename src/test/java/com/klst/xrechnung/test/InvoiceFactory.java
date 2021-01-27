@@ -2,7 +2,7 @@ package com.klst.xrechnung.test;
 
 import java.util.logging.Logger;
 
-import com.klst.einvoice.ubl.GenericInvoice;
+import com.klst.einvoice.CoreInvoice;
 import com.klst.marshaller.AbstactTransformer;
 
 public abstract class InvoiceFactory {
@@ -29,7 +29,7 @@ public abstract class InvoiceFactory {
 	
 	abstract Object makeInvoice();
 	
-	public GenericInvoice getTestDoc() { // ===> GenericInvoice ===> CoreInvoice
+	public CoreInvoice getTestDoc() { // ===> GenericInvoice ===> CoreInvoice
 		LOG.warning("not implemented (for test only)");
 		return null;
 	}

@@ -40,8 +40,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	private static final String TESTDIR = "src/test/resources/"; // mit Daten aus xrechnung-1.2.0-testsuite-2018-12-14.zip\instances\
 	
 	private File testFile;
-	private GenericInvoice<?> testDoc;
-	private GenericInvoice<?> testCN; // GenericInvoice ===> CoreInvoice
+	private CoreInvoice testDoc;
+	private CoreInvoice testCN; // GenericInvoice ===> CoreInvoice
 	
 	// ctor
 	public CreateUblXXXInvoice() {
@@ -62,7 +62,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		}
 	}
 
-	public GenericInvoice getTestDoc() {
+	public CoreInvoice getTestDoc() {
 		return testDoc;
 	}
 		
@@ -94,7 +94,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("finished DocumentTotalsGroup.");
 		
 //		makeVatBreakDownGroup2(ublInvoice);
-        List<TaxSubtotal> vbdList = testCN.getVATBreakDowns();
+        List<TaxSubtotal> vbdList = ((GenericInvoice)testCN).getVATBreakDowns();
         LOG.info("CreditNote VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
         	TaxSubtotal vatBreakdown = new TaxSubtotal(
@@ -212,7 +212,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		return ublInvoice;
 	}
 
-	void makeOptionals(CoreInvoice ublInvoice, GenericInvoice<?> testDoc) {	
+	void makeOptionals(CoreInvoice ublInvoice, CoreInvoice testDoc) {	
 		LOG.info("testDoc.ProjectReference="+
 				(testDoc.getProjectReference()==null ? "null" : testDoc.getProjectReference().getID()));
 		ublInvoice.setProjectReference(testDoc.getProjectReference()); // BT-11 + 0..1
@@ -280,7 +280,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("finished.");
 	}
 	
-	void makePaymentGroup(CoreInvoice ublInvoice, GenericInvoice<?> testDoc) {
+	void makePaymentGroup(CoreInvoice ublInvoice, CoreInvoice testDoc) {
 		
 		// BT-20 + 0..1 Payment terms
 		ublInvoice.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp());
@@ -338,7 +338,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makeVatBreakDownGroup(CoreInvoice ublInvoice) {
-        List<TaxSubtotal> vbdList = testDoc.getVATBreakDowns();
+        List<TaxSubtotal> vbdList = ((GenericInvoice)testDoc).getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
         	BG23_VatBreakdown vatBreakdown = new TaxSubtotal(
@@ -353,12 +353,14 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("finished. "+vbdList.size() + " vatBreakDowns.");
 	}
 	
-	void makeLineGroup(CoreInvoice ublDoc, GenericInvoice<?> testDoc) {
+	void makeLineGroup(CoreInvoice ublDoc, CoreInvoice testDoc) {
 		List<CoreInvoiceLine> testLines = testDoc.getLines();
-		LOG.info("LineGroup started for "+testLines.size() + " lines. testDoc ist "+testDoc.getClass());
+		Object testDocObject = ((GenericInvoice)testDoc).get();
+		LOG.info("LineGroup started for "+testLines.size() + " lines. testDocObject ist "+testDocObject.getClass() +
+				" testDoc ist "+testDoc.getClass());
 		testLines.forEach(testLine -> {
 			CoreInvoiceLine targetLine;
-			if(testDoc.get() instanceof InvoiceType) {
+			if(testDocObject instanceof InvoiceType) {
 				targetLine = ublDoc.createInvoiceLine(testLine.getId(), 
 						testLine.getQuantity(),                                       // BT-129
 						testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), // BT-131 , BG-29.BT-146 
