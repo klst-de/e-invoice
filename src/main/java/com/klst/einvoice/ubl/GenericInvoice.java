@@ -989,17 +989,18 @@ UBL:
 			}
 		}
 	}
-	private void mergePaymentInstructions(PaymentMeans pmToMerge) {
-		List<PaymentMeansType> list = isInvoiceType ? invoice.getPaymentMeans() : creditNote.getPaymentMeans();
-		if(list==null) return;
-		if(list.isEmpty()) return;
-		PaymentMeansType pm = (PaymentMeansType)(list.get(0));
-		PaymentMeansEnum pmCode = PaymentMeans.getPaymentMeansEnum(pm);
-		if(PaymentMeansEnum.isCreditTransfer(pmCode)) {
-			LOG.info("merge to "+list.size()+" elements paymentMeans:"+pmToMerge);
-			list.add(pmToMerge); // TODO funktioniert nicht richtig
-		}
-	}
+// TODO	
+//	private void mergePaymentInstructions(PaymentMeans pmToMerge) {
+//		List<PaymentMeansType> list = isInvoiceType ? invoice.getPaymentMeans() : creditNote.getPaymentMeans();
+//		if(list==null) return;
+//		if(list.isEmpty()) return;
+//		PaymentMeansType pm = (PaymentMeansType)(list.get(0));
+//		PaymentMeansEnum pmCode = PaymentMeans.getPaymentMeansEnum(pm);
+//		if(PaymentMeansEnum.isCreditTransfer(pmCode)) {
+//			LOG.info("merge to "+list.size()+" elements paymentMeans:"+pmToMerge);
+//			list.add(pmToMerge); // TODO funktioniert nicht richtig
+//		}
+//	}
 	private void removePaymentInstructions() {
 		List<PaymentMeansType> list = isInvoiceType ? invoice.getPaymentMeans() : creditNote.getPaymentMeans();
 		if(list==null) return;
