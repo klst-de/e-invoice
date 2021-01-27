@@ -800,10 +800,6 @@ UBL:
 	public String getProcessType() {
 		return getProcessType(this);
 	}
-	@Deprecated
-	public String getProfile() {
-		return getProcessType(this);
-	}
 	static String getProcessType(CrossIndustryInvoiceType doc) {
 		List<DocumentContextParameterType> documentContextParameterList = doc.getExchangedDocumentContext().getBusinessProcessSpecifiedDocumentContextParameter();
 		List<String> res = new ArrayList<String>(documentContextParameterList.size());

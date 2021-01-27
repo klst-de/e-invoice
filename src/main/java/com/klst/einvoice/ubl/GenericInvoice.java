@@ -685,13 +685,9 @@ UBL:
 	// BG-2.BT-23 ++ 0..1 Business process type
 	@Override
 	public String getProcessType() {
-		// Test in 02.01a
+		// Test in 02.01a, etwas verwirrend: UBL ProfileIDType enthält nicht BG2_ProcessControl.PROFILE_XXX
 		ProfileIDType profileID = isInvoiceType ? invoice.getProfileID() : creditNote.getProfileID();
 		return profileID==null ? null : profileID.getValue();
-	}
-	@Deprecated
-	public String getProfile() {
-		return getProcessType();
 	}
 
 	// BG-3 + 0..n PRECEDING INVOICE REFERENCE
@@ -736,7 +732,6 @@ UBL:
             <cbc:IssueDate>2013-03-10</cbc:IssueDate>
         </cac:InvoiceDocumentReference>
     </cac:BillingReference>
-
 
  */
 		List<BillingReferenceType> billingReferenceList = isInvoiceType ? invoice.getBillingReference() : creditNote.getBillingReference();
