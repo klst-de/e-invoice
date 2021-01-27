@@ -1135,14 +1135,29 @@ UBL:
 		return PaymentMandate.create(mandateID, bankAssignedCreditorID, debitedAccountID);
 	}
 
-	// BG-20 + 0..n DOCUMENT LEVEL ALLOWANCES                          TODO
-	public void setDocumentLevelAllowence(Object todo) {
-		LOG.warning(NOT_IMPEMENTED);
+	// BG-20 + 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+	// BG-21 + 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
+	@Override
+	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
+		if(isInvoiceType) {
+			invoice.getAllowanceCharge().add((AllowanceChargeType)allowanceOrCharge);
+		} else {
+			creditNote.getAllowanceCharge().add((AllowanceChargeType)allowanceOrCharge);
+		}
 	}
-
-	// BG-21 + 0..n DOCUMENT LEVEL CHARGES                             TODO
-	public void setDocumentLevelCharges(Object todo) {
-		LOG.warning(NOT_IMPEMENTED);
+	@Override
+	public List<AllowancesAndCharges> getAllowancesAndCharges() {
+		List<AllowanceChargeType> allowanceChargeList;
+		if(isInvoiceType) {
+			allowanceChargeList = invoice.getAllowanceCharge();
+		} else {
+			allowanceChargeList = creditNote.getAllowanceCharge();
+		}
+		List<AllowancesAndCharges> resList = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
+		allowanceChargeList.forEach(doc -> {
+			resList.add(new AllowanceCharge(doc));
+		});
+		return resList;
 	}
 	
 	// BG-22 + 1..1 DOCUMENT TOTALS
@@ -1391,31 +1406,6 @@ UBL:
 		return taxTotalFirst;
 	}
 	
-	// BG-20 + 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
-	// BG-21 + 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
-	@Override
-	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
-		if(isInvoiceType) {
-			invoice.getAllowanceCharge().add((AllowanceChargeType)allowanceOrCharge);
-		} else {
-			creditNote.getAllowanceCharge().add((AllowanceChargeType)allowanceOrCharge);
-		}
-	}
-	@Override
-	public List<AllowancesAndCharges> getAllowancesAndCharges() {
-		List<AllowanceChargeType> allowanceChargeList;
-		if(isInvoiceType) {
-			allowanceChargeList = invoice.getAllowanceCharge();
-		} else {
-			allowanceChargeList = creditNote.getAllowanceCharge();
-		}
-		List<AllowancesAndCharges> resList = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
-		allowanceChargeList.forEach(doc -> {
-			resList.add(new AllowanceCharge(doc));
-		});
-		return resList;
-	}
-
 	@Override
 	public BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode code, BigDecimal percent) {
 		return new TaxSubtotal(taxableAmount, tax, code, percent);
