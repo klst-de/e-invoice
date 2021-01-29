@@ -24,6 +24,7 @@ import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.Reference;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
@@ -694,13 +695,29 @@ UBL:
 	// BG-3.BT-25 ++ 1..1 Preceding Invoice reference
 	// BG-3.BT-26 ++ 0..1 Preceding Invoice issue date
 	@Override
+	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
+		return DocumentReference.createPrecedingInvoiceReference(docRefId, ts);
+	}
+	@Override
+	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice) {
+		if(precedingInvoice==null) return;
+		DocumentReferenceType docRef = (DocumentReference)precedingInvoice;
+		BillingReferenceType billingReference = new BillingReferenceType();
+		billingReference.setInvoiceDocumentReference(docRef);
+		List<BillingReferenceType> billingReferenceList = isInvoiceType ? invoice.getBillingReference() : creditNote.getBillingReference();
+		billingReferenceList.add(billingReference);
+	}
+	@Deprecated
+	@Override
 	public void setPrecedingInvoiceReference(String docRefId, String ymd) {
 		setPrecedingInvoiceReference(docRefId, DateTimeFormats.ymdToTs(ymd));
 	}
+	@Deprecated
 	@Override
 	public void setPrecedingInvoiceReference(String docRefId) {
 		setPrecedingInvoiceReference(docRefId, (Timestamp)null); // Date is optional
 	}
+	@Deprecated
 	@Override
 	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts) {
 		DocumentReferenceType docRef = new DocumentReferenceType();
@@ -716,6 +733,7 @@ UBL:
 		billingReferenceList.add(billingReference);
 	}
 	
+	@Deprecated
 	@Override
 	public String getPrecedingInvoiceReference() {
 //		List<DocumentReferenceType> originatorDocumentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
@@ -749,6 +767,17 @@ UBL:
 		Reference docRef = new ID(docRefList.get(0).getID());
 		return docRef.getName();
 	}
+	@Override
+	public List<PrecedingInvoice> getPrecedingInvoices() {
+		List<BillingReferenceType> billingReferenceList = isInvoiceType ? invoice.getBillingReference() : creditNote.getBillingReference();
+		List<PrecedingInvoice> docRefList = new ArrayList<PrecedingInvoice>();
+		billingReferenceList.forEach(billingRef -> {
+			DocumentReferenceType docRef = billingRef.getInvoiceDocumentReference();
+			docRefList.add(new DocumentReference(docRef));
+		});
+		return docRefList;
+	}
+
 	
 	// BG-4 + 1..1 SELLER
 	@Override

@@ -1,16 +1,25 @@
 package com.klst.einvoice.unece.uncefact;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
+import com.klst.einvoice.PrecedingInvoice;
+import com.klst.einvoice.Reference;
+import com.klst.untdid.codelist.DateTimeFormats;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.ReferenceCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
+// BG-3 + 0..n PRECEDING INVOICE REFERENCE
+// BG-3.BT-25 ++ 1..1 Preceding Invoice reference
+// BG-3.BT-26 ++ 0..1 Preceding Invoice issue date
+//
 // BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
 // 0 .. n AdditionalReferencedDocument Rechnungsbegründende Unterlagen BG-24
 // BG-24.BT-122 ++ 1..1 Supporting document reference
@@ -22,15 +31,27 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 BR-52 Each Additional supporting document (BG-24) shall contain a Supporting document reference (BT-122).
 Additional supporting documents BT-122
 
-ReferencedDocument kapselt auch BT-17 und BT-18 
+ReferencedDocument kapselt auch BT-3, BT-17 und BT-18 
 
  */
-public class ReferencedDocument extends ReferencedDocumentType implements BG24_AdditionalSupportingDocs {
+public class ReferencedDocument extends ReferencedDocumentType implements BG24_AdditionalSupportingDocs, PrecedingInvoice {
 
+	// factory for BG-3
+	static PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
+		ReferencedDocument rd = new ReferencedDocument(docRefId, null);
+		rd.setDate(ts);
+		return rd;
+	}
+	
 	static final String ValidatedPricedTender = "50";
 	static final String InvoicingDataSheet = "130";
 	static final String RelatedDocument = "916";
 
+	public ReferencedDocument(IDType issuerAssignedID, FormattedDateTimeType ftd) {
+		super();
+		super.setIssuerAssignedID(issuerAssignedID);
+		super.setFormattedIssueDateTime(ftd);
+	}
 	/**
 	 * ADDITIONAL SUPPORTING DOCUMENT
 	 * <p>
@@ -55,8 +76,8 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 		setReferenceCode(referenceTypeCode);
 	}
 	
-	@Override
-	public void setSupportingDocumentReference(String docRefId) {
+	@Override // TODO setSupportingDocumentReference == setDocumentReference
+	public void setSupportingDocumentReference(String docRefId) { 
 		super.setIssuerAssignedID(new ID(docRefId));
 	}
 
@@ -148,12 +169,44 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	private String getSupportingDocumentCode() {
 		DocumentCodeType documentCode = super.getTypeCode();
 		if(documentCode==null) {
-			// TODO exception
+			// ===> isPrecedingInvoice
+			//super.getIssuerAssignedID()
+			//super.getFormattedIssueDateTime();
 		}
 		return documentCode.getValue();
 	}
 	
+	// BG-3.BT-25 ++ 1..1 Preceding Invoice reference / implements PrecedingInvoice
+	@Override
+	public Reference getDocumentReference() {
+		return super.getIssuerAssignedID()==null ? null : new ID(getIssuerAssignedID());
+	}
+	@Override
+	public void setDocumentReference(Reference docRefId) {
+		super.setIssuerAssignedID((ID)docRefId);
+	}
 
+	// BG-3.BT-26 ++ 0..1 Preceding Invoice issue date / implements PrecedingInvoice
+	@Override
+	public Timestamp getDateAsTimestamp() {
+		if(super.getFormattedIssueDateTime()==null) return null;
+		FormattedDateTimeType dateTime = getFormattedIssueDateTime(); // FormattedDateTimeType
+		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
+	}
+//	@Override
+//	public void setDate(String ymd) {
+//		setDate(DateTimeFormats.ymdToTs(ymd));
+//	}
+	@Override
+	public void setDate(Timestamp ts) {
+		if(ts==null) return;
+		super.setFormattedIssueDateTime(DateTimeFormatStrings.toFormattedDateTime(ts));
+	}
+
+	boolean isPrecedingInvoice() {
+		return (getSupportingDocumentCode()==null);
+	}
+	
 //	Der Code  50 "Price/sales catalogue response" wird benutzt, 
 //	um die Ausschreibung oder das Los zu referenzieren. (BT-17)
 //	.  50 . Validated priced tender

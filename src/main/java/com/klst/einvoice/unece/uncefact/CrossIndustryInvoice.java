@@ -23,6 +23,7 @@ import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.Reference;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
@@ -858,13 +859,41 @@ UBL:
 	}
 
 	@Override
+	// Spec BUG BG-3 hat die Kardinalität 0..n : in CII kann aber nur 0..1 abgebildet werden
 	public String getPrecedingInvoiceReference() {
+//		super.getSupplyChainTradeTransaction()  // 0..1
+//			.getApplicableHeaderTradeSettlement() // 0..1
+//				.getInvoiceReferencedDocument() // 0..1
+////					.getIssuerAssignedID() // 0..1   ==> also kann es nur einen geben
+////					.getFormattedIssueDateTime() // 0..1 
+					
 		ReferencedDocumentType referencedDocument = applicableHeaderTradeSettlement.getInvoiceReferencedDocument();
-		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
+		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();
 	}
 	static String getPrecedingInvoiceReference(CrossIndustryInvoiceType doc) {
 		ReferencedDocumentType referencedDocument =  doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getInvoiceReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
+	}
+	@Override
+	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
+		return ReferencedDocument.createPrecedingInvoiceReference(docRefId, ts);
+	}
+	@Override
+	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice) {
+		if(getPrecedingInvoices().isEmpty()) {
+			applicableHeaderTradeSettlement.setInvoiceReferencedDocument((ReferencedDocument)precedingInvoice);
+		} else {
+			LOG.warning("You try to add a second Preceding Invoice. In CII there is only one BG-3. " + NOT_IMPEMENTED + " due to secification.");
+		}
+	}
+	@Override
+	public List<PrecedingInvoice> getPrecedingInvoices() {
+		ReferencedDocumentType referencedDocument = applicableHeaderTradeSettlement.getInvoiceReferencedDocument();
+		List<PrecedingInvoice> docRefList = new ArrayList<PrecedingInvoice>();
+		if(referencedDocument!=null) {
+			docRefList.add(new ReferencedDocument(referencedDocument.getIssuerAssignedID(), referencedDocument.getFormattedIssueDateTime()));
+		}
+		return docRefList;
 	}
 
 	FormattedDateTimeType newFormattedDateTimeType(Timestamp ts) {

@@ -1,6 +1,9 @@
 package com.klst.einvoice;
 
 import java.sql.Timestamp;
+import java.util.List;
+
+import com.klst.untdid.codelist.DateTimeFormats;
 
 /**
  * BG-3 PRECEDING INVOICE REFERENCE
@@ -28,21 +31,32 @@ UBL:
 1 .. 1 DateTimeString Rechnungsdatum der vorausgegangenen Rechnung           BT-26 
 required format Datum, Format                                                BT-26-0
  */
-// TODO Idee runter zu ubl und cii und public raus ?!
 public interface BG3_PrecedingInvoiceReference {
 	
-	// BT-25 ++ 1..1 Preceding Invoice reference	
-	// BT-26 ++ 0..1 Preceding Invoice issue date
+	@Deprecated // use factory method
 	public void setPrecedingInvoiceReference(String docRefId);
+	@Deprecated // use factory method
 	public void setPrecedingInvoiceReference(String docRefId, String ymd);
-	
-	/**
-	 * 
-	 * @param docRefId - Preceding Invoice reference, BT-25 / 1..1
-	 * @param ts - Preceding Invoice issue date, BT-26 / 0..1
-	 */
+	@Deprecated // use factory method
 	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts);
-	
+	@Deprecated
 	public String getPrecedingInvoiceReference(); // TODO muss List<> liefern wg. 0.n
 	
+	// TODO: factory 
+	// createPrecedingInvoiceReference
+	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts);
+	
+	default PrecedingInvoice createPrecedingInvoiceReference(String docRefId, String ymd) {
+		return createPrecedingInvoiceReference(docRefId, ymd==null? null : DateTimeFormats.ymdToTs(ymd));
+	}
+	
+	default PrecedingInvoice createPrecedingInvoiceReference(String docRefId) {
+		return createPrecedingInvoiceReference(docRefId, (Timestamp)null);
+	}
+	// und addPrecedingInvoiceReference(PrecedingInvoiceReference pir) coreInvoice
+	// und ein IF PrecedingInvoiceReference
+	// statt setXXX 3x:
+	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice);
+	public List<PrecedingInvoice> getPrecedingInvoices();
+
 }

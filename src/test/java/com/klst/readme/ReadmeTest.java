@@ -2,9 +2,11 @@ package com.klst.readme;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.junit.Before;
@@ -14,6 +16,7 @@ import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
@@ -24,6 +27,8 @@ import com.klst.marshaller.CiiTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.TaxCategoryCode;
+
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 
 public class ReadmeTest {
 
@@ -100,6 +105,24 @@ public class ReadmeTest {
 		PostalAddress buyerAddress = invoice.createAddress(DE, "12345", "[Buyer city]");
 		IContact buyerContact = null;                           // (optional)
 		invoice.setBuyer("[Buyer name]", buyerAddress, buyerContact);
+		
+		// BG-3 + 0..n REFERENZ AUF DIE VORAUSGEGANGENE RECHNUNG
+		// Zu verwenden, falls:
+//		— eine vorausgegangene Rechnung korrigiert wird;
+//		— aus einer Schlussrechnung auf vorausgegangene Teilrechnungen Bezug genommen wird;
+//		— aus einer Schlussrechnung auf vorausgegangene Rechnungen für Vorauszahlungen Bezug genommen wird.
+		invoice.setPrecedingInvoiceReference("Teilrechnung 123456T1", "2016-10-31");
+		invoice.setPrecedingInvoiceReference("Teilrechnung 123456T2", "2016-11-11");
+		invoice.addPrecedingInvoice(invoice.createPrecedingInvoiceReference("Teilrechnung 123456T1", "2016-10-31"));
+		List<PrecedingInvoice> precedingInvoices = invoice.getPrecedingInvoices();
+		assertFalse(precedingInvoices.isEmpty());
+		if(precedingInvoices.get(0) instanceof ReferencedDocumentType) {
+			// eine Warnung wird augegeben wg. https://github.com/klst-de/e-invoice/issues/19
+			// Specification BUG in EN16931 : BG-3 PRECEDING INVOICE REFERENCE
+			assertEquals(1, invoice.getPrecedingInvoices().size());
+		} else {
+			assertEquals(3, invoice.getPrecedingInvoices().size());
+		}
 		
 		
 		assertEquals(CoreInvoice.PROFILE_XRECHNUNG, invoice.getCustomization());
