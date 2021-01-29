@@ -1,6 +1,7 @@
 package com.klst.einvoice.ubl;
 
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
+import com.klst.einvoice.Reference;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AttachmentType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
@@ -60,22 +61,35 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 	}
 	
 	void init(String docRefId, String description, String url) {
-		setSupportingDocumentReference(docRefId);
+//		setSupportingDocumentReference(docRefId);
+		super.setID(new ID(docRefId));
 		setSupportingDocumentDescription(description);
 		setExternalDocumentLocation(url);
 	}
 
 	// BG.24.BT-122
+	public void setDocumentReference(Reference docRefId) {
+		super.setID((ID)docRefId);
+	}
+	public Reference getDocumentReference() {
+		return new ID(getId(this));
+	}
+	
+//	TODO in V3 löschen:
+	@Deprecated
 	@Override
 	public void setSupportingDocumentReference(String id) {
 		super.setID(new ID(id));
 	}
 
+	@Deprecated
 	@Override
 	public String getSupportingDocumentReference() {
 		return getId(this);
 	}
-	static String getId(DocumentReferenceType documentReference) {
+//	---------------------------- ENDE TODO
+	
+	private static String getId(DocumentReferenceType documentReference) {
 		return documentReference.getID().getValue();
 	}
 

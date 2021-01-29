@@ -151,12 +151,13 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //			((CrossIndustryInvoice)cii).addSupportigDocument((ReferencedDocument)additionalSupportingDoc);
 			
 			byte[] byteDoc = additionalSupportingDoc.getAttachedDocument();
+			String documentReference = additionalSupportingDoc.getDocumentReference().getName();
 			if(byteDoc==null) {
-				cii.addSupportigDocument(additionalSupportingDoc.getSupportingDocumentReference()
+				cii.addSupportigDocument(documentReference
 						, additionalSupportingDoc.getSupportingDocumentDescription()
 						, additionalSupportingDoc.getExternalDocumentLocation());
 			} else {
-				cii.addSupportigDocument(additionalSupportingDoc.getSupportingDocumentReference()
+				cii.addSupportigDocument(documentReference
 						, additionalSupportingDoc.getSupportingDocumentDescription()
 						, byteDoc
 						, additionalSupportingDoc.getAttachedDocumentMimeCode()

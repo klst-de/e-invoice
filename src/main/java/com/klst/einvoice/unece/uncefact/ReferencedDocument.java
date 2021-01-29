@@ -16,6 +16,10 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
+// BT-17 + 0..1 Tender or lot reference
+// BT-18 + 0..1 Invoiced object identifier
+// BT-18-0 0..1 Scheme identifier
+//
 // BG-3 + 0..n PRECEDING INVOICE REFERENCE
 // BG-3.BT-25 ++ 1..1 Preceding Invoice reference
 // BG-3.BT-26 ++ 0..1 Preceding Invoice issue date
@@ -71,20 +75,25 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	}
 	ReferencedDocument(String docRefId, String code, String referenceTypeCode) {
 		super();
-		setSupportingDocumentReference(docRefId);
+//		setSupportingDocumentReference(docRefId);
+		super.setIssuerAssignedID(new ID(docRefId));
 		setDocumentCode(code);
 		setReferenceCode(referenceTypeCode);
 	}
 	
-	@Override // TODO setSupportingDocumentReference == setDocumentReference
+//	TODO in V3 löschen:
+	@Deprecated
+	@Override
 	public void setSupportingDocumentReference(String docRefId) { 
 		super.setIssuerAssignedID(new ID(docRefId));
 	}
 
+	@Deprecated
 	@Override
 	public String getSupportingDocumentReference() {
 		return super.getIssuerAssignedID().getValue();
 	}
+//	---------------------------- ENDE TODO
 
 	// BG-24.BT-123 ++ 0..1 Supporting document description
 	@Override

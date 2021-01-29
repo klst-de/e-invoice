@@ -269,14 +269,15 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		
 		List<BG24_AdditionalSupportingDocs> asDocList = testDoc.getAdditionalSupportingDocuments();
 		asDocList.forEach(asDoc -> {
-			LOG.info("SupportingDocumentReference:"+asDoc.getSupportingDocumentReference() + " MimeCode:"+asDoc.getAttachedDocumentMimeCode());
+			String documentReference = asDoc.getDocumentReference().getName();
+			LOG.info("SupportingDocumentReference:"+documentReference + " MimeCode:"+asDoc.getAttachedDocumentMimeCode());
 			byte[] content = asDoc.getAttachedDocument();
 			if(content==null) {
 				LOG.info("SupportingDocumentDescription:"+asDoc.getSupportingDocumentDescription() 
 					+ " ExternalDocumentLocation:"+asDoc.getExternalDocumentLocation());
-				ublInvoice.addSupportigDocument(asDoc.getSupportingDocumentReference(), asDoc.getSupportingDocumentDescription(), asDoc.getExternalDocumentLocation());
+				ublInvoice.addSupportigDocument(documentReference, asDoc.getSupportingDocumentDescription(), asDoc.getExternalDocumentLocation());
 			} else {
-				ublInvoice.addSupportigDocument(asDoc.getSupportingDocumentReference()
+				ublInvoice.addSupportigDocument(documentReference
 						, asDoc.getSupportingDocumentDescription()
 						, content, asDoc.getAttachedDocumentMimeCode(), asDoc.getAttachedDocumentFilename()
 						);
