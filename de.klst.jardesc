@@ -9,15 +9,16 @@
             <packagesToSeal/>
             <packagesToUnSeal>
                 <package handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.einvoice"/>
-                <package handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.einvoice.ubl"/>
-                <package handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.einvoice.unece.uncefact"/>
             </packagesToUnSeal>
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=e-invoice/src\/main\/resources"/>
-        <file path="/e-invoice/README.md"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/resources&lt;cii.maindoc"/>
         <file path="/e-invoice/LICENSE"/>
         <javaElement handleIdentifier="=e-invoice/src\/main\/java"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/resources&lt;ubl.maindoc"/>
+        <file path="/e-invoice/README.md"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/resources&lt;ubl.common"/>
+        <file path="/e-invoice/src/main/resources/testLogging.properties"/>
     </selectedElements>
 </jardesc>
