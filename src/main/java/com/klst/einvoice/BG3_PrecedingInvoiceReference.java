@@ -18,32 +18,25 @@ import com.klst.untdid.codelist.DateTimeFormats;
  * <br>EN16931-ID: 	BG-3 , BT-25,BT-26,BT-26-0
  * <br>Rule ID: 	
  * <br>Request ID: 	R11, R12
- */
-
-/* es fehlen testdaten
-CII:
-UBL:
-
-0 .. 1 InvoiceReferencedDocument Referenz auf die vorausgegangene Rechnungen BG-3 
-       xs:sequence 
-1 .. 1 IssuerAssignedID Nummer der vorausgegangenen Rechnung                 BT-25 
-0 .. 1 FormattedIssueDateTime Rechnungsdatum xs:sequence 
-1 .. 1 DateTimeString Rechnungsdatum der vorausgegangenen Rechnung           BT-26 
-required format Datum, Format                                                BT-26-0
+ * 
+ * <p>
+ * Article 219 (COUNCIL DIRECTIVE 2006/112/EC)
+ * <br>
+ * Any document or message that amends and refers specifically and unambiguously 
+ * to the initial invoice shall be treated as an invoice.
+ * 
+ * @see PrecedingInvoice
  */
 public interface BG3_PrecedingInvoiceReference {
 	
-	@Deprecated // use factory method
-	public void setPrecedingInvoiceReference(String docRefId);
-	@Deprecated // use factory method
-	public void setPrecedingInvoiceReference(String docRefId, String ymd);
-	@Deprecated // use factory method
-	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts);
 	@Deprecated
-	public String getPrecedingInvoiceReference(); // TODO muss List<> liefern wg. 0.n
+	default String getPrecedingInvoiceReference() {
+		List<PrecedingInvoice> list = getPrecedingInvoices();
+		if(list.isEmpty()) return null;
+		return list.get(0).getDocumentReference().getName();
+	}
 	
-	// TODO: factory 
-	// createPrecedingInvoiceReference
+	// factory 
 	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts);
 	
 	default PrecedingInvoice createPrecedingInvoiceReference(String docRefId, String ymd) {
@@ -53,10 +46,19 @@ public interface BG3_PrecedingInvoiceReference {
 	default PrecedingInvoice createPrecedingInvoiceReference(String docRefId) {
 		return createPrecedingInvoiceReference(docRefId, (Timestamp)null);
 	}
-	// und addPrecedingInvoiceReference(PrecedingInvoiceReference pir) coreInvoice
-	// und ein IF PrecedingInvoiceReference
-	// statt setXXX 3x:
+
 	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice);
 	public List<PrecedingInvoice> getPrecedingInvoices();
+
+	// shortcuts:
+	default void setPrecedingInvoiceReference(String docRefId) {
+		addPrecedingInvoice(createPrecedingInvoiceReference(docRefId));
+	}
+	default void setPrecedingInvoiceReference(String docRefId, Timestamp ts) {
+		addPrecedingInvoice(createPrecedingInvoiceReference(docRefId, ts));
+	}
+	default void setPrecedingInvoiceReference(String docRefId, String ymd) {
+		addPrecedingInvoice(createPrecedingInvoiceReference(docRefId, DateTimeFormats.ymdToTs(ymd)));
+	}
 
 }
