@@ -238,7 +238,7 @@ public class UblTest {
     	List<BG24_AdditionalSupportingDocs> asdList = ublInvoice.getAdditionalSupportingDocuments();
     	assertEquals(1, asdList.size());
     	BG24_AdditionalSupportingDocs asDoc = asdList.get(0);
-    	assertEquals("01_15_Anhang_01.pdf", asDoc.getSupportingDocumentReference());
+    	assertEquals("01_15_Anhang_01.pdf", asDoc.getDocumentReference().getName());
     	assertEquals("Aufschlüsselung der einzelnen Leistungspositionen", asDoc.getSupportingDocumentDescription());
     	assertEquals("application/pdf", asDoc.getAttachedDocumentMimeCode());
     	assertEquals("01_15_Anhang_01.pdf", asDoc.getAttachedDocumentFilename());
@@ -320,7 +320,7 @@ public class UblTest {
 	@Test
     public void ublZZZ() {
 //    	InvoiceFactory factory = new CreateUblXXXInvoice("01.05a-INVOICE_ubl.xml");
-    	InvoiceFactory factory = new CreateUblXXXInvoice("ubl-tc434-example6.xml");
+    	InvoiceFactory factory = new CreateUblXXXInvoice("ubl-tc434-example8.xml");
     	byte[] bytes = factory.toUbl(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
