@@ -193,10 +193,6 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 		FormattedDateTimeType dateTime = getFormattedIssueDateTime(); // FormattedDateTimeType
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
 	}
-//	@Override
-//	public void setDate(String ymd) {
-//		setDate(DateTimeFormats.ymdToTs(ymd));
-//	}
 	@Override
 	public void setDate(Timestamp ts) {
 		if(ts==null) return;

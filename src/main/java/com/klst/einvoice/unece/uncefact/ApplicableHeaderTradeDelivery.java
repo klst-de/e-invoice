@@ -109,7 +109,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 	@Override
 	public void setActualDate(Timestamp ts) {
 		if(ts==null) return;
-		DateTimeType dateTime = CrossIndustryInvoice.newDateTime(ts);
+		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		SupplyChainEventType supplyChainEvent = new SupplyChainEventType();
 		supplyChainEvent.setOccurrenceDateTime(dateTime);
 		super.setActualDeliverySupplyChainEvent(supplyChainEvent);

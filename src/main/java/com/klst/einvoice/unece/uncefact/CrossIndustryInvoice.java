@@ -310,7 +310,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	
 	@Override
 	public void setIssueDate(Timestamp ts) {
-		DateTimeType dateTime = newDateTime(ts);
+		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		this.getExchangedDocument().setIssueDateTime(dateTime);
 	}
 
@@ -456,22 +456,11 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 			tradePaymentTerms.getDescription().add(new Text(description)); // returns List<TextType>
 		}
 		if(ts!=null) {
-			tradePaymentTerms.setDueDateDateTime(newDateTime(ts));
+			tradePaymentTerms.setDueDateDateTime(DateTimeFormatStrings.toDateTime(ts));
 		}	
 		applicableHeaderTradeSettlement.setPaymentTerms(tradePaymentTerms);
 	}
 	
-	static DateTimeType newDateTime(Timestamp ts) {
-		if(ts==null) return null;
-		
-		DateTimeType dateTime = new DateTimeType();
-		DateTimeType.DateTimeString dts = new DateTimeType.DateTimeString(); // DateTimeString ist inner class in DateTimeType
-		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
-		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
-		dateTime.setDateTimeString(dts);
-		return dateTime;
-	}
-
 	@Override
 	public String getPaymentTerm() {
 		return getPaymentTerm(applicableHeaderTradeSettlement);
@@ -827,66 +816,22 @@ UBL:
 	/* PRECEDING INVOICE REFERENCE                 BG-3                        0..* (optional)
 	 * Eine Gruppe von Informationselementen, die Informationen über eine vorausgegangene Rechnung liefern, 
 	 * die berichtigt oder gutgeschrieben werden soll.
-	 * 
-	 * Anmerkung: Das Informationselement ist zu verwenden, wenn eine vorangegangene Rechnung korrigiert wird, 
-	 * eine Abschlussrechnung auf vorangegangene Teilrechnungen Bezug nimmt 
-	 * oder eine Abschlussrechnung auf vorangegangene Vorauszahlungsrechnungen Bezug nimmt.
-
-1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
-0 .. 1 InvoiceReferencedDocument Referenz auf die vorausgegangene Rechnungen BG-3 xs:sequence      <============
-1 .. 1 IssuerAssignedID Nummer der vorausgegangenen Rechnung BT-25 
-0 .. 1 FormattedIssueDateTime Rechnungsdatum xs:sequence 
-1 .. 1 DateTimeString Rechnungsdatum der vorausgegangenen Rechnung BT-26 
-       required format Datum, Format BT-26-0
- */
-	@Override
-	public void setPrecedingInvoiceReference(String docRefId, String ymd) {
-		setPrecedingInvoiceReference(docRefId, DateTimeFormats.ymdToTs(ymd));
-	}
-	@Override
-	public void setPrecedingInvoiceReference(String docRefId) {
-		setPrecedingInvoiceReference(docRefId, (Timestamp)null);
-	}
-	// 0..n (optional) BG-3 , BT-25,BT-26,BT-26-0
-	@Override
-	public void setPrecedingInvoiceReference(String docRefId, Timestamp ts) {
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
-		FormattedDateTimeType dateTime = newFormattedDateTimeType(ts);
-		if(dateTime!=null) referencedDocument.setFormattedIssueDateTime(dateTime);
-
-		applicableHeaderTradeSettlement.setInvoiceReferencedDocument(referencedDocument);
-	}
-
-	@Override
-	// Spec BUG BG-3 hat die Kardinalität 0..n : in CII kann aber nur 0..1 abgebildet werden
-	public String getPrecedingInvoiceReference() {
-//		super.getSupplyChainTradeTransaction()  // 0..1
-//			.getApplicableHeaderTradeSettlement() // 0..1
-//				.getInvoiceReferencedDocument() // 0..1
-////					.getIssuerAssignedID() // 0..1   ==> also kann es nur einen geben
-////					.getFormattedIssueDateTime() // 0..1 
-					
-		ReferencedDocumentType referencedDocument = applicableHeaderTradeSettlement.getInvoiceReferencedDocument();
-		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();
-	}
-	static String getPrecedingInvoiceReference(CrossIndustryInvoiceType doc) {
-		ReferencedDocumentType referencedDocument =  doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getInvoiceReferencedDocument();
-		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
-	}
+	 */
+	
+	// BG-3 + 0..n PRECEDING INVOICE REFERENCE / implements BG3_PrecedingInvoiceReference factory
 	@Override
 	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
 		return ReferencedDocument.createPrecedingInvoiceReference(docRefId, ts);
 	}
-	@Override
+	@Override // implements BG3_PrecedingInvoiceReference
 	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice) {
 		if(getPrecedingInvoices().isEmpty()) {
 			applicableHeaderTradeSettlement.setInvoiceReferencedDocument((ReferencedDocument)precedingInvoice);
 		} else {
-			LOG.warning("You try to add a second Preceding Invoice. In CII there is only one BG-3. " + NOT_IMPEMENTED + " due to secification.");
+			LOG.warning("You try to add a second Preceding Invoice. In CII there is only one BG-3. " + NOT_IMPEMENTED + " due to specification.");
 		}
 	}
-	@Override
+	@Override // implements BG3_PrecedingInvoiceReference
 	public List<PrecedingInvoice> getPrecedingInvoices() {
 		ReferencedDocumentType referencedDocument = applicableHeaderTradeSettlement.getInvoiceReferencedDocument();
 		List<PrecedingInvoice> docRefList = new ArrayList<PrecedingInvoice>();
@@ -894,17 +839,6 @@ UBL:
 			docRefList.add(new ReferencedDocument(referencedDocument.getIssuerAssignedID(), referencedDocument.getFormattedIssueDateTime()));
 		}
 		return docRefList;
-	}
-
-	FormattedDateTimeType newFormattedDateTimeType(Timestamp ts) {
-		if(ts==null) return null;
-		
-		FormattedDateTimeType dateTime = new FormattedDateTimeType();
-		FormattedDateTimeType.DateTimeString dts = new FormattedDateTimeType.DateTimeString(); // DateTimeString ist inner class in FormattedDateTimeType
-		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
-		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
-		dateTime.setDateTimeString(dts);
-		return dateTime;
 	}
 
 	/* SELLER                                      BG-4                        1 (mandatory) 
@@ -1080,7 +1014,7 @@ UBL:
 	@Override
 	public void setStartDate(Timestamp ts) {
 		if(ts==null) return;
-		DateTimeType dateTime = newDateTime(ts);
+		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		applicableHeaderTradeSettlement.getBillingSpecifiedPeriod().setStartDateTime(dateTime);
 	}
 
@@ -1104,7 +1038,7 @@ UBL:
 	@Override
 	public void setEndDate(Timestamp ts) {
 		if(ts==null) return;
-		DateTimeType dateTime = newDateTime(ts);
+		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		applicableHeaderTradeSettlement.getBillingSpecifiedPeriod().setEndDateTime(dateTime);
 	}
 

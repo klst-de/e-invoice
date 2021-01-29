@@ -13,7 +13,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 // - DateTimeType.DateTimeString
 public class DateTimeFormatStrings extends DateTimeFormats {
 
-	static DateTimeType newDateTime(Timestamp ts) { // TODO aus CrossIndustryInvoice hierher und umbenennen
+	static DateTimeType toDateTime(Timestamp ts) {
 		if(ts==null) return null;
 		
 		DateTimeType dateTime = new DateTimeType();

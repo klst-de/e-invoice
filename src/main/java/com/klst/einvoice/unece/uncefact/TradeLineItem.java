@@ -277,7 +277,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	@Override
 	public void setStartDate(Timestamp ts) {
 		if(ts==null) return;
-		DateTimeType dateTime = CrossIndustryInvoice.newDateTime(ts);
+		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		if(specifiedLineTradeSettlement.getBillingSpecifiedPeriod()==null) {
 //			LOG.info("creating SpecifiedPeriodType and setBillingSpecifiedPeriod");
 			SpecifiedPeriodType sp = new SpecifiedPeriodType();
@@ -307,7 +307,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	@Override
 	public void setEndDate(Timestamp ts) {
 		if(ts==null) return;
-		DateTimeType dateTime = CrossIndustryInvoice.newDateTime(ts);
+		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		if(specifiedLineTradeSettlement.getBillingSpecifiedPeriod()==null) {
 			SpecifiedPeriodType sp = new SpecifiedPeriodType();
 			sp.setStartDateTime(dateTime);
