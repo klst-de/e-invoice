@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.klst.einvoice.unece.uncefact.Amount;
+import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
@@ -63,11 +64,20 @@ public interface CoreInvoice extends CoreInvoiceFactory, BG1_InvoiceNote, BG2_Pr
 	 * <br>Rule ID: 	BR-3
 	 * <br>Request ID: 	R56
 	 * 
-	 * @param ymd Date
+	 * @param timestamp
 	 */
-	public void setIssueDate(String ymd);
-	public void setIssueDate(Timestamp ts);
+	public void setIssueDate(Timestamp timestamp);
 	public Timestamp getIssueDateAsTimestamp();
+	
+	/**
+	 * Invoice issue date
+	 * 
+	 * @param ymd - String in UNTDID 2379 Format "102" : CCYYMMDD = "yyyyMMdd" or "yyyy-MM-dd" 
+	 * @see #setIssueDate(Timestamp)
+	 */
+	default void setIssueDate(String ymd) {
+		if(ymd!=null) setIssueDate(DateTimeFormats.ymdToTs(ymd));
+	}
 	
 	/* Code für den Rechnungstyp
 Anwendung: Für ZUGFeRD werden ab dem Profil BASIC folgende Codes empfohlen: 
@@ -229,11 +239,21 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * <br>Rule ID: 	BR-CO-3
 	 * <br>Request ID: 	R45 R46
 	 * 
-	 * @param ymd Date
+	 * @param timestamp
 	 */
-	public void setTaxPointDate(String ymd);	
-	public void setTaxPointDate(Timestamp ts);
+	public void setTaxPointDate(Timestamp timestamp);
 	public Timestamp getTaxPointDateAsTimestamp();
+	
+	/**
+	 * Value added tax point date
+	 * 
+	 * @param ymd - String in UNTDID 2379 Format "102" : CCYYMMDD = "yyyyMMdd" or "yyyy-MM-dd" 
+	 * @see #setTaxPointDate(Timestamp)
+	 */
+
+	default void setTaxPointDate(String ymd) {
+		if(ymd!=null) setTaxPointDate(DateTimeFormats.ymdToTs(ymd));
+	}
 
 	/**
 	 * Value added tax point date code
@@ -283,12 +303,22 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * <br>Rule ID: 	BR-CO-25
 	 * <br>Request ID: 	R60
 	 * 
-	 * @param ymd Date, optional: can be null
+	 * @param timestamp
 	 */
 	// CII: SpecifiedTradePaymentTerms.DueDateDateTime.DateTimeString
-	public void setDueDate(String ymd);
-	public void setDueDate(Timestamp ts);
+	public void setDueDate(Timestamp timestamp);
 	public Timestamp getDueDateAsTimestamp();
+	
+	/**
+	 * Payment due date 
+	 * 
+	 * @param ymd - String in UNTDID 2379 Format "102" : CCYYMMDD = "yyyyMMdd" or "yyyy-MM-dd" 
+	 * @see #setDate(Timestamp)
+	 */
+	default void setDueDate(String ymd) {
+		if(ymd!=null) setDueDate(DateTimeFormats.ymdToTs(ymd));
+	}
+
 
 	/**
 	 * Payment terms & Payment due date

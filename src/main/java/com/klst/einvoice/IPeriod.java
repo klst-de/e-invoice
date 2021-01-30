@@ -2,6 +2,8 @@ package com.klst.einvoice;
 
 import java.sql.Timestamp;
 
+import com.klst.untdid.codelist.DateTimeFormats;
+
 /**
  * Period with Start and End Date
  * <p>
@@ -12,12 +14,16 @@ import java.sql.Timestamp;
  */
 public interface IPeriod {
 	
-	public void setStartDate(String ymd);
 	public void setStartDate(Timestamp ts);
 	public Timestamp getStartDateAsTimestamp();
+	default void setStartDate(String ymd) {
+		if(ymd!=null) setStartDate(DateTimeFormats.ymdToTs(ymd));
+	}
 	
-	public void setEndDate(String ymd);
 	public void setEndDate(Timestamp ts);
 	public Timestamp getEndDateAsTimestamp();
+	default void setEndDate(String ymd) {
+		if(ymd!=null) setEndDate(DateTimeFormats.ymdToTs(ymd));
+	}
 	
 }

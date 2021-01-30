@@ -178,11 +178,6 @@ public class GenericInvoice <T> implements CoreInvoice  {
 	
 	// BT-2 + 1..1 Invoice issue date
 	@Override
-	public void setIssueDate(String ymd) {
-		setIssueDate(DateTimeFormats.ymdToTs(ymd));
-	}
-
-	@Override
 	public void setIssueDate(Timestamp ts) {
 		IssueDateType issueDate = new IssueDateType();
 		issueDate.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
@@ -245,20 +240,15 @@ public class GenericInvoice <T> implements CoreInvoice  {
 		if(isoCurrencyCode==null) return;
 		TaxCurrencyCodeType taxCurrencyCode = new TaxCurrencyCodeType();
 		taxCurrencyCode.setValue(isoCurrencyCode);
-//		PaymentCurrencyCodeType paymentCurrencyCode = new PaymentCurrencyCodeType();
-//		paymentCurrencyCode.setValue(isoCurrencyCode); 
 		if(isInvoiceType) {
 			invoice.setTaxCurrencyCode(taxCurrencyCode);
-//			invoice.setPaymentCurrencyCode(paymentCurrencyCode);
 		} else {
 			creditNote.setTaxCurrencyCode(taxCurrencyCode);
-//			creditNote.setPaymentCurrencyCode(paymentCurrencyCode);
 		}
 	}
 	
 	@Override
 	public String getTaxCurrency() {
-//		PaymentCurrencyCodeType code = isInvoiceType ? invoice.getPaymentCurrencyCode() : creditNote.getPaymentCurrencyCode();
 		TaxCurrencyCodeType code = isInvoiceType ? invoice.getTaxCurrencyCode() : creditNote.getTaxCurrencyCode();
 		return code==null ? null : code.getValue();
 	}
@@ -271,10 +261,6 @@ public class GenericInvoice <T> implements CoreInvoice  {
 	 *            Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 *       Bsp: ubl-tc434-example2.xml ==> <cbc:TaxPointDate>2013-06-30</cbc:TaxPointDate>
 	 */
-	@Override
-	public void setTaxPointDate(String ymd) {	
-		setTaxPointDate(DateTimeFormats.ymdToTs(ymd));
-	}
 	@Override
 	public void setTaxPointDate(Timestamp ts) {
 		if(ts==null) return; // optional
@@ -318,10 +304,6 @@ public class GenericInvoice <T> implements CoreInvoice  {
 	}
 	
 	// BT-9 + 0..1 Payment due date
-	@Override
-	public void setDueDate(String ymd) {
-		setDueDate(DateTimeFormats.ymdToTs(ymd));
-	}
 	@Override
 	public void setDueDate(Timestamp ts) {
 		if(ts==null) return; // optional
@@ -864,10 +846,6 @@ UBL:
 	}
 	// BG-14.BT-73 +++ 0..1 Invoicing period start date
 	@Override
-	public void setStartDate(String ymd) {	
-		setStartDate(DateTimeFormats.ymdToTs(ymd));
-	}
-	@Override
 	public void setStartDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		StartDateType date = new StartDateType();
@@ -886,10 +864,6 @@ UBL:
 	}
 	
 	// BG-14.BT-74 +++ 0..1 Invoicing period end date
-	@Override
-	public void setEndDate(String ymd) {	
-		setEndDate(DateTimeFormats.ymdToTs(ymd));
-	}
 	@Override
 	public void setEndDate(Timestamp ts) {
 		if(ts==null) return; // optional

@@ -53,7 +53,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
@@ -303,11 +302,6 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	 * Das Datum, an dem die Rechnung ausgestellt wurde.
 	 */
 	@Override
-	public void setIssueDate(String ymd) {	
-		setIssueDate(DateTimeFormats.ymdToTs(ymd));
-	}
-	
-	@Override
 	public void setIssueDate(Timestamp ts) {
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		this.getExchangedDocument().setIssueDateTime(dateTime);
@@ -371,26 +365,10 @@ required format Datum, Format                                  BT-7-0
 Anwendung: In Deutschland wird dieses nicht verwendet. 
 Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 */
-	@Override
-	public void setTaxPointDate(String ymd) {
-		setTaxPointDate(DateTimeFormats.ymdToTs(ymd));
-	}
-
 	// 0..1 (optional) BT-7 BT-7-0
 	@Override
 	public void setTaxPointDate(Timestamp ts) {
 		applicableHeaderTradeSettlement.setTaxPointDate(ts);
-	}
-
-	DateType newDateType(Timestamp ts) {
-		if(ts==null) return null;
-		
-		DateType dateTime = new DateType();
-		DateType.DateString dts = new DateType.DateString(); // DateString ist inner class in DateType
-		dts.setFormat(DateTimeFormats.CCYYMMDD_QUALIFIER);
-		dts.setValue(DateTimeFormats.tsToCCYYMMDD(ts));
-		dateTime.setDateString(dts);
-		return dateTime;
 	}
 
 	@Override
@@ -416,11 +394,6 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	}
 
 	// BT-9 0..1 DueDateDateTime Fälligkeitsdatum
-	@Override
-	public void setDueDate(String ymd) {
-		setDueDate(DateTimeFormats.ymdToTs(ymd));
-	}
-
 	@Override
 	public void setDueDate(Timestamp ts) {
 		setPaymentTermsAndDate(null, ts);
@@ -1006,11 +979,6 @@ UBL:
 
 	// BG-14.BT-73 +++ 0..1 Invoicing period start date
 	@Override
-	public void setStartDate(String ymd) {
-		setStartDate(DateTimeFormats.ymdToTs(ymd));
-	}
-
-	@Override
 	public void setStartDate(Timestamp ts) {
 		if(ts==null) return;
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
@@ -1029,11 +997,6 @@ UBL:
 	}
 	
 	// BG-14.BT-74 +++ 0..1 Invoicing period end date
-	@Override
-	public void setEndDate(String ymd) {
-		setEndDate(DateTimeFormats.ymdToTs(ymd));		
-	}
-
 	@Override
 	public void setEndDate(Timestamp ts) {
 		if(ts==null) return;

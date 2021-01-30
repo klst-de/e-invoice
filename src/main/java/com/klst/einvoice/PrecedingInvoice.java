@@ -58,7 +58,7 @@ public interface PrecedingInvoice {
 	 * @see #setDate(Timestamp)
 	 */
 	default void setDate(String ymd) {
-		setDate(DateTimeFormats.ymdToTs(ymd));
+		if(ymd!=null) setDate(DateTimeFormats.ymdToTs(ymd));
 	}
 
 }
