@@ -565,6 +565,52 @@ UBL:
 		return null;
 	}
 	// BT-19 + 0..1 Buyer accounting reference
+/* keine kosit Beispiele
+example-peppol-ubl.xml : ...
+  <cac:AccountingSupplierParty>
+    <!-- Die Lieferantennummer/Kreditorennummer: -->
+    <!-- The ID of your company in the systems of the government: -->
+    <cbc:CustomerAssignedAccountID>11011011</cbc:CustomerAssignedAccountID>
+
+ABER: [UBL-CR-138]-A UBL invoice should not include the AccountingSupplierParty CustomerAssignedAccountID
+daher: NOT_IMPEMENTED
+ */
+	public void setBuyerAccountingReference(Reference reference) {
+		LOG.warning(NOT_IMPEMENTED); // TODO
+		return;
+//		if(reference==null) return;
+//		// falls das peppol Beispiel zutrifft muss die Implementierung setBuyer berücksichtigen:
+//		CustomerAssignedAccountIDType caaID = new CustomerAssignedAccountIDType();
+//		caaID.setValue(reference.getName());
+//		
+//		if(isInvoiceType) {
+//			CustomerPartyType customerparty = invoice.getAccountingCustomerParty();
+//			if(customerparty==null) {
+//				customerparty = new CustomerPartyType();
+//				customerparty.setCustomerAssignedAccountID(caaID);
+//			} else {
+//				customerparty.setCustomerAssignedAccountID(caaID);
+//			}
+//			invoice.setAccountingCustomerParty(customerparty);
+//		} else {
+//			CustomerPartyType customerparty = creditNote.getAccountingCustomerParty();
+//			if(customerparty==null) {
+//				customerparty = new CustomerPartyType();
+//				customerparty.setCustomerAssignedAccountID(caaID);
+//			} else {
+//				customerparty.setCustomerAssignedAccountID(caaID);
+//			}
+//			creditNote.setAccountingCustomerParty(customerparty);
+//		}
+	}
+	public Reference getBuyerAccountingReference() {
+		LOG.warning(NOT_IMPEMENTED); // TODO
+		return null;
+//		CustomerPartyType customerparty = isInvoiceType ? invoice.getAccountingCustomerParty() : creditNote.getAccountingCustomerParty();
+//		if(customerparty==null) return null;
+//		CustomerAssignedAccountIDType caaID = customerparty.getCustomerAssignedAccountID();
+//		return caaID==null ? null : new ID(caaID.getValue());
+	}
 	
 	// BT-20 + 0..1 Payment terms
 //	@Override

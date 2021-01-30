@@ -46,6 +46,7 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
@@ -689,6 +690,23 @@ UBL:
 		return id==null? null : id.getContent();
 	}
 	
+	// BT-19 + 0..1 Buyer accounting reference       --- keine Testdaten
+	// ApplicableHeaderTradeSettlement
+	//   - ReceivableSpecifiedTradeAccountingAccount
+	//      1 .. 1 ID Buchungsreferenz des Käufers BT-19
+	public void setBuyerAccountingReference(Reference reference) {
+		if(reference==null) return;
+		TradeAccountingAccountType tradeAccountingAccount = new TradeAccountingAccountType();
+		tradeAccountingAccount.setID((ID)reference);
+		// List<TradeAccountingAccountType> nur ein Element nutzen
+		applicableHeaderTradeSettlement.getReceivableSpecifiedTradeAccountingAccount().add(tradeAccountingAccount);
+	}
+	public Reference getBuyerAccountingReference() {
+		List<TradeAccountingAccountType> list = applicableHeaderTradeSettlement.getReceivableSpecifiedTradeAccountingAccount();
+		if(list.isEmpty()) return null;
+		return new ID(list.get(0).getID());
+	}
+
 	/* INVOICE NOTE                                BG-1                        0..*
 	 * Eine Gruppe von Informationselementen für rechnungsrelevante Erläuterungen mit Hinweisen auf den Rechnungsbetreff.
 	 * 

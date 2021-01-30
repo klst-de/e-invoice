@@ -505,7 +505,21 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public String getInvoicedObject();
 	public Identifier getInvoicedObjectIdentifier();
 	
-	// BT-19 Buyer accounting reference                                TODO
+	/**
+	 * Buyer accounting reference
+	 * <p>
+	 * A textual value that specifies where to book the relevant data into the Buyer's financial accounts.
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>EN16931-ID: 	BT-19
+	 * <br>Rule ID: 	 
+	 * <br>Request ID: 	R2, R4
+	 * 
+	 * @param textReference
+	 */
+	// BT-19 Buyer accounting reference       - es fehlen Testdaten beide CII + UBL  TODO
+	public void setBuyerAccountingReference(Reference textReference);
+	public Reference getBuyerAccountingReference();
 
 	// BT-20 @see setPaymentTermsAndDate
 	
