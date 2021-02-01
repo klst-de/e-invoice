@@ -165,14 +165,11 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 				, getDueDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement())); // optional
 		
 		List<TradeTaxType> attList = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getApplicableTradeTax();
-		List<ApplicableTradeTax> applicableTradeTaxes = new ArrayList<ApplicableTradeTax>(attList.size()); 
-		// ApplicableTradeTax extends TradeTaxType
 		attList.forEach(att -> {
-			ApplicableTradeTax applicableTradeTax = new ApplicableTradeTax(att);
+			TradeTax applicableTradeTax = new TradeTax(att);
 			LOG.fine("copy-ctor: applicableTradeTax "+applicableTradeTax);
-			applicableTradeTaxes.add(applicableTradeTax);
+			addVATBreakDown(applicableTradeTax);
 		});
-		addVATBreakDown(applicableTradeTaxes);
 
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));
@@ -1248,12 +1245,10 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 1 .. 1 ApplicableHeaderTradeSettlement Gruppierung von Angaben zur Zahlung und Rechnungsausgleich
 0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung                                                 BG-23 xs:sequence 
 
-       VatBreakdown extends ApplicableTradeTax
-
 	 */
 	@Override
-	public BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode codeEnum, BigDecimal taxRate) {
-		return new ApplicableTradeTax(taxableAmount, tax, codeEnum, taxRate);
+	public BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal taxRate) {
+		return TradeTax.createVATBreakDown(taxableAmount, taxAmount, codeEnum, taxRate);
 	}
 	
 	/**
@@ -1264,24 +1259,23 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	@Override
 	public void addVATBreakDown(BG23_VatBreakdown vatBreakdown) {
 		List<TradeTaxType> tradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		tradeTaxes.add((ApplicableTradeTax)vatBreakdown);
-	}
-	private void addVATBreakDown(List<ApplicableTradeTax> vatBreakdowns) {
-		List<TradeTaxType> applicableTradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		vatBreakdowns.forEach(applicableTradeTax -> {
-			applicableTradeTaxes.add(applicableTradeTax);
-		});	
+		tradeTaxes.add((TradeTax)vatBreakdown);
 	}
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
-		ApplicableTradeTax vatBreakdown = new ApplicableTradeTax(taxableAmount, tax, taxCategoryCode, taxRate);
-		addVATBreakDown(vatBreakdown);
+		addVATBreakDown(createVATBreakDown(taxableAmount, tax, taxCategoryCode, taxRate));
 	}
-	public List<ApplicableTradeTax> getVATBreakDowns() {
+//	@Override
+	public List<BG23_VatBreakdown> getVATBreakDowns() {
 		if(applicableHeaderTradeSettlement==null) return null;
 		List<TradeTaxType> list = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		List<ApplicableTradeTax> result = new ArrayList<ApplicableTradeTax>(list.size()); // VatBreakdown extends TradeTaxType
-		list.forEach(vbd -> {
-			result.add(new ApplicableTradeTax(vbd));
+		List<BG23_VatBreakdown> result = new ArrayList<BG23_VatBreakdown>(list.size());
+		list.forEach(tradeTax -> {
+			if(tradeTax instanceof TradeTaxType && tradeTax.getClass()!=TradeTaxType.class) {
+				// tradeTax an instance of a subclass of TradeTaxType, but not TradeTaxType itself
+				result.add( (TradeTax)tradeTax );			
+			} else {
+				result.add(new TradeTax(tradeTax));
+			}
 		});
 		return result;
 	}

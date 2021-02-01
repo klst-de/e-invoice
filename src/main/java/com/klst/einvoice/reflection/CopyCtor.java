@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -95,39 +94,4 @@ public class CopyCtor {
 		
 	}
 	
-	public static Map<String, Method> getCorrespondingGettersByName(Object doc, Map<String, Method> settersByName) {
-		Method[] methods = doc.getClass().getDeclaredMethods();
-		List<Method> getters = new ArrayList<Method>(methods.length);
-		Map<String, Method> gettersByName = new HashMap<String, Method>(methods.length);
-		for(int i=0; i<methods.length; i++) {
-			Method method = methods[i];
-			String methodName = method.getName();
-			// getter Signatur: T getXXX()
-			// die getter ohne Parameter heißen getXXX und haben keine Parameter, also 
-			if(methodName.startsWith(get) && method.getParameterCount()==0) {
-				getters.add(method);
-				Method getter = method;
-				String getterName = methodName;
-				// die getter können korrespondierende setter haben
-				String setterName = set+methodName.substring(set.length());
-				if(settersByName.containsKey(setterName)) {
-					Method setter = settersByName.get(setterName); // potentieller Setter muss den Parameter == Result des getters haben
-					Class<?> param0Type = setter.getParameterTypes()[0];
-					if(method.getReturnType()==param0Type) {						
-						LOG.info(setterName+" + "+methodName);
-						gettersByName.put(getterName, getter);
-					} else {
-						LOG.warning(setterName+" + "+methodName + " typen passen nicht");
-					}
-				} else {
-					// if(settersByName.containsKey(setterName)) false ==> es gibt keinen passenden Setter
-					// dann muss es ein member/field geben mit name==getterName (beginnend mit Kleinbuchstaben)
-					String fieldName = getterName.substring(set.length(), set.length()+1).toLowerCase()+getterName.substring(set.length()+1);
-					LOG.info("List<?> "+fieldName+" = "+methodName);
-				}
-			}
-		}
-		return gettersByName;
-	}
-
 }

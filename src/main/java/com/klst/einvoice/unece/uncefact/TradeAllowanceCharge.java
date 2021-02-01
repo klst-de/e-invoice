@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
+import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.AllowanceChargeReasonCodeType;
@@ -56,17 +57,13 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	// copy ctor
 	TradeAllowanceCharge(TradeAllowanceChargeType tradeAllowanceCharge) {
 		super();
-		this.setChargeIndicator(tradeAllowanceCharge.getChargeIndicator());
-		this.setAmountWithoutTax(getAmountWithoutTax(tradeAllowanceCharge));
-		this.setAssessmentBase(getAssessmentBase(tradeAllowanceCharge));
-		this.setPercentage(getPercentage(tradeAllowanceCharge));
-		CategoryTradeTax tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
-		if(tradeTax==null) {
-			LOG.warning("tradeTax==null, expected one element.");
+		if(tradeAllowanceCharge!=null) {
+			CopyCtor.invokeCopy(this, tradeAllowanceCharge);
+			if(getCategoryTradeTax().isEmpty()) {
+				LOG.warning("CategoryTradeTax is empty, expected one element.");
+			}
 		}
-		this.setTax(tradeTax.getTaxType(), tradeTax.getTaxCategoryCode(), tradeTax.getTaxPercentage());
-		this.setReasonText(getReasonText(tradeAllowanceCharge));
-		this.setReasoncode(getReasoncode(tradeAllowanceCharge));
+		LOG.fine("copy ctor:"+this);
 	}
 	
 	@Override
@@ -152,35 +149,26 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		return percent==null ? null : percent.getValue();
 	}
 
-	void setTax(String type, TaxCategoryCode category, BigDecimal percentage) {
-		CategoryTradeTax tradeTax = getCategoryTradeTax(this);
-		if(tradeTax==null) {
-			LOG.info("tradeTax==null, expected one element. Create it.");
-			tradeTax = new CategoryTradeTax(type, category.getValue(), percentage);
-			super.getCategoryTradeTax().add(tradeTax);
-			return;
-		}
-		tradeTax.setTaxType(type);
-		tradeTax.setTaxCategoryCode(category);
-		tradeTax.setTaxPercentage(percentage);
-	}
-	
 	// null or first Element, because of 1..1 CategoryTradeTax
-	private static CategoryTradeTax getCategoryTradeTax(TradeAllowanceChargeType tradeAllowanceCharge) {
+	private static TradeTax getFirstCategoryTradeTax(TradeAllowanceChargeType tradeAllowanceCharge) {
 		List<TradeTaxType> categoryTradeTax = tradeAllowanceCharge.getCategoryTradeTax();
 		if(categoryTradeTax.isEmpty()) return null; // sollte nicht vorkommen, da mandatory
 		
 		// nur das erste Element holen:
 		TradeTaxType tradeTax = categoryTradeTax.get(0);
-		if(tradeTax instanceof CategoryTradeTax) return (CategoryTradeTax)tradeTax;
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(tradeTax instanceof TradeTaxType && tradeTax.getClass()!=TradeTaxType.class) {
+			// tradeTax an instance of a subclass of TradeTaxType, but not TradeTaxType itself
+			return (TradeTax)tradeTax;
+		}
 		// copy ctor:
-		return new CategoryTradeTax(tradeTax);
+		return new TradeTax(tradeTax);
 	}
 	
 	// BT-95-0, BT-102-0
 	@Override
 	public void setTaxType(String type) {
-		CategoryTradeTax tradeTax = getCategoryTradeTax(this);
+		TradeTax tradeTax = getFirstCategoryTradeTax(this);
 		if(tradeTax==null) {
 			LOG.warning("tradeTax==null, expected one element.");
 		}
@@ -192,7 +180,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		return getTaxType(this);
 	}
 	static String getTaxType(TradeAllowanceChargeType tradeAllowanceCharge) {
-		CategoryTradeTax tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
+		TradeTax tradeTax = getFirstCategoryTradeTax(tradeAllowanceCharge);
 		return tradeTax==null? null : tradeTax.getTaxType();
 	}
 
@@ -204,7 +192,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	@Override
 	public void setTaxCategoryCode(String category) {
-		CategoryTradeTax tradeTax = getCategoryTradeTax(this);
+		TradeTax tradeTax = getFirstCategoryTradeTax(this);
 		if(tradeTax==null) {
 			LOG.warning("tradeTax==null, expected one element.");
 		}
@@ -216,7 +204,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		return getTaxCategoryCode(this);
 	}
 	static TaxCategoryCode getTaxCategoryCode(TradeAllowanceChargeType tradeAllowanceCharge) {
-		CategoryTradeTax tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
+		TradeTax tradeTax = getFirstCategoryTradeTax(tradeAllowanceCharge);
 		return tradeTax==null? null : tradeTax.getTaxCategoryCode();
 	}
 
@@ -224,7 +212,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	@Override
 	public void setTaxPercentage(BigDecimal percentage) {
 		if(percentage==null) return;
-		CategoryTradeTax tradeTax = getCategoryTradeTax(this);
+		TradeTax tradeTax = getFirstCategoryTradeTax(this);
 		if(tradeTax==null) {
 			LOG.warning("tradeTax==null, expected one element.");
 		}
@@ -236,7 +224,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		return getTaxPercentage(this);
 	}
 	static BigDecimal getTaxPercentage(TradeAllowanceChargeType tradeAllowanceCharge) {
-		CategoryTradeTax tradeTax = getCategoryTradeTax(tradeAllowanceCharge);
+		TradeTax tradeTax = getFirstCategoryTradeTax(tradeAllowanceCharge);
 		return tradeTax==null? null : tradeTax.getTaxPercentage();
 	}
 

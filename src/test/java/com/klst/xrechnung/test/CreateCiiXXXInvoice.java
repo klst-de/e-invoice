@@ -23,14 +23,12 @@ import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.Reference;
 import com.klst.einvoice.unece.uncefact.Amount;
-import com.klst.einvoice.unece.uncefact.ApplicableTradeTax;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.marshaller.CiiTransformer;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.ReferenceCode;
-import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 
@@ -275,16 +273,17 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setStartDate(testDoc.getStartDateAsTimestamp());
 		cii.setEndDate(testDoc.getEndDateAsTimestamp());
 
-        List<ApplicableTradeTax> vbdList = ((CrossIndustryInvoice)testDoc).getVATBreakDowns();
+        List<BG23_VatBreakdown> vbdList = ((CrossIndustryInvoice)testDoc).getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
-        	BG23_VatBreakdown vatBreakdown = cii.createVATBreakDown( new Amount(tradeTax.getBasisAmount().get(0).getValue())
-					,new Amount(tradeTax.getCalculatedAmount().get(0).getValue())
-					,TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
-					,tradeTax.getRateApplicablePercent()==null ? null : tradeTax.getRateApplicablePercent().getValue()
-					);
-        	vatBreakdown.setTaxExemption(tradeTax.getExemptionReason()==null ? null : tradeTax.getExemptionReason().getValue()
-        			, tradeTax.getExemptionReasonCode()==null ? null : tradeTax.getExemptionReasonCode().getValue());
+        	BG23_VatBreakdown vatBreakdown = cii.createVATBreakDown( tradeTax.getTaxBaseAmount(),
+        			tradeTax.getCalculatedTaxAmount(),
+        			tradeTax.getTaxCategoryCode(),
+        			tradeTax.getTaxPercentage() );
+        	
+        	// 0..1 (optional) BG-23.BT-120 ExemptionReason Grund der Steuerbefreiung (Freitext)
+        	// 0..1 (optional) BG-23.BT-121 ExemptionReasonCode Code für den Umsatzsteuerbefreiungsgrund
+        	vatBreakdown.setTaxExemption(tradeTax.getTaxExemptionReasonText(), tradeTax.getTaxExemptionReasonCode());
         	cii.addVATBreakDown(vatBreakdown);
         	LOG.info("added vatBreakdown "+vatBreakdown);
         });

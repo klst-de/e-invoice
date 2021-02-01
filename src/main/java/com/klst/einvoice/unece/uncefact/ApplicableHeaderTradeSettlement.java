@@ -210,12 +210,6 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 			this.setRemittanceInformation(getRemittanceInformation(ahts));
 		}
 		
-//		// BG-20 + BG-21- 0..n
-//		getAllowancesAndCharges(ahts).forEach(aac -> {
-//			addAllowanceCharge(aac);
-//		});
-
-		
 		// 1 .. 1 SpecifiedTradeSettlementHeaderMonetarySummation Gesamtsummen auf Dokumentenebene BG-22 : nicht null
 		setSpecifiedTradeSettlementHeaderMonetarySummation(ahts.getSpecifiedTradeSettlementHeaderMonetarySummation());
 		
@@ -692,7 +686,12 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		List<TradeAllowanceChargeType> list = hts.getSpecifiedTradeAllowanceCharge();
 		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>(list.size());
 		list.forEach(stac -> {
-			res.add(new TradeAllowanceCharge(stac));
+			if(stac instanceof TradeAllowanceChargeType && stac.getClass()!=TradeAllowanceChargeType.class) {
+				// stac an instance of a subclass of TradeAllowanceChargeType, but not TradeAllowanceChargeType itself
+				res.add((TradeAllowanceCharge)stac);
+			} else {
+				res.add(new TradeAllowanceCharge(stac));
+			}
 		});
 		return res;
 	}
