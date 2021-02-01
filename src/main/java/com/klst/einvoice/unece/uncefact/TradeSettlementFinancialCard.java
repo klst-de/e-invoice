@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentCardFactory;
+import com.klst.einvoice.reflection.CopyCtor;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementFinancialCardType;
 
@@ -39,18 +40,8 @@ public class TradeSettlementFinancialCard extends TradeSettlementFinancialCardTy
 	TradeSettlementFinancialCard(TradeSettlementFinancialCardType financialCard) {
 		super();
 		if(financialCard!=null) {
-			super.setMicrochipIndicator(financialCard.getMicrochipIndicator());
-			super.setID(financialCard.getID());
-			super.setTypeCode(financialCard.getTypeCode());
-			super.setCardholderName(financialCard.getCardholderName());
-			super.setExpiryDate(financialCard.getExpiryDate());
-			super.setVerificationNumeric(financialCard.getVerificationNumeric());
-			super.setValidFromDateTime(financialCard.getValidFromDateTime());
-			super.creditLimitAmount = financialCard.getCreditLimitAmount();
-			super.creditAvailableAmount = financialCard.getCreditAvailableAmount();
-			super.setInterestRatePercent(financialCard.getInterestRatePercent());
-			super.setIssuingCompanyName(financialCard.getIssuingCompanyName());
-			super.setDescription(financialCard.getDescription());
+			CopyCtor.invokeCopy(this, financialCard);
+			LOG.fine("copy ctor:"+this);
 		}
 	}
 	/**
