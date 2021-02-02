@@ -1394,16 +1394,14 @@ daher: NOT_IMPEMENTED
 	}
 	
 	@Override
-	public BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode code, BigDecimal percent) {
-		return new TaxSubtotal(taxableAmount, tax, code, percent);
+	public BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode code, BigDecimal percent) {
+		return TaxSubtotal.createVATBreakDown(taxableAmount, taxAmount, code, percent);
 	}
 
 	// BG-23 + 1..n VAT BREAKDOWN
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
-		TaxSubtotalType taxSubtotal = new TaxSubtotal(taxableAmount, tax, taxCategoryCode, taxRate);
-		
-		taxTotalFirst = getTaxTotalFirst();
-		taxTotalFirst.getTaxSubtotal().add(taxSubtotal);
+		BG23_VatBreakdown taxSubtotal = createVATBreakDown(taxableAmount, tax, taxCategoryCode, taxRate);
+		addVATBreakDown(taxSubtotal);
 	}
 
 	@Override
@@ -1411,26 +1409,41 @@ daher: NOT_IMPEMENTED
 		taxTotalFirst = getTaxTotalFirst();
 		taxTotalFirst.getTaxSubtotal().add((TaxSubtotal)vatBreakdown);
 	}
-	public void addVATBreakDown(List<TaxSubtotal> vatBreakdowns) {
-		taxTotalFirst = getTaxTotalFirst();
-//		LOG.info("anfügen #"+vatBreakdowns.size());
-		vatBreakdowns.forEach(vbd -> {
-			taxTotalFirst.getTaxSubtotal().add(vbd);
-		});	
-	}
+//	public void addVATBreakDown(List<TaxSubtotal> vatBreakdowns) {
+//		taxTotalFirst = getTaxTotalFirst();
+////		LOG.info("anfügen #"+vatBreakdowns.size());
+//		vatBreakdowns.forEach(vbd -> {
+//			taxTotalFirst.getTaxSubtotal().add(vbd);
+//		});	
+//	}
 
-	public List<TaxSubtotal> getVATBreakDowns() {
+	public List<BG23_VatBreakdown> getVATBreakDowns() {
 		List<TaxTotalType> taxTotalList = isInvoiceType ? invoice.getTaxTotal() : creditNote.getTaxTotal();
-		LOG.fine("List<TaxTotalType> taxTotalList size="+taxTotalList.size());
 		taxTotalFirst = getTaxTotalFirst();
 		List<TaxSubtotalType> taxSuptotalList = taxTotalFirst.getTaxSubtotal();
-		List<TaxSubtotal> result = new ArrayList<TaxSubtotal>(taxSuptotalList.size()); // VatBreakdown extends TaxSubtotalType
+		List<BG23_VatBreakdown> result = new ArrayList<BG23_VatBreakdown>(taxSuptotalList.size());
 		taxSuptotalList.forEach(vbd -> {
-			TaxSubtotal taxSubtotal = new TaxSubtotal(vbd);
-			result.add(taxSubtotal);
+			if(vbd instanceof TaxSubtotalType && vbd.getClass()!=TaxSubtotalType.class) {
+				// vbd is instance of a subclass of TaxSubtotalType, but not TaxSubtotalType itself
+				result.add( (TaxSubtotal)vbd );
+			} else {
+				result.add(new TaxSubtotal(vbd));
+			}
 		});	
 		return result;
 	}
+//	public List<TaxSubtotal> ALTgetVATBreakDowns() {
+//		List<TaxTotalType> taxTotalList = isInvoiceType ? invoice.getTaxTotal() : creditNote.getTaxTotal();
+//		LOG.fine("List<TaxTotalType> taxTotalList size="+taxTotalList.size());
+//		taxTotalFirst = getTaxTotalFirst();
+//		List<TaxSubtotalType> taxSuptotalList = taxTotalFirst.getTaxSubtotal();
+//		List<TaxSubtotal> result = new ArrayList<TaxSubtotal>(taxSuptotalList.size()); // VatBreakdown extends TaxSubtotalType
+//		taxSuptotalList.forEach(vbd -> {
+//			TaxSubtotal taxSubtotal = new TaxSubtotal(vbd);
+//			result.add(taxSubtotal);
+//		});	
+//		return result;
+//	}
 
 	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	@Override

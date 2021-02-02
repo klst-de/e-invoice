@@ -22,13 +22,11 @@ import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.ubl.GenericLine;
-import com.klst.einvoice.ubl.TaxSubtotal;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.marshaller.UblCreditNoteTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
 import com.klst.untdid.codelist.PaymentMeansEnum;
-import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
@@ -92,18 +90,19 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setInvoiceTax(testCN.getInvoiceTax());
 		LOG.info("finished DocumentTotalsGroup.");
 		
-//		makeVatBreakDownGroup2(ublInvoice);
-        List<TaxSubtotal> vbdList = ((GenericInvoice)testCN).getVATBreakDowns();
+        List<BG23_VatBreakdown> vbdList = ((GenericInvoice)testCN).getVATBreakDowns();
         LOG.info("CreditNote VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
-        	TaxSubtotal vatBreakdown = new TaxSubtotal(
-        	  new Amount(tradeTax.getTaxableAmount().getCurrencyID(), tradeTax.getTaxableAmount().getValue())
-			, new Amount(tradeTax.getTaxAmount().getCurrencyID(), tradeTax.getTaxAmount().getValue())
-			, TaxCategoryCode.valueOf(tradeTax.getTaxCategory())
-			, tradeTax.getTaxCategory().getPercent()==null ? null : tradeTax.getTaxCategory().getPercent().getValue()
-			); 
-        	vatBreakdown.setTaxExemption(tradeTax.getTaxExemptionReasonText() , tradeTax.getTaxExemptionReasonCode());
+        	BG23_VatBreakdown vatBreakdown = ublInvoice.createVATBreakDown( tradeTax.getTaxBaseAmount(),
+        			tradeTax.getCalculatedTaxAmount(),
+        			tradeTax.getTaxCategoryCode(),
+        			tradeTax.getTaxPercentage() );
+        	
+        	// 0..1 (optional) BG-23.BT-120 ExemptionReason Grund der Steuerbefreiung (Freitext)
+        	// 0..1 (optional) BG-23.BT-121 ExemptionReasonCode Code für den Umsatzsteuerbefreiungsgrund
+        	vatBreakdown.setTaxExemption(tradeTax.getTaxExemptionReasonText(), tradeTax.getTaxExemptionReasonCode());
         	ublInvoice.addVATBreakDown(vatBreakdown);
+        	LOG.info("added vatBreakdown "+vatBreakdown);
         });
 		LOG.info("finished. "+vbdList.size() + " vatBreakDowns.");
 		
@@ -345,17 +344,22 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makeVatBreakDownGroup(CoreInvoice ublInvoice) {
-        List<TaxSubtotal> vbdList = ((GenericInvoice)testDoc).getVATBreakDowns();
+        List<BG23_VatBreakdown> vbdList = ((GenericInvoice)testDoc).getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
-        	BG23_VatBreakdown vatBreakdown = new TaxSubtotal(
-        	  new Amount(tradeTax.getTaxableAmount().getCurrencyID(), tradeTax.getTaxableAmount().getValue())
-			, new Amount(tradeTax.getTaxAmount().getCurrencyID(), tradeTax.getTaxAmount().getValue())
-			, TaxCategoryCode.valueOf(tradeTax.getTaxCategory())
-			, tradeTax.getTaxCategory().getPercent()==null ? null : tradeTax.getTaxCategory().getPercent().getValue()
-			); 
-        	vatBreakdown.setTaxExemption(tradeTax.getTaxExemptionReasonText() , tradeTax.getTaxExemptionReasonCode());
+        	Amount taxBaseAmount = tradeTax.getTaxBaseAmount();
+        	Amount calculatedTaxAmount = tradeTax.getCalculatedTaxAmount();
+            LOG.info("taxBaseAmount="+taxBaseAmount + " calculatedTaxAmount="+calculatedTaxAmount);
+        	BG23_VatBreakdown vatBreakdown = ublInvoice.createVATBreakDown( taxBaseAmount,
+        			calculatedTaxAmount,
+        			tradeTax.getTaxCategoryCode(),
+        			tradeTax.getTaxPercentage() );
+        	
+        	// 0..1 (optional) BG-23.BT-120 ExemptionReason Grund der Steuerbefreiung (Freitext)
+        	// 0..1 (optional) BG-23.BT-121 ExemptionReasonCode Code für den Umsatzsteuerbefreiungsgrund
+        	vatBreakdown.setTaxExemption(tradeTax.getTaxExemptionReasonText(), tradeTax.getTaxExemptionReasonCode());
         	ublInvoice.addVATBreakDown(vatBreakdown);
+        	LOG.info("added vatBreakdown "+vatBreakdown);
         });
 		LOG.info("finished. "+vbdList.size() + " vatBreakDowns.");
 	}

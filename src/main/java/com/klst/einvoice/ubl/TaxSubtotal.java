@@ -2,8 +2,10 @@ package com.klst.einvoice.ubl;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.klst.einvoice.BG23_VatBreakdown;
+import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.TaxCategoryCode;
 import com.klst.untdid.codelist.TaxTypeCode;
@@ -19,26 +21,47 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableA
 
 public class TaxSubtotal extends TaxSubtotalType implements BG23_VatBreakdown {
 
-	TaxSubtotal() {
-		super();
+	// factory for VatBreakdown
+	static BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
+		return new TaxSubtotal(taxableAmount, taxAmount, taxCode, taxRate);
 	}
+
+	private static final Logger LOG = Logger.getLogger(TaxSubtotal.class.getName());
+
+//	TaxSubtotal() {
+//		super();
+//	}
+//
+//	// copy ctor
+//	public TaxSubtotal(TaxSubtotalType tradeTax, int xxx) {
+//		super();
+//		List<TaxExemptionReasonType> taxExemptionReasonList = tradeTax.getTaxCategory().getTaxExemptionReason();
+//		TaxExemptionReasonCodeType tec = tradeTax.getTaxCategory().getTaxExemptionReasonCode();
+//		init( new Amount(tradeTax.getTaxableAmount().getCurrencyID(), tradeTax.getTaxableAmount().getValue())
+//			, new Amount(tradeTax.getTaxAmount().getCurrencyID(), tradeTax.getTaxAmount().getValue())
+//			, TaxCategoryCode.valueOf(tradeTax.getTaxCategory())
+//			, tradeTax.getTaxCategory().getPercent()==null ? null : tradeTax.getTaxCategory().getPercent().getValue()
+//			, taxExemptionReasonList.isEmpty() ? null : taxExemptionReasonList.get(0).getValue()
+//			, tec==null ? null : tec.getValue()
+//			);
+//	}
 
 	// copy ctor
-	public TaxSubtotal(TaxSubtotalType tradeTax) {
-		this();
-		List<TaxExemptionReasonType> taxExemptionReasonList = tradeTax.getTaxCategory().getTaxExemptionReason();
-		TaxExemptionReasonCodeType tec = tradeTax.getTaxCategory().getTaxExemptionReasonCode();
-		init( new Amount(tradeTax.getTaxableAmount().getCurrencyID(), tradeTax.getTaxableAmount().getValue())
-			, new Amount(tradeTax.getTaxAmount().getCurrencyID(), tradeTax.getTaxAmount().getValue())
-			, TaxCategoryCode.valueOf(tradeTax.getTaxCategory())
-			, tradeTax.getTaxCategory().getPercent()==null ? null : tradeTax.getTaxCategory().getPercent().getValue()
-			, taxExemptionReasonList.isEmpty() ? null : taxExemptionReasonList.get(0).getValue()
-			, tec==null ? null : tec.getValue()
-			);
+	public TaxSubtotal(TaxSubtotalType doc) {
+		super();
+		if(doc!=null) {
+			CopyCtor.invokeCopy(this, doc);
+//			
+//			Amount taxableAmount = new Amount(doc.getTaxableAmount().getCurrencyID(), doc.getTaxableAmount().getValue());
+//			LOG.info(">>>>>>>>>>>>>>>taxableAmount="+taxableAmount + " / "+super.taxableAmount.getValue());	
+//			super.taxableAmount.setCurrencyID(taxableAmount.copyCurrencyID());
+//			
+		}
+		LOG.info("copy ctor: getTaxBaseAmount="+this.getTaxBaseAmount());	
 	}
-
-	public TaxSubtotal(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
-		this();
+	
+	private TaxSubtotal(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
+		super();
 		init(taxableAmount, taxAmount, codeEnum, percent);
 	}
 
@@ -63,18 +86,20 @@ public class TaxSubtotal extends TaxSubtotalType implements BG23_VatBreakdown {
 				, exemptionText, exemptionCode);
 	}
 
+	// BG-23.BT-116 taxBaseAmount aka taxableAmount aka basisAmount
 	@Override
 	public void setTaxBaseAmount(Amount taxBaseAmount) {
 		TaxableAmountType amount = new TaxableAmountType();
 		taxBaseAmount.copyTo(amount);
 		super.setTaxableAmount(amount);
 	}
-
 	@Override
 	public Amount getTaxBaseAmount() {
-		return new Amount(super.getTaxableAmount().getValue());
+		if(super.getTaxableAmount()==null) return null;
+		return new Amount(super.getTaxableAmount().getCurrencyID(), super.getTaxableAmount().getValue());
 	}
-
+	
+	// BG-23.BT-117 calculatedTaxAmount aka taxAmount
 	@Override
 	public void setCalculatedTaxAmount(Amount taxAmount) {
 		TaxAmountType amount = new TaxAmountType();
@@ -84,7 +109,8 @@ public class TaxSubtotal extends TaxSubtotalType implements BG23_VatBreakdown {
 
 	@Override
 	public Amount getCalculatedTaxAmount() {
-		return new Amount(super.getTaxAmount().getValue());
+		if(super.getTaxAmount()==null) return null;
+		return new Amount(super.getTaxAmount().getCurrencyID(), super.getTaxAmount().getValue());
 	}
 
 	// BG-23.BT-118-0

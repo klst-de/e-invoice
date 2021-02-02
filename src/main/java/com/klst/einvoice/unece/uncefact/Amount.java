@@ -44,8 +44,8 @@ public class Amount extends AmountType implements Rounding {
 	
 	public Amount(String currencyID, BigDecimal amount) {
 		this();
-		this.setCurrencyID(currencyID);
-		this.setValue(amount);
+		super.setCurrencyID(currencyID);
+		super.setValue(amount);
 	}
 
 	public Amount(oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.AmountType amount) {

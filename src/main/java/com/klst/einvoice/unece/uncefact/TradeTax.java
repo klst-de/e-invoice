@@ -162,7 +162,7 @@ public class TradeTax extends TradeTaxType implements BG23_VatBreakdown, ITaxCat
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);
 		}
-		LOG.info("--------------------copy ctor:"+this);
+		LOG.fine("copy ctor:"+this);
 	}
 	
 	public String toString() {

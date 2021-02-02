@@ -1252,7 +1252,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	}
 	
 	/**
-	 * Adds a mandatory VAT BREAKDOWN element
+	 * Adds a mandatory (1..n) VAT BREAKDOWN (BG-23) group
 	 * 
 	 * @param vatBreakdown
 	 */
@@ -1264,7 +1264,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
 		addVATBreakDown(createVATBreakDown(taxableAmount, tax, taxCategoryCode, taxRate));
 	}
-//	@Override
+	@Override
 	public List<BG23_VatBreakdown> getVATBreakDowns() {
 		if(applicableHeaderTradeSettlement==null) return null;
 		List<TradeTaxType> list = applicableHeaderTradeSettlement.getApplicableTradeTax();
