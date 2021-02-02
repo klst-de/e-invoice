@@ -43,11 +43,12 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 	 * @param taxCode
 	 * @param taxRate
 	 * @return
-	 */
+	 */ 
+	// TODO sollte result ITaxCategory sein ????
 	static TaxCategory createTaxCategory(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return new TaxCategory(taxType, taxCode, taxRate);
 	}
-	static TaxCategory createTaxCategory(TaxCategoryType doc) {
+	static TaxCategory createTaxCategory(TaxCategoryType doc) { // das ist ein copy-ctor
 		return doc==null? null : new TaxCategory(TaxScheme.getTaxType(doc.getTaxScheme()),
 				TaxCategoryCode.valueOf(doc), getTaxPercentage(doc));
 	}

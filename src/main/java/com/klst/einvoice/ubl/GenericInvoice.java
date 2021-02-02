@@ -1142,7 +1142,12 @@ daher: NOT_IMPEMENTED
 		}
 		List<AllowancesAndCharges> resList = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
 		allowanceChargeList.forEach(doc -> {
-			resList.add(new AllowanceCharge(doc));
+			if(doc instanceof AllowanceChargeType && doc.getClass()!=AllowanceChargeType.class) {
+				// doc is instance of a subclass of AllowanceChargeType, but not AllowanceChargeType itself
+				resList.add((AllowanceCharge)doc);
+			} else {
+				resList.add(new AllowanceCharge(doc));
+			}
 		});
 		return resList;
 	}

@@ -50,7 +50,7 @@ public class CopyCtor {
 	
 	// obj class extends doc!
 	public static void invokeCopy(Object obj, Object doc) {
-		LOG.info("for "+doc);
+		LOG.fine("for "+doc);
 		Map<String, Field> fieldsByName = getFieldsByName(doc.getClass());
 		Map<String, Method> settersByName = getSettersByName(doc.getClass());
 		Map<String, Method> gettersByName = getGettersByName(doc.getClass());
@@ -63,7 +63,7 @@ public class CopyCtor {
 			if(settersByName.containsKey(setterName)) {
 				Method setter = settersByName.get(setterName); // potentieller Setter muss den Parameter == Result des getters haben
 				if(getter.getReturnType()==setter.getParameterTypes()[0]) {						
-					LOG.info(setterName+" ( "+getterName+" ) ");
+					LOG.fine(setterName+" ( "+getterName+" ) ");
 					try {
 						setter.invoke(obj, getter.invoke(doc)); // obj.setXXX( doc.getXXX() )
 				    } catch (Exception e) {
@@ -76,7 +76,7 @@ public class CopyCtor {
 				// if(settersByName.containsKey(setterName)) false ==> es gibt keinen passenden Setter
 				// dann muss es ein member/field geben mit name==getterName (beginnend mit Kleinbuchstaben)
 				String fieldName = getterName.substring(set.length(), set.length()+1).toLowerCase()+getterName.substring(set.length()+1);
-				LOG.info("List<?> "+fieldName+" = "+getterName);
+				LOG.fine("List<?> "+fieldName+" = "+getterName);
 				if(fieldsByName.containsKey(fieldName)) {
 					Field field = fieldsByName.get(fieldName);
 				    try {

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
+import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
@@ -57,25 +58,44 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 
 	private static final Logger LOG = Logger.getLogger(AllowanceCharge.class.getName());
 	
-	// das erste element der Liste taxCategory aus super
+	// das erste element der Liste taxCategory aus super, die anderen werden nicht genutzt
 	TaxCategory taxCategory = null;
 	
 	// copy ctor
 	AllowanceCharge(AllowanceChargeType doc) {
 		super();
-		this.setChargeIndicator(doc.getChargeIndicator());
-		this.setAmountWithoutTax(getAmountWithoutTax(doc));
-		this.setAssessmentBase(getAssessmentBase(doc));
-		this.setPercentage(getPercentage(doc));
-		
-		List<TaxCategoryType> list = doc.getTaxCategory();
-		list.forEach(el -> {
-			taxCategory = TaxCategory.createTaxCategory(el);
-			LOG.fine("add taxCategory:"+taxCategory);
-			super.getTaxCategory().add(taxCategory);
-		});
-		this.setReasonText(getReasonText(doc));
-		this.setReasoncode(getReasoncode(doc));
+//		this.setChargeIndicator(doc.getChargeIndicator());
+//		this.setAmountWithoutTax(getAmountWithoutTax(doc));
+//		this.setAssessmentBase(getAssessmentBase(doc));
+//		this.setPercentage(getPercentage(doc));
+//		
+//		List<TaxCategoryType> list = doc.getTaxCategory();
+//		list.forEach(el -> {
+//			taxCategory = TaxCategory.createTaxCategory(el);
+//			LOG.fine("add taxCategory:"+taxCategory);
+//			super.getTaxCategory().add(taxCategory);
+//		});
+//		this.setReasonText(getReasonText(doc));
+//		this.setReasoncode(getReasoncode(doc));
+		if(doc!=null) {
+			CopyCtor.invokeCopy(this, doc);
+			TaxCategoryType tc = doc.getTaxCategory().isEmpty() ? null : doc.getTaxCategory().get(0);
+			if(tc instanceof TaxCategoryType && tc.getClass()!=TaxCategoryType.class) {
+				// tc is instance of a subclass of TaxCategoryType, but not TaxCategoryType itself
+				taxCategory = (TaxCategory)tc;
+			} else {
+				taxCategory = TaxCategory.createTaxCategory(tc); 
+			}
+//			if(doc instanceof AllowanceChargeType && doc.getClass()!=AllowanceChargeType.class) {
+//				// doc an instance of a subclass of AllowanceChargeType, but not AllowanceChargeType itself
+//				taxCategory = doc.getTaxCategory().isEmpty() ? null : (TaxCategory)(doc.getTaxCategory().get(0));
+//			} else {
+//				taxCategory = doc.getTaxCategory().isEmpty() ? null :TaxCategory.createTaxCategory(doc.getTaxCategory().get(0));
+//			}
+
+		}
+		LOG.info("copy ctor:"+this);	
+
 	}
 
 	@Override

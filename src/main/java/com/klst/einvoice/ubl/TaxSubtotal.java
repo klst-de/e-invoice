@@ -28,37 +28,16 @@ public class TaxSubtotal extends TaxSubtotalType implements BG23_VatBreakdown {
 
 	private static final Logger LOG = Logger.getLogger(TaxSubtotal.class.getName());
 
-//	TaxSubtotal() {
-//		super();
-//	}
-//
-//	// copy ctor
-//	public TaxSubtotal(TaxSubtotalType tradeTax, int xxx) {
-//		super();
-//		List<TaxExemptionReasonType> taxExemptionReasonList = tradeTax.getTaxCategory().getTaxExemptionReason();
-//		TaxExemptionReasonCodeType tec = tradeTax.getTaxCategory().getTaxExemptionReasonCode();
-//		init( new Amount(tradeTax.getTaxableAmount().getCurrencyID(), tradeTax.getTaxableAmount().getValue())
-//			, new Amount(tradeTax.getTaxAmount().getCurrencyID(), tradeTax.getTaxAmount().getValue())
-//			, TaxCategoryCode.valueOf(tradeTax.getTaxCategory())
-//			, tradeTax.getTaxCategory().getPercent()==null ? null : tradeTax.getTaxCategory().getPercent().getValue()
-//			, taxExemptionReasonList.isEmpty() ? null : taxExemptionReasonList.get(0).getValue()
-//			, tec==null ? null : tec.getValue()
-//			);
-//	}
-
 	// copy ctor
 	public TaxSubtotal(TaxSubtotalType doc) {
 		super();
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);
-//			
-//			Amount taxableAmount = new Amount(doc.getTaxableAmount().getCurrencyID(), doc.getTaxableAmount().getValue());
-//			LOG.info(">>>>>>>>>>>>>>>taxableAmount="+taxableAmount + " / "+super.taxableAmount.getValue());	
-//			super.taxableAmount.setCurrencyID(taxableAmount.copyCurrencyID());
-//			
 		}
 		LOG.info("copy ctor: getTaxBaseAmount="+this.getTaxBaseAmount());	
 	}
+
+	// TODO toString
 	
 	private TaxSubtotal(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
 		super();
@@ -171,7 +150,7 @@ public class TaxSubtotal extends TaxSubtotalType implements BG23_VatBreakdown {
 	}
 
 	/**
-	 * non public - use ctor
+	 * non really public - use factory
 	 * 
  	 * set tax category code and rate
 	 * 
