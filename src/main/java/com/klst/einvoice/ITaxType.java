@@ -1,7 +1,7 @@
 package com.klst.einvoice;
 
 /*
-Tax Categoty TypeCode : Code der Umsatzsteuerkategorie
+Tax TypeCode : Code der Umsatzsteuerkategorie
 . CII Datentyp: qdt:TaxTypeCodeType
 . Beschreibung: Codierte Bezeichnung einer Umsatzsteuerkategorie
 . Hinweis: Fester Wert = "VAT"
@@ -38,10 +38,12 @@ CII:
 public interface ITaxType {
 
 	/**
-	 * BG-23.BT-118-0 Tax Categoty TypeCode, 
+	 * BG-23.BT-118-0 Tax TypeCode, 
 	 * also used in EN16931-IDs BG-20.BT-95-0 , BG-21.BT-102-0 and BG-30.BT-151-0
 	 * 
 	 * @param type typically VAT
+	 * 
+	 * @see TaxTypeCode
 	 */
 	public void setTaxType(String type);
 	public String getTaxType();

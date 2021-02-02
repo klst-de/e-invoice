@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.klst.einvoice.ITaxCategory;
+import com.klst.einvoice.ITaxType;
 import com.klst.untdid.codelist.TaxCategoryCode;
 import com.klst.untdid.codelist.TaxTypeCode;
 
@@ -73,8 +74,8 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 	// ALLOWANCES (BG-20.BT-95-0) and CHARGES (BG-21.BT-102-0)
 	// BG-23.BT-118-0
 	public void setTaxType(String type) {
-		TaxSchemeType taxScheme = new TaxScheme(type);
-		super.setTaxScheme(taxScheme);
+		ITaxType taxScheme = TaxScheme.create(type);
+		super.setTaxScheme((TaxScheme)taxScheme);
 	}
 
 	@Override

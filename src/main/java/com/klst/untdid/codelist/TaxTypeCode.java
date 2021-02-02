@@ -16,6 +16,11 @@ Sollen andere Steuerarten angegeben wie beispielsweise eine Versicherungssteuer 
 muss das EXTENDED Profil genutzt werden. 
 Der Code für die Steuerart muss dann der Codeliste UNTDID 5153 entnommen werden
 
+*/
+/**
+	UN/EDIFACT 5153  Duty or tax or fee type name code
+
+<pre>
      AAA   Petroleum tax
               A tax levied on the volume of petroleum being  transacted.
 
@@ -44,7 +49,7 @@ Der Code für die Steuerart muss dann der Codeliste UNTDID 5153 entnommen werden
      VAT   Value added tax
               A tax on domestic or imported goods applied to the value
               added at each stage in the production/distribution cycle
-
+</pre>
  */
 public enum TaxTypeCode {
 

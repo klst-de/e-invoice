@@ -1,7 +1,7 @@
 package com.klst.einvoice.ubl;
 
 import com.klst.einvoice.ITaxType;
-import com.klst.untdid.codelist.TaxTypeCode;
+import com.klst.einvoice.ITaxTypeFactory;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 
@@ -20,8 +20,8 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxS
  */
 // verwendet in
 // ALLOWANCES (BG-20) and CHARGES (BG-21) : BT-95-0, BT-102-0
-// BG-23.BT-118-0
-public class TaxScheme extends TaxSchemeType implements ITaxType {
+// BG-23 VAT BREAKDOWN : BG-23.BT-118-0
+public class TaxScheme extends TaxSchemeType implements ITaxType, ITaxTypeFactory {
 
 	/**
 	 * factory method to create different tax types
@@ -29,18 +29,23 @@ public class TaxScheme extends TaxSchemeType implements ITaxType {
 	 * @param type enum, example TaxTypeCode.PetroleumTax or InsuranceTax
 	 * @return
 	 */
-	static TaxScheme createTaxType(TaxTypeCode type) {
-		return new TaxScheme(type.getValue());
+	// implements ITaxTypeFactory
+	@Override
+	public ITaxType createTaxType(String type) {
+		return create(type);
+	}
+	static ITaxType create(String type) {
+		return type==null ? null : new TaxScheme(type);
 	}
 	
-	TaxScheme(String type) {
+	private TaxScheme(String type) {
 		super();
 		setTaxType(type);
 	}
 
-	TaxScheme() {
-		this(TaxTypeCode.VAT);
-	}
+//	private TaxScheme() {
+//		this(TaxTypeCode.VAT);
+//	}
 
 	@Override
 	public void setTaxType(String type) {
