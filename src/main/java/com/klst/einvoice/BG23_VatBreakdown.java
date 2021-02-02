@@ -143,7 +143,7 @@ public interface BG23_VatBreakdown extends ITaxCategory {
 	 * Geschäftsregel: BR-DE-14 Das Element „VAT category rate“ (BT-119) muss übermittelt werden.
 	 */
 	// 
-	public void setTaxPercentage(BigDecimal taxableAmount); // use ctor
+	public void setTaxPercentage(BigDecimal taxRate); // use ctor
 	public BigDecimal getTaxPercentage();
 
 	/**
@@ -169,7 +169,7 @@ public interface BG23_VatBreakdown extends ITaxCategory {
 	 * @see <a href="http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02006L0112-20150101">COUNCIL DIRECTIVE. 2006/112/EC</a> 
 	 *  of 28 November 2006 on the common system of value added tax – last version: 2006L0112 - EN - 01.01.2015
 	 */
-	// BT-120 ExemptionReason Grund der Steuerbefreiung (Freitext)
+	// 0..1 (optional) BG-23.BT-120 ExemptionReason Grund der Steuerbefreiung (Freitext)
 	public String getTaxExemptionReasonText();
 	/**
 	 * VAT exemption reason code
@@ -184,7 +184,7 @@ public interface BG23_VatBreakdown extends ITaxCategory {
 	 * 
 	 * @return Code
 	 */
-	// BT-121 ExemptionReasonCode Code für den Umsatzsteuerbefreiungsgrund
+	// 0..1 (optional) BG-23.BT-121 ExemptionReasonCode Code für den Umsatzsteuerbefreiungsgrund
 	// Hinweis: Codeliste von der Connecting Europe Facility ausgegeben und geführt.
 	public String getTaxExemptionReasonCode();
 
