@@ -230,10 +230,10 @@ public class TradeTax extends TradeTaxType implements BG23_VatBreakdown, ITaxCat
 		taxCategoryCode.setValue(code);
 		super.setCategoryCode(taxCategoryCode);
 	}
-	@Override
-	public void setTaxCategoryCode(TaxCategoryCode code) {
-		setTaxCategoryCode(code.getValue());  // TODO default in IF
-	}
+//	@Override
+//	public void setTaxCategoryCode(TaxCategoryCode code) {
+//		setTaxCategoryCode(code.getValue());  // TODO default in IF
+//	}
 	@Override
 	public TaxCategoryCode getTaxCategoryCode() {
 		return TaxCategoryCode.valueOf(super.getCategoryCode());

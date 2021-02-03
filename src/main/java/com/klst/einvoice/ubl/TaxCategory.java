@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.klst.einvoice.ITaxCategory;
+import com.klst.einvoice.ITaxCategoryFactory;
 import com.klst.einvoice.ITaxType;
 import com.klst.untdid.codelist.TaxCategoryCode;
 import com.klst.untdid.codelist.TaxTypeCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
 
@@ -33,7 +33,19 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
  * <br>Cardinality: 1..1 (mandatory)
  * <br>Req.ID: R45, R48
  */
-public class TaxCategory extends TaxCategoryType implements ITaxCategory {
+public class TaxCategory extends TaxCategoryType implements ITaxCategory, ITaxCategoryFactory {
+
+	/**
+	 * {@inheritDoc}
+	 */
+	// implements ITaxCategoryFactory
+	@Override
+	public ITaxCategory createTaxCategory(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
+		return create(taxType, taxCode, taxRate);
+	}
+	static ITaxCategory create(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
+		return new TaxCategory(taxType.getValue(), taxCode, taxRate);
+	}
 
 //	private static final Logger LOG = Logger.getLogger(TaxCategory.class.getName());
 	
@@ -72,13 +84,14 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 	}
 	
 	// ALLOWANCES (BG-20.BT-95-0) and CHARGES (BG-21.BT-102-0)
-	// BG-23.BT-118-0
+	// VAT BREAKDOWN BG-23.BT-118-0 and LINE VAT INFORMATION BG-30.BT-151-0
+	@Override // implements ITaxCategory , ITaxType
 	public void setTaxType(String type) {
 		ITaxType taxScheme = TaxScheme.create(type);
 		super.setTaxScheme((TaxScheme)taxScheme);
 	}
 
-	@Override
+	@Override // implements ITaxCategory , ITaxType
 	public String getTaxType() {
 		return TaxScheme.getTaxType(super.getTaxScheme());
 	}
@@ -90,11 +103,11 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 		super.setID(new ID(code));
 	}
 
-	@Override
-	public void setTaxCategoryCode(TaxCategoryCode code) {
-		setTaxCategoryCode(code.getValue());
-	}
-
+//	@Override
+//	public void setTaxCategoryCode(TaxCategoryCode code) {
+//		setTaxCategoryCode(code.getValue());
+//	}
+//
 	/**
 	 * Coded identification of a tax/VAT category. Entries of UNTDID 5305 are used.
 	 * <p>
@@ -104,6 +117,7 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 	 * 
 	 * @return Code
 	 */
+	@Override
 	public TaxCategoryCode getTaxCategoryCode() {
 		return TaxCategoryCode.valueOf(this);
 	}
@@ -111,9 +125,9 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 	// BT-96, BT-103 0..1 Document level allowance/charge tax/VAT rate
 	// BG-23.BT-119
 	@Override
-	public void setTaxPercentage(BigDecimal percentage) {
-		if(percentage==null) return;
-		super.setPercent(new Percent(percentage));
+	public void setTaxPercentage(BigDecimal taxRate) {
+		if(taxRate==null) return;
+		super.setPercent(new Percent(taxRate));
 	}
 
 	/**
@@ -123,14 +137,15 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory {
 	 * <br>ID: BT-119, BT-152
 	 * <br>Req.ID: R38, R49; R37, R45, R48
 	 * 
-	 * @return Percent
+	 * @return taxRate percentage
 	 */
 	@Override
 	public BigDecimal getTaxPercentage() {
 		return getTaxPercentage(this);
 	}
+	
 	private static final int SCALE = 2;
-	public BigDecimal getTaxPercentage(RoundingMode roundingMode) {
+	private BigDecimal getTaxPercentage(RoundingMode roundingMode) {
 		BigDecimal rate = getTaxPercentage();
 		if(rate==null) return rate;
 		return rate.setScale(SCALE, roundingMode);

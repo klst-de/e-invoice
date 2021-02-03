@@ -110,8 +110,8 @@ public interface BG23_VatBreakdown extends ITaxCategory {
 	 */
 	@Override
 	public void setTaxCategoryCode(String code);
-	@Override
-	public void setTaxCategoryCode(TaxCategoryCode code);
+//	@Override
+//	public void setTaxCategoryCode(TaxCategoryCode code);
 	@Override
 	public TaxCategoryCode getTaxCategoryCode();
 	
@@ -125,24 +125,13 @@ public interface BG23_VatBreakdown extends ITaxCategory {
 	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal percent); // use ctor
 //	public void setTaxCategoryAndRate(String typeCode, TaxCategoryCode codeEnum, BigDecimal percent);
 	
-	/**
-	 * VAT category rate
-	 * <p>
-	 * The VAT rate, represented as percentage that applies for the relevant VAT category.
-	 *  The VAT category code and the VAT category rate shall be consistent.
-	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>EN16931-ID: 	BT-119
-	 * <br>Rule ID: 	BR-48 , BR-DE-14 (mandatory)
-	 * <br>Request ID: 	R38, R49
-	 * 
-	 * @param Percentage
-	 */
 	/* BT-119 RateApplicablePercent Kategoriespezifischer Umsatzsteuersatz
 	 * Besonderheit der XRechnung :
 	 * Geschäftsregel: BR-DE-14 Das Element „VAT category rate“ (BT-119) muss übermittelt werden.
 	 */
-	// 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setTaxPercentage(BigDecimal taxRate); // use ctor
 	public BigDecimal getTaxPercentage();
 

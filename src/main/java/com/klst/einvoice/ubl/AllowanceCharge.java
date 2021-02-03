@@ -64,19 +64,6 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 	// copy ctor
 	AllowanceCharge(AllowanceChargeType doc) {
 		super();
-//		this.setChargeIndicator(doc.getChargeIndicator());
-//		this.setAmountWithoutTax(getAmountWithoutTax(doc));
-//		this.setAssessmentBase(getAssessmentBase(doc));
-//		this.setPercentage(getPercentage(doc));
-//		
-//		List<TaxCategoryType> list = doc.getTaxCategory();
-//		list.forEach(el -> {
-//			taxCategory = TaxCategory.createTaxCategory(el);
-//			LOG.fine("add taxCategory:"+taxCategory);
-//			super.getTaxCategory().add(taxCategory);
-//		});
-//		this.setReasonText(getReasonText(doc));
-//		this.setReasoncode(getReasoncode(doc));
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);
 			TaxCategoryType tc = doc.getTaxCategory().isEmpty() ? null : doc.getTaxCategory().get(0);
@@ -86,16 +73,8 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 			} else {
 				taxCategory = TaxCategory.createTaxCategory(tc); 
 			}
-//			if(doc instanceof AllowanceChargeType && doc.getClass()!=AllowanceChargeType.class) {
-//				// doc an instance of a subclass of AllowanceChargeType, but not AllowanceChargeType itself
-//				taxCategory = doc.getTaxCategory().isEmpty() ? null : (TaxCategory)(doc.getTaxCategory().get(0));
-//			} else {
-//				taxCategory = doc.getTaxCategory().isEmpty() ? null :TaxCategory.createTaxCategory(doc.getTaxCategory().get(0));
-//			}
-
 		}
 		LOG.info("copy ctor:"+this);	
-
 	}
 
 	@Override
