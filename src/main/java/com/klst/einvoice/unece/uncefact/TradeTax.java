@@ -3,8 +3,10 @@ package com.klst.einvoice.unece.uncefact;
 import java.math.BigDecimal;
 import java.util.logging.Logger;
 
-import com.klst.einvoice.BG23_VatBreakdown;
+import com.klst.einvoice.VatBreakdown;
+import com.klst.einvoice.VatBreakdownFactory;
 import com.klst.einvoice.ITaxCategory;
+import com.klst.einvoice.ITaxCategoryFactory;
 import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.TaxCategoryCode;
 import com.klst.untdid.codelist.TaxTypeCode;
@@ -107,13 +109,32 @@ CII: ApplicableHeaderTradeSettlement ...
             </ram:SpecifiedTradeAllowanceCharge>
 
  */
+public class TradeTax extends TradeTaxType 
+                      implements VatBreakdown, VatBreakdownFactory
+                               , ITaxCategory, ITaxCategoryFactory {
 
-// replaces ApplicableTradeTax and CategoryTradeTax
-public class TradeTax extends TradeTaxType implements BG23_VatBreakdown, ITaxCategory {
-
-	// factory for VatBreakdown
-	static BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
+	/**
+	 * {@inheritDoc}
+	 */
+	// implements VatBreakdownFactory
+	@Override
+	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
+		return create(taxableAmount, taxAmount, taxCode, taxRate);
+	}
+	static VatBreakdown create(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return new TradeTax(taxableAmount, taxAmount, taxCode, taxRate);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	// implements ITaxCategoryFactory
+	@Override
+	public ITaxCategory createTaxCategory(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
+		return create(taxType, taxCode, taxRate);
+	}
+	static ITaxCategory create(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
+		return new TradeTax(taxType.getValue(), taxCode, taxRate);
 	}
 
 	/**
@@ -124,15 +145,15 @@ public class TradeTax extends TradeTaxType implements BG23_VatBreakdown, ITaxCat
 	 * @param taxRate or taxPercent
 	 * @return
 	 */ 
-	static ITaxCategory createTaxCategory(TaxTypeCode taxType, TaxCategoryCode taxCode, Percent taxPercent) {
-		return new TradeTax(taxType.getValue(), taxCode, taxPercent);
-	}
-	static ITaxCategory createTaxCategory(TaxCategoryCode taxCode, Percent taxPercent) {
-		return new TradeTax(TaxTypeCode.ValueAddedTax.getValue(), taxCode, taxPercent);
-	}
-	static ITaxCategory createTaxCategory(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
-		return new TradeTax(taxType, taxCode, taxRate);
-	}
+//	static ITaxCategory createTaxCategory(TaxTypeCode taxType, TaxCategoryCode taxCode, Percent taxPercent) {
+//		return new TradeTax(taxType.getValue(), taxCode, taxPercent);
+//	}
+//	static ITaxCategory createTaxCategory(TaxCategoryCode taxCode, Percent taxPercent) {
+//		return new TradeTax(TaxTypeCode.ValueAddedTax.getValue(), taxCode, taxPercent);
+//	}
+//	static ITaxCategory createTaxCategory(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
+//		return new TradeTax(taxType, taxCode, taxRate);
+//	}
 
 	private static final Logger LOG = Logger.getLogger(TradeTax.class.getName());
 
@@ -142,12 +163,12 @@ public class TradeTax extends TradeTaxType implements BG23_VatBreakdown, ITaxCat
 		setTaxCategoryCodeAndRate(taxCode, taxRate);
 		
 	}
-	private TradeTax(String taxType, TaxCategoryCode taxCode, Percent taxPercent) {
-		super();
-		setTaxType(taxType);
-		setTaxCategoryCode(taxCode);
-		setTaxPercentage(taxPercent);
-	}
+//	private TradeTax(String taxType, TaxCategoryCode taxCode, Percent taxPercent) {
+//		super();
+//		setTaxType(taxType);
+//		setTaxCategoryCode(taxCode);
+//		setTaxPercentage(taxPercent);
+//	}
 	
 	private TradeTax(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		super();
@@ -278,7 +299,7 @@ public class TradeTax extends TradeTaxType implements BG23_VatBreakdown, ITaxCat
 	/**
 	 * VAT exemption reason text (BT-120) and code (BT-121)
 	 *
-	 * @see com.klst.einvoice.BG23_VatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
+	 * @see com.klst.einvoice.VatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void setTaxExemption(String text, String codeId) {

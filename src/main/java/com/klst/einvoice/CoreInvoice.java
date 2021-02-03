@@ -628,12 +628,11 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * 
 	 * @return VatBreakdown object
 	 */
-	// TODO BG23_VatBreakdown in VatBreakdown umbenennen
-	public BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode code, BigDecimal percent);
+	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode code, BigDecimal percent);
 
 	// VAT BREAKDOWN BG-23 1..* (mandatory)
-	public void addVATBreakDown(BG23_VatBreakdown vatBreakdown);
-	public List<BG23_VatBreakdown> getVATBreakDowns();
+	public void addVATBreakDown(VatBreakdown vatBreakdown);
+	public List<VatBreakdown> getVATBreakDowns();
 	
 	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	// BG-24.BT-122 ++ 1..1 Supporting document reference

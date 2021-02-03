@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.BG23_VatBreakdown;
+import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
@@ -1247,8 +1247,8 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 
 	 */
 	@Override
-	public BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal taxRate) {
-		return TradeTax.createVATBreakDown(taxableAmount, taxAmount, codeEnum, taxRate);
+	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal taxRate) {
+		return TradeTax.create(taxableAmount, taxAmount, codeEnum, taxRate);
 	}
 	
 	/**
@@ -1257,7 +1257,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 * @param vatBreakdown
 	 */
 	@Override
-	public void addVATBreakDown(BG23_VatBreakdown vatBreakdown) {
+	public void addVATBreakDown(VatBreakdown vatBreakdown) {
 		List<TradeTaxType> tradeTaxes = applicableHeaderTradeSettlement.getApplicableTradeTax();
 		tradeTaxes.add((TradeTax)vatBreakdown);
 	}
@@ -1265,10 +1265,10 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		addVATBreakDown(createVATBreakDown(taxableAmount, tax, taxCategoryCode, taxRate));
 	}
 	@Override
-	public List<BG23_VatBreakdown> getVATBreakDowns() {
+	public List<VatBreakdown> getVATBreakDowns() {
 		if(applicableHeaderTradeSettlement==null) return null;
 		List<TradeTaxType> list = applicableHeaderTradeSettlement.getApplicableTradeTax();
-		List<BG23_VatBreakdown> result = new ArrayList<BG23_VatBreakdown>(list.size());
+		List<VatBreakdown> result = new ArrayList<VatBreakdown>(list.size());
 		list.forEach(tradeTax -> {
 			if(tradeTax instanceof TradeTaxType && tradeTax.getClass()!=TradeTaxType.class) {
 				// tradeTax an instance of a subclass of TradeTaxType, but not TradeTaxType itself

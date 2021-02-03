@@ -40,7 +40,7 @@ import com.klst.untdid.codelist.TaxCategoryCode;
  * BR-DE-14 Kategoriespezifischer Umsatzsteuersatz :
  * Das Element „VAT category rate“ (BT-119) muss übermittelt werden.
  */
-public interface BG23_VatBreakdown extends ITaxCategory {
+public interface VatBreakdown extends ITaxCategory {
 
 	/**
 	 * VAT category taxable amount

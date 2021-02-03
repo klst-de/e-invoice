@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.klst.einvoice.BG23_VatBreakdown;
+import com.klst.einvoice.VatBreakdown;
+import com.klst.einvoice.VatBreakdownFactory;
 import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.TaxCategoryCode;
@@ -19,10 +20,18 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemp
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxableAmountType;
 
-public class TaxSubtotal extends TaxSubtotalType implements BG23_VatBreakdown {
+public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBreakdownFactory {
 
+	/**
+	 * {@inheritDoc}
+	 */
+	// implements VatBreakdownFactory
+	@Override
+	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
+		return create(taxableAmount, taxAmount, taxCode, taxRate);
+	}
 	// factory for VatBreakdown
-	static BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
+	static VatBreakdown create(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return new TaxSubtotal(taxableAmount, taxAmount, taxCode, taxRate);
 	}
 
@@ -34,10 +43,21 @@ public class TaxSubtotal extends TaxSubtotalType implements BG23_VatBreakdown {
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);
 		}
-		LOG.info("copy ctor: getTaxBaseAmount="+this.getTaxBaseAmount());	
+		LOG.info("copy ctor:"+this);	
 	}
 
-	// TODO toString
+	@Override
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[TaxBaseAmount=");
+		stringBuilder.append(super.getTaxableAmount()==null ? "null" : getTaxBaseAmount());
+		stringBuilder.append(", CalculatedTaxAmount=");
+		stringBuilder.append(super.getTaxAmount()==null ? "null" : getCalculatedTaxAmount());
+		stringBuilder.append(", TaxCategory=");
+//		stringBuilder.append(getTaxRateAsString()==null ? "null" : getTaxRateAsString());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
+	}
 	
 	private TaxSubtotal(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
 		super();
@@ -176,7 +196,7 @@ public class TaxSubtotal extends TaxSubtotalType implements BG23_VatBreakdown {
 	/**
 	 * VAT exemption reason text and code
 	 * 
-	 * @see com.klst.einvoice.BG23_VatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
+	 * @see com.klst.einvoice.VatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
 	 */
  	@Override
 	public void setTaxExemption(String text, String code) {

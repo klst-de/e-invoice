@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.BG23_VatBreakdown;
+import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
@@ -1399,18 +1399,18 @@ daher: NOT_IMPEMENTED
 	}
 	
 	@Override
-	public BG23_VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode code, BigDecimal percent) {
-		return TaxSubtotal.createVATBreakDown(taxableAmount, taxAmount, code, percent);
+	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode code, BigDecimal percent) {
+		return TaxSubtotal.create(taxableAmount, taxAmount, code, percent);
 	}
 
 	// BG-23 + 1..n VAT BREAKDOWN
 	public void addVATBreakDown(Amount taxableAmount, Amount tax, TaxCategoryCode taxCategoryCode, BigDecimal taxRate) {
-		BG23_VatBreakdown taxSubtotal = createVATBreakDown(taxableAmount, tax, taxCategoryCode, taxRate);
+		VatBreakdown taxSubtotal = createVATBreakDown(taxableAmount, tax, taxCategoryCode, taxRate);
 		addVATBreakDown(taxSubtotal);
 	}
 
 	@Override
-	public void addVATBreakDown(BG23_VatBreakdown vatBreakdown) {
+	public void addVATBreakDown(VatBreakdown vatBreakdown) {
 		taxTotalFirst = getTaxTotalFirst();
 		taxTotalFirst.getTaxSubtotal().add((TaxSubtotal)vatBreakdown);
 	}
@@ -1422,11 +1422,11 @@ daher: NOT_IMPEMENTED
 //		});	
 //	}
 
-	public List<BG23_VatBreakdown> getVATBreakDowns() {
+	public List<VatBreakdown> getVATBreakDowns() {
 		List<TaxTotalType> taxTotalList = isInvoiceType ? invoice.getTaxTotal() : creditNote.getTaxTotal();
 		taxTotalFirst = getTaxTotalFirst();
 		List<TaxSubtotalType> taxSuptotalList = taxTotalFirst.getTaxSubtotal();
-		List<BG23_VatBreakdown> result = new ArrayList<BG23_VatBreakdown>(taxSuptotalList.size());
+		List<VatBreakdown> result = new ArrayList<VatBreakdown>(taxSuptotalList.size());
 		taxSuptotalList.forEach(vbd -> {
 			if(vbd instanceof TaxSubtotalType && vbd.getClass()!=TaxSubtotalType.class) {
 				// vbd is instance of a subclass of TaxSubtotalType, but not TaxSubtotalType itself
