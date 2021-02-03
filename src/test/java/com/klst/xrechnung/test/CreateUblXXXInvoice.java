@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG19_DirectDebit;
-import com.klst.einvoice.BG23_VatBreakdown;
+import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
@@ -90,10 +90,10 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setInvoiceTax(testCN.getInvoiceTax());
 		LOG.info("finished DocumentTotalsGroup.");
 		
-        List<BG23_VatBreakdown> vbdList = ((GenericInvoice)testCN).getVATBreakDowns();
+        List<VatBreakdown> vbdList = ((GenericInvoice)testCN).getVATBreakDowns();
         LOG.info("CreditNote VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
-        	BG23_VatBreakdown vatBreakdown = ublInvoice.createVATBreakDown( tradeTax.getTaxBaseAmount(),
+        	VatBreakdown vatBreakdown = ublInvoice.createVATBreakDown( tradeTax.getTaxBaseAmount(),
         			tradeTax.getCalculatedTaxAmount(),
         			tradeTax.getTaxCategoryCode(),
         			tradeTax.getTaxPercentage() );
@@ -344,13 +344,13 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makeVatBreakDownGroup(CoreInvoice ublInvoice) {
-        List<BG23_VatBreakdown> vbdList = ((GenericInvoice)testDoc).getVATBreakDowns();
+        List<VatBreakdown> vbdList = ((GenericInvoice)testDoc).getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
         	Amount taxBaseAmount = tradeTax.getTaxBaseAmount();
         	Amount calculatedTaxAmount = tradeTax.getCalculatedTaxAmount();
             LOG.info("taxBaseAmount="+taxBaseAmount + " calculatedTaxAmount="+calculatedTaxAmount);
-        	BG23_VatBreakdown vatBreakdown = ublInvoice.createVATBreakDown( taxBaseAmount,
+        	VatBreakdown vatBreakdown = ublInvoice.createVATBreakDown( taxBaseAmount,
         			calculatedTaxAmount,
         			tradeTax.getTaxCategoryCode(),
         			tradeTax.getTaxPercentage() );

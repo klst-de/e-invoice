@@ -34,7 +34,7 @@ public class TaxScheme extends TaxSchemeType implements ITaxType, ITaxTypeFactor
 	public ITaxType createTaxType(String type) {
 		return create(type);
 	}
-	static ITaxType create(String type) {
+	static TaxScheme create(String type) {
 		return type==null ? null : new TaxScheme(type);
 	}
 	
@@ -54,10 +54,10 @@ public class TaxScheme extends TaxSchemeType implements ITaxType, ITaxTypeFactor
 
 	@Override
 	public String getTaxType() {
-		return super.getID().getValue();
+		return getTaxType(this);
 	}
 	static String getTaxType(TaxSchemeType taxScheme) {
-		return taxScheme.getID().getValue();
+		return taxScheme.getID()==null ? null : taxScheme.getID().getValue();
 	}
 	
 }

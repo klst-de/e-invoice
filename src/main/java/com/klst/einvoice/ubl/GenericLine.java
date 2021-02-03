@@ -15,6 +15,7 @@ import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.TaxCategoryCode;
+import com.klst.untdid.codelist.TaxTypeCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AllowanceChargeType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CommodityClassificationType;
@@ -94,7 +95,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	}
 
 	void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
-			, TaxCategoryCode codeEnum, BigDecimal percent) {
+			, TaxCategoryCode codeEnum, BigDecimal taxRate) {
 		ItemType item = new ItemType();
 //		PriceType price = new PriceType();
 		if(isInvoiceLineType) {
@@ -108,7 +109,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		setLineTotalAmount(lineTotalAmount);
 		setUnitPriceAmount(priceAmount);
 		setItemName(itemName);
-		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
+		setTaxCategoryAndRate(codeEnum, taxRate);
 		LOG.config("ctor "+this);
 	}
 
@@ -427,13 +428,13 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	// BG-30.BT-151 +++ 1..1 Invoiced item VAT category code
 	// BG-30.BT-152 +++ 0..1 Invoiced item VAT rate
 	/**
-	 * non public - use ctor
+	 * not public - use ctor
 	 * 
 	 * @param codeEnum 1..1 EN16931-ID: BT-151
 	 * @param percent 0..1 EN16931-ID: BT-152
 	 */
-	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, Percent percent) {
-		TaxCategory taxCategory = new TaxCategory(codeEnum, percent);
+	void setTaxCategoryAndRate(TaxCategoryCode taxCode, BigDecimal taxRate) {
+		TaxCategory taxCategory = TaxCategory.create(TaxTypeCode.ValueAddedTax, taxCode, taxRate);
 		if(isInvoiceLineType) {
 			ItemType item = iLine.getItem();
 			item.getClassifiedTaxCategory().add(taxCategory);
@@ -443,9 +444,6 @@ public class GenericLine<T> implements CoreInvoiceLine {
 			item.getClassifiedTaxCategory().add(taxCategory);
 			cnLine.setItem(item);
 		}	
-	}
-	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
-		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
 	}
 	
 	@Override

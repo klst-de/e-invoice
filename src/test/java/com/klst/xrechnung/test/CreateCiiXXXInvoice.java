@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG19_DirectDebit;
-import com.klst.einvoice.BG23_VatBreakdown;
+import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
@@ -273,10 +273,10 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setStartDate(testDoc.getStartDateAsTimestamp());
 		cii.setEndDate(testDoc.getEndDateAsTimestamp());
 
-        List<BG23_VatBreakdown> vbdList = ((CrossIndustryInvoice)testDoc).getVATBreakDowns();
+        List<VatBreakdown> vbdList = ((CrossIndustryInvoice)testDoc).getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
-        	BG23_VatBreakdown vatBreakdown = cii.createVATBreakDown( tradeTax.getTaxBaseAmount(),
+        	VatBreakdown vatBreakdown = cii.createVATBreakDown( tradeTax.getTaxBaseAmount(),
         			tradeTax.getCalculatedTaxAmount(),
         			tradeTax.getTaxCategoryCode(),
         			tradeTax.getTaxPercentage() );

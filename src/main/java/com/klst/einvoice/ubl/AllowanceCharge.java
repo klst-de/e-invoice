@@ -71,7 +71,7 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 				// tc is instance of a subclass of TaxCategoryType, but not TaxCategoryType itself
 				taxCategory = (TaxCategory)tc;
 			} else {
-				taxCategory = TaxCategory.createTaxCategory(tc); 
+				taxCategory = new TaxCategory(tc); 
 			}
 		}
 		LOG.info("copy ctor:"+this);	

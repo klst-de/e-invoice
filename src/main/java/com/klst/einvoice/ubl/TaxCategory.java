@@ -4,10 +4,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.klst.einvoice.ITaxCategory;
 import com.klst.einvoice.ITaxCategoryFactory;
-import com.klst.einvoice.ITaxType;
+import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.TaxCategoryCode;
 import com.klst.untdid.codelist.TaxTypeCode;
 
@@ -43,57 +44,37 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory, ITaxCa
 	public ITaxCategory createTaxCategory(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return create(taxType, taxCode, taxRate);
 	}
-	static ITaxCategory create(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
+	static TaxCategory create(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return new TaxCategory(taxType.getValue(), taxCode, taxRate);
 	}
 
-//	private static final Logger LOG = Logger.getLogger(TaxCategory.class.getName());
+	private static final Logger LOG = Logger.getLogger(TaxCategory.class.getName());
 	
-	/**
-	 * factory method
-	 * 
-	 * @param taxType
-	 * @param taxCode
-	 * @param taxRate
-	 * @return
-	 */ 
-	// TODO sollte result ITaxCategory sein ????
-	static TaxCategory createTaxCategory(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
-		return new TaxCategory(taxType, taxCode, taxRate);
-	}
-	static TaxCategory createTaxCategory(TaxCategoryType doc) { // das ist ein copy-ctor
-		return doc==null? null : new TaxCategory(TaxScheme.getTaxType(doc.getTaxScheme()),
-				TaxCategoryCode.valueOf(doc), getTaxPercentage(doc));
+	public TaxCategory(TaxCategoryType doc) {
+		super();
+		if(doc!=null) {
+			CopyCtor.invokeCopy(this, doc);
+		}
+		LOG.info("copy ctor:"+this);			
 	}
 	
-	public TaxCategory(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
+	private TaxCategory(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		super();
 		setTaxType(taxType);
 		setTaxCategoryCode(taxCode);
 		setTaxPercentage(taxRate);
-	}
-	public TaxCategory(TaxCategoryCode taxCode, BigDecimal taxRate) {
-		this(TaxTypeCode.VAT, taxCode, taxRate);
-	}
-	public TaxCategory(TaxCategoryCode taxCode, Percent percent) {
-		this(TaxTypeCode.VAT, taxCode, percent==null? null : percent.getValue());
-	}
-	
-	public TaxCategory(TaxCategoryCode taxCode) {
-		this(taxCode, (BigDecimal)null);
 	}
 	
 	// ALLOWANCES (BG-20.BT-95-0) and CHARGES (BG-21.BT-102-0)
 	// VAT BREAKDOWN BG-23.BT-118-0 and LINE VAT INFORMATION BG-30.BT-151-0
 	@Override // implements ITaxCategory , ITaxType
 	public void setTaxType(String type) {
-		ITaxType taxScheme = TaxScheme.create(type);
-		super.setTaxScheme((TaxScheme)taxScheme);
+		super.setTaxScheme(TaxScheme.create(type));
 	}
 
 	@Override // implements ITaxCategory , ITaxType
 	public String getTaxType() {
-		return TaxScheme.getTaxType(super.getTaxScheme());
+		return super.getTaxScheme()==null ? null : TaxScheme.getTaxType(super.getTaxScheme());
 	}
 
 	// BT-95, BT-102 (mandatory) Document level allowance/charge VAT category code
@@ -103,11 +84,6 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory, ITaxCa
 		super.setID(new ID(code));
 	}
 
-//	@Override
-//	public void setTaxCategoryCode(TaxCategoryCode code) {
-//		setTaxCategoryCode(code.getValue());
-//	}
-//
 	/**
 	 * Coded identification of a tax/VAT category. Entries of UNTDID 5305 are used.
 	 * <p>
