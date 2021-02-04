@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.einvoice.ITaxCategory;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.VatBreakdownFactory;
 import com.klst.einvoice.reflection.CopyCtor;
@@ -12,9 +13,7 @@ import com.klst.untdid.codelist.TaxCategoryCode;
 import com.klst.untdid.codelist.TaxTypeCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSubtotalType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PercentType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonType;
@@ -42,8 +41,15 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 		super();
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);
+			LOG.fine("copy ctor:"+this);	
 		}
-		LOG.info("copy ctor:"+this);	
+	}
+
+	private TaxSubtotal(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal taxRate) {
+		super();
+		setTaxBaseAmount(taxableAmount);
+		setCalculatedTaxAmount(taxAmount);
+		setTaxCategoryCodeAndRate(codeEnum, taxRate);
 	}
 
 	@Override
@@ -54,37 +60,11 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 		stringBuilder.append(", CalculatedTaxAmount=");
 		stringBuilder.append(super.getTaxAmount()==null ? "null" : getCalculatedTaxAmount());
 		stringBuilder.append(", TaxCategory=");
-//		stringBuilder.append(getTaxRateAsString()==null ? "null" : getTaxRateAsString());
+		stringBuilder.append(getITaxCategory()==null ? "null" : getITaxCategory());
 		stringBuilder.append("]");
 		return stringBuilder.toString();
 	}
 	
-	private TaxSubtotal(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal percent) {
-		super();
-		init(taxableAmount, taxAmount, codeEnum, percent);
-	}
-
-	/**
-	 * mandatory elements of VAT BREAKDOWN BG-23
-	 * 
-	 * @param taxableAmount BT-116 BasisAmount
-	 * @param taxAmount     BT-117 CalculatedAmount
-	 * @param codeEnum      BT-118 CategoryCode
-	 * @param taxRate       BT-119 RateApplicablePercent
-//	 * @param exemptionText BT-120 optional
-//	 * @param exemptionCode BT-121 optional
-	 */
-	void init(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal taxRate) {
-		init(taxableAmount, taxAmount, codeEnum, taxRate, null, null);
-	}
-	void init(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal taxRate, String exemptionText, String exemptionCode) {
-		setTaxBaseAmount(taxableAmount);
-		setCalculatedTaxAmount(taxAmount);
-//		setTaxCategoryCodeAndRate(codeEnum, taxRate);
-		setTaxCategoryAndRate(codeEnum, TaxTypeCode.VAT, taxRate==null ? null : new Percent(taxRate)
-				, exemptionText, exemptionCode);
-	}
-
 	// BG-23.BT-116 taxBaseAmount aka taxableAmount aka basisAmount
 	@Override
 	public void setTaxBaseAmount(Amount taxBaseAmount) {
@@ -112,61 +92,29 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 		return new Amount(super.getTaxAmount().getCurrencyID(), super.getTaxAmount().getValue());
 	}
 
+	private ITaxCategory getITaxCategory() {
+		TaxCategoryType tc = super.getTaxCategory();
+		if(tc==null) return null;
+		if(tc instanceof TaxCategoryType && tc.getClass()!=TaxCategoryType.class) {
+			// tc is instance of a subclass of TaxCategoryType, but not TaxCategoryType itself
+			return (TaxCategory)tc;
+		} else {
+			return new TaxCategory(tc); 
+		}
+	}
+	
 	// BG-23.BT-118-0
 	@Override
 	public void setTaxType(String type) {
-//		TaxSchemeType taxScheme = new TaxSchemeType();
-//		taxScheme.setID(Identifier.newIDType(type, null)); // USt/VAT
-//		taxCategory.setTaxScheme(taxScheme);
+		//if(super.getTaxCategory()==null) super.setTaxCategory(new TaxCategory(null));
+		// oder kurz:
+		super.setTaxCategory(new TaxCategory(super.getTaxCategory()));
+		// delegieren:
+		((TaxCategory)getTaxCategory()).setTaxType(type);
 	}
 	@Override
 	public String getTaxType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	// BG-23.BT-118
-	@Override
-	public void setTaxCategoryCode(String code) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void setTaxCategoryCode(TaxCategoryCode code) {
-		setTaxCategoryCodeAndRate(code, null);	
-	}
-	@Override
-	public TaxCategoryCode getTaxCategoryCode() {
-		return TaxCategoryCode.valueOf(super.getTaxCategory());
-	}
-
-
-// TODO TaxCategory class extends TaxCategoryType verwenden
-	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, String vat, Percent taxRate, String exemptionText, String exemptionCode) {
-		TaxCategoryType taxCategory = new TaxCategoryType();
-		taxCategory.setID(new ID(codeEnum.getValue()));
-		
-		TaxSchemeType taxScheme = new TaxSchemeType();
-		taxScheme.setID(new ID(vat)); // USt/VAT
-		taxCategory.setTaxScheme(taxScheme);
-		
-		if(taxRate!=null) {
-			taxCategory.setPercent(taxRate);
-		}
-		
-		if(exemptionText!=null) {
-			TaxExemptionReasonType taxExemptionReason = new TaxExemptionReasonType();
-			taxExemptionReason.setValue(exemptionText);
-			taxCategory.getTaxExemptionReason().add(taxExemptionReason);
-		}
-		
-		if(exemptionCode!=null) {
-			TaxExemptionReasonCodeType taxExemptionReasonCode = new TaxExemptionReasonCodeType();
-			taxExemptionReasonCode.setValue(exemptionCode);
-			taxCategory.setTaxExemptionReasonCode(taxExemptionReasonCode);
-		}
-            
-		super.setTaxCategory(taxCategory);
+		return super.getTaxCategory()==null ? null : ((TaxCategory)getTaxCategory()).getTaxType();
 	}
 
 	/**
@@ -178,19 +126,40 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 	 * @param percent  BT-119
 	 */
 	@Override
-	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal taxRate) {
-		setTaxCategoryAndRate(codeEnum, TaxTypeCode.VAT, taxRate==null ? null : new Percent(taxRate), null, null);
+	public void setTaxCategoryCodeAndRate(TaxCategoryCode taxCode, BigDecimal taxRate) {
+		super.setTaxCategory(TaxCategory.create(TaxTypeCode.ValueAddedTax, taxCode, taxRate));
 	}
 
+	// BG-23.BT-118
 	@Override
-	public void setTaxPercentage(BigDecimal taxableAmount) {
-		// use ctor
+	public void setTaxCategoryCode(String code) {
+		super.setTaxCategory(new TaxCategory(super.getTaxCategory()));
+		((TaxCategory)getTaxCategory()).setTaxCategoryCode(code);
+	}
+	@Override
+	public void setTaxCategoryCode(TaxCategoryCode code) {
+		super.setTaxCategory(new TaxCategory(super.getTaxCategory()));
+		((TaxCategory)getTaxCategory()).setTaxCategoryCode(code);
+	}
+	@Override
+	public TaxCategoryCode getTaxCategoryCode() {
+		return TaxCategoryCode.valueOf(super.getTaxCategory());
+	}
+
+	// BG-23.BT-119
+	@Override
+	public void setTaxPercentage(BigDecimal taxRate) {
+//		if(taxRate==null) return;
+//		super.setPercent(new Percent(taxRate));
+		super.setTaxCategory(new TaxCategory(super.getTaxCategory()));
+		((TaxCategory)getTaxCategory()).setTaxPercentage(taxRate);
 	}
 
 	@Override
 	public BigDecimal getTaxPercentage() {
-		PercentType percent = super.getTaxCategory().getPercent();
-		return percent==null ? null : percent.getValue();
+//		PercentType percent = super.getTaxCategory().getPercent();
+//		return percent==null ? null : percent.getValue();
+		return super.getTaxCategory()==null ? null : ((TaxCategory)getTaxCategory()).getTaxPercentage();
 	}
 
 	/**

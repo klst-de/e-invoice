@@ -50,12 +50,13 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory, ITaxCa
 
 	private static final Logger LOG = Logger.getLogger(TaxCategory.class.getName());
 	
+	// copy ctor
 	public TaxCategory(TaxCategoryType doc) {
 		super();
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);
+			LOG.fine("copy ctor:"+this);			
 		}
-		LOG.info("copy ctor:"+this);			
 	}
 	
 	private TaxCategory(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
