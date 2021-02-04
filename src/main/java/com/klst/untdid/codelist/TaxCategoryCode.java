@@ -59,6 +59,8 @@ Anmerkung: nicht alle Codes aus der Codeliste UNTDID 5305 werden verwendet
  * 
  * <br> - Canary Islands General Indirect Tax IGIC (Liable for IGIC tax)
  * <br> - Liable for IPSI (Ceuta/Melilla tax)
+ * 
+ * @see EN16931-1 Chapter 6.4.3.2 Specification of VAT category codes
  */
 public enum TaxCategoryCode {
 
