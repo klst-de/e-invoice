@@ -120,15 +120,15 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory, ITaxCa
 	public BigDecimal getTaxPercentage() {
 		return getTaxPercentage(this);
 	}
+	static BigDecimal getTaxPercentage(TaxCategoryType doc) {
+		return doc.getPercent()==null? null : doc.getPercent().getValue();
+	}
 	
 	private static final int SCALE = 2;
 	private BigDecimal getTaxPercentage(RoundingMode roundingMode) {
 		BigDecimal rate = getTaxPercentage();
 		if(rate==null) return rate;
 		return rate.setScale(SCALE, roundingMode);
-	}
-	private static BigDecimal getTaxPercentage(TaxCategoryType doc) {
-		return doc.getPercent()==null? null : doc.getPercent().getValue();
 	}
 
 	private String getTaxRateAsString() {

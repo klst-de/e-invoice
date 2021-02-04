@@ -149,19 +149,14 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 	// BG-23.BT-119
 	@Override
 	public void setTaxPercentage(BigDecimal taxRate) {
-//		if(taxRate==null) return;
-//		super.setPercent(new Percent(taxRate));
 		super.setTaxCategory(new TaxCategory(super.getTaxCategory()));
 		((TaxCategory)getTaxCategory()).setTaxPercentage(taxRate);
 	}
 
 	@Override
 	public BigDecimal getTaxPercentage() {
-//		PercentType percent = super.getTaxCategory().getPercent();
-//		return percent==null ? null : percent.getValue();
 		if(super.getTaxCategory()==null) return null;
-		super.setTaxCategory(new TaxCategory(super.getTaxCategory()));
-		return ((TaxCategory)getTaxCategory()).getTaxPercentage();
+		return TaxCategory.getTaxPercentage(super.getTaxCategory());
 	}
 
 	/**
