@@ -183,6 +183,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				);
 			cii.setPayee(testPayeeParty.getRegistrationName(), testPayeeParty.getId(), testPayeeParty.getCompanyLegalForm());
 		}
+		LOG.info("BG-10 (optional) ???? PayeeParty:"+cii.getPayee() );
 
 		BusinessParty testSellerTaxRepresentativeParty = testDoc.getTaxRepresentative();
 		if(testSellerTaxRepresentativeParty==null) {
@@ -250,8 +251,10 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				paymentInstructions = cii.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText());
 				break;
 			}
+			LOG.info("BG-10 (optional) ???? PayeeParty:"+cii.getPayee() ); // TODO Payee ist weg !!!!!!!!
 			cii.setPaymentInstructions(paymentInstructions);
 		}
+		LOG.info("BG-10 (optional) ???? PayeeParty:"+cii.getPayee() ); // TODO Payee ist weg !!!!!!!!
 
 		// BG-20 + BG-21 0..n
 		List<AllowancesAndCharges> aac = testDoc.getAllowancesAndCharges();
@@ -273,7 +276,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setStartDate(testDoc.getStartDateAsTimestamp());
 		cii.setEndDate(testDoc.getEndDateAsTimestamp());
 
-        List<VatBreakdown> vbdList = ((CrossIndustryInvoice)testDoc).getVATBreakDowns();
+        List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
         	VatBreakdown vatBreakdown = cii.createVATBreakDown( tradeTax.getTaxBaseAmount(),
@@ -287,6 +290,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         	cii.addVATBreakDown(vatBreakdown);
         	LOG.info("added vatBreakdown "+vatBreakdown);
         });
+        LOG.info("VATBreakDown added "+cii.getVATBreakDowns().size() + " ?????????? VATBreakDowns.");
 
 		cii.setTaxPointDate(testDoc.getTaxPointDateAsTimestamp()); // BT-7 BT-7-0
 

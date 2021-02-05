@@ -233,9 +233,9 @@ java.lang.ArrayIndexOutOfBoundsException: 5
 	@Test
     public void ciixml_last() {
 //    	InvoiceFactory factory = new CreateCiiXXXInvoice("CII_business_example_01.xml");
-    	InvoiceFactory factory = new CreateCiiXXXInvoice("cii001.xml");
-//    	InvoiceFactory factory = new CreateCiiXXXInvoice("03.03a-INVOICE_uncefact.xml");
-//    	InvoiceFactory factory = new CreateCiiXXXInvoice("01.14a-INVOICE_uncefact.xml");
+//    	InvoiceFactory factory = new CreateCiiXXXInvoice("cii001.xml");
+//    	InvoiceFactory factory = new CreateCiiXXXInvoice("02.04a-INVOICE_uncefact.xml");
+    	InvoiceFactory factory = new CreateCiiXXXInvoice("01.14a-INVOICE_uncefact.xml"); // TODO Payee weg
 //    	InvoiceFactory factory = new CreateCiiXXXInvoice(CII_XML[CII_XML.length-1]);
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);

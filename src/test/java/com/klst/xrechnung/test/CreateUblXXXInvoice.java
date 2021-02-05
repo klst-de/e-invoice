@@ -344,7 +344,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	}
 	
 	void makeVatBreakDownGroup(CoreInvoice ublInvoice) {
-        List<VatBreakdown> vbdList = ((GenericInvoice)testDoc).getVATBreakDowns();
+        List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
         	Amount taxBaseAmount = tradeTax.getTaxBaseAmount();
