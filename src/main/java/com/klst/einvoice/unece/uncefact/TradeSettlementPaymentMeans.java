@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
@@ -84,7 +85,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 	}
 
 	static TradeSettlementPaymentMeans create(String cardAccountID, String cardHolderName) {
-		TradeSettlementFinancialCard paymentCard = new TradeSettlementFinancialCard(cardAccountID, cardHolderName);
+		TradeSettlementFinancialCard paymentCard = TradeSettlementFinancialCard.create(cardAccountID, cardHolderName);
 		return new TradeSettlementPaymentMeans(paymentCard);
 	}
 
@@ -95,26 +96,28 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		return new TradeSettlementPaymentMeans(debitedAccount, bic);
 	}
 
+	static TradeSettlementPaymentMeans create() {
+		return new TradeSettlementPaymentMeans((TradeSettlementPaymentMeansType)null);
+	}
+	// copy factory
+	static TradeSettlementPaymentMeans create(TradeSettlementPaymentMeansType pm) {
+		if(pm==null) return null;
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(pm instanceof TradeSettlementPaymentMeansType && pm.getClass()!=TradeSettlementPaymentMeansType.class) {
+			// tt is instance of a subclass of TradeTaxType, but not TradeTaxType itself
+			return (TradeSettlementPaymentMeans)pm;
+		} else {
+			return new TradeSettlementPaymentMeans(pm); 
+		}
+	}
+
 	private static final Logger LOG = Logger.getLogger(TradeSettlementPaymentMeans.class.getName());
 
-	TradeSettlementPaymentMeans(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
+	private TradeSettlementPaymentMeans(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
 		super();
 		if(tradeSettlementPaymentMeans!=null) {
-			super.setPaymentChannelCode(tradeSettlementPaymentMeans.getPaymentChannelCode());
-			super.setTypeCode(tradeSettlementPaymentMeans.getTypeCode());
-			super.setGuaranteeMethodCode(tradeSettlementPaymentMeans.getGuaranteeMethodCode());
-			super.setPaymentMethodCode(tradeSettlementPaymentMeans.getPaymentMethodCode());
-			super.information = tradeSettlementPaymentMeans.getInformation();
-			super.id = tradeSettlementPaymentMeans.getID();
-			// BG-18 ++ 0..1 PAYMENT CARD INFORMATION:
-			super.setApplicableTradeSettlementFinancialCard(tradeSettlementPaymentMeans.getApplicableTradeSettlementFinancialCard());
-			// BG-19 ++ 0..1 DIRECT DEBIT:
-			super.setPayerPartyDebtorFinancialAccount(tradeSettlementPaymentMeans.getPayerPartyDebtorFinancialAccount());
-			// BG-17 ++ 0..n CREDIT TRANSFER:
-			super.setPayeePartyCreditorFinancialAccount(tradeSettlementPaymentMeans.getPayeePartyCreditorFinancialAccount());
-
-			super.setPayerSpecifiedDebtorFinancialInstitution(tradeSettlementPaymentMeans.getPayerSpecifiedDebtorFinancialInstitution());
-			super.setPayeeSpecifiedCreditorFinancialInstitution(tradeSettlementPaymentMeans.getPayeeSpecifiedCreditorFinancialInstitution());
+			CopyCtor.invokeCopy(this, tradeSettlementPaymentMeans);
+			LOG.info("copy ctor:"+this);
 		}
 	}
 	
@@ -134,7 +137,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		super.setTypeCode(pmc);
 	}
 	
-	private PaymentMeansEnum getPaymentMeansEnum() {
+	PaymentMeansEnum getPaymentMeansEnum() {
 		PaymentMeansCodeType pmc = super.getTypeCode();
 		if(pmc==null) return null;
 		return PaymentMeansEnum.valueOf(pmc);
@@ -146,6 +149,11 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 	
 	boolean isBankCard() {
 		return PaymentMeansEnum.isBankCard(getPaymentMeansEnum());
+	}
+	
+	TradeSettlementFinancialCard getPaymentCard() {
+		if(super.getApplicableTradeSettlementFinancialCard()==null) return null;
+		return TradeSettlementFinancialCard.create(getApplicableTradeSettlementFinancialCard());
 	}
 	
 	boolean isDirectDebit() {
@@ -177,9 +185,9 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 			stringBuilder.append(getPaymentServiceProviderID()==null ? "null" : getPaymentServiceProviderID());
 		}
 		if(isBankCard()) {
-			stringBuilder.append(", PAYMENT CARD INFORMATION CardAccountID (BG-18.BT-87):");
-			stringBuilder.append(getApplicableTradeSettlementFinancialCard()==null ? "null" 
-					: TradeSettlementFinancialCard.getCardAccountID(getApplicableTradeSettlementFinancialCard()));
+			stringBuilder.append(", PAYMENT CARD INFORMATION CardAccountID (BG-18.BT-87):"); // TODO toString
+			stringBuilder.append(super.getApplicableTradeSettlementFinancialCard()==null ? "null" 
+					: this.getPaymentCard());
 		}	
 		if(isDirectDebit()) {
 			stringBuilder.append(", DIRECT DEBIT DebitedAccountID (BG-19.BT-91):");

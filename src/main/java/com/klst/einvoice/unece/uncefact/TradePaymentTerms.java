@@ -1,72 +1,78 @@
 package com.klst.einvoice.unece.uncefact;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.reflection.CopyCtor;
+import com.klst.untdid.codelist.DateTimeFormats;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
+
+/* Beispiel: 01.07a-INVOICE_uncefact.xml
+
+            <ram:SpecifiedTradePaymentTerms>
+                <ram:Description>Bis zum 14.08.2016 ohne Abzug</ram:Description>
+                <ram:DueDateDateTime>
+                    <udt:DateTimeString format="102">20160814</udt:DateTimeString>
+                </ram:DueDateDateTime>
+            </ram:SpecifiedTradePaymentTerms>
+
+
+01.10a-INVOICE_uncefact.xml:
+
+            <ram:SpecifiedTradePaymentTerms>
+                <ram:Description>#SKONTO#TAGE=7#PROZENT=2.00#
+#SKONTO#TAGE=14#PROZENT=1.00#
+#SKONTO#TAGE=30#PROZENT=0.00#</ram:Description>
+            </ram:SpecifiedTradePaymentTerms>
+
+03.01a-INVOICE_uncefact.xml:
+            <ram:SpecifiedTradePaymentTerms>
+                <ram:Description>Dieses Guthaben werden wir auf Ihr Konto erstatten.</ram:Description>
+                <ram:DueDateDateTime>
+                    <udt:DateTimeString format="102">20190314</udt:DateTimeString>
+                </ram:DueDateDateTime>
+                <ram:DirectDebitMandateID>[Mandate reference identifier]</ram:DirectDebitMandateID>
+            </ram:SpecifiedTradePaymentTerms>
+
+0 .. n SpecifiedTradePaymentTerms Detailinformationen zu Zahlungsbedingungen xs:sequence
+0 .. 1 Description Zahlungsbedingungen                                       BT-20
+0 .. 1 DueDateDateTime Fälligkeitsdatum xs:choice
+1 .. 1 DateTimeString Fälligkeitsdatum der Zahlung                           BT-9
+       required format Datum, Format                                         BT-9-0
+0 .. 1 DirectDebitMandateID Kennung der Mandatsreferenz                      BG-19/BT-89
+
+ */
 
 public class TradePaymentTerms extends TradePaymentTermsType {
 
 	private static final Logger LOG = Logger.getLogger(TradePaymentTerms.class.getName());
 
-	private TradePaymentTerms(TradePaymentTermsType doc) {
-		CopyCtor.invokeCopy(this, doc);
+	static TradePaymentTerms create() {
+		return new TradePaymentTerms(null);
 	}
-	private TradePaymentTerms(TradePaymentTermsType doc, int xxx) {
+	// copy factory
+	static TradePaymentTerms create(TradePaymentTermsType hts) {
+//		if(hts==null) return null;
+		if(hts instanceof TradePaymentTermsType && hts.getClass()!=TradePaymentTermsType.class) {
+			// hts is instance of a subclass of TradePaymentTermsType, but not TradePaymentTermsType itself
+			return (TradePaymentTerms)hts;
+		} else {
+			return new TradePaymentTerms(hts); 
+		}
+	}
+
+	private TradePaymentTerms(TradePaymentTermsType doc) {
 		super();
 		if(doc!=null) {
-			Field[] fields = doc.getClass().getDeclaredFields();
-			Map<String, Field> fieldsByName = new HashMap<String, Field>(fields.length);
-			for(int i=0; i<fields.length; i++) {
-				Field field = fields[i];
-				String fieldName = fields[i].getName();
-				fieldsByName.put(fieldName, field);
-			}
-			Method[] methods = doc.getClass().getDeclaredMethods();
-			List<Method> setters = new ArrayList<Method>(methods.length);
-			Map<String, Method> settersByName = new HashMap<String, Method>(methods.length);
-			for(int i=0; i<methods.length; i++) {
-				Method method = methods[i];
-				String methodName = method.getName();
-				// die setter mit einem Parameter heißen setXXX, also 
-				if(methodName.startsWith("set") && method.getParameterCount()==1) {
-					setters.add(method);
-					// die setter können korrespondierende getter haben, aber nicht wenn es Listen/xs:sequence sind
-					// Beispiel: TradePaymentTermsType:: public List<TextType> getDescription()
-					settersByName.put(methodName, method);
-				}
-			}
-			List<Method> getters = new ArrayList<Method>(methods.length);
-			for(int i=0; i<methods.length; i++) {
-				Method method = methods[i];
-				String methodName = method.getName();
-				// die getter ohne Parameter heißen getXXX, also 
-				if(methodName.startsWith("get") && method.getParameterCount()==0) {
-					getters.add(method);
-					Method getter = method;
-					String getterName = methodName;
-					// die getter können korrespondierende setter haben
-					String setterName = "set"+methodName.substring(3);
-					if(settersByName.containsKey(setterName)) {
-						Method setter = settersByName.get(setterName); // potentieller Setter muss den Parameter == Result des getters haben
-						Class<?> param0Type = setter.getParameterTypes()[0];
-						if(method.getReturnType()==param0Type) {						
-							LOG.info(setterName+" + "+methodName);
-						    try {
-						    	getter.invoke(doc);
-						    	setter.invoke(this, getter.invoke(doc));
-						    } catch (Exception e) {
-						        LOG.warning(setterName+" + "+methodName + "Exception:"+e);
-						    }
-						} else {
-							LOG.warning(setterName+" + "+methodName + " typen passen nicht");
+			CopyCtor.invokeCopy(this, doc);
+			LOG.info("copy ctor:"+this);			// TODO toString
+		}
+	}
 /*
 #9:
 INFORMATION: setTypeCode + getTypeCode
@@ -87,36 +93,50 @@ INFORMATION: List<?> getter : getDescription
 #14 fields
 
  */
-						}
-					} else {
-						// if(settersByName.containsKey(setterName)) false ==> es gibt keinen passenden Setter
-						// dann muss es ein member/field geben mit name==getterName (
-						String fieldName = getterName.substring(3, 4).toLowerCase()+getterName.substring(4);
-						LOG.info("List<?> "+fieldName+" = "+methodName);
-						if(fieldsByName.containsKey(fieldName)) {
-							Field field = fieldsByName.get(fieldName);
-						    try {
-						    	// see https://stackoverflow.com/questions/24094871/set-field-value-with-reflection
-						    	getter.invoke(doc);
-						    	field.set(this, getter.invoke(doc));
-						    } catch (Exception e) {
-						        LOG.warning("List<?> "+fieldName+" = "+methodName + "Exception:"+e);
-						    }
-						} else {
-							LOG.warning("List<?> "+fieldName+" zu  "+methodName + " nicht gefunden.");
-						}
-					}
-				}
+
+	// BT-9 & BT-20
+	public void setPaymentTermsAndDate(String description, Timestamp ts) {
+//		if(description!=null) super.getDescription().add(new Text(description));
+//		if(ts!=null) super.setDueDateDateTime(DateTimeFormatStrings.toDateTime(ts));
+		setPaymentTerm(description);
+		setDueDate(ts);
+	}
+	
+	// BT-9
+	public Timestamp getDueDateAsTimestamp() {
+		DateTimeType dateTime = super.getDueDateDateTime();
+		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
+	}
+	public void setDueDate(Timestamp ts) {
+		if(ts!=null) super.setDueDateDateTime(DateTimeFormatStrings.toDateTime(ts));
+	}
+
+	// BT-20
+	public String getPaymentTerm() {
+		List<TextType> list = super.getDescription();
+		if(list.isEmpty()) return null;
+		return list.get(0).getValue();
+	}
+	public void setPaymentTerm(String description) {
+		if(description!=null) super.getDescription().add(new Text(description));
+	}
+
+	// BG-19.BT-89 0..1 Mandate reference identifier, DirectDebitMandateID
+	// Synonym: Mandatsreferenz für SEPA, Kennung der Mandatsreferenz
+	public void setMandateReferencedID(String mandateID) {
+		if(mandateID!=null) {
+			List<IDType> list = super.getDirectDebitMandateID();
+			if(list.isEmpty()) {
+				list.add(new ID(mandateID));
+			} else {
+				list.set(0, new ID(mandateID));
 			}
-			
-//			super.setID(doc.getID());
-//			...
 		}
 	}
-
-	// Test:
-	public static void main(String[] args) {
-		TradePaymentTerms tradePaymentTerms = new TradePaymentTerms(new TradePaymentTermsType());
+	public String getMandateReferencedID() {
+		List<IDType> list = super.getDirectDebitMandateID();
+		if(list.isEmpty()) return null;
+		return list.get(0).getValue();
 	}
-
+	
 }

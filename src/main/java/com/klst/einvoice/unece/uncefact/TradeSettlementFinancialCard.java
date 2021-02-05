@@ -33,30 +33,46 @@ public class TradeSettlementFinancialCard extends TradeSettlementFinancialCardTy
 	public PaymentCard createPaymentCard(String cardAccountID, String cardHolderName) {
 		return create(cardAccountID, cardHolderName);
 	}
-	static PaymentCard create(String cardAccountID, String cardHolderName) {
+	static TradeSettlementFinancialCard create(String cardAccountID, String cardHolderName) {
 		return cardAccountID==null? null : new TradeSettlementFinancialCard(cardAccountID, cardHolderName);
 	}
 
-	TradeSettlementFinancialCard(TradeSettlementFinancialCardType financialCard) {
+	static TradeSettlementFinancialCard create() {
+		return new TradeSettlementFinancialCard(null);
+	}
+	// copy factory
+	static TradeSettlementFinancialCard create(TradeSettlementFinancialCardType tsfc) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(tsfc instanceof TradeSettlementFinancialCardType && tsfc.getClass()!=TradeSettlementFinancialCardType.class) {
+			// tsfc is instance of a subclass of TradeTaxType, but not TradeTaxType itself
+			return (TradeSettlementFinancialCard)tsfc;
+		} else {
+			return new TradeSettlementFinancialCard(tsfc); 
+		}
+	}
+
+	private TradeSettlementFinancialCard(TradeSettlementFinancialCardType financialCard) {
 		super();
 		if(financialCard!=null) {
 			CopyCtor.invokeCopy(this, financialCard);
-			LOG.fine("copy ctor:"+this);
+			LOG.info("copy ctor:"+this);
 		}
 	}
+	
 	/**
 	 * BG-18 PAYMENT CARD INFORMATION
 	 * 
 	 * @param @param pan - (mandatory) Payment card primary account number (pan)
 	 * @param name - (optional) name of the payment card holder
 	 */
-	public TradeSettlementFinancialCard(String pan, String name) {
+	private TradeSettlementFinancialCard(String pan, String name) {
 		super();
 		setCardAccountID(pan);
 		setCardHolderName(name);
 	}
 
-
+	// TODO toString
+	
 	// BG-18.BT-87
 	@Override
 	public String getCardAccountID() {

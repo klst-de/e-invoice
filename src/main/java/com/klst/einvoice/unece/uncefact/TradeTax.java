@@ -1,13 +1,15 @@
 package com.klst.einvoice.unece.uncefact;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.logging.Logger;
 
-import com.klst.einvoice.VatBreakdown;
-import com.klst.einvoice.VatBreakdownFactory;
 import com.klst.einvoice.ITaxCategory;
 import com.klst.einvoice.ITaxCategoryFactory;
+import com.klst.einvoice.VatBreakdown;
+import com.klst.einvoice.VatBreakdownFactory;
 import com.klst.einvoice.reflection.CopyCtor;
+import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.TaxCategoryCode;
 import com.klst.untdid.codelist.TaxTypeCode;
 
@@ -16,6 +18,7 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
+import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateType;
 
 /*  verwendet in
 
@@ -121,7 +124,7 @@ public class TradeTax extends TradeTaxType
 	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return create(taxableAmount, taxAmount, taxCode, taxRate);
 	}
-	static VatBreakdown create(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
+	static TradeTax create(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return new TradeTax(taxableAmount, taxAmount, taxCode, taxRate);
 	}
 
@@ -155,6 +158,21 @@ public class TradeTax extends TradeTaxType
 //		return new TradeTax(taxType, taxCode, taxRate);
 //	}
 
+	static TradeTax create() {
+		return new TradeTax(null);
+	}
+	// copy factory
+	static TradeTax create(TradeTaxType tt) {
+		if(tt==null) return null;
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(tt instanceof TradeTaxType && tt.getClass()!=TradeTaxType.class) {
+			// tt is instance of a subclass of TradeTaxType, but not TradeTaxType itself
+			return (TradeTax)tt;
+		} else {
+			return new TradeTax(tt); 
+		}
+	}
+
 	private static final Logger LOG = Logger.getLogger(TradeTax.class.getName());
 
 	private TradeTax(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
@@ -178,12 +196,12 @@ public class TradeTax extends TradeTaxType
 	}
 	
 	// copy ctor
-	TradeTax(TradeTaxType doc) {
+	private TradeTax(TradeTaxType doc) {
 		super();
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);
+			LOG.fine("copy ctor:"+this);
 		}
-		LOG.fine("copy ctor:"+this);
 	}
 	
 	public String toString() {
@@ -198,12 +216,21 @@ public class TradeTax extends TradeTaxType
 		stringBuilder.append(getTaxPercentage()==null ? "null" : getTaxPercentage());
 		if(this.getTaxPointDate()!=null) {
 			stringBuilder.append(", TaxPointDate:");
-			stringBuilder.append(ApplicableHeaderTradeSettlement.taxPointDateAsTimestamp(getTaxPointDate()));			
+			stringBuilder.append(this.getTaxPointDateAsTimestamp());			
 		}
 		stringBuilder.append("]");
 		return stringBuilder.toString();
 	}
 
+	// BT-7 0..1 Value added tax point date
+	public Timestamp getTaxPointDateAsTimestamp() {
+		DateType date = super.getTaxPointDate();
+		return date==null ? null : DateTimeFormats.ymdToTs(date.getDateString().getValue());		
+	}
+	public void setTaxPointDate(Timestamp ts) {
+		if(ts!=null) super.setTaxPointDate(DateTimeFormatStrings.toDate(ts));
+	}
+	
 	// BT-116 1..1 BasisAmount Steuerbasisbetrag
 	@Override
 	public void setTaxBaseAmount(Amount taxBaseAmount) {
@@ -251,10 +278,6 @@ public class TradeTax extends TradeTaxType
 		taxCategoryCode.setValue(code);
 		super.setCategoryCode(taxCategoryCode);
 	}
-//	@Override
-//	public void setTaxCategoryCode(TaxCategoryCode code) {
-//		setTaxCategoryCode(code.getValue());  // TODO default in IF
-//	}
 	@Override
 	public TaxCategoryCode getTaxCategoryCode() {
 		return TaxCategoryCode.valueOf(super.getCategoryCode());
@@ -276,8 +299,8 @@ public class TradeTax extends TradeTaxType
 	 * BT-119   RateApplicablePercent, EN16931 0..1 (optional), wg BR-DE-14 1.1
 	 */
 	void setTaxCategoryAndRate(String type, TaxCategoryCode code, BigDecimal rate) {
-		setTaxCategoryCode(code.getValue());
 		setTaxType(type);	
+		setTaxCategoryCode(code.getValue());
 		setTaxPercentage(rate);
 	}
 

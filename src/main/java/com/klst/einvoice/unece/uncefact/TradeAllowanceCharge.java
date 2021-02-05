@@ -54,8 +54,22 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	private static final Logger LOG = Logger.getLogger(TradeAllowanceCharge.class.getName());
 
+	static TradeAllowanceCharge create() {
+		return new TradeAllowanceCharge(null);
+	}
+	// copy factory
+	static TradeAllowanceCharge create(TradeAllowanceChargeType tac) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(tac instanceof TradeAllowanceChargeType && tac.getClass()!=TradeAllowanceChargeType.class) {
+			// tt is instance of a subclass of TradeAllowanceChargeType, but not TradeAllowanceChargeType itself
+			return (TradeAllowanceCharge)tac;
+		} else {
+			return new TradeAllowanceCharge(tac); 
+		}
+	}
+
 	// copy ctor
-	TradeAllowanceCharge(TradeAllowanceChargeType tradeAllowanceCharge) {
+	private TradeAllowanceCharge(TradeAllowanceChargeType tradeAllowanceCharge) {
 		super();
 		if(tradeAllowanceCharge!=null) {
 			CopyCtor.invokeCopy(this, tradeAllowanceCharge);
@@ -63,7 +77,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 				LOG.warning("CategoryTradeTax is empty, expected one element.");
 			}
 		}
-		LOG.fine("copy ctor:"+this);
+		LOG.info("copy ctor:"+this); // TODO toString
 	}
 	
 	@Override
@@ -156,13 +170,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		
 		// nur das erste Element holen:
 		TradeTaxType tradeTax = categoryTradeTax.get(0);
-		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
-		if(tradeTax instanceof TradeTaxType && tradeTax.getClass()!=TradeTaxType.class) {
-			// tradeTax an instance of a subclass of TradeTaxType, but not TradeTaxType itself
-			return (TradeTax)tradeTax;
-		}
-		// copy ctor:
-		return new TradeTax(tradeTax);
+		return TradeTax.create(tradeTax);
 	}
 	
 	// BT-95-0, BT-102-0

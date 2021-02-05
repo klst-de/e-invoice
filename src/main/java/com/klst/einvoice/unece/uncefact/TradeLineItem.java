@@ -348,7 +348,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		List<TradeAllowanceChargeType> allowanceChargeList = specifiedLineTradeSettlement.getSpecifiedTradeAllowanceCharge();
 		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
 		allowanceChargeList.forEach(stac -> {
-			res.add(new TradeAllowanceCharge(stac));
+			res.add(TradeAllowanceCharge.create(stac));
 		});
 		return res;
 	}
