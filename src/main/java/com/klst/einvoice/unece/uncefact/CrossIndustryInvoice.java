@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
@@ -25,6 +24,7 @@ import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.Reference;
+import com.klst.einvoice.VatBreakdown;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -48,7 +48,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
@@ -126,7 +125,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery();
 		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 		
-		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement();
+		applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create();
 		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
 		
@@ -152,25 +151,13 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 		}
 
-		applicableHeaderTradeSettlement = new ApplicableHeaderTradeSettlement(
-				doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
-		LOG.fine("copy-ctor: PayeeParty ...");
-		TradePartyType tradeParty = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getPayeeTradeParty();
-		if(tradeParty!=null) setPayee(new TradeParty(tradeParty));
+		applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create(doc.getSupplyChainTradeTransaction());
+		
+		LOG.info("copy-ctor: PayeeParty ..."+this.getPayee());
 				
 		setStartDate(getStartDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement()));
 		setEndDate(getEndDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement()));
 		
-		setPaymentTermsAndDate(getPaymentTerm(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement())
-				, getDueDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement())); // optional
-		
-		List<TradeTaxType> attList = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getApplicableTradeTax();
-		attList.forEach(att -> {
-			TradeTax applicableTradeTax = new TradeTax(att);
-			LOG.fine("copy-ctor: applicableTradeTax "+applicableTradeTax);
-			addVATBreakDown(applicableTradeTax);
-		});
-
 		setId(getId(doc));
 		setIssueDate(getIssueDateAsTimestamp(doc));
 		
@@ -179,12 +166,6 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 
 		String taxCurrency = applicableHeaderTradeSettlement.getTaxCurrency();
 		setTaxCurrency(taxCurrency); // optional
-		
-		Timestamp ts = ApplicableHeaderTradeSettlement.getTaxPointDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
-		LOG.fine("copy-ctor: TaxPointDateAsTimestamp="+ts);
-		if(ts!=null) { // optional
-			setTaxPointDate(ts);
-		}
 		
 		setBuyerReference(getBuyerReferenceValue(doc)); // optional BT-10
 		setProjectReference(getProjectReference(doc)); // optional BT-11
@@ -366,12 +347,16 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	// 0..1 (optional) BT-7 BT-7-0
 	@Override
 	public void setTaxPointDate(Timestamp ts) {
-		applicableHeaderTradeSettlement.setTaxPointDate(ts);
+		if(ts==null) return;
+		this.getVATBreakDowns().forEach(vb -> {
+			TradeTax tradeTax = (TradeTax)vb;
+			tradeTax.setTaxPointDate(ts);
+		});
 	}
 
 	@Override
 	public Timestamp getTaxPointDateAsTimestamp() {
-		return ApplicableHeaderTradeSettlement.getTaxPointDateAsTimestamp(applicableHeaderTradeSettlement);
+		return applicableHeaderTradeSettlement.getTaxPointDateAsTimestamp();
 	}
 	
 	// BT-8 + 0..1 Value added tax point date code
@@ -399,49 +384,19 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 
 	@Override
 	public Timestamp getDueDateAsTimestamp() {
-		return getDueDateAsTimestamp(applicableHeaderTradeSettlement);
-	}
-	static Timestamp getDueDateAsTimestamp(HeaderTradeSettlementType ahts) {
-		if(ahts==null) return null;
-		List<TradePaymentTermsType> tradePaymentTermsList = ahts.getSpecifiedTradePaymentTerms(); // 0 .. n
-		// tradePaymentTermsList / Detailinformationen zu Zahlungsbedingungen
-		if(tradePaymentTermsList.isEmpty()) return null;
-		DateTimeType dateTime = tradePaymentTermsList.get(0).getDueDateDateTime();
-		if(dateTime==null) return null;
-		return DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue(), dateTime.getDateTimeString().getFormat());
-	}
-
-	@Override
-	public void setPaymentTermsAndDate(String description, String ymd) {
-		setPaymentTermsAndDate(description, DateTimeFormats.ymdToTs(ymd));
+		return applicableHeaderTradeSettlement.getTradePaymentTerms()==null ? null : applicableHeaderTradeSettlement.getTradePaymentTerms().getDueDateAsTimestamp();
 	}
 
 	// BT-9 0..1 & BT-20 0..1 : Payment terms & Payment due date
 	// auch <ram:DirectDebitMandateID> BG-19.BT-89 ist in TradePaymentTermsType
 	@Override
 	public void setPaymentTermsAndDate(String description, Timestamp ts) {
-		LOG.fine("setPaymentTermsAndDate: description:"+description + " & Payment due date Timestamp:"+ts);
-		TradePaymentTermsType tradePaymentTerms = applicableHeaderTradeSettlement.getPaymentTerms();
-		if(description!=null) {
-			tradePaymentTerms.getDescription().add(new Text(description)); // returns List<TextType>
-		}
-		if(ts!=null) {
-			tradePaymentTerms.setDueDateDateTime(DateTimeFormatStrings.toDateTime(ts));
-		}	
-		applicableHeaderTradeSettlement.setPaymentTerms(tradePaymentTerms);
+		applicableHeaderTradeSettlement.setPaymentTermsAndDate(description, ts);
 	}
 	
 	@Override
 	public String getPaymentTerm() {
-		return getPaymentTerm(applicableHeaderTradeSettlement);
-	}
-	static String getPaymentTerm(HeaderTradeSettlementType ahts) {
-		List<TradePaymentTermsType> tradePaymentTermsList = ahts.getSpecifiedTradePaymentTerms();
-		if(tradePaymentTermsList.isEmpty()) return null;
-		
-		TradePaymentTermsType tradePaymentTerms = tradePaymentTermsList.get(0); // da Cardinality 0..1 kann es nur einen geben
-		List<TextType> textList = tradePaymentTerms.getDescription();
-		return textList.isEmpty() ? null : textList.get(0).getValue();
+		return applicableHeaderTradeSettlement.getTradePaymentTerms()==null ? null : applicableHeaderTradeSettlement.getTradePaymentTerms().getPaymentTerm();
 	}
 
 	/* EN16931-ID: 	BT-10 (optional), but mandatory in CIUS rule BR-DE-15
@@ -922,9 +877,11 @@ UBL:
 		party.setCompanyLegalForm(companyLegalForm);
 		setPayee(party);
 	}
+	// BG-10 + 0..1 PAYEE
 	public void setPayee(BusinessParty party) {
-		LOG.fine("setPayee BusinessParty party "+party);
-		applicableHeaderTradeSettlement.setPayeeTradeParty((TradePartyType) party);
+		LOG.info("setPayee BusinessParty party "+party);
+		applicableHeaderTradeSettlement.setPayee(party);
+		// ?????????????????????? TODO
 	}
 
 	public BusinessParty getPayee() {
@@ -1041,17 +998,19 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	@Override
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		applicableHeaderTradeSettlement.init(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
-		return applicableHeaderTradeSettlement;
+		
+		return applicableHeaderTradeSettlement.createPaymentInstructions(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 
 	@Override
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		applicableHeaderTradeSettlement.init(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+		setPaymentInstructions(applicableHeaderTradeSettlement.createPaymentInstructions(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit));
 	}
 
 	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
+		// PaymentInstructions wird durch ApplicableHeaderTradeSettlement implementiert
+		// werden andere Informationen in applicableHeaderTradeSettlement zerstört ????? JA,z.B PayeeParty TODO
 		applicableHeaderTradeSettlement = (ApplicableHeaderTradeSettlement)paymentInstructions;
 	}
 	public PaymentInstructions getPaymentInstructions() {
@@ -1270,12 +1229,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		List<TradeTaxType> list = applicableHeaderTradeSettlement.getApplicableTradeTax();
 		List<VatBreakdown> result = new ArrayList<VatBreakdown>(list.size());
 		list.forEach(tradeTax -> {
-			if(tradeTax instanceof TradeTaxType && tradeTax.getClass()!=TradeTaxType.class) {
-				// tradeTax an instance of a subclass of TradeTaxType, but not TradeTaxType itself
-				result.add( (TradeTax)tradeTax );			
-			} else {
-				result.add(new TradeTax(tradeTax));
-			}
+			result.add(TradeTax.create(tradeTax));
 		});
 		return result;
 	}
