@@ -47,7 +47,8 @@ public interface BG19_DirectDebit extends DirectDebit {
 	 * 
 	 * @return Identifier
 	 */
-	// BG-19.BT-89 0..1 Mandate reference identifier, DirectDebitMandateID, Kennung der Mandatsreferenz
+	// BG-19.BT-89 0..1 Mandate reference identifier, DirectDebitMandateID
+	// Synonym: Mandatsreferenz für SEPA, Kennung der Mandatsreferenz
 	public String getMandateReferencedID();
 	public void setMandateReferencedID(String id);
 

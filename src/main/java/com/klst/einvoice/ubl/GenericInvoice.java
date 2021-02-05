@@ -630,10 +630,6 @@ daher: NOT_IMPEMENTED
 	}
 	
 	@Override
-	public void setPaymentTermsAndDate(String description, String ymd) {
-		setPaymentTermsAndDate(description, DateTimeFormats.ymdToTs(ymd));
-	}
-	@Override
 	public void setPaymentTermsAndDate(String description, Timestamp ts) {
 		setPaymentTerm(description); // BT-20 optional
 		setDueDate(ts); // BT-9 optional	

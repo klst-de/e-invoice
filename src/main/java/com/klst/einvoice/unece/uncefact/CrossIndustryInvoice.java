@@ -388,7 +388,6 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	}
 
 	// BT-9 0..1 & BT-20 0..1 : Payment terms & Payment due date
-	// auch <ram:DirectDebitMandateID> BG-19.BT-89 ist in TradePaymentTermsType
 	@Override
 	public void setPaymentTermsAndDate(String description, Timestamp ts) {
 		applicableHeaderTradeSettlement.setPaymentTermsAndDate(description, ts);

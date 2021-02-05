@@ -332,16 +332,18 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * For partial payments it states the first net due date. 
 	 * <p>
 	 * Cardinality: 0..1 (optional)
-	 * <br>EN16931-ID: 	BT-9 & BT-20
+	 * <br>EN16931-ID: 	BT-9 (Payment due date) & BT-20 
 	 * <br>Rule ID: 	BR-CO-25
 	 * <br>Request ID: 	R60
 	 * 
-	 * @param description, optional: can be null
-	 * @param ymd Date, optional: can be null
+	 * @param description optional BT-20 textual description of the payment terms
+	 * @param timestamp optional BT-9 Payment due date
 	 */
-	public void setPaymentTermsAndDate(String description, String ymd);
-	public void setPaymentTermsAndDate(String description, Timestamp ts);
-
+	public void setPaymentTermsAndDate(String description, Timestamp timestamp);
+	default void setPaymentTermsAndDate(String description, String ymd) {
+		setPaymentTermsAndDate(description, ymd==null ? (Timestamp)null : DateTimeFormats.ymdToTs(ymd));
+	}
+	// BT-20
 	public String getPaymentTerm();
 
 	/**
