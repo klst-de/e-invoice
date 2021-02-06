@@ -104,7 +104,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		if(pm==null) return null;
 		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
 		if(pm instanceof TradeSettlementPaymentMeansType && pm.getClass()!=TradeSettlementPaymentMeansType.class) {
-			// tt is instance of a subclass of TradeTaxType, but not TradeTaxType itself
+			// pm is instance of a subclass of TradeSettlementPaymentMeansType, but not TradeSettlementPaymentMeansType itself
 			return (TradeSettlementPaymentMeans)pm;
 		} else {
 			return new TradeSettlementPaymentMeans(pm); 
@@ -117,17 +117,17 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		super();
 		if(tradeSettlementPaymentMeans!=null) {
 			CopyCtor.invokeCopy(this, tradeSettlementPaymentMeans);
-			LOG.info("copy ctor:"+this);
+			LOG.fine("copy ctor:"+this);
 		}
 	}
 	
-	TradeSettlementPaymentMeans(PaymentMeansEnum code, String text) {
+	private TradeSettlementPaymentMeans(PaymentMeansEnum code, String text) {
 		super();
 		this.setTypeCode(code);
 		this.setPaymentMeansText(text);
 		LOG.config("done:"+this);
 	}
-	TradeSettlementPaymentMeans(PaymentMeansEnum code) {
+	private TradeSettlementPaymentMeans(PaymentMeansEnum code) {
 		this(code, null);
 	}
 
@@ -177,20 +177,19 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		StringBuilder stringBuilder = new StringBuilder().append("[");
 		stringBuilder.append(this.getPaymentMeansEnum());
 		if(isCreditTransfer()) {
-			stringBuilder.append(", CREDIT TRANSFER PaymentAccountID (BG-17.BT-84):");
+			stringBuilder.append(", CREDIT TRANSFER PaymentAccountID:"); // BG-17.BT-84
 			stringBuilder.append(getPaymentAccountID()==null ? "null" : getPaymentAccountID());
-			stringBuilder.append(", PaymentAccountName:");
+			stringBuilder.append(", PaymentAccountName:");               // BG-17.BT-85
 			stringBuilder.append(getPaymentAccountName()==null ? "null" : getPaymentAccountName());
-			stringBuilder.append(", PaymentServiceProviderID:");
+			stringBuilder.append(", PaymentServiceProviderID:");         // BG-17.BT-86
 			stringBuilder.append(getPaymentServiceProviderID()==null ? "null" : getPaymentServiceProviderID());
 		}
 		if(isBankCard()) {
-			stringBuilder.append(", PAYMENT CARD INFORMATION CardAccountID (BG-18.BT-87):"); // TODO toString
-			stringBuilder.append(super.getApplicableTradeSettlementFinancialCard()==null ? "null" 
-					: this.getPaymentCard());
+			stringBuilder.append(", PAYMENT CARD INFORMATION:");
+			stringBuilder.append(getPaymentCard()==null ? "null" : getPaymentCard());
 		}	
 		if(isDirectDebit()) {
-			stringBuilder.append(", DIRECT DEBIT DebitedAccountID (BG-19.BT-91):");
+			stringBuilder.append(", DIRECT DEBIT DebitedAccountID:");
 			stringBuilder.append(getDebitedAccountID()==null ? "null" : getDebitedAccountID());
 		}	
 		stringBuilder.append("]");
@@ -229,6 +228,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 
 // ---------------- implements CreditTransfer:
 	
+	// BG-17.BT-84 BT-84-0
 	@Override
 	public String getPaymentAccountID() {
 		if(isCreditTransfer()) {
@@ -258,6 +258,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		}
 	}
 
+	// BG-17.BT-85
 	@Override
 	public String getPaymentAccountName() {
 		if(isCreditTransfer()) {
@@ -305,8 +306,8 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 	}
 
 // ---------------- implements DirectDebit:
-//	BG-19.BT-89 eine Ebene höher
-//	BG-19.BT-90 eine Ebene höher
+//	BG-19.BT-89 0..1 Mandate reference identifier - Ebene höher, in ApplicableHeaderTradeSettlement
+//	BG-19.BT-90 0..1 Bank assigned creditor identifier - ebenfalls
 
 	// BG-19.BT-91
 	@Override

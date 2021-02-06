@@ -55,7 +55,7 @@ public class TradeSettlementFinancialCard extends TradeSettlementFinancialCardTy
 		super();
 		if(financialCard!=null) {
 			CopyCtor.invokeCopy(this, financialCard);
-			LOG.info("copy ctor:"+this);
+			LOG.fine("copy ctor:"+this);
 		}
 	}
 	
@@ -71,21 +71,17 @@ public class TradeSettlementFinancialCard extends TradeSettlementFinancialCardTy
 		setCardHolderName(name);
 	}
 
-	// TODO toString
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder().append("[");
+		stringBuilder.append("CardAccountID:");    // BG-18.BT-87
+		stringBuilder.append(getCardAccountID()==null ? "null" : getCardAccountID());
+		stringBuilder.append(", CardHolderName:"); // BG-18.BT-88
+		stringBuilder.append(getCardHolderName()==null ? "null" : getCardHolderName());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
+	}
 	
 	// BG-18.BT-87
-	@Override
-	public String getCardAccountID() {
-		return getCardAccountID(this);
-	}
-	static String getCardAccountID(TradeSettlementFinancialCardType card) {
-		if(card.getID()==null) {
-			LOG.warning("(mandatory) Payment card primary account number (pan) is not set.");
-			return null;
-		}
-		return card.getID().getValue();
-	}
-
 	@Override
 	public void setCardAccountID(String pan) {
 		if(pan==null) {
@@ -95,7 +91,22 @@ public class TradeSettlementFinancialCard extends TradeSettlementFinancialCardTy
 		super.setID(new ID(pan));
 	}
 
+	@Override
+	public String getCardAccountID() {
+		if(super.getID()==null) {
+			LOG.warning("(mandatory) Payment card primary account number (pan) is not set.");
+			return null;
+		}
+		return getID().getValue();
+	}
+
 	// BG-18.BT-88
+	@Override
+	public void setCardHolderName(String name) {
+		if(name==null) return;
+		super.setCardholderName(new Text(name));	
+	}
+
 	@Override
 	public String getCardHolderName() {
 		return getCardHolderName(this);
@@ -103,12 +114,6 @@ public class TradeSettlementFinancialCard extends TradeSettlementFinancialCardTy
 	static String getCardHolderName(TradeSettlementFinancialCardType card) {
 		if(card==null) return null;
 		return card.getCardholderName()==null ? null : card.getCardholderName().getValue();
-	}
-
-	@Override
-	public void setCardHolderName(String name) {
-		if(name==null) return;
-		super.setCardholderName(new Text(name));	
 	}
 
 }
