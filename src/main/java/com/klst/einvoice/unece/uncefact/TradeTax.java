@@ -140,24 +140,6 @@ public class TradeTax extends TradeTaxType
 		return new TradeTax(taxType.getValue(), taxCode, taxRate);
 	}
 
-	/**
-	 * factory methods to be used for TradeAllowanceCharge (which implements AllowancesAndCharges)
-	 * 
-	 * @param taxType
-	 * @param taxCode
-	 * @param taxRate or taxPercent
-	 * @return
-	 */ 
-//	static ITaxCategory createTaxCategory(TaxTypeCode taxType, TaxCategoryCode taxCode, Percent taxPercent) {
-//		return new TradeTax(taxType.getValue(), taxCode, taxPercent);
-//	}
-//	static ITaxCategory createTaxCategory(TaxCategoryCode taxCode, Percent taxPercent) {
-//		return new TradeTax(TaxTypeCode.ValueAddedTax.getValue(), taxCode, taxPercent);
-//	}
-//	static ITaxCategory createTaxCategory(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
-//		return new TradeTax(taxType, taxCode, taxRate);
-//	}
-
 	static TradeTax create() {
 		return new TradeTax(null);
 	}
@@ -181,12 +163,6 @@ public class TradeTax extends TradeTaxType
 		setTaxCategoryCodeAndRate(taxCode, taxRate);
 		
 	}
-//	private TradeTax(String taxType, TaxCategoryCode taxCode, Percent taxPercent) {
-//		super();
-//		setTaxType(taxType);
-//		setTaxCategoryCode(taxCode);
-//		setTaxPercentage(taxPercent);
-//	}
 	
 	private TradeTax(String taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		super();
@@ -210,9 +186,11 @@ public class TradeTax extends TradeTaxType
 		stringBuilder.append(getTaxBaseAmount()==null ? "null" : getTaxBaseAmount());
 		stringBuilder.append(", CalculatedTaxAmount:");
 		stringBuilder.append(getCalculatedTaxAmount()==null ? "null" : getCalculatedTaxAmount());
+		stringBuilder.append(", TaxType:");
+		stringBuilder.append(getTaxType()==null ? "null" : getTaxType());
 		stringBuilder.append(", TaxCategoryCode:");
 		stringBuilder.append(getTaxCategoryCode()==null ? "null" : getTaxCategoryCode());
-		stringBuilder.append(", TaxCategoryRate:");
+		stringBuilder.append(", %rate:");
 		stringBuilder.append(getTaxPercentage()==null ? "null" : getTaxPercentage());
 		if(this.getTaxPointDate()!=null) {
 			stringBuilder.append(", TaxPointDate:");
@@ -240,7 +218,7 @@ public class TradeTax extends TradeTaxType
 	}
 	@Override
 	public Amount getTaxBaseAmount() {
-		return new Amount(super.getBasisAmount().get(0).getValue());
+		return super.getBasisAmount().isEmpty() ? null : new Amount(super.getBasisAmount().get(0).getValue());
 	}
 
 	// BT-117 1..1 CalculatedAmount Kategoriespezifischer Steuerbetrag
@@ -253,7 +231,7 @@ public class TradeTax extends TradeTaxType
 
 	@Override
 	public Amount getCalculatedTaxAmount() {
-		return new Amount(super.getCalculatedAmount().get(0).getValue());
+		return super.getCalculatedAmount().isEmpty() ? null : new Amount(super.getCalculatedAmount().get(0).getValue());
 	}
 
 	// ALLOWANCES (BG-20.BT-95-0) and CHARGES (BG-21.BT-102-0)
@@ -267,7 +245,7 @@ public class TradeTax extends TradeTaxType
 
 	@Override
 	public String getTaxType() {
-		return super.getTypeCode().getValue();
+		return super.getTypeCode()==null ? null : super.getTypeCode().getValue();
 	}
 
 	// BT-95, BT-102 (mandatory) Document level allowance/charge VAT category code

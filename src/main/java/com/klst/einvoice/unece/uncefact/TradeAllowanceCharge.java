@@ -76,7 +76,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 			if(getCategoryTradeTax().isEmpty()) {
 				LOG.warning("CategoryTradeTax is empty, expected one element.");
 			}
-			LOG.info("copy ctor:"+this);
+			LOG.fine("copy ctor:"+this);
 		}
 	}
 	
