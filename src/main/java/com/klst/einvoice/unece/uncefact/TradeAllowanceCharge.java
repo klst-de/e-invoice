@@ -76,10 +76,39 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 			if(getCategoryTradeTax().isEmpty()) {
 				LOG.warning("CategoryTradeTax is empty, expected one element.");
 			}
+			LOG.info("copy ctor:"+this);
 		}
-		LOG.info("copy ctor:"+this); // TODO toString
 	}
 	
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder().append("[");
+		if(isAllowance()) stringBuilder.append("ALLOWANCE");
+		if(isCharge()) stringBuilder.append("CHARGE"); // BG-21
+		
+		stringBuilder.append(", AmountWithoutTax:"); // BT-99
+		stringBuilder.append(getAmountWithoutTax()==null ? "null" : getAmountWithoutTax());
+		stringBuilder.append(", AssessmentBase:");   // BT-100
+		stringBuilder.append(getAssessmentBase()==null ? "null" : getAssessmentBase());
+		stringBuilder.append(", %rate:");            // BT-101
+		stringBuilder.append(getPercentage()==null ? "null" : getPercentage());
+		
+		stringBuilder.append(", tax:");   // BT-102-0
+		stringBuilder.append(getTaxType()==null ? "null" : getTaxType());
+		stringBuilder.append("/");        // BT-102
+		stringBuilder.append(getTaxCategoryCode()==null ? "null" : getTaxCategoryCode());
+		stringBuilder.append(", tax%:");  // BT-103
+		stringBuilder.append(getTaxPercentage()==null ? "null" : getTaxPercentage());
+		
+		stringBuilder.append(", Reasoncode:"); // BT-104
+		stringBuilder.append(getReasoncode()==null ? "null" : getReasoncode());
+		stringBuilder.append(", ReasonText:"); // BT-105
+		stringBuilder.append(getReasonText()==null ? "null" : getReasonText());
+		
+		stringBuilder.append("]");
+		return stringBuilder.toString();
+	}
+
+
 	@Override
 	public void setChargeIndicator(boolean value) {
 		IndicatorType indicator = new IndicatorType();
@@ -93,9 +122,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	}
 	static boolean isAllowance(TradeAllowanceChargeType tradeAllowanceCharge) {
 		IndicatorType indicator = tradeAllowanceCharge.getChargeIndicator();
-		IndicatorType allowance = new IndicatorType();
-		allowance.setIndicator(AllowancesAndCharges.ALLOWANCE);
-		return indicator.equals(allowance);
+		return indicator!=null && indicator.isIndicator().equals(AllowancesAndCharges.ALLOWANCE);
 	}
 
 	@Override
@@ -104,9 +131,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	}
 	static boolean isCharge(TradeAllowanceChargeType tradeAllowanceCharge) {
 		IndicatorType indicator = tradeAllowanceCharge.getChargeIndicator();
-		IndicatorType charge = new IndicatorType();
-		charge.setIndicator(AllowancesAndCharges.CHARGE);
-		return indicator.equals(charge);
+		return indicator!=null && indicator.isIndicator().equals(AllowancesAndCharges.CHARGE);
 	}
 
 	// BT-92, BT-99 (mandatory) Document level allowance/charge amount
@@ -216,7 +241,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		return tradeTax==null? null : tradeTax.getTaxCategoryCode();
 	}
 
-	// BT-96, BT103 0..1 Document level allowance/charge VAT rate
+	// BT-96, BT-103 0..1 Document level allowance/charge VAT rate
 	@Override
 	public void setTaxPercentage(BigDecimal percentage) {
 		if(percentage==null) return;
