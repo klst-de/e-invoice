@@ -57,7 +57,6 @@ public class TradePaymentTerms extends TradePaymentTermsType {
 	}
 	// copy factory
 	static TradePaymentTerms create(TradePaymentTermsType hts) {
-//		if(hts==null) return null;
 		if(hts instanceof TradePaymentTermsType && hts.getClass()!=TradePaymentTermsType.class) {
 			// hts is instance of a subclass of TradePaymentTermsType, but not TradePaymentTermsType itself
 			return (TradePaymentTerms)hts;
@@ -70,7 +69,7 @@ public class TradePaymentTerms extends TradePaymentTermsType {
 		super();
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);
-			LOG.info("copy ctor:"+this);			// TODO toString
+			LOG.fine("copy ctor:"+this);
 		}
 	}
 /*
@@ -94,6 +93,20 @@ INFORMATION: List<?> getter : getDescription
 
  */
 
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder().append("[");
+		stringBuilder.append("DueDate:"); // BT-9
+		stringBuilder.append(getDueDateAsTimestamp()==null ? "null" : getDueDateAsTimestamp());
+		stringBuilder.append(", PaymentTerm:");   // BT-20
+		stringBuilder.append(getPaymentTerm()==null ? "null" : getPaymentTerm());
+		
+		stringBuilder.append(", MandateReferencedID:");            // BG-19.BT-89
+		stringBuilder.append(getMandateReferencedID()==null ? "null" : getMandateReferencedID());
+		
+		stringBuilder.append("]");
+		return stringBuilder.toString();
+	}
+
 	// BT-9 & BT-20
 	public void setPaymentTermsAndDate(String description, Timestamp ts) {
 //		if(description!=null) super.getDescription().add(new Text(description));
@@ -103,12 +116,12 @@ INFORMATION: List<?> getter : getDescription
 	}
 	
 	// BT-9
+	public void setDueDate(Timestamp ts) {
+		if(ts!=null) super.setDueDateDateTime(DateTimeFormatStrings.toDateTime(ts));
+	}
 	public Timestamp getDueDateAsTimestamp() {
 		DateTimeType dateTime = super.getDueDateDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
-	}
-	public void setDueDate(Timestamp ts) {
-		if(ts!=null) super.setDueDateDateTime(DateTimeFormatStrings.toDateTime(ts));
 	}
 
 	// BT-20

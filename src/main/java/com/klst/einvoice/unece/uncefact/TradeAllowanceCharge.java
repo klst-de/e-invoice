@@ -108,7 +108,6 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		return stringBuilder.toString();
 	}
 
-
 	@Override
 	public void setChargeIndicator(boolean value) {
 		IndicatorType indicator = new IndicatorType();
