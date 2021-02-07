@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.BG19_DirectDebit;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
@@ -33,7 +34,6 @@ import com.klst.untdid.codelist.TaxCategoryCode;
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.ReferenceCodeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.TimeReferenceCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentContextParameterType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
@@ -362,18 +362,16 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	// BT-8 + 0..1 Value added tax point date code
 	@Override
 	public void setTaxPointDateCode(String code) {
-		if(code==null) return;  // optional
-		TimeReferenceCodeType timeReferenceCode = new TimeReferenceCodeType();
-		timeReferenceCode.setValue(code);
-		TradeTaxType tradeTax = new TradeTaxType();
-		tradeTax.setDueDateTypeCode(timeReferenceCode);
-		applicableHeaderTradeSettlement.getApplicableTradeTax().add(tradeTax);
+		if(code==null) return;
+		this.getVATBreakDowns().forEach(vb -> {
+			TradeTax tradeTax = (TradeTax)vb;
+			tradeTax.setTaxPointDateCode(code);
+		});
 	}
 
 	@Override
 	public String getTaxPointDateCode() {
-		LOG.warning(NOT_IMPEMENTED); // TODO
-		return null;
+		return applicableHeaderTradeSettlement.getTaxPointDateCode();
 	}
 
 	// BT-9 0..1 DueDateDateTime Fälligkeitsdatum
@@ -996,21 +994,49 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	// factory delegate to ApplicableHeaderTradeSettlement
 	@Override
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
 		
 		return applicableHeaderTradeSettlement.createPaymentInstructions(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 
 	@Override
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
 		setPaymentInstructions(applicableHeaderTradeSettlement.createPaymentInstructions(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit));
 	}
 
 	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
 		// PaymentInstructions wird durch ApplicableHeaderTradeSettlement implementiert
 		// werden andere Informationen in applicableHeaderTradeSettlement zerstört ????? JA,z.B PayeeParty TODO
+		LOG.info(">>>>>>>>>>>>>>>>"+applicableHeaderTradeSettlement.getPayeeTradeParty());
 		applicableHeaderTradeSettlement = (ApplicableHeaderTradeSettlement)paymentInstructions;
+		
+//		applicableHeaderTradeSettlement.setPaymentMeansEnum(paymentInstructions.getPaymentMeansEnum());
+//		paymentInstructions.getPaymentMeansText();
+		//----------
+//		LOG.info("paymentInstructions:"+paymentInstructions);
+//		applicableHeaderTradeSettlement.setPaymentMeans(paymentInstructions.getPaymentMeansEnum(), paymentInstructions.getPaymentMeansText());
+//
+//		applicableHeaderTradeSettlement.setRemittanceInformation(paymentInstructions.getRemittanceInformation());
+//		paymentInstructions.getCreditTransfer().forEach(ct -> {
+////			TradeSettlementPaymentMeans extends ... implements CreditTransfer, DirectDebit
+//			applicableHeaderTradeSettlement.addCreditTransfer(ct);
+//		});
+//		applicableHeaderTradeSettlement.setPaymentCard(paymentInstructions.getPaymentCard());
+//		applicableHeaderTradeSettlement.setDirectDebit(paymentInstructions.getDirectDebit());
+		
+		// das hat nix gebracht:
+//		// dh. nur die paymentInstructions elemente kopieren!!!!
+////		applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create(paymentInstructions.getPaymentMeansEnum()
+////				, paymentInstructions.getPaymentMeansText(), paymentInstructions.getRemittanceInformation()
+////				, paymentInstructions.getCreditTransfer()
+////				, paymentInstructions.getPaymentCard()
+////				, paymentInstructions.getDirectDebit());
+//		applicableHeaderTradeSettlement.init(paymentInstructions.getPaymentMeansEnum()
+//				, paymentInstructions.getPaymentMeansText(), paymentInstructions.getRemittanceInformation()
+//				, paymentInstructions.getCreditTransfer()
+//				, paymentInstructions.getPaymentCard()
+//				, paymentInstructions.getDirectDebit());
 	}
 	public PaymentInstructions getPaymentInstructions() {
 		return applicableHeaderTradeSettlement; // das implementiert PaymentInstructions!

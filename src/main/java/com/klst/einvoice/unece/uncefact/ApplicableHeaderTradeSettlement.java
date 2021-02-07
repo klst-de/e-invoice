@@ -19,7 +19,6 @@ import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CurrencyCodeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
@@ -148,11 +147,11 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 	// implements PaymentInstructionsFactory
 	@Override
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
 		return create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
-	static PaymentInstructions create(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+	static ApplicableHeaderTradeSettlement create(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
 		return new ApplicableHeaderTradeSettlement(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 	
@@ -204,23 +203,30 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 /*
 in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
  */
-	ApplicableHeaderTradeSettlement(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+	private ApplicableHeaderTradeSettlement(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
 		super();
 		init(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
-	private void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-//		TradeSettlementPaymentMeansType pm = addPaymentMeans(code, paymentMeansText); // BT-81, BT-82
+	void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
+		setPaymentMeans(code, paymentMeansText); // BT-81, BT-82 - ein pm ohne BG-17 wird erstellt
 		setRemittanceInformation(remittanceInformation); // BT-83
 		 // BG-17 :
 		if(creditTransfer!=null) {
 			if(creditTransfer.size()>0) {
-				TradeSettlementPaymentMeansType pm = TradeSettlementPaymentMeans.create((TradeSettlementPaymentMeansType)creditTransfer.get(0));
-				getSpecifiedTradeSettlementPaymentMeans().add(pm);
+				TradeSettlementPaymentMeans pm = TradeSettlementPaymentMeans.create((TradeSettlementPaymentMeansType)creditTransfer.get(0));
+//				getSpecifiedTradeSettlementPaymentMeans().add(pm);
+//				TODO kopieren:
+//				setPaymentAccountID(accountId);
+//				setPaymentAccountName(accountName);
+//				setPaymentServiceProviderID(bic);
+				getSpecifiedTradeSettlementPaymentMeans().get(0).setPayeePartyCreditorFinancialAccount(pm.getPayeePartyCreditorFinancialAccount());
+//accountName	getSpecifiedTradeSettlementPaymentMeans().get(0).setPayeePartyCreditorFinancialAccount(pm.getPayeePartyCreditorFinancialAccount());
+				getSpecifiedTradeSettlementPaymentMeans().get(0).setPayeeSpecifiedCreditorFinancialInstitution(pm.getPayeeSpecifiedCreditorFinancialInstitution());
 			}
 			for(int i=1; i<creditTransfer.size(); i++) {
-				TradeSettlementPaymentMeansType pm = TradeSettlementPaymentMeans.create((TradeSettlementPaymentMeansType)creditTransfer.get(i));
+				TradeSettlementPaymentMeans pm = TradeSettlementPaymentMeans.create((TradeSettlementPaymentMeansType)creditTransfer.get(i));
 				getSpecifiedTradeSettlementPaymentMeans().add(pm);
 			}
 		} else {
@@ -262,9 +268,16 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	
 	// BT-7 + 0..1 Value added tax point date : ist in jedem VATBreakDowns
 	// TODO sequenzproblem : setTaxPointDate , dannach addVATBreakDowns ==> TaxPointDate nicht im VATBreakDown
-
 	public Timestamp getTaxPointDateAsTimestamp() {
 		return tradeTax.getTaxPointDateAsTimestamp();
+	}
+	
+	// BT-8 + 0..1 Value added tax point date code
+	public void setTaxPointDateCode(String code) {
+		tradeTax.setTaxPointDateCode(code);
+	}
+	public String getTaxPointDateCode() {
+		return tradeTax.getTaxPointDateCode();
 	}
 	
 // ---------------- implements PaymentInstructions:
@@ -294,19 +307,22 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		}
 		addPaymentMeans(code, text);
 	}
-	private TradeSettlementPaymentMeansType addPaymentMeans(PaymentMeansEnum code, String text) { // code+text
-		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
-		pmc.setValue(code.getValueAsString());
-		
-		TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = new TradeSettlementPaymentMeansType();
-		getSpecifiedTradeSettlementPaymentMeans().add(tradeSettlementPaymentMeans);
-		
-		tradeSettlementPaymentMeans.setTypeCode(pmc);
-		
-		if(text!=null) { // BT-82 
-			tradeSettlementPaymentMeans.getInformation().add(new Text(text));
-		}
-		return tradeSettlementPaymentMeans;
+	private TradeSettlementPaymentMeans addPaymentMeans(PaymentMeansEnum code, String text) { // code+text
+//		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
+//		pmc.setValue(code.getValueAsString());
+//		
+//		TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = new TradeSettlementPaymentMeansType();
+//		getSpecifiedTradeSettlementPaymentMeans().add(tradeSettlementPaymentMeans);
+//		
+//		tradeSettlementPaymentMeans.setTypeCode(pmc);
+//		
+//		if(text!=null) { // BT-82 
+//			tradeSettlementPaymentMeans.getInformation().add(new Text(text));
+//		}
+		TradeSettlementPaymentMeans pm = new TradeSettlementPaymentMeans(code, text); // BT-81 , BT-82
+		getSpecifiedTradeSettlementPaymentMeans().add(pm);
+		LOG.info("added pm"+pm);
+		return pm;
 	}
 	
 	@Override
@@ -317,7 +333,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		}
 		return getPaymentMeansText(getSpecifiedTradeSettlementPaymentMeans().get(0));
 	}
-	static String getPaymentMeansText(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
+	private static String getPaymentMeansText(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
 		if(tradeSettlementPaymentMeans==null) return null;
 		return tradeSettlementPaymentMeans.getInformation().isEmpty() ? null : tradeSettlementPaymentMeans.getInformation().get(0).getValue();
 	}
@@ -334,7 +350,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	public String getRemittanceInformation() {
 		return getRemittanceInformation(this);
 	}
-	static String getRemittanceInformation(HeaderTradeSettlementType headerTradeSettlement) {
+	private static String getRemittanceInformation(HeaderTradeSettlementType headerTradeSettlement) {
 		List<TextType> list = headerTradeSettlement.getPaymentReference();
 		return list.isEmpty() ? null : list.get(0).getValue();
 	}
@@ -357,7 +373,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	public List<CreditTransfer> getCreditTransfer() {
 		return getCreditTransfer(this);
 	}
-	static List<CreditTransfer> getCreditTransfer(HeaderTradeSettlementType haderTradeSettlement) {
+	private static List<CreditTransfer> getCreditTransfer(HeaderTradeSettlementType haderTradeSettlement) {
 		List<CreditTransfer> ret = new ArrayList<CreditTransfer>();
 
 		if(haderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
@@ -401,37 +417,9 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 			LOG.warning("super.getSpecifiedTradeSettlementPaymentMeans().isEmpty()");
 			TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = new TradeSettlementPaymentMeans((TradeSettlementFinancialCard)paymentCard);
 			getSpecifiedTradeSettlementPaymentMeans().add(tradeSettlementPaymentMeans);
+		} else {
+			getSpecifiedTradeSettlementPaymentMeans().get(0).setApplicableTradeSettlementFinancialCard((TradeSettlementFinancialCard)paymentCard);
 		}
-	}
-
-	// BG-19 ++ 0..1 DIRECT DEBIT
-	@Override
-	public void setDirectDebit(BG19_DirectDebit directDebit) {
-		if(directDebit==null) return;
-		if(directDebit instanceof ApplicableHeaderTradeSettlement) { // das ist immer der Fall
-//			LOG.warning("----MandateReferencedID:"+directDebit.getMandateReferencedID());
-			this.setMandateReferencedID(directDebit.getMandateReferencedID());
-//			LOG.warning("----BankAssignedCreditorID:"+directDebit.getBankAssignedCreditorID());
-			this.setBankAssignedCreditorID(directDebit.getBankAssignedCreditorID());
-//			LOG.warning("----getDebitedAccountID:"+directDebit.getDebitedAccountID());
-//			LOG.warning("----???:"+directDebit + " this:"+this);
-//			LOG.warning("----size:"+((ApplicableHeaderTradeSettlement)directDebit).getSpecifiedTradeSettlementPaymentMeans().size() + " this:"+getSpecifiedTradeSettlementPaymentMeans().size());
-			getSpecifiedTradeSettlementPaymentMeans().add(((ApplicableHeaderTradeSettlement)directDebit).getSpecifiedTradeSettlementPaymentMeans().get(0));
-		}
-	}
-
-// BG-19 ++ 0..1 DIRECT DEBIT
-// CII:
-	// ram:SpecifiedTradePaymentTerms . ram:DirectDebitMandateID
-// 0 .. 1 DirectDebitMandateID Kennung der Mandatsreferenz               BG-19/ BT-89
-// 0 .. 1 CreditorReferenceID Kennung des Gläubigers                     BG-19/ BT-90
-// 1 .. 1 IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos BG-19/ BT-91
-	@Override
-	public BG19_DirectDebit getDirectDebit() {
-		if(PaymentMeansEnum.isDirectDebit(getPaymentMeansEnum())) {
-			return (BG19_DirectDebit)this;
-		};
-		return null;
 	}
 
 // ---------------- implements CreditTransferFactory:
@@ -463,69 +451,21 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		return ct;
 	}
 	
-// ---------------- implements DirectDebit + Factory:
-	// BG19_DirectDebit methods
-	@Override
-	public String getMandateReferencedID() {
-		return tradePaymentTerms==null ? null : tradePaymentTerms.getMandateReferencedID();
-	}
-	@Override
-	public void setMandateReferencedID(String mandateID) {
-		if(mandateID==null) return;
-		checkTradePaymentTerms();
-		tradePaymentTerms.setMandateReferencedID(mandateID);
-	}
-	private void checkTradePaymentTerms() {
-		if(tradePaymentTerms==null) {
-			tradePaymentTerms = TradePaymentTerms.create();
-			super.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
-		}
-	}
-	void setPaymentTermsAndDate(String description, Timestamp ts) {
-		if(description==null && ts==null) return;
-		checkTradePaymentTerms();
-		tradePaymentTerms.setPaymentTermsAndDate(description, ts);;
-	}
-	
-	@Override
-	public String getBankAssignedCreditorID() {
-		return super.getCreditorReferenceID()==null ? null : super.getCreditorReferenceID().getValue();
-	}
-	@Override
-	public void setBankAssignedCreditorID(String bankAssignedCreditorID) {
-		if(bankAssignedCreditorID!=null) {
-			super.setCreditorReferenceID(new ID(bankAssignedCreditorID));		
-		}
-	}
-	@Override
-	public String getDebitedAccountID() {
-		if(PaymentMeansEnum.isDirectDebit(getPaymentMeansEnum())) {
-			TradeSettlementPaymentMeans pm = TradeSettlementPaymentMeans.create(getSpecifiedTradeSettlementPaymentMeans().get(0));
-			return pm.getDebitedAccountID();
-		};
-		return null;
-	}
-	
-	@Override
-	public void setDebitedAccountID(String id) {
-		BG19_DirectDebit dd = getDirectDebit();
-		if(dd==null) {
-			createDirectDebit(null, null, id);
-		} else {
-			dd.setDebitedAccountID(id);
-		}
-	}
-	@Override
-	public void setDebitedAccountID(IBANId iban) {
-		BG19_DirectDebit dd = getDirectDebit();
-		if(dd==null) {
-			createDirectDebit(null, null, iban);
-		} else {
-			dd.setDebitedAccountID(iban);
-		}
-	}
+/* ---------------- implements DirectDebit + Factory:
+	BG-19 ++ 0..1 DIRECT DEBIT
+	ram:SpecifiedTradePaymentTerms . ram:DirectDebitMandateID
+0 .. 1 DirectDebitMandateID Kennung der Mandatsreferenz               BG-19/ BT-89
+0 .. 1 CreditorReferenceID Kennung des Gläubigers                     BG-19/ BT-90
+1 .. 1 IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos BG-19/ BT-91
 
-	@Override
+	BG19_DirectDebit == DirectDebit + get/setMandateReferencedID(String id) ==> in tradePaymentTerms
+	                                + get/setBankAssignedCreditorID(String id) ==> this
+                        DirectDebit.get/setDebitedAccountID(iban oder account) ==> in pm
+
+ */
+
+	// interface DirectDebitFactory
+	@Override 
 	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
 		LOG.info("mandateID="+mandateID + " bankAssignedCreditorID="+bankAssignedCreditorID + " iban="+iban);
 
@@ -545,7 +485,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 			this.setMandateReferencedID(mandateID);
 		}
 		
-		return (DirectDebit)this;
+		return (BG19_DirectDebit)this; // BG19_DirectDebit extends DirectDebit
 	}
 
 	@Override
@@ -565,18 +505,127 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 			this.setMandateReferencedID(mandateID);
 		}
 		
-		return (DirectDebit)this;
+		return (BG19_DirectDebit)this; // BG19_DirectDebit extends DirectDebit
 	}
 
+	@Override // implements interface PaymentInstructions
+	public void setDirectDebit(BG19_DirectDebit bg19_directDebit) {
+		if(bg19_directDebit==null) return;
+//		if(bg19_directDebit instanceof ApplicableHeaderTradeSettlement) { // das ist immer der Fall
+////			LOG.warning("----MandateReferencedID:"+directDebit.getMandateReferencedID());
+//			this.setMandateReferencedID(bg19_directDebit.getMandateReferencedID());
+////			LOG.warning("----BankAssignedCreditorID:"+directDebit.getBankAssignedCreditorID());
+//			this.setBankAssignedCreditorID(bg19_directDebit.getBankAssignedCreditorID());
+////			LOG.warning("----getDebitedAccountID:"+directDebit.getDebitedAccountID());
+////			LOG.warning("----???:"+directDebit + " this:"+this);
+////			LOG.warning("----size:"+((ApplicableHeaderTradeSettlement)directDebit).getSpecifiedTradeSettlementPaymentMeans().size() + " this:"+getSpecifiedTradeSettlementPaymentMeans().size());
+//			getSpecifiedTradeSettlementPaymentMeans().add(((ApplicableHeaderTradeSettlement)bg19_directDebit).getSpecifiedTradeSettlementPaymentMeans().get(0));
+//		}
+		
+		// verschlimmbersserung:
+		LOG.info("bg19_directDebit:"+bg19_directDebit.getMandateReferencedID()+" ==> tradePaymentTerms:"+this.tradePaymentTerms);
+		LOG.info("bg19_directDebit:"+bg19_directDebit.getBankAssignedCreditorID()+" ==> this:"+this.getBankAssignedCreditorID());
+		LOG.info("bg19_directDebit:"+bg19_directDebit.getDebitedAccountID()+" ==> this.pm#"+this.getSpecifiedTradeSettlementPaymentMeans().size());
+		// in pm ist lediglich der Code 59!!!!!!!!!!!!
+//		BG19_DirectDebit == DirectDebit + get/setMandateReferencedID(String id) ==> in tradePaymentTerms
+//                                      + get/setBankAssignedCreditorID(String id) ==> this
+//                          DirectDebit.get/setDebitedAccountID(iban oder account) ==> in pm
+		setMandateReferencedID(bg19_directDebit.getMandateReferencedID());       // BG-19.BT-89 0..1
+		setBankAssignedCreditorID(bg19_directDebit.getBankAssignedCreditorID()); // BG-19.BT-90 0..1
+//		setDebitedAccountID(bg19_directDebit.getDebitedAccountID());             // BG-19.BT-91 0..1
+		TradeSettlementPaymentMeansType dd = ((ApplicableHeaderTradeSettlement)bg19_directDebit).getSpecifiedTradeSettlementPaymentMeans().get(0);
+//		this.getSpecifiedTradeSettlementPaymentMeans().r.add(0
+//				,((ApplicableHeaderTradeSettlement)bg19_directDebit).getSpecifiedTradeSettlementPaymentMeans().get(0)
+//				);
+		this.getSpecifiedTradeSettlementPaymentMeans().get(0).setPayerPartyDebtorFinancialAccount(dd.getPayerPartyDebtorFinancialAccount());
+	}
+
+	@Override // implements interface PaymentInstructions
+	public BG19_DirectDebit getDirectDebit() {
+		if(PaymentMeansEnum.isDirectDebit(getPaymentMeansEnum())) {
+			return (BG19_DirectDebit)this;
+		};
+		return null;
+	}
+
+	// BG19_DirectDebit methods:
+	// BG-19.BT-89 0..1
+	@Override
+	public String getMandateReferencedID() {
+		return tradePaymentTerms==null ? null : tradePaymentTerms.getMandateReferencedID();
+	}
+	@Override
+	public void setMandateReferencedID(String mandateID) {
+		if(mandateID==null) return;
+		checkTradePaymentTerms();
+		tradePaymentTerms.setMandateReferencedID(mandateID);
+	}
+	
+	// BG-19.BT-90 0..1
+	@Override
+	public String getBankAssignedCreditorID() {
+		return super.getCreditorReferenceID()==null ? null : super.getCreditorReferenceID().getValue();
+	}
+	@Override
+	public void setBankAssignedCreditorID(String bankAssignedCreditorID) {
+		if(bankAssignedCreditorID!=null) {
+			super.setCreditorReferenceID(new ID(bankAssignedCreditorID));		
+		}
+	}
+	
+	// BG-19.BT-91 0..1
+	@Override
+	public String getDebitedAccountID() {
+		if(PaymentMeansEnum.isDirectDebit(getPaymentMeansEnum())) {
+			TradeSettlementPaymentMeans pm = TradeSettlementPaymentMeans.create(getSpecifiedTradeSettlementPaymentMeans().get(0));
+			return pm.getDebitedAccountID();
+		};
+		return null;
+	}
+	
+	@Override
+	public void setDebitedAccountID(String id) {
+		BG19_DirectDebit thisAlsDD = getDirectDebit();
+		if(thisAlsDD==null) {
+			createDirectDebit(null, null, id);
+		}
+//			thisAlsDD.setDebitedAccountID(id); // rekursion == stackoverflow
+		TradeSettlementPaymentMeans dd = TradeSettlementPaymentMeans.create(getSpecifiedTradeSettlementPaymentMeans().get(0));
+		LOG.info(">>>>>>> dd:"+dd);
+		dd.setDebitedAccountID(id);
+		this.getSpecifiedTradeSettlementPaymentMeans().set(0, dd);
+	}
+	@Override
+	public void setDebitedAccountID(IBANId iban) {
+		BG19_DirectDebit thisAlsDD = getDirectDebit();
+		if(thisAlsDD==null) {
+			createDirectDebit(null, null, iban);
+		} else {
+			TradeSettlementPaymentMeans dd = TradeSettlementPaymentMeans.create(getSpecifiedTradeSettlementPaymentMeans().get(0));
+			LOG.info(">>>>>>> dd:"+dd);
+			dd.setDebitedAccountID(iban);
+			this.getSpecifiedTradeSettlementPaymentMeans().set(0, dd);
+		}
+	}
+
+	private void checkTradePaymentTerms() {
+		if(tradePaymentTerms==null) {
+			tradePaymentTerms = TradePaymentTerms.create();
+			super.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
+		}
+	}
+	void setPaymentTermsAndDate(String description, Timestamp ts) {
+		if(description==null && ts==null) return;
+		checkTradePaymentTerms();
+		tradePaymentTerms.setPaymentTermsAndDate(description, ts);;
+	}
+	
 	// TradeAllowanceCharge extends TradeAllowanceChargeType implements AllowancesAndCharges
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
 		super.getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge); // ram:SpecifiedTradeAllowanceCharge
 	}
 	public List<AllowancesAndCharges> getAllowancesAndCharges() {
-		return getAllowancesAndCharges(this);
-	}
-	static List<AllowancesAndCharges> getAllowancesAndCharges(HeaderTradeSettlementType hts) {
-		List<TradeAllowanceChargeType> list = hts.getSpecifiedTradeAllowanceCharge();
+		List<TradeAllowanceChargeType> list = super.getSpecifiedTradeAllowanceCharge();
 		List<AllowancesAndCharges> res = new ArrayList<AllowancesAndCharges>(list.size());
 		list.forEach(stac -> {
 			res.add(TradeAllowanceCharge.create(stac));
@@ -657,13 +706,13 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		getSpecifiedTradeSettlementHeaderMonetarySummation().getRoundingAmount().add(rounding); // add to list
 	}
 	
-	public TradeParty getPayeeTradeParty() {
-		TradePartyType party = super.getPayeeTradeParty();
-		return party==null ? null : new TradeParty(party);
-	}
 	// BG-10 + 0..1 PAYEE
 	public void setPayee(BusinessParty party) {
 		super.setPayeeTradeParty((TradePartyType) party);
+	}
+	public TradeParty getPayeeTradeParty() {
+		TradePartyType party = super.getPayeeTradeParty();
+		return party==null ? null : new TradeParty(party);
 	}
 	
 	// BG-14 ++ 0..1 INVOICING PERIOD

@@ -121,7 +121,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		}
 	}
 	
-	private TradeSettlementPaymentMeans(PaymentMeansEnum code, String text) {
+	TradeSettlementPaymentMeans(PaymentMeansEnum code, String text) {
 		super();
 		this.setTypeCode(code);
 		this.setPaymentMeansText(text);
@@ -210,7 +210,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		setPaymentServiceProviderID(bic);
 	}
 
-	public TradeSettlementPaymentMeans(TradeSettlementFinancialCard financialCard) {
+	TradeSettlementPaymentMeans(TradeSettlementFinancialCard financialCard) { // TODO private + factory
 		this(PaymentMeansEnum.BankCard);
 		super.setApplicableTradeSettlementFinancialCard(financialCard);
 	}
