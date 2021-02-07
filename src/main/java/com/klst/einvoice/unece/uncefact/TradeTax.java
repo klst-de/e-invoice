@@ -15,6 +15,7 @@ import com.klst.untdid.codelist.TaxTypeCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._100.TimeReferenceCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
@@ -176,7 +177,7 @@ public class TradeTax extends TradeTaxType
 		super();
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);
-			LOG.fine("copy ctor:"+this);
+			LOG.config("copy ctor:"+this);
 		}
 	}
 	
@@ -193,20 +194,55 @@ public class TradeTax extends TradeTaxType
 		stringBuilder.append(", %rate:");
 		stringBuilder.append(getTaxPercentage()==null ? "null" : getTaxPercentage());
 		if(this.getTaxPointDate()!=null) {
-			stringBuilder.append(", TaxPointDate:");
+			stringBuilder.append(", TaxPointDate:");                   // BT-7 0..1
 			stringBuilder.append(this.getTaxPointDateAsTimestamp());			
+		}
+		if(this.getTaxPointDateCode()!=null) {
+			stringBuilder.append(", TaxPointDateCode:");               // BT-8 0..1
+			stringBuilder.append(this.getTaxPointDateCode());			
 		}
 		stringBuilder.append("]");
 		return stringBuilder.toString();
 	}
 
 	// BT-7 0..1 Value added tax point date
+	//  Die Verwendung von BT-7 und BT-8 schließt sich gegenseitig aus.
+	public void setTaxPointDate(Timestamp ts) {
+		if(ts!=null) super.setTaxPointDate(DateTimeFormatStrings.toDate(ts));
+	}
 	public Timestamp getTaxPointDateAsTimestamp() {
 		DateType date = super.getTaxPointDate();
 		return date==null ? null : DateTimeFormats.ymdToTs(date.getDateString().getValue());		
 	}
-	public void setTaxPointDate(Timestamp ts) {
-		if(ts!=null) super.setTaxPointDate(DateTimeFormatStrings.toDate(ts));
+	
+	// BT-8 0..1 Value added tax point date code
+	//  Die Verwendung von BT-7 und BT-8 schließt sich gegenseitig aus.
+/*
+Anwendung: 
+Die in der Norm zitierten semantischen Werte, die durch die Werte 3, 35, 432 in UNTDID 2005 repräsentiert werden, 
+werden auf die folgenden Werte von UNTDID2475 abgebildet, das ist die von CII 16B unterstützte relevante Codeliste:
+- 5: Ausstellungsdatum des Rechnungsbelegs
+- 29: Liefertermin, Ist-Zustand
+- 72: Bis heute bezahlt
+
+In Deutschland ist das Liefer- und Leistungsdatum maßgebend (BT-72) SupplyChainTradeTransaction/ApplicableHeaderTradeDelivery/ActualDeliverySupplyChainEvent/OccurrenceDateTime/DateTimeString).
+. Codeliste: UNTDID 2475 Untermenge
+
+keine Beispiele für Tests!
+
+ */
+//	0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung            BG-23
+//	0 .. 1 DueDateTypeCode Code für das Datum der Steuerfälligkeit   BT-8
+	public void setTaxPointDateCode(String code) {
+		if(code!=null) {
+			TimeReferenceCodeType trc = new TimeReferenceCodeType();
+			trc.setValue(code);
+			super.setDueDateTypeCode(trc);
+		}
+	}
+	public String getTaxPointDateCode() {
+		TimeReferenceCodeType trc = super.getDueDateTypeCode();
+		return trc==null ? null : trc.getValue();		
 	}
 	
 	// BT-116 1..1 BasisAmount Steuerbasisbetrag
