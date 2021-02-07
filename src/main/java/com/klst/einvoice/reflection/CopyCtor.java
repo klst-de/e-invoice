@@ -75,7 +75,10 @@ public class CopyCtor {
 			} else {
 				// if(settersByName.containsKey(setterName)) false ==> es gibt keinen passenden Setter
 				// dann muss es ein member/field geben mit name==getterName (beginnend mit Kleinbuchstaben)
+				// ausser bei getID ==> dann ist fieldName="id"
 				String fieldName = getterName.substring(set.length(), set.length()+1).toLowerCase()+getterName.substring(set.length()+1);
+				if(getterName.equals("getID")) fieldName = "id";
+				
 				LOG.fine("List<?> "+fieldName+" = "+getterName);
 				if(fieldsByName.containsKey(fieldName)) {
 					Field field = fieldsByName.get(fieldName);
