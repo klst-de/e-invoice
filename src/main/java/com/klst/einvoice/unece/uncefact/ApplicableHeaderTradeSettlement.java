@@ -213,16 +213,11 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		setPaymentMeans(code, paymentMeansText); // BT-81, BT-82 - ein pm ohne BG-17 wird erstellt
 		setRemittanceInformation(remittanceInformation); // BT-83
 		 // BG-17 :
-		if(creditTransfer!=null) {
+		if(creditTransfer!=null && creditTransfer.size()>0) {
 			if(creditTransfer.size()>0) {
 				TradeSettlementPaymentMeans pm = TradeSettlementPaymentMeans.create((TradeSettlementPaymentMeansType)creditTransfer.get(0));
-//				getSpecifiedTradeSettlementPaymentMeans().add(pm);
-//				TODO kopieren:
-//				setPaymentAccountID(accountId);
-//				setPaymentAccountName(accountName);
-//				setPaymentServiceProviderID(bic);
 				getSpecifiedTradeSettlementPaymentMeans().get(0).setPayeePartyCreditorFinancialAccount(pm.getPayeePartyCreditorFinancialAccount());
-//accountName	getSpecifiedTradeSettlementPaymentMeans().get(0).setPayeePartyCreditorFinancialAccount(pm.getPayeePartyCreditorFinancialAccount());
+				//                          accountName ist auch in PayeePartyCreditorFinancialAccount
 				getSpecifiedTradeSettlementPaymentMeans().get(0).setPayeeSpecifiedCreditorFinancialInstitution(pm.getPayeeSpecifiedCreditorFinancialInstitution());
 			}
 			for(int i=1; i<creditTransfer.size(); i++) {
@@ -269,7 +264,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	// BT-7 + 0..1 Value added tax point date : ist in jedem VATBreakDowns
 	// TODO sequenzproblem : setTaxPointDate , dannach addVATBreakDowns ==> TaxPointDate nicht im VATBreakDown
 	public Timestamp getTaxPointDateAsTimestamp() {
-		return tradeTax.getTaxPointDateAsTimestamp();
+		return tradeTax==null ? null : tradeTax.getTaxPointDateAsTimestamp();
 	}
 	
 	// BT-8 + 0..1 Value added tax point date code
@@ -277,7 +272,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		tradeTax.setTaxPointDateCode(code);
 	}
 	public String getTaxPointDateCode() {
-		return tradeTax.getTaxPointDateCode();
+		return tradeTax==null ? null : tradeTax.getTaxPointDateCode();
 	}
 	
 // ---------------- implements PaymentInstructions:
@@ -308,17 +303,6 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		addPaymentMeans(code, text);
 	}
 	private TradeSettlementPaymentMeans addPaymentMeans(PaymentMeansEnum code, String text) { // code+text
-//		PaymentMeansCodeType pmc = new PaymentMeansCodeType(); // BT-81
-//		pmc.setValue(code.getValueAsString());
-//		
-//		TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = new TradeSettlementPaymentMeansType();
-//		getSpecifiedTradeSettlementPaymentMeans().add(tradeSettlementPaymentMeans);
-//		
-//		tradeSettlementPaymentMeans.setTypeCode(pmc);
-//		
-//		if(text!=null) { // BT-82 
-//			tradeSettlementPaymentMeans.getInformation().add(new Text(text));
-//		}
 		TradeSettlementPaymentMeans pm = new TradeSettlementPaymentMeans(code, text); // BT-81 , BT-82
 		getSpecifiedTradeSettlementPaymentMeans().add(pm);
 		LOG.info("added pm"+pm);
@@ -355,6 +339,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		return list.isEmpty() ? null : list.get(0).getValue();
 	}
 
+// ---------------- implements CreditTransferFactory:
 	// BG-17 ++ 0..n CREDIT TRANSFER
 	@Override
 	public void addCreditTransfer(CreditTransfer creditTransfer) {
@@ -399,30 +384,6 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		return ret;
 	}
 
-	// implements BG-18 (optional) PAYMENT CARD INFORMATION
-	@Override
-	public PaymentCard getPaymentCard() {
-		if(PaymentMeansEnum.isBankCard(getPaymentMeansEnum())) {
-			TradeSettlementPaymentMeans pm = TradeSettlementPaymentMeans.create(getSpecifiedTradeSettlementPaymentMeans().get(0));
-			return (PaymentCard)(pm.getPaymentCard());
-		};
-		return null;
-	}
-	
-	@Override
-	public void setPaymentCard(PaymentCard paymentCard) {
-		if(paymentCard==null) return;
-		
-		if(super.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
-			LOG.warning("super.getSpecifiedTradeSettlementPaymentMeans().isEmpty()");
-			TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = new TradeSettlementPaymentMeans((TradeSettlementFinancialCard)paymentCard);
-			getSpecifiedTradeSettlementPaymentMeans().add(tradeSettlementPaymentMeans);
-		} else {
-			getSpecifiedTradeSettlementPaymentMeans().get(0).setApplicableTradeSettlementFinancialCard((TradeSettlementFinancialCard)paymentCard);
-		}
-	}
-
-// ---------------- implements CreditTransferFactory:
 	@Override
 	public CreditTransfer createCreditTransfer(IBANId iban, String accountName, BICId bic) {
 		return TradeSettlementPaymentMeans.create(iban, accountName, bic);
@@ -451,6 +412,29 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		return ct;
 	}
 	
+// ---------------- implements BG-18 (optional) PAYMENT CARD INFORMATION
+		@Override
+		public PaymentCard getPaymentCard() {
+			if(PaymentMeansEnum.isBankCard(getPaymentMeansEnum())) {
+				TradeSettlementPaymentMeans pm = TradeSettlementPaymentMeans.create(getSpecifiedTradeSettlementPaymentMeans().get(0));
+				return (PaymentCard)(pm.getPaymentCard());
+			};
+			return null;
+		}
+		
+		@Override
+		public void setPaymentCard(PaymentCard paymentCard) {
+			if(paymentCard==null) return;
+			
+			if(super.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
+				LOG.warning("super.getSpecifiedTradeSettlementPaymentMeans().isEmpty()");
+				TradeSettlementPaymentMeansType tradeSettlementPaymentMeans = TradeSettlementPaymentMeans.create((TradeSettlementFinancialCard)paymentCard);
+				getSpecifiedTradeSettlementPaymentMeans().add(tradeSettlementPaymentMeans);
+			} else {
+				getSpecifiedTradeSettlementPaymentMeans().get(0).setApplicableTradeSettlementFinancialCard((TradeSettlementFinancialCard)paymentCard);
+			}
+		}
+
 /* ---------------- implements DirectDebit + Factory:
 	BG-19 ++ 0..1 DIRECT DEBIT
 	ram:SpecifiedTradePaymentTerms . ram:DirectDebitMandateID
@@ -511,33 +495,19 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	@Override // implements interface PaymentInstructions
 	public void setDirectDebit(BG19_DirectDebit bg19_directDebit) {
 		if(bg19_directDebit==null) return;
-//		if(bg19_directDebit instanceof ApplicableHeaderTradeSettlement) { // das ist immer der Fall
-////			LOG.warning("----MandateReferencedID:"+directDebit.getMandateReferencedID());
-//			this.setMandateReferencedID(bg19_directDebit.getMandateReferencedID());
-////			LOG.warning("----BankAssignedCreditorID:"+directDebit.getBankAssignedCreditorID());
-//			this.setBankAssignedCreditorID(bg19_directDebit.getBankAssignedCreditorID());
-////			LOG.warning("----getDebitedAccountID:"+directDebit.getDebitedAccountID());
-////			LOG.warning("----???:"+directDebit + " this:"+this);
-////			LOG.warning("----size:"+((ApplicableHeaderTradeSettlement)directDebit).getSpecifiedTradeSettlementPaymentMeans().size() + " this:"+getSpecifiedTradeSettlementPaymentMeans().size());
-//			getSpecifiedTradeSettlementPaymentMeans().add(((ApplicableHeaderTradeSettlement)bg19_directDebit).getSpecifiedTradeSettlementPaymentMeans().get(0));
-//		}
-		
-		// verschlimmbersserung:
-		LOG.info("bg19_directDebit:"+bg19_directDebit.getMandateReferencedID()+" ==> tradePaymentTerms:"+this.tradePaymentTerms);
-		LOG.info("bg19_directDebit:"+bg19_directDebit.getBankAssignedCreditorID()+" ==> this:"+this.getBankAssignedCreditorID());
-		LOG.info("bg19_directDebit:"+bg19_directDebit.getDebitedAccountID()+" ==> this.pm#"+this.getSpecifiedTradeSettlementPaymentMeans().size());
-		// in pm ist lediglich der Code 59!!!!!!!!!!!!
-//		BG19_DirectDebit == DirectDebit + get/setMandateReferencedID(String id) ==> in tradePaymentTerms
-//                                      + get/setBankAssignedCreditorID(String id) ==> this
-//                          DirectDebit.get/setDebitedAccountID(iban oder account) ==> in pm
+
+//		LOG.fine("bg19_directDebit:"+bg19_directDebit.getMandateReferencedID()+" ==> tradePaymentTerms:"+this.tradePaymentTerms);
+//		LOG.fine("bg19_directDebit:"+bg19_directDebit.getBankAssignedCreditorID()+" ==> this:"+this.getBankAssignedCreditorID());
+//		LOG.fine("bg19_directDebit:"+bg19_directDebit.getDebitedAccountID()+" ==> this.pm#"+this.getSpecifiedTradeSettlementPaymentMeans().size());
 		setMandateReferencedID(bg19_directDebit.getMandateReferencedID());       // BG-19.BT-89 0..1
 		setBankAssignedCreditorID(bg19_directDebit.getBankAssignedCreditorID()); // BG-19.BT-90 0..1
-//		setDebitedAccountID(bg19_directDebit.getDebitedAccountID());             // BG-19.BT-91 0..1
+//		                                                                         // BG-19.BT-91 0..1 :
 		TradeSettlementPaymentMeansType dd = ((ApplicableHeaderTradeSettlement)bg19_directDebit).getSpecifiedTradeSettlementPaymentMeans().get(0);
-//		this.getSpecifiedTradeSettlementPaymentMeans().r.add(0
-//				,((ApplicableHeaderTradeSettlement)bg19_directDebit).getSpecifiedTradeSettlementPaymentMeans().get(0)
-//				);
-		this.getSpecifiedTradeSettlementPaymentMeans().get(0).setPayerPartyDebtorFinancialAccount(dd.getPayerPartyDebtorFinancialAccount());
+		if(this.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
+			getSpecifiedTradeSettlementPaymentMeans().add(dd);
+		} else {
+			getSpecifiedTradeSettlementPaymentMeans().get(0).setPayerPartyDebtorFinancialAccount(dd.getPayerPartyDebtorFinancialAccount());
+		}
 	}
 
 	@Override // implements interface PaymentInstructions
@@ -589,9 +559,8 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		if(thisAlsDD==null) {
 			createDirectDebit(null, null, id);
 		}
-//			thisAlsDD.setDebitedAccountID(id); // rekursion == stackoverflow
 		TradeSettlementPaymentMeans dd = TradeSettlementPaymentMeans.create(getSpecifiedTradeSettlementPaymentMeans().get(0));
-		LOG.info(">>>>>>> dd:"+dd);
+//		LOG.info(">>>>>>> dd:"+dd);
 		dd.setDebitedAccountID(id);
 		this.getSpecifiedTradeSettlementPaymentMeans().set(0, dd);
 	}
@@ -602,7 +571,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 			createDirectDebit(null, null, iban);
 		} else {
 			TradeSettlementPaymentMeans dd = TradeSettlementPaymentMeans.create(getSpecifiedTradeSettlementPaymentMeans().get(0));
-			LOG.info(">>>>>>> dd:"+dd);
+//			LOG.info(">>>>>>> dd:"+dd);
 			dd.setDebitedAccountID(iban);
 			this.getSpecifiedTradeSettlementPaymentMeans().set(0, dd);
 		}

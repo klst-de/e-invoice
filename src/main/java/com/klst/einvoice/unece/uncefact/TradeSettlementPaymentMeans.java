@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
@@ -196,21 +197,24 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		return stringBuilder.toString();
 	}
 
-	TradeSettlementPaymentMeans(IBANId iban, String accountName, BICId bic) {
+	TradeSettlementPaymentMeans(IBANId iban, String accountName, BICId bic) { // TODO private + factory
 		this(PaymentMeansEnum.SEPACreditTransfer);
 		setPaymentAccountID(iban);
 		setPaymentAccountName(accountName);
 		setPaymentServiceProviderID(bic);
 	}
 
-	TradeSettlementPaymentMeans(String accountId, String accountName, BICId bic) {
+	TradeSettlementPaymentMeans(String accountId, String accountName, BICId bic) { // TODO private + factory
 		this(PaymentMeansEnum.CreditTransfer);
 		setPaymentAccountID(accountId);
 		setPaymentAccountName(accountName);
 		setPaymentServiceProviderID(bic);
 	}
 
-	TradeSettlementPaymentMeans(TradeSettlementFinancialCard financialCard) { // TODO private + factory
+	static TradeSettlementPaymentMeans create(PaymentCard paymentCard) { 
+		return new TradeSettlementPaymentMeans((TradeSettlementFinancialCard)paymentCard);
+	}
+	private TradeSettlementPaymentMeans(TradeSettlementFinancialCard financialCard) {
 		this(PaymentMeansEnum.BankCard);
 		super.setApplicableTradeSettlementFinancialCard(financialCard);
 	}

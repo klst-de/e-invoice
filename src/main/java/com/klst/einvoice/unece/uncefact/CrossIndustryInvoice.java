@@ -1006,37 +1006,16 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	}
 
 	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
-		// PaymentInstructions wird durch ApplicableHeaderTradeSettlement implementiert
-		// werden andere Informationen in applicableHeaderTradeSettlement zerstört ????? JA,z.B PayeeParty TODO
-		LOG.info(">>>>>>>>>>>>>>>>"+applicableHeaderTradeSettlement.getPayeeTradeParty());
-		applicableHeaderTradeSettlement = (ApplicableHeaderTradeSettlement)paymentInstructions;
-		
-//		applicableHeaderTradeSettlement.setPaymentMeansEnum(paymentInstructions.getPaymentMeansEnum());
-//		paymentInstructions.getPaymentMeansText();
-		//----------
-//		LOG.info("paymentInstructions:"+paymentInstructions);
-//		applicableHeaderTradeSettlement.setPaymentMeans(paymentInstructions.getPaymentMeansEnum(), paymentInstructions.getPaymentMeansText());
-//
-//		applicableHeaderTradeSettlement.setRemittanceInformation(paymentInstructions.getRemittanceInformation());
-//		paymentInstructions.getCreditTransfer().forEach(ct -> {
-////			TradeSettlementPaymentMeans extends ... implements CreditTransfer, DirectDebit
-//			applicableHeaderTradeSettlement.addCreditTransfer(ct);
-//		});
-//		applicableHeaderTradeSettlement.setPaymentCard(paymentInstructions.getPaymentCard());
-//		applicableHeaderTradeSettlement.setDirectDebit(paymentInstructions.getDirectDebit());
-		
-		// das hat nix gebracht:
-//		// dh. nur die paymentInstructions elemente kopieren!!!!
-////		applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create(paymentInstructions.getPaymentMeansEnum()
-////				, paymentInstructions.getPaymentMeansText(), paymentInstructions.getRemittanceInformation()
-////				, paymentInstructions.getCreditTransfer()
-////				, paymentInstructions.getPaymentCard()
-////				, paymentInstructions.getDirectDebit());
-//		applicableHeaderTradeSettlement.init(paymentInstructions.getPaymentMeansEnum()
-//				, paymentInstructions.getPaymentMeansText(), paymentInstructions.getRemittanceInformation()
-//				, paymentInstructions.getCreditTransfer()
-//				, paymentInstructions.getPaymentCard()
-//				, paymentInstructions.getDirectDebit());
+		// so geht es nicht: applicableHeaderTradeSettlement = (ApplicableHeaderTradeSettlement)paymentInstructions;
+		// denn es gibt ein sequenzproblem: ApplicableHeaderTradeSettlement implementiert nicht nur PaymentInstructions
+		// sondern auch // BG-10 + 0..1 PAYEE : PayeeTradeParty und andere elemente,
+		// die man mit dem assign von paymentInstructions überschreiben würde
+		// ===> also: nur die paymentInstructions elemente kopieren:
+		applicableHeaderTradeSettlement.init(paymentInstructions.getPaymentMeansEnum()
+				, paymentInstructions.getPaymentMeansText(), paymentInstructions.getRemittanceInformation()
+				, paymentInstructions.getCreditTransfer()
+				, paymentInstructions.getPaymentCard()
+				, paymentInstructions.getDirectDebit());
 	}
 	public PaymentInstructions getPaymentInstructions() {
 		return applicableHeaderTradeSettlement; // das implementiert PaymentInstructions!
