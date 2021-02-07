@@ -261,17 +261,28 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		return currencyCode==null ? null : currencyCode.getValue();
 	}
 	
+	private void checkTradeTax() {
+		if(tradeTax==null) {
+			tradeTax = TradeTax.create(); 
+		super.getApplicableTradeTax().add(tradeTax);
+		}
+	}
+
 	// BT-7 + 0..1 Value added tax point date : ist in jedem VATBreakDowns
-	// TODO sequenzproblem : setTaxPointDate , dannach addVATBreakDowns ==> TaxPointDate nicht im VATBreakDown
-	public Timestamp getTaxPointDateAsTimestamp() {
+	void setTaxPointDate(Timestamp ts) {
+		checkTradeTax();
+		tradeTax.setTaxPointDate(ts);
+	}
+	Timestamp getTaxPointDateAsTimestamp() {
 		return tradeTax==null ? null : tradeTax.getTaxPointDateAsTimestamp();
 	}
 	
 	// BT-8 + 0..1 Value added tax point date code
-	public void setTaxPointDateCode(String code) {
+	void setTaxPointDateCode(String code) {
+		checkTradeTax();
 		tradeTax.setTaxPointDateCode(code);
 	}
-	public String getTaxPointDateCode() {
+	String getTaxPointDateCode() {
 		return tradeTax==null ? null : tradeTax.getTaxPointDateCode();
 	}
 	
@@ -583,6 +594,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 			super.getSpecifiedTradePaymentTerms().add(tradePaymentTerms);
 		}
 	}
+	
 	void setPaymentTermsAndDate(String description, Timestamp ts) {
 		if(description==null && ts==null) return;
 		checkTradePaymentTerms();

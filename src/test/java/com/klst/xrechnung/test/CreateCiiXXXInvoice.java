@@ -242,8 +242,10 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 //				dd.getDebitedAccountID();
 //				dd.getMandateReferencetID();
 //				cii.createDirectDebit(TESTDIR, TESTDIR, null)
-				paymentInstructions = cii.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText()
-						, pi.getRemittanceInformation(), pi.getDirectDebit() );
+				paymentInstructions = cii.createPaymentInstructions(paymentMeansCode
+						, pi.getPaymentMeansText()
+						, pi.getRemittanceInformation()
+						, pi.getDirectDebit() );
 				break;
 			default:
 				LOG.warning("[BR-DE-13] In der Rechnung müssen Angaben zu genau einer der drei Gruppen sein: CREDIT TRANSFER, PAYMENT CARD INFORMATION, DIRECT DEBIT - Ist:"

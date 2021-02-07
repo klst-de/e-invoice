@@ -348,10 +348,15 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	@Override
 	public void setTaxPointDate(Timestamp ts) {
 		if(ts==null) return;
-		this.getVATBreakDowns().forEach(vb -> {
-			TradeTax tradeTax = (TradeTax)vb;
-			tradeTax.setTaxPointDate(ts);
-		});
+		List<VatBreakdown> vbs = this.getVATBreakDowns();
+		if(vbs.isEmpty()) {
+			applicableHeaderTradeSettlement.setTaxPointDate(ts);
+		} else {
+			vbs.forEach(vb -> {
+				TradeTax tradeTax = (TradeTax)vb;
+				tradeTax.setTaxPointDate(ts);
+			});
+		}
 	}
 
 	@Override
@@ -363,10 +368,15 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	@Override
 	public void setTaxPointDateCode(String code) {
 		if(code==null) return;
-		this.getVATBreakDowns().forEach(vb -> {
-			TradeTax tradeTax = (TradeTax)vb;
-			tradeTax.setTaxPointDateCode(code);
-		});
+		List<VatBreakdown> vbs = this.getVATBreakDowns();
+		if(vbs.isEmpty()) {
+			applicableHeaderTradeSettlement.setTaxPointDateCode(code);
+		} else {
+			vbs.forEach(vb -> {
+				TradeTax tradeTax = (TradeTax)vb;
+				tradeTax.setTaxPointDateCode(code);
+			});
+		}
 	}
 
 	@Override

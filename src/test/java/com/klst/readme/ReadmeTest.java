@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -17,6 +18,7 @@ import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.PrecedingInvoice;
+import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
@@ -27,6 +29,7 @@ import com.klst.marshaller.CiiTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.TaxCategoryCode;
+import com.klst.untdid.codelist.TaxTypeCode;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 
@@ -106,6 +109,26 @@ public class ReadmeTest {
 		IContact buyerContact = null;                           // (optional)
 		invoice.setBuyer("[Buyer name]", buyerAddress, buyerContact);
 		
+		String taxPointDate = "2016-12-31";
+		invoice.setTaxPointDate(taxPointDate);  // wg. sequenzproblem
+		
+		List<VatBreakdown> vatBreakdowns = invoice.getVATBreakDowns();
+		BigDecimal ermUSt = new BigDecimal(16); // 16%
+		VatBreakdown vb = invoice.createVATBreakDown(
+				new Amount(EUR, new BigDecimal(99.79)) // Amount taxableAmount
+			, 	new Amount(EUR, new BigDecimal(9.79)) //Amount taxAmount
+			, 	TaxCategoryCode.StandardRate // code
+			, 	ermUSt // BigDecimal percent
+			);
+		LOG.info(">>>>>>>>>>>> tax type VAT? : "+vb.getTaxType() + " , Standard:"+vb.getTaxCategoryCode() + vb.getTaxPercentage());
+		assertEquals(TaxTypeCode.VAT, vb.getTaxType());
+		assertEquals(TaxCategoryCode.StandardRate, vb.getTaxCategoryCode());
+		assertEquals(ermUSt, vb.getTaxPercentage());
+		String TobaccoTax = "AAD";
+		vb.setTaxType(TobaccoTax);
+		LOG.info(">>>>>>>>>>>> tax type AAD? : "+vb.getTaxType());
+		assertEquals(TobaccoTax, vb.getTaxType());
+		
 		// BG-3 + 0..n REFERENZ AUF DIE VORAUSGEGANGENE RECHNUNG
 		// Zu verwenden, falls:
 //		— eine vorausgegangene Rechnung korrigiert wird;
@@ -143,6 +166,13 @@ public class ReadmeTest {
 		assertEquals(DE, invoice.getSeller().getAddress().getCountryCode());
 		assertEquals(DE, invoice.getBuyer() .getAddress().getCountryCode());
 		
+		Timestamp tsTaxPointDate = invoice.getTaxPointDateAsTimestamp();  // wg. sequenzproblem
+		LocalDateTime ldtTaxPointDate = tsTaxPointDate==null ? null : tsTaxPointDate.toLocalDateTime();
+		LOG.info("TaxPointDate (LocalDateTime):"+ ldtTaxPointDate); // TODO darf nicht null sein
+		assertEquals(2016, tsTaxPointDate.toLocalDateTime().getYear());
+		assertEquals(12, tsTaxPointDate.toLocalDateTime().getMonthValue());
+		assertEquals(31, tsTaxPointDate.toLocalDateTime().getDayOfMonth());
+
 		byte[] xml = transformer.fromModel(invoice);
 		LOG.info(new String(xml));
 	}
