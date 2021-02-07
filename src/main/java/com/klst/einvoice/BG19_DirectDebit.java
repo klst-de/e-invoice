@@ -52,6 +52,20 @@ public interface BG19_DirectDebit extends DirectDebit {
 	public String getMandateReferencedID();
 	public void setMandateReferencedID(String id);
 
+	/**
+	 * Bank assigned creditor identifier
+	 * <p>
+	 * Unique banking reference identifier of the Payee or Seller assigned by the Payee or Seller bank.
+	 * <p>
+	 * Used in order to pre-notify the Buyer of a SEPA direct debit.
+	 * <p>
+	 * Cardinality: 	0..1
+	 * <br>EN16931-ID: 	BG-19.BT-90
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R69
+	 * 
+	 * @return Identifier
+	 */
 	// BG-19.BT-90 0..1 Bank assigned creditor identifier, CreditorReferenceID, Kennung des Gläubigers
 	// Hinweis: Wird verwendet, um den Käufer vorweg über eine SEPA-Lastschrift in Kenntnis zu setzen.
 	public String getBankAssignedCreditorID();
@@ -59,8 +73,11 @@ public interface BG19_DirectDebit extends DirectDebit {
 	
 	// BG-19.BT-91 0..1 Debited account identifier
 	// IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getDebitedAccountID();
-	public void setDebitedAccountID(String id); // non iban ist nicht vorgesehen, oder doch? "SEPA or other direct debit"
 	public void setDebitedAccountID(IBANId iban);
+	public void setDebitedAccountID(String accountId);
 	
 }

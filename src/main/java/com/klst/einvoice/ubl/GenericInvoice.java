@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.BG19_DirectDebit;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
@@ -928,7 +929,7 @@ daher: NOT_IMPEMENTED
 	// factory delegate to PaymentMeans
 	@Override
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
+			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
 
 		LOG.config("creditTransferList:"+creditTransferList + " paymentCard:"+paymentCard + " directDebit:"+directDebit);	
 		return PaymentMeans.create(code, paymentMeansText, remittanceInformation, creditTransferList, paymentCard, directDebit);
@@ -941,7 +942,7 @@ daher: NOT_IMPEMENTED
 	// BG-16.BG-19 ++ 0..1 DIRECT DEBIT
 	@Override
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, DirectDebit directDebit) {
+			, List<CreditTransfer> creditTransferList, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
 		
 		PaymentMeansType paymentMeans 
 		= new PaymentMeans(code, paymentMeansText, remittanceInformation, creditTransferList, paymentCard, directDebit);

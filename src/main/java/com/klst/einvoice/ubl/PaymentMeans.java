@@ -114,7 +114,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	@Override
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText,
 			String remittanceInformation, List<CreditTransfer> creditTransfer, PaymentCard paymentCard,
-			DirectDebit directDebit) {
+			BG19_DirectDebit directDebit) {
 		return create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 	static PaymentInstructions create(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation, 

@@ -33,7 +33,7 @@ import com.klst.einvoice.unece.uncefact.IBANId;
 
 public interface DirectDebit {
 	
-	/**
+	/*
 	 * Mandate reference identifier
 	 * <p>
 	 * Unique identifier assigned by the Payee for referencing the direct debit mandate.
@@ -47,6 +47,7 @@ public interface DirectDebit {
 	 * 
 	 * @return Identifier
 	 */
+	// moved to BG19_DirectDebit :
 //	// BT-89 +++ 0..1 Mandate reference identifier, DirectDebitMandateID, Kennung der Mandatsreferenz
 //	public String getMandateReferencedID();
 //	public void setMandateReferencedID(String id);
@@ -56,10 +57,22 @@ public interface DirectDebit {
 //	public String getBankAssignedCreditorID();
 //	public void setBankAssignedCreditorID(String id);
 	
+	/**
+	 * Debited account identifier
+	 * <p>
+	 * The account to be debited by the direct debit.
+	 * <p>
+	 * Cardinality: 	0..1
+	 * <br>EN16931-ID: 	BG-19.BT-91
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R69
+	 * 
+	 * @return Identifier IBAN aka bank account
+	 */
 	// BT-91 +++ 0..1 Debited account identifier
 	// IBANID Lastschriftverfahren: Kennung des zu belastenden Kontos
 	public String getDebitedAccountID();
-	public void setDebitedAccountID(String id); // non iban ist nicht vorgesehen, oder doch? "SEPA or other direct debit"
 	public void setDebitedAccountID(IBANId iban);
+	public void setDebitedAccountID(String accountId);
 	
 }
