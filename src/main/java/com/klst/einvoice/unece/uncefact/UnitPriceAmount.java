@@ -28,6 +28,8 @@ import java.math.RoundingMode;
  */
 public class UnitPriceAmount extends Amount {
 
+	// in EN 16931-1:2017/A1:2019 + AC:2020 entfällt die Einschränkung:
+	//  „Typ repräsentiert eine Fließkommazahl ohne Limitierung der Anzahl an Nachkommastellen.“ 
 	public static final int SCALE = 4;
 	
 	UnitPriceAmount() {
