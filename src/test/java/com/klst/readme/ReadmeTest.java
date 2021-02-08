@@ -166,9 +166,9 @@ public class ReadmeTest {
 		assertEquals(DE, invoice.getSeller().getAddress().getCountryCode());
 		assertEquals(DE, invoice.getBuyer() .getAddress().getCountryCode());
 		
-		Timestamp tsTaxPointDate = invoice.getTaxPointDateAsTimestamp();  // wg. sequenzproblem
+		Timestamp tsTaxPointDate = invoice.getTaxPointDateAsTimestamp();  // Test wg. sequenzproblem
 		LocalDateTime ldtTaxPointDate = tsTaxPointDate==null ? null : tsTaxPointDate.toLocalDateTime();
-		LOG.info("TaxPointDate (LocalDateTime):"+ ldtTaxPointDate); // TODO darf nicht null sein
+		LOG.info("TaxPointDate (LocalDateTime):"+ ldtTaxPointDate);
 		assertEquals(2016, tsTaxPointDate.toLocalDateTime().getYear());
 		assertEquals(12, tsTaxPointDate.toLocalDateTime().getMonthValue());
 		assertEquals(31, tsTaxPointDate.toLocalDateTime().getDayOfMonth());
