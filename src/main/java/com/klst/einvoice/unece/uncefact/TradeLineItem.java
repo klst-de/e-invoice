@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoiceLine;
@@ -12,12 +13,11 @@ import com.klst.einvoice.Identifier;
 import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.TaxCategoryCode;
+import com.klst.untdid.codelist.TaxTypeCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CountryIDType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.ReferenceCodeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentLineDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeDeliveryType;
@@ -34,11 +34,9 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePriceType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeProductType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementLineMonetarySummationType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
 
 /**
@@ -71,6 +69,8 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		}
 	}
 
+	private static final Logger LOG = Logger.getLogger(TradeLineItem.class.getName());
+
 	// copy ctor
 	private TradeLineItem(SupplyChainTradeLineItemType line) {
 		super();
@@ -78,7 +78,15 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 			CopyCtor.invokeCopy(this, line);
 			//LOG.fine("copy ctor:"+this);
 		}
+		if(specifiedLineTradeSettlement.getApplicableTradeTax().isEmpty()) {
+			tradeTax = null; //TradeTax.create();
+		} else {
+			tradeTax = TradeTax.create(specifiedLineTradeSettlement.getApplicableTradeTax().get(0));
+		}
 	}
+
+	// BG-30 ++ 1..1 UMSATZSTEUERINFORMATIONEN AUF DER EBENE DER RECHNUNGSPOSITION
+	TradeTax tradeTax = null;
 
 	private TradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
 			, TaxCategoryCode codeEnum, BigDecimal percent) {
@@ -100,17 +108,17 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	 * @param BT-131 lineTotalAmount : the total amount of the Invoice line.
 	 * @param BT-146 priceAmt : item net price (mandatory part in PRICE DETAILS)
 	 * @param BT-153 itemName : a name for an item (mandatory part in ITEM INFORMATION)
-	 * @param BG-30.BT-151 codeEnum 1..1 VAT category code
+	 * @param BG-30.BT-151 taxCode 1..1 VAT category code
 	 * @param BG-30.BT-152 percent  0..1 VAT rate
 	 */
 	private void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
-			, TaxCategoryCode codeEnum, BigDecimal percent) {
+			, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		setId(id);
 		setQuantity(quantity);
 		setLineTotalAmount(lineTotalAmount);
 		setUnitPriceAmount(priceAmount);
 		setItemName(itemName);
-		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
+		setTaxCategoryAndRate(taxCode, taxRate);
 	}
 	
 	// 1 .. 1 LineID BT-126
@@ -540,128 +548,30 @@ Bsp.
 1 .. 1 CategoryCode Code der Umsatzsteuerkategorie des in Rechnung gestellten Artikels  BT-151
 
  */
-	/*
-	 * TypeCode Steuerart (Code) Datentyp: qdt:TaxTypeCodeType 
-	 * Hinweis: Fester Wert = "VAT" Kardinalität: 1 .. 1 EN16931-ID: BT-151-0
-	 */
-	static final TaxTypeCodeType VAT() {
-		TaxTypeCodeType taxTypeCode = new TaxTypeCodeType();
-		taxTypeCode.setValue("VAT");
-		return taxTypeCode;
-	}
 	
 	/*
 	 * 
 	 * @param codeEnum 1..1 EN16931-ID: BT-151
 	 * @param percent 0..1 EN16931-ID: BT-152
-	 */
-	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, Percent percent) {
-		TaxCategoryCodeType taxCategoryCode = new TaxCategoryCodeType();
-		taxCategoryCode.setValue(codeEnum.getValue());
-
-		TradeTaxType tradeTax = new TradeTaxType();
-		tradeTax.setCategoryCode(taxCategoryCode);
-		tradeTax.setTypeCode(VAT());
-		
-		if(percent!=null) {
-			tradeTax.setRateApplicablePercent(percent);
+	 */	
+	void setTaxCategoryAndRate(TaxCategoryCode code, BigDecimal taxRate) {
+		if(tradeTax==null) {
+			tradeTax = TradeTax.create(TaxTypeCode.ValueAddedTax, code, taxRate);
+			specifiedLineTradeSettlement.getApplicableTradeTax().add(tradeTax);
+		} else {
+			tradeTax = TradeTax.create(TaxTypeCode.ValueAddedTax, code, taxRate);
+			LOG.info("replaces BG-30 LINE VAT INFORMATION with "+tradeTax);
+			specifiedLineTradeSettlement.getApplicableTradeTax().set(0, tradeTax);
 		}
-		
-		specifiedLineTradeSettlement.getApplicableTradeTax().add(tradeTax);
-		super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);		
-	}
-	
-	void setTaxCategoryAndRate(TaxCategoryCode codeEnum, BigDecimal percent) {
-		setTaxCategoryAndRate(codeEnum, percent==null ? null : new Percent(percent));
-	}
-
-	void setTaxCategory(TaxCategoryCode codeEnum) {
-		setTaxCategoryAndRate(codeEnum, (Percent)null);
 	}
 
 	@Override
 	public TaxCategoryCode getTaxCategory() {
-		TradeTaxType tradeTax = specifiedLineTradeSettlement.getApplicableTradeTax().get(0); // Kardinalität: 1..n
-		return TaxCategoryCode.valueOf(tradeTax.getCategoryCode());
+		return tradeTax==null ? null : tradeTax.getTaxCategoryCode();
 	}
 
 	public BigDecimal getTaxRate() {
-		TradeTaxType tradeTax = specifiedLineTradeSettlement.getApplicableTradeTax().get(0); // Kardinalität: 1..n
-		PercentType percent = tradeTax.getRateApplicablePercent();
-		return percent==null ? null : percent.getValue();
+		return tradeTax==null ? null : tradeTax.getTaxPercentage();
 	}
-
-/**
-1 .. 1 SpecifiedLineTradeSettlement Gruppierung von Angaben zur Abrechnung auf Positionsebene
-0 .. n AdditionalReferencedDocument Objektkennung auf Ebene der Rechnungsposition xs:sequence 
-0 .. 1 IssuerAssignedID Objektkennung auf Ebene der Rechnungsposition, Wert                      BT-128 
-1 .. 1 TypeCode Typ der Kennung für einen Gegenstand, auf dem die Rechnungsposition basiert      BT-128-0 
-0 .. 1 ReferenceTypeCode Kennung des Schemas                                                     BT-128-1
-
-CII:
-0 .. n IncludedSupplyChainTradeLineItem Rechnungsposition                                        BG-25
-1 .. 1 AssociatedDocumentLineDocument Gruppierung von allgemeinen Positionsangaben xs:sequence 
-1 .. 1 LineID Kennung der Rechnungsposition                                                      BT-126 
-0 .. 1 LineStatusCode Typ der Rechnungsposition (Code) 
-0 .. 1 LineStatusReasonCode Untertyp der Rechnungsposition 
-0 .. n IncludedNote Detailinformationen zum Freitext zur Position xs:sequence 
-0 .. 1 ContentCode Freitext zur Position (Code zum Inhalt) 
-1 .. 1 Content Freitext zur Rechnungsposition                                                    BT-127 
-0 .. 1 SubjectCode Freitext zur Position (Code zur Art) 
-1 .. 1 SpecifiedTradeProduct Artikelinformationen                                                BG-31
-0 .. 1 GlobalID Kennung eines Artikels nach registriertem Schema                                 BT-157 
-       required schemeID Kennung des Schemas                                                     BT-157-1 
-0 .. 1 SellerAssignedID Artikelnummer des Verkäufers                                             BT-155 
-0 .. 1 BuyerAssignedID Artikelnummer des Käufers                                                 BT-156 
-1 .. 1 Name Artikelname                                                                          BT-153 
-0 .. 1 Description Artikelbeschreibung                                                           BT-154 
-0 .. n ApplicableProductCharacteristic Artikelattribute                                          BG-32 xs:sequence 
-0 .. 1 TypeCode Art der Produkteigenschaft (Code) 
-1 .. 1 Description Artikelattributname                                                           BT-160 
-0 .. 1 ValueMeasure Wert der Produkteigenschaft (numerische Messgröße) required unitCode Maßeinheit 
-1 .. 1 Value Artikelattributwert                                                                 BT-161 
-0 .. n DesignatedProductClassification Detailinformationen zur Produktklassifikation xs:sequence 
-1 .. 1 ClassCode Kennung der Artikelklassifizierung                                              BT-158 
-       required listID Kennung des Schemas                                                       BT-158-1 
-       optional listVersionID Version des Schemas                                                BT-158-2 
-0 .. 1 ClassName Klassifikationsname 
-0 .. 1 OriginTradeCountry Detailinformationen zur Produktherkunft xs:sequence 
-1 .. 1 ID Artikelherkunftsland                                                                   BT-159
-...
-1 .. 1 SpecifiedLineTradeAgreement Detailinformationen zum Preis                                 BG-29 xs:sequence 
-0 .. 1 BuyerOrderReferencedDocument Detailangaben zur zugehörigen Bestellung xs:sequence 
-0 .. 1 IssuerAssignedID Bestellnummer 
-0 .. 1 LineID Referenz zur Bestellposition                                                       BT-132
-...
-0 .. 1 GrossPriceProductTradePrice Detailinformationen zum Bruttopreis des Artikels xs:sequence 
-1 .. 1 ChargeAmount Bruttopreis des Artikels                                                     BT-148 
-0 .. 1 BasisQuantity Basismenge zum Artikelpreis                                                 BT-149 
-       required unitCode Code der Maßeinheit der Basismenge zum Artikelpreis                     BT-150
-0 .. n AppliedTradeAllowanceCharge Detailinformationen zu Zu- und Abschlägen xs:sequence 
-0 .. 1 ChargeIndicator Schalter für Zu-/Abschlag xs:choice 
-1 .. 1 Indicator Schalter für Zu-/Abschlag, Wert 
-0 .. 1 CalculationPercent Rabatt in Prozent 
-0 .. 1 BasisAmount Basisbetrag des Rabatts 
-1 .. 1 ActualAmount Nachlass auf den Artikelpreis                                                BT-147 
-1 .. 1 Reason Grund des Zu-/Abschlags (Freitext) 
-1 .. 1 NetPriceProductTradePrice Detailinformationen zum Nettopreis des Artikels xs:sequence 
-1 .. 1 ChargeAmount Nettopreis des Artikels                                                      BT-146 
-0 .. 1 BasisQuantity Basismenge zum Artikelpreis                                                 BT-149-0 
-       required unitCode Code der Maßeinheit der Basismenge zum Artikelpreis                     BT-150-0
-...
-0 .. n AppliedTradeAllowanceCharge Detailinformationen zu Zu- und Abschlägen xs:sequence 
-0 .. 1 ChargeIndicator Schalter für Zu-/Abschlag xs:choice 
-1 .. 1 Indicator Schalter für Zu-/Abschlag, Wert 
-0 .. 1 CalculationPercent Rabatt in Prozent 
-0 .. 1 BasisAmount Basisbetrag des Rabatts 
-1 .. 1 ActualAmount Nachlass auf den Artikelpreis                                                BT-147 
-1 .. 1 Reason Grund des Zu-/Abschlags (Freitext) 
-1 .. 1 NetPriceProductTradePrice Detailinformationen zum Nettopreis des Artikels xs:sequence 
-1 .. 1 ChargeAmount Nettopreis des Artikels                                                      BT-146 
-0 .. 1 BasisQuantity Basismenge zum Artikelpreis                                                 BT-149-0 
-       required unitCode Code der Maßeinheit der Basismenge zum Artikelpreis                     BT-150-0
-...
- *
- */
 
 }
