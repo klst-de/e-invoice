@@ -56,12 +56,12 @@ public class TradePaymentTerms extends TradePaymentTermsType {
 		return new TradePaymentTerms(null);
 	}
 	// copy factory
-	static TradePaymentTerms create(TradePaymentTermsType hts) {
-		if(hts instanceof TradePaymentTermsType && hts.getClass()!=TradePaymentTermsType.class) {
-			// hts is instance of a subclass of TradePaymentTermsType, but not TradePaymentTermsType itself
-			return (TradePaymentTerms)hts;
+	static TradePaymentTerms create(TradePaymentTermsType object) {
+		if(object instanceof TradePaymentTermsType && object.getClass()!=TradePaymentTermsType.class) {
+			// object is instance of a subclass of TradePaymentTermsType, but not TradePaymentTermsType itself
+			return (TradePaymentTerms)object;
 		} else {
-			return new TradePaymentTerms(hts); 
+			return new TradePaymentTerms(object); 
 		}
 	}
 

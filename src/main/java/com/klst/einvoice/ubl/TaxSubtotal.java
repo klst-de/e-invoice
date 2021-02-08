@@ -95,12 +95,7 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 	private ITaxCategory getITaxCategory() {
 		TaxCategoryType tc = super.getTaxCategory();
 		if(tc==null) return null;
-		if(tc instanceof TaxCategoryType && tc.getClass()!=TaxCategoryType.class) {
-			// tc is instance of a subclass of TaxCategoryType, but not TaxCategoryType itself
-			return (TaxCategory)tc;
-		} else {
-			return new TaxCategory(tc); 
-		}
+		return TaxCategory.create(tc);
 	}
 	
 	// BG-23.BT-118-0
@@ -108,7 +103,7 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 	public void setTaxType(String type) {
 		//if(super.getTaxCategory()==null) super.setTaxCategory(new TaxCategory(null));
 		// oder kurz:
-		super.setTaxCategory(new TaxCategory(super.getTaxCategory()));
+		super.setTaxCategory(TaxCategory.create(super.getTaxCategory()));
 		// delegieren:
 		((TaxCategory)getTaxCategory()).setTaxType(type);
 	}
@@ -133,12 +128,12 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 	// BG-23.BT-118
 	@Override
 	public void setTaxCategoryCode(String code) {
-		super.setTaxCategory(new TaxCategory(super.getTaxCategory()));
+		super.setTaxCategory(TaxCategory.create(super.getTaxCategory()));
 		((TaxCategory)getTaxCategory()).setTaxCategoryCode(code);
 	}
 	@Override
 	public void setTaxCategoryCode(TaxCategoryCode code) {
-		super.setTaxCategory(new TaxCategory(super.getTaxCategory()));
+		super.setTaxCategory(TaxCategory.create(super.getTaxCategory()));
 		((TaxCategory)getTaxCategory()).setTaxCategoryCode(code);
 	}
 	@Override
@@ -149,7 +144,7 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 	// BG-23.BT-119
 	@Override
 	public void setTaxPercentage(BigDecimal taxRate) {
-		super.setTaxCategory(new TaxCategory(super.getTaxCategory()));
+		super.setTaxCategory(TaxCategory.create(super.getTaxCategory()));
 		((TaxCategory)getTaxCategory()).setTaxPercentage(taxRate);
 	}
 

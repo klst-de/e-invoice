@@ -48,10 +48,20 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory, ITaxCa
 		return new TaxCategory(taxType.getValue(), taxCode, taxRate);
 	}
 
+	// copy factory
+	static TaxCategory create(TaxCategoryType object) {
+		if(object instanceof TaxCategoryType && object.getClass()!=TaxCategoryType.class) {
+			// object is instance of a subclass of TaxCategoryType, but not TaxCategoryType itself
+			return (TaxCategory)object;
+		} else {
+			return new TaxCategory(object); 
+		}
+	}
+
 	private static final Logger LOG = Logger.getLogger(TaxCategory.class.getName());
 	
 	// copy ctor
-	public TaxCategory(TaxCategoryType doc) {
+	private TaxCategory(TaxCategoryType doc) {
 		super();
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);

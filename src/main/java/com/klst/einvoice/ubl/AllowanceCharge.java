@@ -67,15 +67,35 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);
 			TaxCategoryType tc = doc.getTaxCategory().isEmpty() ? null : doc.getTaxCategory().get(0);
-			if(tc instanceof TaxCategoryType && tc.getClass()!=TaxCategoryType.class) {
-				// tc is instance of a subclass of TaxCategoryType, but not TaxCategoryType itself
-				taxCategory = (TaxCategory)tc;
-			} else {
-				taxCategory = new TaxCategory(tc); 
-			}
+			taxCategory = TaxCategory.create(tc); 
+			LOG.fine("copy ctor:"+this);
 		}
-		LOG.info("copy ctor:"+this);	
 	}
+
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder().append("[");
+		if(isAllowance()) stringBuilder.append("ALLOWANCE");
+		if(isCharge()) stringBuilder.append("CHARGE"); // BG-21
+		
+		stringBuilder.append(", AmountWithoutTax:"); // BT-99
+		stringBuilder.append(getAmountWithoutTax()==null ? "null" : getAmountWithoutTax());
+		stringBuilder.append(", AssessmentBase:");   // BT-100
+		stringBuilder.append(getAssessmentBase()==null ? "null" : getAssessmentBase());
+		stringBuilder.append(", %rate:");            // BT-101
+		stringBuilder.append(getPercentage()==null ? "null" : getPercentage());
+		
+		stringBuilder.append(", tax:");   // BT-102-0 + BT-102 + BT-103
+		stringBuilder.append(taxCategory==null ? "null" : taxCategory);
+		
+		stringBuilder.append(", Reasoncode:"); // BT-104
+		stringBuilder.append(getReasoncode()==null ? "null" : getReasoncode());
+		stringBuilder.append(", ReasonText:"); // BT-105
+		stringBuilder.append(getReasonText()==null ? "null" : getReasonText());
+		
+		stringBuilder.append("]");
+		return stringBuilder.toString();
+	}
+
 
 	@Override
 	public void setChargeIndicator(boolean indicator) {
