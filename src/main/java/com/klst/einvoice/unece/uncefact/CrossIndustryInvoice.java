@@ -1398,7 +1398,7 @@ Code Codename
 	public void addLines(CrossIndustryInvoiceType doc) {
 		List<TradeLineItem> tradeLineItemList = getLines(doc);
 		tradeLineItemList.forEach(line -> {
-			CoreInvoiceLine invoiceLine = new TradeLineItem(line); // TradeLineItem implements CoreInvoiceLine
+			CoreInvoiceLine invoiceLine = TradeLineItem.create(line); // TradeLineItem implements CoreInvoiceLine
 			addLine(invoiceLine);
 		});
 	}
@@ -1407,7 +1407,7 @@ Code Codename
 		List<SupplyChainTradeLineItemType> lines = supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem();
 		List<CoreInvoiceLine> resultLines = new ArrayList<CoreInvoiceLine>(lines.size());
 		lines.forEach(line -> {
-			resultLines.add(new TradeLineItem(line));
+			resultLines.add(TradeLineItem.create(line));
 		});
 		return resultLines;
 	}
@@ -1415,7 +1415,7 @@ Code Codename
 		List<SupplyChainTradeLineItemType> lines = doc.getSupplyChainTradeTransaction().getIncludedSupplyChainTradeLineItem();
 		List<TradeLineItem> resultLines = new ArrayList<TradeLineItem>(lines.size());
 		lines.forEach(line -> {
-			resultLines.add(new TradeLineItem(line));
+			resultLines.add(TradeLineItem.create(line));
 		});
 		return resultLines;
 	}

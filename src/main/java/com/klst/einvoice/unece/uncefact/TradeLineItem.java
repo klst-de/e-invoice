@@ -9,6 +9,7 @@ import java.util.Properties;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.Identifier;
+import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
@@ -61,39 +62,28 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return new TradeLineItem(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 	}
 
-//	private static final Logger LOG = Logger.getLogger(TradeLineItem.class.getName());
-
-	TradeLineItem() {
-		super();
+	// copy factory
+	static TradeLineItem create(SupplyChainTradeLineItemType object) {
+		if(object instanceof SupplyChainTradeLineItemType && object.getClass()!=SupplyChainTradeLineItemType.class) {
+			// object is instance of a subclass of SupplyChainTradeLineItemType, but not SupplyChainTradeLineItemType itself
+			return (TradeLineItem)object;
+		} else {
+			return new TradeLineItem(object); 
+		}
 	}
-	
+
 	// copy ctor
-	public TradeLineItem(SupplyChainTradeLineItemType line) {
-		this();
-		associatedDocumentLineDocument = line.getAssociatedDocumentLineDocument();
-		specifiedTradeProduct = line.getSpecifiedTradeProduct();
-		specifiedLineTradeAgreement = line.getSpecifiedLineTradeAgreement();
-		specifiedLineTradeDelivery = line.getSpecifiedLineTradeDelivery(); // 0..1
-		specifiedLineTradeSettlement = line.getSpecifiedLineTradeSettlement();
-
-		TradeTaxType tradeTax = specifiedLineTradeSettlement.getApplicableTradeTax().get(0);
-		PercentType percent = tradeTax.getRateApplicablePercent();
-//		LOG.info("specifiedLineTradeSettlement:"+specifiedLineTradeSettlement + " tradeTax.getCategoryCode()="+tradeTax.getCategoryCode() 
-//		+ "\n TaxCategoryCode:"+TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
-//		);
-		init( associatedDocumentLineDocument.getLineID().getValue()
-			, new Quantity(specifiedLineTradeDelivery.getBilledQuantity().getUnitCode(), specifiedLineTradeDelivery.getBilledQuantity().getValue())
-			, new Amount(specifiedLineTradeSettlement.getSpecifiedTradeSettlementLineMonetarySummation().getLineTotalAmount().get(0).getValue())
-			, new UnitPriceAmount(specifiedLineTradeAgreement.getNetPriceProductTradePrice().getChargeAmount().get(0).getValue())
-			, specifiedTradeProduct.getName().get(0).getValue()
-			, TaxCategoryCode.valueOf(tradeTax.getCategoryCode())
-			, percent==null ? null : percent.getValue()
-			);
+	private TradeLineItem(SupplyChainTradeLineItemType line) {
+		super();
+		if(line!=null) {
+			CopyCtor.invokeCopy(this, line);
+			//LOG.fine("copy ctor:"+this);
+		}
 	}
 
-	public TradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
+	private TradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
 			, TaxCategoryCode codeEnum, BigDecimal percent) {
-		this();
+		super();
 		associatedDocumentLineDocument = new DocumentLineDocumentType();
 		specifiedTradeProduct = new TradeProductType();
 		specifiedLineTradeAgreement = new LineTradeAgreementType();

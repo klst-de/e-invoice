@@ -330,7 +330,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         LOG.info("LineGroup starts for "+lines.size() + " lines.");
         lines.forEach(testLine -> {
         	LOG.info("testLine.getTaxCategory() = "+testLine.getTaxCategory() + " , testLine.getTaxRate() = "+testLine.getTaxRate());
-        	CoreInvoiceLine line = new TradeLineItem
+        	CoreInvoiceLine line = cii.createInvoiceLine
         			( testLine.getId()
         			, testLine.getQuantity()
         			, testLine.getLineTotalAmount()
