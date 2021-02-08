@@ -1411,41 +1411,17 @@ daher: NOT_IMPEMENTED
 		taxTotalFirst = getTaxTotalFirst();
 		taxTotalFirst.getTaxSubtotal().add((TaxSubtotal)vatBreakdown);
 	}
-//	public void addVATBreakDown(List<TaxSubtotal> vatBreakdowns) {
-//		taxTotalFirst = getTaxTotalFirst();
-////		LOG.info("anfügen #"+vatBreakdowns.size());
-//		vatBreakdowns.forEach(vbd -> {
-//			taxTotalFirst.getTaxSubtotal().add(vbd);
-//		});	
-//	}
 
 	public List<VatBreakdown> getVATBreakDowns() {
-		List<TaxTotalType> taxTotalList = isInvoiceType ? invoice.getTaxTotal() : creditNote.getTaxTotal();
+//		List<TaxTotalType> taxTotalList = isInvoiceType ? invoice.getTaxTotal() : creditNote.getTaxTotal();
 		taxTotalFirst = getTaxTotalFirst();
 		List<TaxSubtotalType> taxSuptotalList = taxTotalFirst.getTaxSubtotal();
 		List<VatBreakdown> result = new ArrayList<VatBreakdown>(taxSuptotalList.size());
 		taxSuptotalList.forEach(vbd -> {
-			if(vbd instanceof TaxSubtotalType && vbd.getClass()!=TaxSubtotalType.class) {
-				// vbd is instance of a subclass of TaxSubtotalType, but not TaxSubtotalType itself
-				result.add( (TaxSubtotal)vbd );
-			} else {
-				result.add(new TaxSubtotal(vbd));
-			}
+			result.add(TaxSubtotal.create(vbd));
 		});	
 		return result;
 	}
-//	public List<TaxSubtotal> ALTgetVATBreakDowns() {
-//		List<TaxTotalType> taxTotalList = isInvoiceType ? invoice.getTaxTotal() : creditNote.getTaxTotal();
-//		LOG.fine("List<TaxTotalType> taxTotalList size="+taxTotalList.size());
-//		taxTotalFirst = getTaxTotalFirst();
-//		List<TaxSubtotalType> taxSuptotalList = taxTotalFirst.getTaxSubtotal();
-//		List<TaxSubtotal> result = new ArrayList<TaxSubtotal>(taxSuptotalList.size()); // VatBreakdown extends TaxSubtotalType
-//		taxSuptotalList.forEach(vbd -> {
-//			TaxSubtotal taxSubtotal = new TaxSubtotal(vbd);
-//			result.add(taxSubtotal);
-//		});	
-//		return result;
-//	}
 
 	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	@Override

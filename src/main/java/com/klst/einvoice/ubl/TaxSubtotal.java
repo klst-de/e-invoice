@@ -34,10 +34,20 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 		return new TaxSubtotal(taxableAmount, taxAmount, taxCode, taxRate);
 	}
 
+	// copy factory
+	static TaxSubtotal create(TaxSubtotalType object) {
+		if(object instanceof TaxSubtotalType && object.getClass()!=TaxSubtotalType.class) {
+			// object is instance of a subclass of TaxSubtotalType, but not TaxSubtotalType itself
+			return (TaxSubtotal)object;
+		} else {
+			return new TaxSubtotal(object); 
+		}
+	}
+
 	private static final Logger LOG = Logger.getLogger(TaxSubtotal.class.getName());
 
 	// copy ctor
-	public TaxSubtotal(TaxSubtotalType doc) {
+	private TaxSubtotal(TaxSubtotalType doc) {
 		super();
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);
