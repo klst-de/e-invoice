@@ -143,12 +143,6 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	}
 
 	@Override
-	public void setActualDate(String ymd) {
-		if(ymd==null) return;
-		setActualDate(DateTimeFormats.ymdToTs(ymd));
-	}
-
-	@Override
 	public void setActualDate(Timestamp ts) {
 		if(ts==null) return;
 		ActualDeliveryDateType dueDate = new ActualDeliveryDateType();

@@ -2,6 +2,8 @@ package com.klst.einvoice;
 
 import java.sql.Timestamp;
 
+import com.klst.untdid.codelist.DateTimeFormats;
+
 /**
  * BG-13 + 0..1 DELIVERY INFORMATION
  * <p>
@@ -28,7 +30,6 @@ import java.sql.Timestamp;
  * BR-DE-12 :
  * Mit dem Element „Deliver to post code“ (BT-78) muss eine Postleitzahl übermittelt werden.
  */
-//TODO Idee runter zu ubl und cii und public raus ?!
 
 /* Test 02:
 
@@ -97,9 +98,11 @@ public interface BG13_DeliveryInformation {
 	public void setId(String name, String schemeID);
 	
 	// BT-72 ++ 0..1 Actual delivery date
-	public void setActualDate(String ymd);
 	public void setActualDate(Timestamp ts);
 	public Timestamp getActualDate();
+	default void setActualDate(String ymd) {
+		if(ymd!=null) setActualDate(DateTimeFormats.ymdToTs(ymd));
+	}
 	
 	// BG-14 ++ 0..1 INVOICING PERIOD
 	

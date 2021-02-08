@@ -116,12 +116,6 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 	}
 
 	@Override
-	public void setActualDate(String ymd) {
-		if(ymd==null) return;
-		setActualDate(DateTimeFormats.ymdToTs(ymd));
-	}
-
-	@Override
 	public void setActualDate(Timestamp ts) {
 		if(ts==null) return;
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
