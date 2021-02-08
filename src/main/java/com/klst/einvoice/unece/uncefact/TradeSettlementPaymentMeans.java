@@ -101,14 +101,14 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		return new TradeSettlementPaymentMeans((TradeSettlementPaymentMeansType)null);
 	}
 	// copy factory
-	static TradeSettlementPaymentMeans create(TradeSettlementPaymentMeansType pm) {
-		if(pm==null) return null;
+	static TradeSettlementPaymentMeans create(TradeSettlementPaymentMeansType object) {
+		if(object==null) return null;
 		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
-		if(pm instanceof TradeSettlementPaymentMeansType && pm.getClass()!=TradeSettlementPaymentMeansType.class) {
-			// pm is instance of a subclass of TradeSettlementPaymentMeansType, but not TradeSettlementPaymentMeansType itself
-			return (TradeSettlementPaymentMeans)pm;
+		if(object instanceof TradeSettlementPaymentMeansType && object.getClass()!=TradeSettlementPaymentMeansType.class) {
+			// object is instance of a subclass of TradeSettlementPaymentMeansType, but not TradeSettlementPaymentMeansType itself
+			return (TradeSettlementPaymentMeans)object;
 		} else {
-			return new TradeSettlementPaymentMeans(pm); 
+			return new TradeSettlementPaymentMeans(object); 
 		}
 	}
 

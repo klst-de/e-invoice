@@ -6,39 +6,54 @@ import java.util.logging.Logger;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.DateTimeFormats;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainEventType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
-
+// TODO rename to HeaderTradeDelivery
 public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType implements BG13_DeliveryInformation {
+
+	// factory
+	static ApplicableHeaderTradeDelivery create(String name, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
+		return new ApplicableHeaderTradeDelivery(name, ts, address, locationId, schemeId);
+	}
+
+	static ApplicableHeaderTradeDelivery create() {
+		return new ApplicableHeaderTradeDelivery((HeaderTradeDeliveryType)null);
+	}
+	// copy factory
+	static ApplicableHeaderTradeDelivery create(HeaderTradeDeliveryType object) {
+		if(object==null) return null;
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(object instanceof HeaderTradeDeliveryType && object.getClass()!=HeaderTradeDeliveryType.class) {
+			// object is instance of a subclass of HeaderTradeDeliveryType, but not HeaderTradeDeliveryType itself
+			return (ApplicableHeaderTradeDelivery)object;
+		} else {
+			return new ApplicableHeaderTradeDelivery(object); 
+		}
+	}
 
 	private static final Logger LOG = Logger.getLogger(ApplicableHeaderTradeDelivery.class.getName());
 	
-	ApplicableHeaderTradeDelivery() {
-		super();
-	}
-
 	// copy ctor
-	public ApplicableHeaderTradeDelivery(HeaderTradeDeliveryType delivery) {
-		this();
-		Timestamp ts = getActualDate(delivery);
-		TradePartyType tradeParty = delivery.getShipToTradeParty();
+	private ApplicableHeaderTradeDelivery(HeaderTradeDeliveryType delivery) {
+		super();
+		if(delivery!=null) {
+			CopyCtor.invokeCopy(this, delivery);
+			LOG.info("copy ctor:"+this);
+		}
+		TradePartyType tradeParty = super.getShipToTradeParty();
 		party = tradeParty==null ? null : new TradeParty(tradeParty);
-		LOG.fine("copy ctor ShipToTradeParty:"+party + " delivery.ActualDate ts:"+ts);
-		setActualDate(ts);
+		LOG.fine("copy ctor ShipToTradeParty:"+party + " delivery.ActualDate ts:"+getActualDate());
 		setParty(party);	
 	}
 
-	TradeParty party;
+	private TradeParty party;
 	
-	public ApplicableHeaderTradeDelivery(String businessName, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
-		this();
-	}
-	
-	void init(String businessName, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
+	private ApplicableHeaderTradeDelivery(String businessName, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
 		LOG.info("BT-70/businessName:"+businessName + " BT-72/Timestamp:"+ts + " BG-15 ++ 0..1 DELIVER TO ADDRESS:"+address + " BT-71/locationId:"+locationId);
 		party = new TradeParty(null, businessName, address, null);
 		party.setId(locationId);
@@ -117,11 +132,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 
 	@Override
 	public Timestamp getActualDate() {
-		return getActualDate(this);
-	}
-
-	static Timestamp getActualDate(HeaderTradeDeliveryType delivery) {
-		SupplyChainEventType supplyChainEvent = delivery.getActualDeliverySupplyChainEvent();
+		SupplyChainEventType supplyChainEvent = super.getActualDeliverySupplyChainEvent();
 		if(supplyChainEvent==null) return null;
 		DateTimeType dateTime = supplyChainEvent.getOccurrenceDateTime();
 		if(dateTime==null) return null;

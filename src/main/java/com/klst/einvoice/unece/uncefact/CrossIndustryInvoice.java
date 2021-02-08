@@ -122,7 +122,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		setProcessControl(customization, processType);
 		supplyChainTradeTransaction = new SupplyChainTradeTransactionType();
 		
-		applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery();
+		applicableHeaderTradeDelivery = ApplicableHeaderTradeDelivery.create();
 		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 		
 		applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create();
@@ -141,13 +141,12 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		this(getCustomization(doc), getProcessType(doc), getTypeCode(doc));
 		LOG.fine("copy-ctor: Customization:"+getCustomization() + ", ProcessType:"+getProcessType() + ", TypeCode:"+getTypeCode());
 		
-		Object ahtd = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
+		HeaderTradeDeliveryType ahtd = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
 		LOG.fine("copy-ctor: ApplicableHeaderTradeDelivery ahtd:"+ahtd);
 		if(ahtd==null) {
 			LOG.fine("copy-ctor: ahtd==null");
 		} else {
-			HeaderTradeDeliveryType htd = (HeaderTradeDeliveryType)ahtd;
-			applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery(htd);
+			applicableHeaderTradeDelivery = ApplicableHeaderTradeDelivery.create(ahtd);
 			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 		}
 
@@ -940,7 +939,7 @@ UBL:
 	 */
 	@Override
 	public void setDelivery(String name, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
-		applicableHeaderTradeDelivery = new ApplicableHeaderTradeDelivery(name, ts, address, locationId, schemeId);
+		applicableHeaderTradeDelivery = ApplicableHeaderTradeDelivery.create(name, ts, address, locationId, schemeId);
 		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 	}
 	
@@ -953,7 +952,7 @@ UBL:
 	public BG13_DeliveryInformation getDelivery() {
 		HeaderTradeDeliveryType headerTradeDelivery = supplyChainTradeTransaction.getApplicableHeaderTradeDelivery();
 		if(headerTradeDelivery==null) return null;
-		return new ApplicableHeaderTradeDelivery(headerTradeDelivery);
+		return ApplicableHeaderTradeDelivery.create(headerTradeDelivery);
 	}
 
 	// BG-14.BT-73 +++ 0..1 Invoicing period start date
