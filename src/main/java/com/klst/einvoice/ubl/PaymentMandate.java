@@ -1,7 +1,6 @@
 package com.klst.einvoice.ubl;
 
 import com.klst.einvoice.BG19_DirectDebit;
-import com.klst.einvoice.DebitedAccountID;
 import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.unece.uncefact.IBANId;
 

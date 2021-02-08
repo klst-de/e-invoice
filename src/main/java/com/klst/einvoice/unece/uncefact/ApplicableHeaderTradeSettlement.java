@@ -10,7 +10,6 @@ import com.klst.einvoice.BG19_DirectDebit;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.CreditTransferFactory;
-import com.klst.einvoice.DebitedAccountID;
 import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;

@@ -16,7 +16,6 @@ import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.DebitedAccountID;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
