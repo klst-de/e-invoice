@@ -291,10 +291,6 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return periodList.get(0);
 	}
 	@Override
-	public void setStartDate(String ymd) {	
-		setStartDate(DateTimeFormats.ymdToTs(ymd));
-	}
-	@Override
 	public void setStartDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		StartDateType date = new StartDateType();
@@ -313,10 +309,6 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	}
 	
 	// BG-26.BT-135 +++ 0..1 Invoice line period end date
-	@Override
-	public void setEndDate(String ymd) {	
-		setEndDate(DateTimeFormats.ymdToTs(ymd));
-	}
 	@Override
 	public void setEndDate(Timestamp ts) {
 		if(ts==null) return; // optional

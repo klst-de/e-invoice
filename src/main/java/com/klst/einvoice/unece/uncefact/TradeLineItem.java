@@ -270,11 +270,6 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 
 	// BT-134 +++ 0..1 Invoice line period start date
 	@Override
-	public void setStartDate(String ymd) {
-		setStartDate(DateTimeFormats.ymdToTs(ymd));
-	}
-
-	@Override
 	public void setStartDate(Timestamp ts) {
 		if(ts==null) return;
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
@@ -297,11 +292,6 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
-	}
-
-	@Override
-	public void setEndDate(String ymd) {
-		setEndDate(DateTimeFormats.ymdToTs(ymd));		
 	}
 
 	@Override
