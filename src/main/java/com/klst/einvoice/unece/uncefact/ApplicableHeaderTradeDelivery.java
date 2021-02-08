@@ -22,11 +22,10 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 	}
 
 	static ApplicableHeaderTradeDelivery create() {
-		return new ApplicableHeaderTradeDelivery((HeaderTradeDeliveryType)null);
+		return new ApplicableHeaderTradeDelivery(null);
 	}
 	// copy factory
 	static ApplicableHeaderTradeDelivery create(HeaderTradeDeliveryType object) {
-		if(object==null) return null;
 		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
 		if(object instanceof HeaderTradeDeliveryType && object.getClass()!=HeaderTradeDeliveryType.class) {
 			// object is instance of a subclass of HeaderTradeDeliveryType, but not HeaderTradeDeliveryType itself
