@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.BG19_DirectDebit;
 import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.DebitedAccountID;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PaymentInstructionsFactory;
@@ -118,7 +118,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 		return create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 	static PaymentInstructions create(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation, 
-			List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+			List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DebitedAccountID directDebit) {
 		if(creditTransfer!=null) {
 			List<PaymentMeansType> list = new ArrayList<PaymentMeansType>();
 			creditTransfer.forEach(ct -> {
@@ -204,12 +204,12 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	}
 	
 	PaymentMeans(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation,
-			List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+			List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DebitedAccountID directDebit) {
 		this();
 		init(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 	private void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DebitedAccountID directDebit) {
 		
 		setPaymentMeans(code, paymentMeansText); // BT-81, BT-82
 		setRemittanceInformation(remittanceInformation); // BT-83

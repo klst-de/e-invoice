@@ -16,7 +16,7 @@ import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.DebitedAccountID;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
@@ -1054,12 +1054,12 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	}
 
 	@Override // implements interface DirectDebitFactory for BG-19
-	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
+	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
 		return applicableHeaderTradeSettlement.createDirectDebit(mandateID, bankAssignedCreditorID, iban);
 	}
 
 	@Override // implements interface DirectDebitFactory for BG-19
-	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
+	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
 		return applicableHeaderTradeSettlement.createDirectDebit(mandateID, bankAssignedCreditorID, debitedAccountID);
 	}
 

@@ -3,7 +3,7 @@ package com.klst.einvoice.unece.uncefact;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.DebitedAccountID;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -74,7 +74,7 @@ Bsp: 03.01a:
 Bsp: 03.04a , 03.05a
  */
 public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType 
-	implements CreditTransfer, DirectDebit {
+	implements CreditTransfer, DebitedAccountID {
 
 	// factory:
 	static CreditTransfer create(IBANId iban, String accountName, BICId bic) {

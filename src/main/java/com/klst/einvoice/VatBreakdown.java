@@ -122,7 +122,7 @@ public interface VatBreakdown extends ITaxCategory {
 	 * @param percent  BT-119
 	 */
 	// TODO in Oberklasse verschieben
-	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal percent); // use ctor
+	public void setTaxCategoryCodeAndRate(TaxCategoryCode codeEnum, BigDecimal percent); // use factory
 //	public void setTaxCategoryAndRate(String typeCode, TaxCategoryCode codeEnum, BigDecimal percent);
 	
 	/* BT-119 RateApplicablePercent Kategoriespezifischer Umsatzsteuersatz

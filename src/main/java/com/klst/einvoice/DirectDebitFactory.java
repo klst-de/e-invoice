@@ -24,6 +24,6 @@ public interface DirectDebitFactory {
 	 * 
 	 * @return DirectDebit object
 	 */
-	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban);
-	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID);
+	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban);
+	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID);
 }

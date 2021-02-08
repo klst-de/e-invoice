@@ -10,7 +10,7 @@ import com.klst.einvoice.BG19_DirectDebit;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.CreditTransferFactory;
-import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.DebitedAccountID;
 import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
@@ -461,7 +461,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 
 	// interface DirectDebitFactory
 	@Override 
-	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
+	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
 		LOG.info("mandateID="+mandateID + " bankAssignedCreditorID="+bankAssignedCreditorID + " iban="+iban);
 
 		if(iban!=null) {
@@ -484,7 +484,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	}
 
 	@Override
-	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
+	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
 		LOG.info("mandateID="+mandateID + " bankAssignedCreditorID="+bankAssignedCreditorID + " debitedAccountID="+debitedAccountID);
 
 		if(debitedAccountID!=null) {

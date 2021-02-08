@@ -18,7 +18,7 @@ import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.DebitedAccountID;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
@@ -1110,12 +1110,12 @@ daher: NOT_IMPEMENTED
 	
 	// BG-16.BG-19 ++ 0..1 DIRECT DEBIT
 	@Override
-	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
+	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
 		return PaymentMandate.create(mandateID, bankAssignedCreditorID, iban);
 	}
 
 	@Override
-	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
+	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
 		return PaymentMandate.create(mandateID, bankAssignedCreditorID, debitedAccountID);
 	}
 
