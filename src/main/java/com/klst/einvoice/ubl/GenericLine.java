@@ -354,7 +354,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		List<AllowanceChargeType> allowanceChargeList = isInvoiceLineType ? iLine.getAllowanceCharge() : cnLine.getAllowanceCharge();
 		List<AllowancesAndCharges> resList = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
 		allowanceChargeList.forEach(doc -> {
-			resList.add(new AllowanceCharge(doc));
+			resList.add(AllowanceCharge.create(doc));
 		});
 		return resList;
 	}
@@ -369,7 +369,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		List<AllowanceChargeType> allowanceChargeList = price.getAllowanceCharge();
 		List<AllowancesAndCharges> allowancesCharges = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
 		allowanceChargeList.forEach(doc -> {
-			allowancesCharges.add(new AllowanceCharge(doc));
+			allowancesCharges.add(AllowanceCharge.create(doc));
 		});
 		if(!allowancesCharges.isEmpty()) {
 			// ein setter ist nicht spezifiziert

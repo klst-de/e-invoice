@@ -56,13 +56,23 @@ Bsp 02.01:
  */
 public class AllowanceCharge extends AllowanceChargeType implements AllowancesAndCharges {
 
+	// copy factory
+	static AllowanceCharge create(AllowanceChargeType object) {
+		if(object instanceof AllowanceChargeType && object.getClass()!=AllowanceChargeType.class) {
+			// object is instance of a subclass of AllowanceChargeType, but not AllowanceChargeType itself
+			return (AllowanceCharge)object;
+		} else {
+			return new AllowanceCharge(object); 
+		}
+	}
+
 	private static final Logger LOG = Logger.getLogger(AllowanceCharge.class.getName());
 	
 	// das erste element der Liste taxCategory aus super, die anderen werden nicht genutzt
 	TaxCategory taxCategory = null;
 	
 	// copy ctor
-	AllowanceCharge(AllowanceChargeType doc) {
+	private AllowanceCharge(AllowanceChargeType doc) {
 		super();
 		if(doc!=null) {
 			CopyCtor.invokeCopy(this, doc);
