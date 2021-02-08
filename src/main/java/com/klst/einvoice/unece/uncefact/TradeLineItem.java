@@ -40,7 +40,6 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 /**
  * INVOICE LINE
@@ -104,7 +103,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	 * @param BG-30.BT-151 codeEnum 1..1 VAT category code
 	 * @param BG-30.BT-152 percent  0..1 VAT rate
 	 */
-	void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
+	private void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
 			, TaxCategoryCode codeEnum, BigDecimal percent) {
 		setId(id);
 		setQuantity(quantity);
@@ -128,17 +127,17 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override // 0 .. n IncludedNote.Content BT-127
 	public void setNote(String text) {
 		if(text==null) return;
-		NoteType note = new NoteType();
-		note.getContent().add(new Text(text)); // Kardinalität: 1 .. 1 TODO test
-		associatedDocumentLineDocument.getIncludedNote().add(note);
+//		NoteType note = new NoteType();
+//		note.getContent().add(new Text(text)); // Kardinalität: 1 .. 1 TODO test
+		associatedDocumentLineDocument.getIncludedNote().add(Note.create(text));
 		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
 	}
 
 	@Override 
 	public String getNote() {
 		if(associatedDocumentLineDocument.getIncludedNote().isEmpty()) return null;
-		List<TextType> textList = associatedDocumentLineDocument.getIncludedNote().get(0).getContent();
-		return textList.isEmpty() ? null : textList.get(0).getValue();
+		List<NoteType> list = associatedDocumentLineDocument.getIncludedNote();
+		return list.isEmpty() ? null : Note.getNote(list.get(0));
 	}
 
 	// 0..1 BT-128  IssuerAssignedID
