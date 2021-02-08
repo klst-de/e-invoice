@@ -137,22 +137,21 @@ public class TradeTax extends TradeTaxType
 	public ITaxCategory createTaxCategory(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return create(taxType, taxCode, taxRate);
 	}
-	static ITaxCategory create(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
+	static TradeTax create(TaxTypeCode taxType, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return new TradeTax(taxType.getValue(), taxCode, taxRate);
 	}
 
 	static TradeTax create() {
-		return new TradeTax(null);
+		return create((TradeTaxType)null);
 	}
 	// copy factory
-	static TradeTax create(TradeTaxType tt) {
-		if(tt==null) return null;
+	static TradeTax create(TradeTaxType object) {
 		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
-		if(tt instanceof TradeTaxType && tt.getClass()!=TradeTaxType.class) {
-			// tt is instance of a subclass of TradeTaxType, but not TradeTaxType itself
-			return (TradeTax)tt;
+		if(object instanceof TradeTaxType && object.getClass()!=TradeTaxType.class) {
+			// object is instance of a subclass of TradeTaxType, but not TradeTaxType itself
+			return (TradeTax)object;
 		} else {
-			return new TradeTax(tt); 
+			return new TradeTax(object); 
 		}
 	}
 
@@ -322,10 +321,7 @@ keine Beispiele für Tests!
 	// BG-23.BT-119
 	@Override
 	public void setTaxPercentage(BigDecimal taxRate) {
-		setTaxPercentage(new Percent(taxRate));
-	}
-	public void setTaxPercentage(Percent rate) {
-		if(rate!=null) super.setRateApplicablePercent(rate);
+		if(taxRate!=null) super.setRateApplicablePercent(new Percent(taxRate));
 	}
 
 	@Override
