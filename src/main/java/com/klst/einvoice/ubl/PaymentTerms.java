@@ -47,24 +47,15 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType
  */
 public class PaymentTerms extends PaymentTermsType {
 
-	PaymentTerms() {
-		super();
-	}
-	
-	public PaymentTerms(PaymentTermsType paymentTerms) {
-		this();
-//		paymentTerms.getPaymentMeansID(); // LIST  
-		super.setID(paymentTerms.getID());
-		// TODO ??? alle member kopieren
-		List<NoteType> myNotes = super.getNote();
-		List<NoteType> notes = paymentTerms.getNote();
-		notes.forEach(note -> {
-			myNotes.add(note);
-		});
-	}
+//	private PaymentTerms(PaymentTermsType doc) {
+//		super();
+//		if(doc!=null) {
+//			CopyCtor.invokeCopy(this, doc);
+//		}
+//	}
 	
 	public PaymentTerms(String paymentTermsNote) {
-		this();
+		super();
 		addNote(paymentTermsNote);
 	}
 
@@ -76,11 +67,11 @@ public class PaymentTerms extends PaymentTermsType {
 		return notes;
 	}
 
-	public String getFirstNote() {
-		List<NoteType> notes = super.getNote();
-		if(notes.isEmpty()) {
-			return null;
-		}
-		return notes.get(0).getValue();
-	}
+//	public String getFirstNote() {
+//		List<NoteType> notes = super.getNote();
+//		if(notes.isEmpty()) {
+//			return null;
+//		}
+//		return notes.get(0).getValue();
+//	}
 }
