@@ -398,6 +398,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				LOG.info("PRICE DETAILS BG-29.BT-149 + BT-150 baseQuantity "+baseQuantity);
 				// BG-29.BT-146 + BG-29:BT-149-0 0..1 , BT-150-0
 				targetLine.setUnitPriceAmountAndQuantity(testLine.getUnitPriceAmount(), baseQuantity);
+				targetLine.setUnitPriceAllowance(testLine.getPriceDiscount(), testLine.getGrossPrice());
 			}
 			
 			List<AllowancesAndCharges> allowancesAndCharges = testLine.getAllowancesAndCharges();

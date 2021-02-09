@@ -12,27 +12,32 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Pric
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BaseQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PriceAmountType;
 
-/*
-UBL: ubl-tc434-example5.xml
-        <cac:Price>
-            <cbc:PriceAmount currencyID="DKK">1.00</cbc:PriceAmount> <!-- BG-29.BT-146 -->
-            <cbc:BaseQuantity unitCode="EA">1</cbc:BaseQuantity>
-            <cac:AllowanceCharge>
-                <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
-                <cbc:Amount currencyID="DKK">0.10</cbc:Amount>
-                <cbc:BaseAmount currencyID="DKK">1.10</cbc:BaseAmount>
-            </cac:AllowanceCharge>
-        </cac:Price>
-
- */
-// implements BG-29 ++ 1..1 PRICE DETAILS
-/*
+/* implements BG-29 ++ 1..1 PRICE DETAILS
 
 BT-146 +++ 1..1 Item net price
 BT-147 +++ 0..1 Item price discount
 BT-148 +++ 0..1 Item gross price
 BT-149 +++ 0..1 Item price base quantity
 BT-150 +++ 0..1 Item price base quantity unit of measure code 
+
+example: 
+ubl-tc434-example5.xml
+
+BG-29.BT-147 0..1 Item price discount, Nachlass auf den Artikelpreis
+                      der gesamte zur Berechnung des Nettopreises vom Bruttopreis subtrahierte Rabatt
+BG-29.BT-148 0..1 Item gross price, Bruttopreis des Artikels
+                      der Einheitspreis ohne Umsatzsteuer vor Abzug des Nachlass auf den Artikelpreis
+ubl-tc434-example5.xml :
+
+        <cac:Price>
+            <cbc:PriceAmount currencyID="DKK">1.00</cbc:PriceAmount>   <!-- BG-29.BT-146 -->
+            <cbc:BaseQuantity unitCode="EA">1</cbc:BaseQuantity>       <!-- BG-29.BT-150:"EA" BG-29.BT-149:1 -->
+            <cac:AllowanceCharge>
+                <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+                <cbc:Amount currencyID="DKK">0.10</cbc:Amount>         <!-- BG-29.BT-147 -->
+                <cbc:BaseAmount currencyID="DKK">1.10</cbc:BaseAmount> <!-- BG-29.BT-148 -->
+            </cac:AllowanceCharge>
+        </cac:Price>
 
  */
 public class Price extends PriceType {
@@ -109,13 +114,12 @@ public class Price extends PriceType {
 		return allowance.getAssessmentBase();
 	}
 	
-	/* BT-149-0 0..1 , BT-150-0 required   ?????????????????
-	 * BT-149 +++ 0..1 Basismenge zum Artikelpreis
-	 * BT-150 +++ 0..1 Code der Maßeinheit der Basismenge zum Artikelpreis
+	/* 
+	 * BT-149 0..1 Basismenge zum Artikelpreis
+	 * BT-150 0..1 Code der Maßeinheit der Basismenge zum Artikelpreis
+	 * 
 	 * Bsp.: <cbc:BaseQuantity unitCode="EA">1</cbc:BaseQuantity>
 	 * 
-	 * (non-Javadoc)
-	 * @see com.klst.einvoice.CoreInvoiceLine#getBaseQuantity()
 	 */
 	public void setUnitPriceQuantity(Quantity quantity) {
 		if(quantity!=null) {
@@ -125,7 +129,6 @@ public class Price extends PriceType {
 			super.setBaseQuantity(baseQuantity);
 		}	
 	}
-//	@Override
 	public Quantity getUnitPriceQuantity() {
 		if(super.getBaseQuantity()==null) return null;
 		String unit = getBaseQuantity().getUnitCode();

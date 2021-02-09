@@ -378,29 +378,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
 		return price.getUnitPriceQuantity();
 	}
-//	@Override
-//	public UnitPriceAmount getUnitPriceAmount() {
-//		PriceType price = isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice();
-//		//BT-146 +++ 1..1 Item net price , Unit price amount
-//		PriceAmountType priceAmount = price.getPriceAmount();
-//		List<AllowanceChargeType> allowanceChargeList = price.getAllowanceCharge();
-//		List<AllowancesAndCharges> allowancesCharges = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
-//		allowanceChargeList.forEach(doc -> {
-//			allowancesCharges.add(AllowanceCharge.create(doc));
-//		});
-//		if(!allowancesCharges.isEmpty()) {
-//			// ein setter ist nicht spezifiziert
-//			LOG.info("TODO Price allowancesCharges "+allowancesCharges.size());
-//		}
-//		
-//		return new UnitPriceAmount(priceAmount.getCurrencyID(), priceAmount.getValue());
-//	}
 
-	/**
-	 * non public - use ctor
-	 * 
-	 * @param unitPriceAmount
-	 */
 	private void setPrice(Price price) {
 		if(isInvoiceLineType) {
 			iLine.setPrice(price);
@@ -409,18 +387,13 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		}		
 	}
 	
-	void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
-//		setUnitPriceAmountAndQuantity(unitPriceAmount, null);
+	private void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
 		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
-//		PriceAmountType amount = new PriceAmountType();
-//		// oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PriceAmountType
-//// 	public void copyTo(oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.AmountType amount) {
-//		unitPriceAmount.copyTo(amount); // TODO ???????????????? ist das eindeutig?
 		price.setUnitPriceAmount(unitPriceAmount);
 		setPrice(price);
 	}
 
-	void setPriceDiscount(UnitPriceAmount unitPriceAmount) { 
+	private void setPriceDiscount(UnitPriceAmount unitPriceAmount) { 
 		if(unitPriceAmount!=null) {
 			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
 			price.setPriceDiscount(unitPriceAmount);
@@ -428,7 +401,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		}
 	}
 
-	void setGrossPrice(UnitPriceAmount unitPriceAmount) { 
+	private void setGrossPrice(UnitPriceAmount unitPriceAmount) { 
 		if(unitPriceAmount!=null) {
 			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
 			price.setGrossPrice(unitPriceAmount);
@@ -436,7 +409,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		}
 	}
 
-	void setUnitPriceQuantity(Quantity quantity) {
+	private void setUnitPriceQuantity(Quantity quantity) {
 		if(quantity!=null) {
 			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
 			price.setUnitPriceQuantity(quantity);
@@ -444,34 +417,10 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		}
 	}
 	
-//	void setUnitPriceQuantity(Quantity quantity) {
-//		if(quantity!=null) {
-//			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
-//			price.setUnitPriceQuantity(quantity);
-//		}
-//	}
-
 	@Override
 	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
 		setUnitPriceAmount(unitPriceAmount);
 		setUnitPriceQuantity(quantity);
-//		PriceAmountType priceAmount = new PriceAmountType();
-//		unitPriceAmount.copyTo(priceAmount);
-//		PriceType price = new PriceType();
-//		price.setPriceAmount(priceAmount);
-//		
-//		if(quantity!=null) {
-//			BaseQuantityType baseQuantity = new BaseQuantityType();
-//			baseQuantity.setUnitCode(quantity.getUnitCode());
-//			baseQuantity.setValue(quantity.getValue());
-//			price.setBaseQuantity(baseQuantity);
-//		}
-//		
-//		if(isInvoiceLineType) {
-//			iLine.setPrice(price);
-//		} else {
-//			cnLine.setPrice(price);
-//		}	
 	}
 
 	@Override
@@ -480,24 +429,11 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		setGrossPrice(grossPrice);
 	}
 
-	
-//	/* BT-149-0 0..1 , BT-150-0 required
-//	 * (non-Javadoc)
-//	 * @see com.klst.einvoice.CoreInvoiceLine#getBaseQuantity()
-//	 */
-//	@Override
-//	public Quantity getBaseQuantity() {
-//		BaseQuantityType baseQuantity = isInvoiceLineType ? iLine.getPrice().getBaseQuantity() : cnLine.getPrice().getBaseQuantity();
-//		if(baseQuantity==null) return null;
-//		String unit = baseQuantity.getUnitCode();
-//		return baseQuantity==null ? null : (unit==null ? new Quantity(baseQuantity.getValue()) : new Quantity(unit, baseQuantity.getValue()));
-//	}
-	
-	// BG-30 ++ 1..1 LINE VAT INFORMATION
-	// BG-30.BT-151 +++ 1..1 Invoiced item VAT category code
-	// BG-30.BT-152 +++ 0..1 Invoiced item VAT rate
+	// BG-30 1..1 LINE VAT INFORMATION
+	// BG-30.BT-151 1..1 Invoiced item VAT category code
+	// BG-30.BT-152 0..1 Invoiced item VAT rate
 	/**
-	 * not public - use ctor
+	 * not public - use factory
 	 * 
 	 * @param codeEnum 1..1 EN16931-ID: BT-151
 	 * @param percent 0..1 EN16931-ID: BT-152

@@ -52,7 +52,7 @@ Bsp 02.01:
     </cac:TaxCategory>
   </cac:AllowanceCharge>
 
-Example for BG-29 ++ 1..1 PRICE DETAILS
+Example for BG-29 1..1 PRICE DETAILS
 BG-29.BT-147 +++ 0..1 Item price discount, Nachlass auf den Artikelpreis
                       der gesamte zur Berechnung des Nettopreises vom Bruttopreis subtrahierte Rabatt
 BG-29.BT-148 +++ 0..1 Item gross price, Bruttopreis des Artikels
@@ -62,7 +62,7 @@ ubl-tc434-example5.xml :
         <cac:Price>
             <cbc:PriceAmount currencyID="DKK">1.00</cbc:PriceAmount> <!-- BG-29.BT-146 -->
             <cbc:BaseQuantity unitCode="EA">1</cbc:BaseQuantity>
-            <cac:AllowanceCharge>
+            <cac:AllowanceCharge>                               <!-- UnitPriceAllowance : discount+gross price -->
                 <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
                 <cbc:Amount currencyID="DKK">0.10</cbc:Amount>         <!-- BG-29.BT-147 -->
                 <cbc:BaseAmount currencyID="DKK">1.10</cbc:BaseAmount> <!-- BG-29.BT-148 -->
