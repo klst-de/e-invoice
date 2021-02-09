@@ -175,8 +175,18 @@ public interface AllowancesAndCharges extends ITaxCategory {
 	public BigDecimal getPercentage();
 
 	// BT-95-0, BT-102-0 (CII)
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see com.klst.untdid.codelist.TaxTypeCode
+	 */
 	@Override
 	public void setTaxType(String code);
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see com.klst.untdid.codelist.TaxTypeCode
+	 */
 	@Override
 	public String getTaxType();
 	

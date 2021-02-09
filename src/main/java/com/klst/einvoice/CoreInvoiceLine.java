@@ -172,7 +172,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 
 	
 	// BG-29 ++ 1..1 PRICE DETAILS
-	/**
+	/*
 	 * Item net price (mandatory part in PRICE DETAILS), exclusive of VAT, after subtracting item price discount.
 	 * <p>
 	 * The unit net price has to be equal with the Item gross price less the Item price discount.
@@ -182,16 +182,25 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * <br>Rule ID: 	BR-27
 	 * <br>Request ID: 	R14
 	 * 
-	 * @param UnitPriceAmount
+	 * @return UnitPriceAmount
 	 */
-//	public void setUnitPriceAmount(UnitPriceAmount unitPriceAmount); // use ctor
 	public UnitPriceAmount getUnitPriceAmount();
 
-	// 1 .. 1 ChargeAmount BT-146 , BaseQuantity BT-149-0 + BT-150-0 optional
-	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity baseQuantity);
+	// 1..1 UnitPriceAmount BT-146 , UnitPriceQuantity BT-149-0 + BT-150-0 optional
+	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity);
 
-	// optional BaseQuantity : BT-149-0 QuantityType 0..1 + BT-150-0 required
-	public Quantity getBaseQuantity();
+	// BT-147 0..1 Item price discount
+	public UnitPriceAmount getPriceDiscount();
+	// BT-148 0..1 Item gross price	
+	public UnitPriceAmount getGrossPrice();
+	public void setUnitPriceAllowance(UnitPriceAmount priceDiscount, UnitPriceAmount grossPrice);
+	
+	// optional UnitPriceQuantity : BT-149-0 QuantityUnit 0..1 + BT-150-0 Quantity required
+	public Quantity getUnitPriceQuantity();
+	@Deprecated   // TODO remove in 3.X
+	default Quantity getBaseQuantity() {
+		return getUnitPriceQuantity();
+	}
 	
 	// BG-30 ++ 1..1 LINE VAT INFORMATION
 	/**
