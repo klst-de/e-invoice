@@ -13,10 +13,10 @@ defines a semantic data model for a core invoice. This "€uro invoice" standard
 - [UN/CEFACT](https://www.unece.org/cefact.html) Cross Industry Invoice XML message, [SCRDM-CII(zip)](https://www.unece.org/fileadmin/DAM/cefact/xml_schemas/D16B_SCRDM__Subset__CII.zip)
 - [OASIS](https://en.wikipedia.org/wiki/OASIS_(organization)) Universal Business Language (UBL 2.1) for invoice and credit note, [ISO/IEC 19845:2015](https://en.wikipedia.org/wiki/Universal_Business_Language#UBL_2.1_(ISO/IEC_19845:2015)_and_UBL_2.2)
 
-Link to [eu/cefdigital](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/eInvoicing) and a rough overview on [CEN/TC 434 and EN 16931](https://peppol.helger.com/public/menuitem-en16931)
+Link to [eu/cefdigital](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/eInvoicing) and a rough overview on [CEN](https://en.wikipedia.org/wiki/European_Committee_for_Standardization)/[Technical Committee TC 434 and EN 16931](https://peppol.helger.com/public/menuitem-en16931)
 
 ### What is a CIUS?
-_The EN16931 data model contains many optional elements. Specific countries, groups, or organisations may create individual specifications for the core model in their respective domains (known as a ‘CIUS’)._
+The EN16931 data model contains many optional elements. Specific countries, groups, or organisations may create individual specifications for the core model in their respective domains (known as a ‘CIUS’).
 
 _A “Core Invoice Usage Specification” (CIUS) is a specification that provides a seller with detailed guidance, explanations and examples, as well as rules (business rules) related to the actual implementation and use of structured information elements present in the core invoice model in a specific trading situation. An instance document created following a given CIUS shall always be compliant with the European Standard EN16931-1:2017._ [[peppol.eu]](https://peppol.eu/core-invoice-usage-specification-cius-use-peppol/)
 
