@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG19_DirectDebit;
-import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
@@ -22,9 +21,9 @@ import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.Reference;
+import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
-import com.klst.einvoice.unece.uncefact.TradeLineItem;
 import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.marshaller.CiiTransformer;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -338,6 +337,10 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         			, testLine.getItemName()
         			, testLine.getTaxCategory(), testLine.getTaxRate() // mandatory, rate can be null
         			);
+        	// BG-29.BT-146 (nochmal) + optional BG-29.BT-150 + BG-29.BT-149
+        	line.setUnitPriceAmountAndQuantity(testLine.getUnitPriceAmount(), testLine.getUnitPriceQuantity());
+        	// BG-29.BT-147  + BG-29.BT-148
+        	line.setUnitPriceAllowance(testLine.getPriceDiscount(), testLine.getGrossPrice());
 
         	line.setNote(testLine.getNote()); // opt BT-127
         	line.setLineObjectIdentifier(testLine.getLineObjectIdentifier()); // opt BT-128
