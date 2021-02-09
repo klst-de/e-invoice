@@ -171,8 +171,8 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	public List<AllowancesAndCharges> getAllowancesAndCharges();
 
 	
-	// BG-29 ++ 1..1 PRICE DETAILS
-	/*
+	// BG-29 ++ 1..1 PRICE DETAILS // TODO move this Block to BG29_PriceDetails
+	/**
 	 * Item net price (mandatory part in PRICE DETAILS), exclusive of VAT, after subtracting item price discount.
 	 * <p>
 	 * The unit net price has to be equal with the Item gross price less the Item price discount.
@@ -189,13 +189,59 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	// 1..1 UnitPriceAmount BT-146 , UnitPriceQuantity BT-149-0 + BT-150-0 optional
 	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity);
 
-	// BT-147 0..1 Item price discount
+	/**
+	 * Item price discount
+	 * <p>
+	 * The total discount subtracted from the Item gross price to calculate the Item net price. 
+	 * Only applies if the discount is provided per unit and if it is not included in the Item gross price.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BG-29.BT-147
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R14
+	 * 
+	 * @return UnitPriceAmount
+	 */
 	public UnitPriceAmount getPriceDiscount();
-	// BT-148 0..1 Item gross price	
+
+	/**
+	 * Item gross price
+	 * <p>
+	 * The unit price, exclusive of VAT, before subtracting Item price discount.
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BG-29.BT-148
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R14
+	 * 
+	 * @return UnitPriceAmount
+	 */
 	public UnitPriceAmount getGrossPrice();
+	
+	/**
+	 * Sets price discount and gross price
+	 * 
+	 * @param priceDiscount, BT-147
+	 * @param grossPrice, BT-148
+	 */
 	public void setUnitPriceAllowance(UnitPriceAmount priceDiscount, UnitPriceAmount grossPrice);
 	
 	// optional UnitPriceQuantity : BT-149-0 QuantityUnit 0..1 + BT-150-0 Quantity required
+	/**
+	 * Item price unit (BT-150) and base quantity (BT-149)
+	 * <p>
+	 * The number of item units to which the price applies.
+	 * <br>Item price base quantity unit of measure code The unit of measure that applies to the Item price base quantity.
+	 * The Item price base quantity unit of measure shall be the same as the Invoiced quantity unit of measure (BT-130).
+	 * <p>
+	 * Cardinality: 	0..1 (optional)
+	 * <br>EN16931-ID: 	BG-29.BT-150 + BG-29.BT-149
+	 * <br>Rule ID: 	
+	 * <br>Request ID: 	R14
+	 * 
+	 * @return UnitPriceQuantity
+	 * @see #getQuantity
+	 */
 	public Quantity getUnitPriceQuantity();
 	@Deprecated   // TODO remove in 3.X
 	default Quantity getBaseQuantity() {
