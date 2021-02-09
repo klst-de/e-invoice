@@ -28,10 +28,8 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Item
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ItemType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.OrderLineReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PeriodType;
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PriceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.AccountingCostType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BaseQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditedQuantityType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DescriptionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EndDateType;
@@ -44,7 +42,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.LineIDTy
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NameType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PercentType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PriceAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.StartDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ValueType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.DateType;
@@ -352,69 +349,149 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	}
 
 	// BG-29 ++ 1..1 PRICE DETAILS
-	// BG-29.BT-146 +++ 1..1 Item net price
+	// BG-29.BT-146 1..1 Item net price
 	@Override
 	public UnitPriceAmount getUnitPriceAmount() {
-		PriceType price = isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice();
-		//BT-146 +++ 1..1 Item net price , Unit price amount
-		PriceAmountType priceAmount = price.getPriceAmount();
-		List<AllowanceChargeType> allowanceChargeList = price.getAllowanceCharge();
-		List<AllowancesAndCharges> allowancesCharges = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
-		allowanceChargeList.forEach(doc -> {
-			allowancesCharges.add(AllowanceCharge.create(doc));
-		});
-		if(!allowancesCharges.isEmpty()) {
-			// ein setter ist nicht spezifiziert
-			LOG.info("TODO Price allowancesCharges "+allowancesCharges.size());
-		}
-		
-		return new UnitPriceAmount(priceAmount.getCurrencyID(), priceAmount.getValue());
+		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
+		return price.getUnitPriceAmount();
 	}
+	
+	// BG-29.BT-147 +++ 0..1 Item price discount
+	@Override
+	public UnitPriceAmount getPriceDiscount() {
+		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
+		Amount amount = price.getPriceDiscount();
+		return amount==null ? null : new UnitPriceAmount(amount.getCurrencyID(), amount.getValue());		
+	}
+	
+	// BG-29.BT-148 +++ 0..1 Item gross price
+	@Override
+	public UnitPriceAmount getGrossPrice() {
+		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
+		Amount amount = price.getGrossPrice();
+		return amount==null ? null : new UnitPriceAmount(amount.getCurrencyID(), amount.getValue());		
+	}
+	
+	// optional UnitPriceQuantity : BT-149-0 QuantityUnit 0..1 + BT-150-0 Quantity required
+	@Override
+	public Quantity getUnitPriceQuantity() {
+		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
+		return price.getUnitPriceQuantity();
+	}
+//	@Override
+//	public UnitPriceAmount getUnitPriceAmount() {
+//		PriceType price = isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice();
+//		//BT-146 +++ 1..1 Item net price , Unit price amount
+//		PriceAmountType priceAmount = price.getPriceAmount();
+//		List<AllowanceChargeType> allowanceChargeList = price.getAllowanceCharge();
+//		List<AllowancesAndCharges> allowancesCharges = new ArrayList<AllowancesAndCharges>(allowanceChargeList.size());
+//		allowanceChargeList.forEach(doc -> {
+//			allowancesCharges.add(AllowanceCharge.create(doc));
+//		});
+//		if(!allowancesCharges.isEmpty()) {
+//			// ein setter ist nicht spezifiziert
+//			LOG.info("TODO Price allowancesCharges "+allowancesCharges.size());
+//		}
+//		
+//		return new UnitPriceAmount(priceAmount.getCurrencyID(), priceAmount.getValue());
+//	}
 
 	/**
 	 * non public - use ctor
 	 * 
 	 * @param unitPriceAmount
 	 */
-	void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
-		setUnitPriceAmountAndQuantity(unitPriceAmount, null);
-	}
-
-	@Override
-	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
-		PriceAmountType priceAmount = new PriceAmountType();
-		unitPriceAmount.copyTo(priceAmount);
-		PriceType price = new PriceType();
-		price.setPriceAmount(priceAmount);
-		
-		if(quantity!=null) {
-			BaseQuantityType baseQuantity = new BaseQuantityType();
-			baseQuantity.setUnitCode(quantity.getUnitCode());
-			baseQuantity.setValue(quantity.getValue());
-			price.setBaseQuantity(baseQuantity);
-		}
-		
+	private void setPrice(Price price) {
 		if(isInvoiceLineType) {
 			iLine.setPrice(price);
 		} else {
 			cnLine.setPrice(price);
-		}	
+		}		
+	}
+	
+	void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
+//		setUnitPriceAmountAndQuantity(unitPriceAmount, null);
+		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
+//		PriceAmountType amount = new PriceAmountType();
+//		// oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PriceAmountType
+//// 	public void copyTo(oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.AmountType amount) {
+//		unitPriceAmount.copyTo(amount); // TODO ???????????????? ist das eindeutig?
+		price.setUnitPriceAmount(unitPriceAmount);
+		setPrice(price);
 	}
 
-	// BT-147 +++ 0..1 Item price discount          TODO
-	// BT-148 +++ 0..1 Item gross price             TODO
-	
-	/* BT-149-0 0..1 , BT-150-0 required
-	 * (non-Javadoc)
-	 * @see com.klst.einvoice.CoreInvoiceLine#getBaseQuantity()
-	 */
-	@Override
-	public Quantity getBaseQuantity() {
-		BaseQuantityType baseQuantity = isInvoiceLineType ? iLine.getPrice().getBaseQuantity() : cnLine.getPrice().getBaseQuantity();
-		if(baseQuantity==null) return null;
-		String unit = baseQuantity.getUnitCode();
-		return baseQuantity==null ? null : (unit==null ? new Quantity(baseQuantity.getValue()) : new Quantity(unit, baseQuantity.getValue()));
+	void setPriceDiscount(UnitPriceAmount unitPriceAmount) { 
+		if(unitPriceAmount!=null) {
+			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
+			price.setPriceDiscount(unitPriceAmount);
+			setPrice(price);
+		}
 	}
+
+	void setGrossPrice(UnitPriceAmount unitPriceAmount) { 
+		if(unitPriceAmount!=null) {
+			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
+			price.setGrossPrice(unitPriceAmount);
+			setPrice(price);
+		}
+	}
+
+	void setUnitPriceQuantity(Quantity quantity) {
+		if(quantity!=null) {
+			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
+			price.setUnitPriceQuantity(quantity);
+			setPrice(price);
+		}
+	}
+	
+//	void setUnitPriceQuantity(Quantity quantity) {
+//		if(quantity!=null) {
+//			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
+//			price.setUnitPriceQuantity(quantity);
+//		}
+//	}
+
+	@Override
+	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
+		setUnitPriceAmount(unitPriceAmount);
+		setUnitPriceQuantity(quantity);
+//		PriceAmountType priceAmount = new PriceAmountType();
+//		unitPriceAmount.copyTo(priceAmount);
+//		PriceType price = new PriceType();
+//		price.setPriceAmount(priceAmount);
+//		
+//		if(quantity!=null) {
+//			BaseQuantityType baseQuantity = new BaseQuantityType();
+//			baseQuantity.setUnitCode(quantity.getUnitCode());
+//			baseQuantity.setValue(quantity.getValue());
+//			price.setBaseQuantity(baseQuantity);
+//		}
+//		
+//		if(isInvoiceLineType) {
+//			iLine.setPrice(price);
+//		} else {
+//			cnLine.setPrice(price);
+//		}	
+	}
+
+	@Override
+	public void setUnitPriceAllowance(UnitPriceAmount priceDiscount, UnitPriceAmount grossPrice) {
+		setPriceDiscount(priceDiscount);
+		setGrossPrice(grossPrice);
+	}
+
+	
+//	/* BT-149-0 0..1 , BT-150-0 required
+//	 * (non-Javadoc)
+//	 * @see com.klst.einvoice.CoreInvoiceLine#getBaseQuantity()
+//	 */
+//	@Override
+//	public Quantity getBaseQuantity() {
+//		BaseQuantityType baseQuantity = isInvoiceLineType ? iLine.getPrice().getBaseQuantity() : cnLine.getPrice().getBaseQuantity();
+//		if(baseQuantity==null) return null;
+//		String unit = baseQuantity.getUnitCode();
+//		return baseQuantity==null ? null : (unit==null ? new Quantity(baseQuantity.getValue()) : new Quantity(unit, baseQuantity.getValue()));
+//	}
 	
 	// BG-30 ++ 1..1 LINE VAT INFORMATION
 	// BG-30.BT-151 +++ 1..1 Invoiced item VAT category code

@@ -52,9 +52,29 @@ Bsp 02.01:
     </cac:TaxCategory>
   </cac:AllowanceCharge>
 
+Example for BG-29 ++ 1..1 PRICE DETAILS
+BG-29.BT-147 +++ 0..1 Item price discount, Nachlass auf den Artikelpreis
+                      der gesamte zur Berechnung des Nettopreises vom Bruttopreis subtrahierte Rabatt
+BG-29.BT-148 +++ 0..1 Item gross price, Bruttopreis des Artikels
+                      der Einheitspreis ohne Umsatzsteuer vor Abzug des Nachlass auf den Artikelpreis
+ubl-tc434-example5.xml :
+
+        <cac:Price>
+            <cbc:PriceAmount currencyID="DKK">1.00</cbc:PriceAmount> <!-- BG-29.BT-146 -->
+            <cbc:BaseQuantity unitCode="EA">1</cbc:BaseQuantity>
+            <cac:AllowanceCharge>
+                <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+                <cbc:Amount currencyID="DKK">0.10</cbc:Amount>         <!-- BG-29.BT-147 -->
+                <cbc:BaseAmount currencyID="DKK">1.10</cbc:BaseAmount> <!-- BG-29.BT-148 -->
+            </cac:AllowanceCharge>
+        </cac:Price>
 
  */
 public class AllowanceCharge extends AllowanceChargeType implements AllowancesAndCharges {
+
+	static AllowanceCharge create() {
+		return new AllowanceCharge(null);
+	}
 
 	// copy factory
 	static AllowanceCharge create(AllowanceChargeType object) {
