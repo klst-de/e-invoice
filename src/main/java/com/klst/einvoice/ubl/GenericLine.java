@@ -393,21 +393,21 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		setPrice(price);
 	}
 
-	private void setPriceDiscount(UnitPriceAmount unitPriceAmount) { 
-		if(unitPriceAmount!=null) {
-			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
-			price.setPriceDiscount(unitPriceAmount);
-			setPrice(price);
-		}
-	}
-
-	private void setGrossPrice(UnitPriceAmount unitPriceAmount) { 
-		if(unitPriceAmount!=null) {
-			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
-			price.setGrossPrice(unitPriceAmount);
-			setPrice(price);
-		}
-	}
+//	private void setPriceDiscount(UnitPriceAmount unitPriceAmount) { 
+//		if(unitPriceAmount!=null) {
+//			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
+//			price.setPriceDiscount(unitPriceAmount);
+//			setPrice(price);
+//		}
+//	}
+//
+//	private void setGrossPrice(UnitPriceAmount unitPriceAmount) { 
+//		if(unitPriceAmount!=null) {
+//			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
+//			price.setGrossPrice(unitPriceAmount);
+//			setPrice(price);
+//		}
+//	}
 
 	private void setUnitPriceQuantity(Quantity quantity) {
 		if(quantity!=null) {
@@ -425,8 +425,12 @@ public class GenericLine<T> implements CoreInvoiceLine {
 
 	@Override
 	public void setUnitPriceAllowance(UnitPriceAmount priceDiscount, UnitPriceAmount grossPrice) {
-		setPriceDiscount(priceDiscount);
-		setGrossPrice(grossPrice);
+		if(priceDiscount==null && grossPrice==null) return;
+//		setPriceDiscount(priceDiscount);
+//		setGrossPrice(grossPrice);
+		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
+		price.setPriceDiscount(priceDiscount, grossPrice);
+		setPrice(price);
 	}
 
 	// BG-30 1..1 LINE VAT INFORMATION

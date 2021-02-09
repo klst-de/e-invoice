@@ -2,7 +2,6 @@ package com.klst.einvoice.ubl;
 
 import java.util.logging.Logger;
 
-import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
@@ -77,32 +76,45 @@ public class Price extends PriceType {
 
 //	BG-29.BT-147 +++ 0..1 Item price discount
 //	BG-29.BT-148 +++ 0..1 Item gross price
-	public void setPriceDiscount(Amount amount) {
+	void setPriceDiscount(Amount priceDiscount, Amount grossPrice) {
 		if(super.getAllowanceCharge().isEmpty()) {
-			AllowanceCharge ac = AllowanceCharge.create(); // TODO factory in AllowanceCharge
-			ac.setChargeIndicator(AllowancesAndCharges.ALLOWANCE);
-			ac.setAmountWithoutTax(amount);
+			AllowanceCharge ac = AllowanceCharge.createAllowance(priceDiscount, grossPrice, null);
 			super.getAllowanceCharge().add(ac);
 		} else {
 			AllowanceCharge ac = AllowanceCharge.create(getAllowanceCharge().get(0)); 
-			LOG.info("Allowance:"+ac + " setPriceDiscount "+amount);			
-			ac.setAmountWithoutTax(amount);
+			LOG.info("Allowance:"+ac + " priceDiscount "+priceDiscount + " grossPrice "+grossPrice);			
+			if(priceDiscount!=null) ac.setAmountWithoutTax(priceDiscount);
+			if(grossPrice!=null) ac.setAmountWithoutTax(grossPrice);
 			super.getAllowanceCharge().set(0, ac);
 		}
 	}
-	public void setGrossPrice(Amount amount) {
-		if(super.getAllowanceCharge().isEmpty()) {
-			AllowanceCharge ac = AllowanceCharge.create(); // TODO factory in AllowanceCharge
-			ac.setChargeIndicator(AllowancesAndCharges.ALLOWANCE);
-			ac.setAssessmentBase(amount);
-			super.getAllowanceCharge().add(ac);
-		} else {
-			AllowanceCharge ac = AllowanceCharge.create(getAllowanceCharge().get(0)); 
-			LOG.info("Allowance:"+ac + " setGrossPrice "+amount);			
-			ac.setAssessmentBase(amount);
-			super.getAllowanceCharge().set(0, ac);
-		}
-	}
+	
+//	public void setPriceDiscount(Amount amount) {
+//		if(super.getAllowanceCharge().isEmpty()) {
+//			AllowanceCharge ac = AllowanceCharge.createAllowance(amount, amount, null);
+//			ac.setChargeIndicator(AllowancesAndCharges.ALLOWANCE);
+//			ac.setAmountWithoutTax(amount);
+//			super.getAllowanceCharge().add(ac);
+//		} else {
+//			AllowanceCharge ac = AllowanceCharge.create(getAllowanceCharge().get(0)); 
+//			LOG.info("Allowance:"+ac + " setPriceDiscount "+amount);			
+//			ac.setAmountWithoutTax(amount);
+//			super.getAllowanceCharge().set(0, ac);
+//		}
+//	}
+//	public void setGrossPrice(Amount amount) {
+//		if(super.getAllowanceCharge().isEmpty()) {
+//			AllowanceCharge ac = AllowanceCharge.create(); // TODO factory in AllowanceCharge
+//			ac.setChargeIndicator(AllowancesAndCharges.ALLOWANCE);
+//			ac.setAssessmentBase(amount);
+//			super.getAllowanceCharge().add(ac);
+//		} else {
+//			AllowanceCharge ac = AllowanceCharge.create(getAllowanceCharge().get(0)); 
+//			LOG.info("Allowance:"+ac + " setGrossPrice "+amount);			
+//			ac.setAssessmentBase(amount);
+//			super.getAllowanceCharge().set(0, ac);
+//		}
+//	}
 	public Amount getPriceDiscount() {
 		if(super.getAllowanceCharge().isEmpty()) return null;
 		AllowanceCharge allowance = AllowanceCharge.create(getAllowanceCharge().get(0));

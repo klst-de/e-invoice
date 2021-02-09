@@ -72,10 +72,16 @@ ubl-tc434-example5.xml :
  */
 public class AllowanceCharge extends AllowanceChargeType implements AllowancesAndCharges {
 
+	/**
+	 * used in (Line)Price
+	 * @see Price#setPriceDiscount
+	 */
+	static AllowanceCharge createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return new AllowanceCharge(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
+	}
 	static AllowanceCharge create() {
 		return new AllowanceCharge(null);
 	}
-
 	// copy factory
 	static AllowanceCharge create(AllowanceChargeType object) {
 		if(object instanceof AllowanceChargeType && object.getClass()!=AllowanceChargeType.class) {
@@ -91,6 +97,14 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 	// das erste element der Liste taxCategory aus super, die anderen werden nicht genutzt
 	TaxCategory taxCategory = null;
 	
+	private AllowanceCharge(boolean chargeIndicator, Amount amount, Amount baseAmount, BigDecimal percentage) {
+		super();
+		setChargeIndicator(chargeIndicator);
+		setAmountWithoutTax(amount);
+		setAssessmentBase(baseAmount);
+		setPercentage(percentage);
+	}
+
 	// copy ctor
 	private AllowanceCharge(AllowanceChargeType doc) {
 		super();
