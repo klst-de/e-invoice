@@ -397,13 +397,21 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	}
 
 	// BG-29.BT-147 + BG-29.BT-148 setter:
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * priceDiscount is mapped to GrossPriceProductTradePrice.AppliedTradeAllowance
+	 * 
+	 * @see BG29_PriceDetails#getPriceDiscount
+	 * @see BG29_PriceDetails#getGrossPrice
+	 */
 	@Override
 	public void setUnitPriceAllowance(UnitPriceAmount priceDiscount, UnitPriceAmount grossPrice) {
 		if(priceDiscount==null && grossPrice==null) return;
 		if(priceDiscount!=null) {
-			TradeAllowanceCharge ac = TradeAllowanceCharge.create(); // TODO factory in TradeAllowanceCharge
-			ac.setChargeIndicator(AllowancesAndCharges.ALLOWANCE);
-			ac.setAmountWithoutTax(priceDiscount);
+			TradeAllowanceCharge ac = TradeAllowanceCharge.createAllowance(priceDiscount,null,null);
+//			ac.setChargeIndicator(AllowancesAndCharges.ALLOWANCE);
+//			ac.setAmountWithoutTax(priceDiscount);
 			specifiedLineTradeAgreement.getGrossPriceProductTradePrice().getAppliedTradeAllowanceCharge().add(ac);		
 		}
 		if(grossPrice!=null) {

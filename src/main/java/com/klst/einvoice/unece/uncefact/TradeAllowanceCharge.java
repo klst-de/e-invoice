@@ -54,6 +54,13 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	private static final Logger LOG = Logger.getLogger(TradeAllowanceCharge.class.getName());
 
+	/**
+	 * used in TradeLineItem
+	 * @see TradeLineItem#setUnitPriceAllowance
+	 */
+	static TradeAllowanceCharge createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return new TradeAllowanceCharge(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
+	}
 	static TradeAllowanceCharge create() {
 		return new TradeAllowanceCharge(null);
 	}
@@ -68,6 +75,13 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		}
 	}
 
+	private TradeAllowanceCharge(boolean chargeIndicator, Amount amount, Amount baseAmount, BigDecimal percentage) {
+		super();
+		setChargeIndicator(chargeIndicator);
+		setAmountWithoutTax(amount);
+		setAssessmentBase(baseAmount);
+		setPercentage(percentage);
+	}
 	// copy ctor
 	private TradeAllowanceCharge(TradeAllowanceChargeType tradeAllowanceCharge) {
 		super();
