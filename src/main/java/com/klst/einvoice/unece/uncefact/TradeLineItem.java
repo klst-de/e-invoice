@@ -340,7 +340,130 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		return res;
 	}
 
-	// 1 .. 1 SpecifiedTradeProduct.Name BT-153
+	/*
+	 * BG-29 1..1 PRICE DETAILS
+	 * 
+	 * BT-146 +++ 1..1      Item net price   ==> NetPriceProductTradePrice
+	 * BT-149-0 + BT-150-0 UnitPriceQuantity ==> NetPriceProductTradePrice
+	 */
+	// BG-29.BT-146 1..1 Item net price aka UnitPriceAmount
+	@Override
+	public UnitPriceAmount getUnitPriceAmount() {
+		return new UnitPriceAmount(specifiedLineTradeAgreement.getNetPriceProductTradePrice().getChargeAmount().get(0).getValue());
+	}
+
+	// 1..1 Item net price + UnitPriceQuantity BT-149+BT-149-0 + BT-150-0 optional
+	@Override
+	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
+		TradePriceType tradePrice = setUnitPriceAmount(unitPriceAmount);
+		if(quantity!=null) {
+			QuantityType qt = new QuantityType();
+			quantity.copyTo(qt);
+			tradePrice.setBasisQuantity(qt); 
+		}
+		specifiedLineTradeAgreement.setNetPriceProductTradePrice(tradePrice);
+		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
+	}	
+	private TradePriceType setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
+		AmountType chargeAmount = new AmountType();
+		unitPriceAmount.copyTo(chargeAmount);
+		TradePriceType tradePrice = new TradePriceType();
+		tradePrice.getChargeAmount().add(chargeAmount);
+
+		specifiedLineTradeAgreement.setNetPriceProductTradePrice(tradePrice);
+		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
+		return tradePrice;
+	}
+	
+	// BG-29.BT-147 0..1 Item price discount  ==>  GrossPriceProductTradePrice 
+	@Override
+	public UnitPriceAmount getPriceDiscount() {
+		if(specifiedLineTradeAgreement.getGrossPriceProductTradePrice()==null) return null;
+		List<TradeAllowanceChargeType> list = specifiedLineTradeAgreement.getGrossPriceProductTradePrice().getAppliedTradeAllowanceCharge();
+		if(list.isEmpty()) return null;
+		TradeAllowanceCharge allowance = TradeAllowanceCharge.create(list.get(0));
+		Amount amount = allowance.getAmountWithoutTax();
+		return amount==null ? null : new UnitPriceAmount(amount.getCurrencyID(), amount.getValue());
+	}
+	
+	// BG-29.BT-148 0..1 Item gross price     ==>  GrossPriceProductTradePrice 
+	@Override
+	public UnitPriceAmount getGrossPrice() {
+		if(specifiedLineTradeAgreement.getGrossPriceProductTradePrice()==null) return null;
+		List<AmountType> list = specifiedLineTradeAgreement.getGrossPriceProductTradePrice().getChargeAmount();
+		if(list.isEmpty()) return null;
+		AmountType amount = list.get(0);
+		return new UnitPriceAmount(amount.getCurrencyID(), amount.getValue());
+	}
+
+	// BG-29.BT-147 + BG-29.BT-148 setter:
+	@Override
+	public void setUnitPriceAllowance(UnitPriceAmount priceDiscount, UnitPriceAmount grossPrice) {
+		if(priceDiscount==null && grossPrice==null) return;
+		if(priceDiscount!=null) {
+			TradeAllowanceCharge ac = TradeAllowanceCharge.create(); // TODO factory in TradeAllowanceCharge
+			ac.setChargeIndicator(AllowancesAndCharges.ALLOWANCE);
+			ac.setAmountWithoutTax(priceDiscount);
+			specifiedLineTradeAgreement.getGrossPriceProductTradePrice().getAppliedTradeAllowanceCharge().add(ac);		
+		}
+		if(grossPrice!=null) {
+			// un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType
+			AmountType amount = new AmountType();
+			grossPrice.copyTo(amount);
+			specifiedLineTradeAgreement.getGrossPriceProductTradePrice().getChargeAmount().add(amount);
+		}		
+	}
+
+	@Override // optional UnitPriceQuantity : BT-149-0 Unit 0..1 + BT-150-0 Quantity required
+	// BT-149 ist in
+	// SpecifiedLineTradeAgreement.GrossPriceProductTradePrice.BasisQuantity  ???
+	// oder in ram:NetPriceProductTradePrice wie in Beispiel 03.05a-INVOICE_uncefact.xml
+	public Quantity getUnitPriceQuantity() {
+		QuantityType qt = specifiedLineTradeAgreement.getNetPriceProductTradePrice().getBasisQuantity();
+		return qt==null ? null : new Quantity(qt.getUnitCode(), qt.getValue());
+	}
+	
+/*     BG-30 1..1 LINE VAT INFORMATION
+
+1 .. n ApplicableTradeTax Umsatzsteuerinformationen auf der Ebene der Rechnungsposition BG-30 xs:sequence 
+0 .. 1 CalculatedAmount Steuerbetrag 
+1 .. 1 TypeCode Steuerart (Code)                                                        BT-151-0 
+0 .. 1 ExemptionReason Grund der Steuerbefreiung (Freitext) 
+1 .. 1 CategoryCode Code der Umsatzsteuerkategorie des in Rechnung gestellten Artikels  BT-151
+
+ */
+	
+	/* non public - use ctor/factory
+	 * 
+	 * @param codeEnum 1..1 EN16931-ID: BT-151
+	 * @param percent 0..1 EN16931-ID: BT-152
+	 */	
+	void setTaxCategoryAndRate(TaxCategoryCode code, BigDecimal taxRate) {
+		if(tradeTax==null) {
+			tradeTax = TradeTax.create(TaxTypeCode.ValueAddedTax, code, taxRate);
+			specifiedLineTradeSettlement.getApplicableTradeTax().add(tradeTax);
+		} else {
+			tradeTax = TradeTax.create(TaxTypeCode.ValueAddedTax, code, taxRate);
+			LOG.info("replaces BG-30 LINE VAT INFORMATION with "+tradeTax);
+			specifiedLineTradeSettlement.getApplicableTradeTax().set(0, tradeTax);
+		}
+	}
+
+	@Override
+	public TaxCategoryCode getTaxCategory() {
+		return tradeTax==null ? null : tradeTax.getTaxCategoryCode();
+	}
+
+	@Override
+	public BigDecimal getTaxRate() {
+		return tradeTax==null ? null : tradeTax.getTaxPercentage();
+	}
+
+	/*
+	 * BG-31 1..1 ITEM INFORMATION
+	 */
+
+	// BG-31.BT-153 1..1 SpecifiedTradeProduct.Name
 	void setItemName(String text) {
 		specifiedTradeProduct.getName().add(new Text(text));
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
@@ -504,74 +627,6 @@ Bsp.
 			result.put(pc.getDescription().get(0).getValue(), pc.getValue().get(0).getValue());			
 		});
 		return result;
-	}
-
-	// 1 .. 1 ChargeAmount BT-146
-	void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
-		setUnitPriceAmountAndQuantity(unitPriceAmount, null);
-	}
-
-	// 1 .. 1 ChargeAmount BT-146 , BaseQuantity BT-149-0 + BT-150-0 optional
-	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
-		AmountType chargeAmount = new AmountType();
-		unitPriceAmount.copyTo(chargeAmount);
-		TradePriceType tradePrice = new TradePriceType();
-		tradePrice.getChargeAmount().add(chargeAmount);
-		
-		if(quantity!=null) {
-			QuantityType qt = new QuantityType();
-			quantity.copyTo(qt);
-			tradePrice.setBasisQuantity(qt); 
-		}
-
-		specifiedLineTradeAgreement.setNetPriceProductTradePrice(tradePrice);
-		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
-	}
-
-	@Override
-	public UnitPriceAmount getUnitPriceAmount() {
-		return new UnitPriceAmount(specifiedLineTradeAgreement.getNetPriceProductTradePrice().getChargeAmount().get(0).getValue());
-	}
-
-	@Override // optional BaseQuantity : BT-149-0 QuantityType 0..1 + BT-150-0 required
-	public Quantity getBaseQuantity() {
-		QuantityType qt = specifiedLineTradeAgreement.getNetPriceProductTradePrice().getBasisQuantity();
-		return qt==null ? null : new Quantity(qt.getValue());
-	}
-
-/*
-
-1 .. n ApplicableTradeTax Umsatzsteuerinformationen auf der Ebene der Rechnungsposition BG-30 xs:sequence 
-0 .. 1 CalculatedAmount Steuerbetrag 
-1 .. 1 TypeCode Steuerart (Code)                                                        BT-151-0 
-0 .. 1 ExemptionReason Grund der Steuerbefreiung (Freitext) 
-1 .. 1 CategoryCode Code der Umsatzsteuerkategorie des in Rechnung gestellten Artikels  BT-151
-
- */
-	
-	/*
-	 * 
-	 * @param codeEnum 1..1 EN16931-ID: BT-151
-	 * @param percent 0..1 EN16931-ID: BT-152
-	 */	
-	void setTaxCategoryAndRate(TaxCategoryCode code, BigDecimal taxRate) {
-		if(tradeTax==null) {
-			tradeTax = TradeTax.create(TaxTypeCode.ValueAddedTax, code, taxRate);
-			specifiedLineTradeSettlement.getApplicableTradeTax().add(tradeTax);
-		} else {
-			tradeTax = TradeTax.create(TaxTypeCode.ValueAddedTax, code, taxRate);
-			LOG.info("replaces BG-30 LINE VAT INFORMATION with "+tradeTax);
-			specifiedLineTradeSettlement.getApplicableTradeTax().set(0, tradeTax);
-		}
-	}
-
-	@Override
-	public TaxCategoryCode getTaxCategory() {
-		return tradeTax==null ? null : tradeTax.getTaxCategoryCode();
-	}
-
-	public BigDecimal getTaxRate() {
-		return tradeTax==null ? null : tradeTax.getTaxPercentage();
 	}
 
 }

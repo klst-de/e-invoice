@@ -58,13 +58,13 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		return new TradeAllowanceCharge(null);
 	}
 	// copy factory
-	static TradeAllowanceCharge create(TradeAllowanceChargeType tac) {
+	static TradeAllowanceCharge create(TradeAllowanceChargeType object) {
 		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
-		if(tac instanceof TradeAllowanceChargeType && tac.getClass()!=TradeAllowanceChargeType.class) {
+		if(object instanceof TradeAllowanceChargeType && object.getClass()!=TradeAllowanceChargeType.class) {
 			// tt is instance of a subclass of TradeAllowanceChargeType, but not TradeAllowanceChargeType itself
-			return (TradeAllowanceCharge)tac;
+			return (TradeAllowanceCharge)object;
 		} else {
-			return new TradeAllowanceCharge(tac); 
+			return new TradeAllowanceCharge(object); 
 		}
 	}
 
