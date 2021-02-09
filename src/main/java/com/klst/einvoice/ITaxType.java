@@ -43,7 +43,7 @@ public interface ITaxType {
 	 * 
 	 * @param type typically VAT
 	 * 
-	 * @see TaxTypeCode
+	 * @see com.klst.untdid.codelist.TaxTypeCode
 	 */
 	public void setTaxType(String type);
 	public String getTaxType();
