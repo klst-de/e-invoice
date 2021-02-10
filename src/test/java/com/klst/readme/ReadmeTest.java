@@ -92,11 +92,12 @@ public class ReadmeTest {
 		  , new UnitPriceAmount(EUR, new BigDecimal(288.79))	// price
 		  , "Zeitschrift [...]"									// itemName
 		  , TaxCategoryCode.StandardRate, new BigDecimal(7));	// VAT category code, rate 7%
-		line.setNote("Die letzte Abonnementslieferung");        // optional BT-127 note ...
+		// optional ...
+		line.setNote("Die letzte Abonnementslieferung");        // BT-127 note
 		line.setPeriod("2016-01-01", "2016-12-31");             // BG-26  line delivery period.
 		line.setOrderLineID("6171175.1");                       // BT-132 Referenced purchase order line
 		line.setUnitPriceAllowance(new UnitPriceAmount(EUR, new BigDecimal(21.21)) // priceDiscount
-				                  ,new UnitPriceAmount(EUR, new BigDecimal(300))); // grossPrice
+				                  ,new UnitPriceAmount(EUR, new BigDecimal(310))); // grossPrice
 		invoice.addLine(line);
 		  
 		// BusinessParty Seller aka Supplier

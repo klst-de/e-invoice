@@ -147,7 +147,7 @@ Zu dieser Gruppe gehört der Preisrabatt. Dieser Abschlag sollte immer in den "N
     , new Amount(EUR, new BigDecimal(288.79))               // Nettobetrag Rechnungsposition
 ...
   line.setUnitPriceAllowance(new UnitPriceAmount(EUR, new BigDecimal(21.21)) // Nachlass
-                            ,new UnitPriceAmount(EUR, new BigDecimal(300))); // Bruttopreis
+                            ,new UnitPriceAmount(EUR, new BigDecimal(310))); // Bruttopreis
   invoice.addLine(line);
 ```
 
