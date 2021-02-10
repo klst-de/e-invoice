@@ -129,13 +129,16 @@ Die obligatorischen Informationen einer Rechnungsposition sind bereits mit der f
 - Artikelname: "Zeitschrift [...]"
 - Umsatzsteuerkategorie mit Steuersatz: 7%
 
-BT-126 ++ 1..1 Kennung der Rechnungsposition, invoice line number
-BT-129 ++ 1..1 in Rechnung gestellte Menge mit Maßeinheit BT-130, Quantity
-BT-131 ++ 1..1 Nettobetrag der Rechnungsposition, line net amount
-BG-29.BT-146 +++ 1..1 Nettopreis des Artikels, price
-BG-31.BT-153 1..1 BT-153  Artikelname
-BG-30 ++ 1..1 UMSATZSTEUERINFORMATIONEN
+Zusätzliche Angaben können angefügt werden:
+
+```java
+  line.setNote("Die letzte Abonnementslieferung ... ");     // Bemerkungen
+  line.setPeriod("2016-01-01", "2016-12-31");               // Lieferzeitraum
+  line.setOrderLineID("6171175.1");                         // Referenz Bestellposition
+...  
+  invoice.addLine(line);
+```
 
 
-A.3.2.4 Abschläge auf der Positionsebene
+A.3.2.4 Abschläge auf der Positionsebene TODO
 Preisrabatt

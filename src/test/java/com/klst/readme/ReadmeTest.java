@@ -92,6 +92,9 @@ public class ReadmeTest {
 		  , new UnitPriceAmount(EUR, new BigDecimal(288.79))	// price
 		  , "Zeitschrift [...]"									// itemName
 		  , TaxCategoryCode.StandardRate, new BigDecimal(7));	// VAT category code, rate 7%
+		line.setNote("Die letzte Abonnementslieferung");        // optional BT-127 note ...
+		line.setPeriod("2016-01-01", "2016-12-31");             // BG-26  line delivery period.
+		line.setOrderLineID("6171175.1");                       // BT-132 Referenced purchase order line
 		invoice.addLine(line);
 		  
 		// BusinessParty Seller aka Supplier

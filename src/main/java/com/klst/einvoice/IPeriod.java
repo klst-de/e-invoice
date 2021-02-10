@@ -25,5 +25,10 @@ public interface IPeriod {
 	default void setEndDate(String ymd) {
 		if(ymd!=null) setEndDate(DateTimeFormats.ymdToTs(ymd));
 	}
-	
+
+	default void setPeriod(String startYmd, String endYmd) {
+		setStartDate(DateTimeFormats.ymdToTs(startYmd));
+		setEndDate(DateTimeFormats.ymdToTs(endYmd));
+	}
+
 }
