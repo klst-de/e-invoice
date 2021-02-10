@@ -123,7 +123,7 @@ Die obligatorischen Informationen einer Rechnungsposition sind bereits mit der f
 ```
 
 - Rechnungsposition: "1"
-- Code und Menge: 1 Stück
+- Code und Menge: 1 Stück/XPP
 - Nettobetrag der Rechnungsposition: 288.79€
 - Artikelpreis: 288.79€
 - Artikelname: "Zeitschrift [...]"
@@ -139,6 +139,17 @@ Zusätzliche Angaben können angefügt werden:
   invoice.addLine(line);
 ```
 
+### Detailinformationen zum Preis
 
-A.3.2.4 Abschläge auf der Positionsebene TODO
-Preisrabatt
+Zu dieser Gruppe gehört der Preisrabatt. Dieser Abschlag sollte immer in den "Nettopreis des Artikels (BT-146)" einbezogen werden. Um zu zeigen, dass ein Preisrabatt gewährt wurde, kann optional der Bruttopreis des Artikels (BT-148) und der Nachlass auf den Artikelpreis (BT-147) angegeben werden.
+
+```java
+    , new Amount(EUR, new BigDecimal(288.79))               // Nettobetrag Rechnungsposition
+...
+  line.setUnitPriceAllowance(new UnitPriceAmount(EUR, new BigDecimal(21.21)) // Nachlass
+                            ,new UnitPriceAmount(EUR, new BigDecimal(300))); // Bruttopreis
+  invoice.addLine(line);
+```
+
+Positionsnachlass:
+Ein Positionsnachlass kann als Rabatt 2. Ordnung angesehen werden, ... TODO
