@@ -31,4 +31,9 @@ public interface IPeriod {
 		setEndDate(DateTimeFormats.ymdToTs(endYmd));
 	}
 
+	default void setPeriod(Timestamp startTs, Timestamp endTs) {
+		setStartDate(startTs);
+		setEndDate(endTs);
+	}
+	
 }
