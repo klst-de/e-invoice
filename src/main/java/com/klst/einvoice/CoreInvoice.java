@@ -592,9 +592,9 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * @param directDebit - BG-19 optional DIRECT DEBIT
 	 */
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit);
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit);
 	default void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, CreditTransfer creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
+			, CreditTransfer creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		List<CreditTransfer> ctList = null;
 		if(creditTransfer!=null) {
 			ctList = new ArrayList<CreditTransfer>();

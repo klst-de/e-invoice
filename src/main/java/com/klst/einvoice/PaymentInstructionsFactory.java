@@ -20,7 +20,7 @@ public interface PaymentInstructionsFactory {
 	
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText
 			, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit);
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit);
 	
 	default PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText) {
 		return createPaymentInstructions(code, paymentMeansText, null, null, null, null);
@@ -39,7 +39,7 @@ public interface PaymentInstructionsFactory {
 		return createPaymentInstructions(code, paymentMeansText, remittanceInformation, null, paymentCard, null);
 	}
 	default PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText
-			, String remittanceInformation, BG19_DirectDebit directDebit) {
+			, String remittanceInformation, DirectDebit directDebit) {
 		return createPaymentInstructions(code, paymentMeansText, remittanceInformation, null, null, directDebit);
 	}
 }

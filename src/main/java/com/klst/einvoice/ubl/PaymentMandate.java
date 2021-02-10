@@ -1,6 +1,6 @@
 package com.klst.einvoice.ubl;
 
-import com.klst.einvoice.BG19_DirectDebit;
+import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.unece.uncefact.IBANId;
 
@@ -46,17 +46,17 @@ Bsp. ubl-tc434-example5.xml :
 
 
  */
-public class PaymentMandate extends PaymentMandateType implements BG19_DirectDebit, DirectDebitFactory {
+public class PaymentMandate extends PaymentMandateType implements DirectDebit, DirectDebitFactory {
 
 	// implements PaymentCardFactory
-	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
 		return create(mandateID, bankAssignedCreditorID, iban);
 	}
 	static PaymentMandate create(String mandateID, String bankAssignedCreditorID, IBANId iban) {
 		return new PaymentMandate(mandateID, bankAssignedCreditorID, iban);
 	}
 	
-	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
 		return create(mandateID, bankAssignedCreditorID, debitedAccountID);
 	}
 	static PaymentMandate create(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {

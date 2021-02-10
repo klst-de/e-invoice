@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.BG19_DirectDebit;
+import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.CreditTransferFactory;
@@ -141,16 +141,16 @@ in ram:ApplicableHeaderTradeSettlement stecken auch BT-5, BT-6
  */
 public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType 
 	implements PaymentInstructions, PaymentInstructionsFactory, CreditTransferFactory
-		, BG19_DirectDebit, DirectDebitFactory {
+		, DirectDebit, DirectDebitFactory {
 
 	// implements PaymentInstructionsFactory
 	@Override
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		return create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 	static ApplicableHeaderTradeSettlement create(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		return new ApplicableHeaderTradeSettlement(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 	
@@ -203,12 +203,12 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
  */
 	private ApplicableHeaderTradeSettlement(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		super();
 		init(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 	void init(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		setPaymentMeans(code, paymentMeansText); // BT-81, BT-82 - ein pm ohne BG-17 wird erstellt
 		setRemittanceInformation(remittanceInformation); // BT-83
 		 // BG-17 :
@@ -225,7 +225,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 			}
 		} else {
 			setPaymentCard(paymentCard); // BG-18
-			setDirectDebit((BG19_DirectDebit)directDebit); // BG-19
+			setDirectDebit((DirectDebit)directDebit); // BG-19
 		}
 		if(getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
 			LOG.warning("no PaymentMeans");
@@ -460,7 +460,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 
 	// interface DirectDebitFactory
 	@Override 
-	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
 		LOG.info("mandateID="+mandateID + " bankAssignedCreditorID="+bankAssignedCreditorID + " iban="+iban);
 
 		if(iban!=null) {
@@ -479,11 +479,11 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 			this.setMandateReferencedID(mandateID);
 		}
 		
-		return (BG19_DirectDebit)this; // BG19_DirectDebit extends DirectDebit
+		return (DirectDebit)this; // BG19_DirectDebit extends DirectDebit
 	}
 
 	@Override
-	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
 		LOG.info("mandateID="+mandateID + " bankAssignedCreditorID="+bankAssignedCreditorID + " debitedAccountID="+debitedAccountID);
 
 		if(debitedAccountID!=null) {
@@ -499,11 +499,11 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 			this.setMandateReferencedID(mandateID);
 		}
 		
-		return (BG19_DirectDebit)this; // BG19_DirectDebit extends DirectDebit
+		return (DirectDebit)this; // BG19_DirectDebit extends DirectDebit
 	}
 
 	@Override // implements interface PaymentInstructions
-	public void setDirectDebit(BG19_DirectDebit bg19_directDebit) {
+	public void setDirectDebit(DirectDebit bg19_directDebit) {
 		if(bg19_directDebit==null) return;
 
 //		LOG.fine("bg19_directDebit:"+bg19_directDebit.getMandateReferencedID()+" ==> tradePaymentTerms:"+this.tradePaymentTerms);
@@ -521,9 +521,9 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	}
 
 	@Override // implements interface PaymentInstructions
-	public BG19_DirectDebit getDirectDebit() {
+	public DirectDebit getDirectDebit() {
 		if(PaymentMeansEnum.isDirectDebit(getPaymentMeansEnum())) {
-			return (BG19_DirectDebit)this;
+			return (DirectDebit)this;
 		};
 		return null;
 	}
@@ -565,7 +565,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	
 	@Override
 	public void setDebitedAccountID(String id) {
-		BG19_DirectDebit thisAlsDD = getDirectDebit();
+		DirectDebit thisAlsDD = getDirectDebit();
 		if(thisAlsDD==null) {
 			createDirectDebit(null, null, id);
 		}
@@ -576,7 +576,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	}
 	@Override
 	public void setDebitedAccountID(IBANId iban) {
-		BG19_DirectDebit thisAlsDD = getDirectDebit();
+		DirectDebit thisAlsDD = getDirectDebit();
 		if(thisAlsDD==null) {
 			createDirectDebit(null, null, iban);
 		} else {

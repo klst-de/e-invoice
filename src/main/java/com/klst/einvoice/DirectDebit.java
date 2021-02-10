@@ -31,7 +31,7 @@ import com.klst.einvoice.unece.uncefact.IBANId;
  * 
  */
 
-public interface BG19_DirectDebit extends DebitedAccountID {
+public interface DirectDebit extends DebitedAccountID {
 	
 	/**
 	 * Mandate reference identifier

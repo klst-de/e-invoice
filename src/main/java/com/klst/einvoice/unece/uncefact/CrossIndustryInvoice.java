@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.BG19_DirectDebit;
+import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
@@ -1002,14 +1002,14 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	// factory delegate to ApplicableHeaderTradeSettlement
 	@Override
 	public PaymentInstructions createPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		
 		return applicableHeaderTradeSettlement.createPaymentInstructions(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 
 	@Override
 	public void setPaymentInstructions(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
-			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, BG19_DirectDebit directDebit) {
+			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		setPaymentInstructions(applicableHeaderTradeSettlement.createPaymentInstructions(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit));
 	}
 
@@ -1053,12 +1053,12 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	}
 
 	@Override // implements interface DirectDebitFactory for BG-19
-	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
 		return applicableHeaderTradeSettlement.createDirectDebit(mandateID, bankAssignedCreditorID, iban);
 	}
 
 	@Override // implements interface DirectDebitFactory for BG-19
-	public BG19_DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
+	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, String debitedAccountID) {
 		return applicableHeaderTradeSettlement.createDirectDebit(mandateID, bankAssignedCreditorID, debitedAccountID);
 	}
 
