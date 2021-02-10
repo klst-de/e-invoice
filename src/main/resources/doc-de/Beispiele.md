@@ -141,7 +141,7 @@ Zusätzliche Angaben können angefügt werden:
 
 ### Detailinformationen zum Preis
 
-Zu dieser Gruppe gehört der Preisrabatt. Dieser Abschlag sollte immer in den "Nettopreis des Artikels (BT-146)" einbezogen werden. Um zu zeigen, dass ein Preisrabatt gewährt wurde, kann optional der Bruttopreis des Artikels (BT-148) und der Nachlass auf den Artikelpreis (BT-147) angegeben werden.
+Zu dieser Gruppe gehört der **Preisrabatt**. Dieser muss bereits im "Nettopreis des Artikels (BT-146)" einbezogen sein. Um zu zeigen, dass ein Rabatt gewährt wurde, kann der Nachlass (BT-147) auf den brutto Artikelpreis und auch der Bruttopreis (BT-148) angegeben werden:
 
 ```java
     , new Amount(EUR, new BigDecimal(288.79))               // Nettobetrag Rechnungsposition
@@ -151,5 +151,8 @@ Zu dieser Gruppe gehört der Preisrabatt. Dieser Abschlag sollte immer in den "N
   invoice.addLine(line);
 ```
 
-Positionsnachlass:
-Ein Positionsnachlass kann als Rabatt 2. Ordnung angesehen werden, ... TODO
+### Abschäge und Zuschläge (Allowance and Charges)
+
+Ein Positionsabschlag kann als Rabatt 2. Ordnung angesehen werden. Bei Abschlägen und Zuschlägen/**Gebühren** (BT-141) kann ein Grund (BT-144) angegeben werden. Der zur Berechnung der Gesamtsumme verwendete Preis ist jedoch immer der Nettopreis (BT-146).
+
+TODO Beispiel
