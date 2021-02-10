@@ -87,3 +87,53 @@ Der Verkäufer darf seine Rolle an einen Steuerbevollmächtigten delegieren, der
 - BR-20 Falls sich der Verkäufer (BG-4) durch einen Steuerbevollmächtigten (BG-11) vertreten lässt, muss die Postanschrift des Steuerbevollmächtigten des Verkäufers (BG-12) den Ländercode der Steuerbevollmächtigtenanschrift (BT-69) enthalten.
 
 Ähnlich wie bei Payee gibt es auch dafür eine Methode `setTaxRepresentative`.
+
+## Rechnungspositionen
+
+![](../image/CoreInvoice_LINE-de.PNG)
+
+### Geschäftsregeln für Rechnungspositionen
+
+jede Rechnungsposition muss ...
+- BR-21: eine Kennung (BT-126) haben, z.B. Positionsnummer
+- BR-22: die in Rechnung gestellte Menge (BT-129) und den Code für 
+- BR-23: die Maßeinheit (BT-130) aufweisen. Der Maßeinheitcode ist der UN/ECE Recommendation No. 20 „Codes for Units of Measure Used in International Trade“ bzw. Recommendation No. 21 zu entnehmen. Beispiele: 
+ - LTR = Liter, 
+ - MTQ = Kubikmeter, 
+ - KGM = Kilogramm, 
+ - XPP = piece/Stück, 
+ - HUR = hour/Stunde
+- BR-24 der Nettobetrag der Rechnungsposition (BT-131) angegeben werden
+- BR-26: den Nettopreis des Artikels (BT-146) enthalten
+- BR-25: den Artikelnamen (BT-153) enthalten
+- BR-CO-4: einer Umsatzsteuerkategorie/VAT (BT-151) zugeordnet werden
+
+
+Die obligatorischen Informationen einer Rechnungsposition sind bereits mit der factory-Methode `createInvoiceLine` abgedeckt.
+
+- Rechnungsposition: "1"
+- Code und Menge: 1 Stück
+- Nettobetrag der Rechnungsposition: 288.79€
+- Artikelpreis: 288.79€
+- Artikelname: "Zeitschrift [...]"
+- Umsatzsteuerkategorie mit Steuersatz: 7%
+
+BT-126 ++ 1..1 Kennung der Rechnungsposition, invoice line number
+BT-129 ++ 1..1 in Rechnung gestellte Menge mit Maßeinheit BT-130, Quantity
+BT-131 ++ 1..1 Nettobetrag der Rechnungsposition, line net amount
+BG-29.BT-146 +++ 1..1 Nettopreis des Artikels, price
+BG-31.BT-153 1..1 BT-153  Artikelname
+BG-30 ++ 1..1 UMSATZSTEUERINFORMATIONEN
+
+```java
+  CoreInvoiceLine line = invoice.createInvoiceLine("1"      // Rechnungsposition
+    , new Quantity("XPP", new BigDecimal(1))                // Code und Menge
+    , new Amount(EUR, new BigDecimal(288.79))               // Nettobetrag Rechnungsposition
+    , new UnitPriceAmount(EUR, new BigDecimal(288.79))      // Artikelpreis
+    , "Zeitschrift [...]"                                   // Artikelname
+    , TaxCategoryCode.StandardRate, new BigDecimal(7));     // VAT category code, rate 7%
+...  
+  invoice.addLine(line);
+```
+A.3.2.4 Abschläge auf der Positionsebene
+Preisrabatt
