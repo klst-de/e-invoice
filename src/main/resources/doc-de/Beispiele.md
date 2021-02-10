@@ -97,7 +97,7 @@ Der Verkäufer darf seine Rolle an einen Steuerbevollmächtigten delegieren, der
 jede Rechnungsposition muss ...
 - BR-21: eine Kennung (BT-126) haben, z.B. Positionsnummer
 - BR-22: die in Rechnung gestellte Menge (BT-129) und den Code für 
-- BR-23: die Maßeinheit (BT-130) aufweisen. Der Maßeinheitcode ist der UN/ECE Recommendation No. 20 „Codes for Units of Measure Used in International Trade“ bzw. Recommendation No. 21 zu entnehmen. Beispiele: 
+- BR-23: die Maßeinheit (BT-130) aufweisen. Der Maßeinheitcode ist der [UN/ECE](https://de.wikipedia.org/wiki/Wirtschaftskommission_f%C3%BCr_Europa) Recommendation [No. 20/21 „Codes for Units of Measure“](https://wiki.idempiere.org/de/Ma%C3%9Feinheiten#UNECE_recommendation_20.2F21) zu entnehmen. Beispiele: 
   - LTR = Liter, 
   - MTQ = Kubikmeter, 
   - KGM = Kilogramm, 
