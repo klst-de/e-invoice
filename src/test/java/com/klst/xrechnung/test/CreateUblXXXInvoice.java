@@ -9,7 +9,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.BG19_DirectDebit;
+import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG7_Buyer;
@@ -326,7 +326,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 				break;
 			case DirectDebit:
 			case SEPADirectDebit:
-				BG19_DirectDebit dd = pi.getDirectDebit();
+				DirectDebit dd = pi.getDirectDebit();
 				LOG.info("DirectDebit Creditor:"+dd.getBankAssignedCreditorID()
 					+" Account="+dd.getDebitedAccountID()+" MandateReference:"+dd.getMandateReferencedID());
 				paymentInstructions = ublInvoice.createPaymentInstructions(paymentMeansCode, pi.getPaymentMeansText()
