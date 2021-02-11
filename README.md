@@ -25,7 +25,7 @@ _A “Core Invoice Usage Specification” (CIUS) is a specification that provide
 - the french counterpart is called [Factur-X(en)](http://fnfe-mpe.org/factur-x/factur-x_en/) [(fr)](http://fnfe-mpe.org/factur-x/)
 
 ## Example 
-this snippet creates a valid xml invoice [ubl.xml see (xrechnung-testsuite)](https://github.com/itplr-kosit/xrechnung-testsuite/blob/master/src/test/business-cases/standard/01.01a-INVOICE_ubl.xml)
+this snippet creates a valid xml invoice [similar to (xrechnung-testsuite)](https://github.com/itplr-kosit/xrechnung-testsuite/blob/master/src/test/business-cases/standard/01.01a-INVOICE_ubl.xml)
 
 ```java
   static final String PROFILE_XRECHNUNG = CoreInvoice.PROFILE_XRECHNUNG;
