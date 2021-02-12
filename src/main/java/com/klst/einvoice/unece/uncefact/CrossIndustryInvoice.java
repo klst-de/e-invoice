@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
@@ -16,6 +15,7 @@ import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
@@ -25,6 +25,7 @@ import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.Reference;
 import com.klst.einvoice.VatBreakdown;
+import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -47,7 +48,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementHeaderMonetarySummationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
@@ -64,7 +64,17 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 	
 	// factory
 	public static CoreInvoice getFactory() {
-		return new CrossIndustryInvoice();
+		return new CrossIndustryInvoice(null);
+	}
+	// copy factory
+	public static CrossIndustryInvoice create(CrossIndustryInvoiceType object) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(object instanceof CrossIndustryInvoiceType && object.getClass()!=CrossIndustryInvoiceType.class) {
+			// object is instance of a subclass of CrossIndustryInvoiceType, but not CrossIndustryInvoiceType itself
+			return (CrossIndustryInvoice)object;
+		} else {
+			return new CrossIndustryInvoice(object); 
+		}
 	}
 	@Override
 	public CoreInvoice createInvoice(String profile, String processType, DocumentNameCode code) {
@@ -104,29 +114,36 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 1 .. 1 CompleteDateTime Vertragliches Fälligkeitsdatum der Rechnung xs:choice 
 1 .. 1 DateTimeString Vertragliches Fälligkeitsdatum der Rechnung, Wert required format Datum, Format
  */
-	CrossIndustryInvoice() {
-		super();
-	}
-
+	
 	ApplicableHeaderTradeSettlement applicableHeaderTradeSettlement;
 	HeaderTradeDeliveryType applicableHeaderTradeDelivery;
-	ExchangedDocumentType exchangedDocument;
+//	ExchangedDocumentType exchangedDocument; // in super
 	
+	private CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
+		super();
+		if(doc!=null) {
+			CopyCtor.invokeCopy(this, doc);
+			LOG.config("copy ctor:"+this);
+		}
+		if(super.getSupplyChainTradeTransaction()==null) {
+			applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create();
+			applicableHeaderTradeDelivery = ApplicableHeaderTradeDelivery.create();
+			super.setSupplyChainTradeTransaction(new SupplyChainTradeTransactionType());
+		} else {
+			applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create(getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
+			applicableHeaderTradeDelivery = ApplicableHeaderTradeDelivery.create(getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery());
+		}
+		getSupplyChainTradeTransaction().setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
+		getSupplyChainTradeTransaction().setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
+	}
+
 	public CrossIndustryInvoice(String customization, DocumentNameCode documentNameCode) {
 		this(customization, null, documentNameCode);
 	}
 	
 	public CrossIndustryInvoice(String customization, String processType, DocumentNameCode documentNameCode) {
-		this();
+		this(null);
 		setProcessControl(customization, processType);
-		supplyChainTradeTransaction = new SupplyChainTradeTransactionType();
-		
-		applicableHeaderTradeDelivery = ApplicableHeaderTradeDelivery.create();
-		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
-		
-		applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create();
-		supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
 		
 		exchangedDocument = new ExchangedDocumentType();
 		DocumentCodeType documentCode = new DocumentCodeType();
@@ -134,114 +151,6 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		exchangedDocument.setTypeCode(documentCode);
 		super.setExchangedDocument(exchangedDocument);
 	}
-
-	// copy-ctor
-	public CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
-		this(getCustomization(doc), getProcessType(doc), getTypeCode(doc));
-		LOG.fine("copy-ctor: Customization:"+getCustomization() + ", ProcessType:"+getProcessType() + ", TypeCode:"+getTypeCode());
-		
-		HeaderTradeDeliveryType ahtd = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
-		LOG.fine("copy-ctor: ApplicableHeaderTradeDelivery ahtd:"+ahtd);
-		if(ahtd==null) {
-			LOG.fine("copy-ctor: ahtd==null");
-		} else {
-			applicableHeaderTradeDelivery = ApplicableHeaderTradeDelivery.create(ahtd);
-			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
-		}
-
-		applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create(doc.getSupplyChainTradeTransaction());
-		
-		LOG.info("copy-ctor: PayeeParty ..."+this.getPayee());
-				
-		setStartDate(getStartDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement()));
-		setEndDate(getEndDateAsTimestamp(doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement()));
-		
-		setId(getId(doc));
-		setIssueDate(getIssueDateAsTimestamp(doc));
-		
-		String documentCurrency = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getInvoiceCurrencyCode().getValue();
-		setDocumentCurrency(documentCurrency);
-
-		String taxCurrency = applicableHeaderTradeSettlement.getTaxCurrency();
-		setTaxCurrency(taxCurrency); // optional
-		
-		setBuyerReference(getBuyerReferenceValue(doc)); // optional BT-10
-		setProjectReference(getProjectReference(doc)); // optional BT-11
-		setContractReference(getContractReferenceID(doc)); // optional BT-12
-		
-		List<ReferencedDocument> additionalReferencedDocuments = getReferencedDocuments(doc);
-		additionalReferencedDocuments.forEach(rd -> {
-			LOG.fine("copy-ctor: ReferencedDocument Description="+rd.getSupportingDocumentDescription()); // aka Name
-			addSupportigDocument(rd);
-		});
-
-		setPurchaseOrderReference(getPurchaseOrderReference(doc)); // optional BT-13
-		setOrderReference(getOrderReferenceID(doc)); // optional BT-14
-		
-		setReceiptReference(getReceiptReference(doc)); // optional BT-15
-		setDespatchAdviceReference(getDespatchAdviceReference(doc)); // optional BT-16
-
-		addNotes(doc.getExchangedDocument());
-		LOG.fine("copy-ctor: SellerParty ...");;
-		setSeller(getSellerParty(doc));
-		LOG.fine("copy-ctor: BuyerParty ...");;
-		setBuyer(getBuyerParty(doc));
-		LOG.fine("copy-ctor: SellerTaxRepresentativeParty ...");;
-		setTaxRepresentative(getTaxRepresentativeParty(doc)); // optional
-		
-		TradeSettlementHeaderMonetarySummationType stshms 
-			= doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement().getSpecifiedTradeSettlementHeaderMonetarySummation();
-		LOG.fine("copy-ctor: stshms:"+stshms);
-		setDocumentTotals(new Amount(stshms.getLineTotalAmount().get(0).getValue())     // getInvoiceLineNetTotal(doc)
-						, new Amount(stshms.getTaxBasisTotalAmount().get(0).getValue()) // getInvoiceTotalTaxExclusive(doc)
-						, new Amount(stshms.getGrandTotalAmount().get(0).getValue())    // getInvoiceTotalTaxInclusive(doc)
-						, new Amount(stshms.getDuePayableAmount().get(0).getValue())    // getDuePayable(doc)
-				);
-		List<AmountType> allowanceTotalAmountList = stshms.getAllowanceTotalAmount(); // BG-22.BT-107
-		if(!allowanceTotalAmountList.isEmpty()) {
-			// nur das erste Element holen und kopieren:
-			AmountType amount = allowanceTotalAmountList.get(0);
-			this.setAllowancesTotal(new Amount(amount.getCurrencyID(), amount.getValue()));
-		}
-		List<AmountType> chargeTotalAmountList = stshms.getChargeTotalAmount(); // BG-22.BT-108
-		if(!chargeTotalAmountList.isEmpty()) {
-			// nur das erste Element holen und kopieren:
-			AmountType amount = chargeTotalAmountList.get(0);
-			this.setChargesTotal(new Amount(amount.getCurrencyID(), amount.getValue()));
-		}
-		List<AmountType> prepaidAmountList = stshms.getTotalPrepaidAmount();
-		LOG.fine("copy-ctor: prepaidAmountList.size="+prepaidAmountList.size());
-		if(!prepaidAmountList.isEmpty()) {
-			// BG-22.BT-113 0..1 (optional) 
-			// nur das erste Element holen und kopieren:
-			AmountType amount = prepaidAmountList.get(0);
-			this.setPrepaid(new Amount(amount.getCurrencyID(), amount.getValue()));
-		}
-		List<AmountType> roundingAmountList = stshms.getRoundingAmount(); // BG-22.BT-114
-		if(!roundingAmountList.isEmpty()) {
-			// nur das erste Element holen und kopieren:
-			AmountType amount = roundingAmountList.get(0);
-			this.setRounding(new Amount(amount.getCurrencyID(), amount.getValue()));
-		}
-
-		List<AmountType> list = stshms.getTaxTotalAmount(); // BT-110, BT-111 1..1
-		if(list.isEmpty()) {
-			// sollte nicht vorkommen
-		} else {  
-			for(int i=0; i<list.size(); i++) {
-				if(getTaxCurrency()==null || getDocumentCurrency().equals(getTaxCurrency())) {
-					Amount invoiceTaxAmount = 
-						list.get(i).getCurrencyID()==null ? new Amount(list.get(i).getValue()) 
-							                              : new Amount(list.get(i).getCurrencyID(), list.get(i).getValue());
-					LOG.fine("copy-ctor: TaxTotalAmount i="+i + " nur Info: invoiceTaxAmount "+invoiceTaxAmount 
-						+ " taxCurrency:"+this.getTaxCurrency() + " documentCurrency:"+this.getDocumentCurrency());
-				}
-			}
-		}
-		
-		addLines(doc);
-	}
-
 
 	/* Invoice number                              BT-1  Identifier            1 (mandatory) 
 	 * Eine eindeutige Kennung der Rechnung, die diese im System des Verkäufers identifiziert.
@@ -1075,17 +984,17 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	// BG-22.BT-106 - 1..1/1..1
 	@Override
 	public Amount getInvoiceLineNetTotal() {
-		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getLineTotalAmount().get(0).getValue());
+		return applicableHeaderTradeSettlement.getInvoiceLineNetTotal();
 	}
 	// BG-22.BT-109 - 1..1/1..1
 	@Override
 	public Amount getInvoiceTotalTaxExclusive() {
-		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxBasisTotalAmount().get(0).getValue());
+		return applicableHeaderTradeSettlement.getInvoiceTotalTaxExclusive();
 	}
 	// BG-22.BT-112 - 1..1/1..1
 	@Override
 	public Amount getInvoiceTotalTaxInclusive() {
-		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getGrandTotalAmount().get(0).getValue());
+		return applicableHeaderTradeSettlement.getInvoiceTotalTaxInclusive();
 	}
 	// BG-22.BT-113 - 1..1/0..1 (optional) The sum of amounts which have been paid in advance.
 	// Summe bereits gezahlter Beträge.
@@ -1096,7 +1005,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	// BG-22.BT-115 - 1..1/1..1
 	@Override
 	public Amount getDuePayable() { 
-		return new Amount(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getDuePayableAmount().get(0).getValue());
+		return applicableHeaderTradeSettlement.getDuePayable();
 	}
 	
 	// BG-22.BT-107
@@ -1164,6 +1073,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	}
 
 	private Amount getInvoiceTax(boolean sameCurrency) {
+		if(applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation() == null) return null;
 		List<AmountType> list = applicableHeaderTradeSettlement.getSpecifiedTradeSettlementHeaderMonetarySummation().getTaxTotalAmount();
 		if(list.isEmpty()) return null;
 		LOG.fine("getInvoiceTax: TaxCurrency="+getTaxCurrency() + " DocumentCurrency="+getDocumentCurrency());

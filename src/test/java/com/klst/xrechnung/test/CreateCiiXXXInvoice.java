@@ -305,12 +305,16 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
     	LOG.info("--------------InvoiceTax amount "+invoiceTaxAmount);
         Amount invoiceTaxIAAmount = testDoc.getInvoiceTaxInAccountingCurrency();
     	LOG.info("--InvoiceTaxInAccountingCurrency amount "+invoiceTaxIAAmount);
-    	if(invoiceTaxAmount==null) {
-    		// wie im Bsp. 02.01a
-            cii.setInvoiceTax(new Amount(cii.getDocumentCurrency(), invoiceTaxIAAmount.getValue()));   	
-    		cii.setInvoiceTaxInAccountingCurrency(invoiceTaxIAAmount);
+    	if(invoiceTaxAmount==null && invoiceTaxIAAmount==null) {
+    		// nix
     	} else {
-            cii.setInvoiceTax(invoiceTaxAmount);   	
+        	if(invoiceTaxAmount==null) {
+        		// wie im Bsp. 02.01a
+                cii.setInvoiceTax(new Amount(cii.getDocumentCurrency(), invoiceTaxIAAmount.getValue()));   	
+        		cii.setInvoiceTaxInAccountingCurrency(invoiceTaxIAAmount);
+        	} else {
+                cii.setInvoiceTax(invoiceTaxAmount);   	
+        	}
     	}
         cii.setPrepaid(prePaidAmount);
         Amount allowancesTotalAmount = testDoc.getAllowancesTotal();
@@ -401,7 +405,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		try {
 			InputStream is = new FileInputStream(xmlfile);
 			invoice = transformer.toModel(is);
-			cii = new CrossIndustryInvoice(invoice);
+			cii = CrossIndustryInvoice.create(invoice);
 			// TODO ...
 		} catch (Exception ex) {
 			ex.printStackTrace();
