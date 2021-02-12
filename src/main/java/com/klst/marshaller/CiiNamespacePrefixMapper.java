@@ -18,16 +18,38 @@ import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 */
 public class CiiNamespacePrefixMapper extends NamespacePrefixMapper {
 
+	/**
+	 * REQUIREMENTS SPECIFICATION MAPPING for Cross Industry Invoice (CII)
+	 * <p>
+	 * CII is based on Supply Chain REFERENCE DATA MODEL (SCRDM)
+	 */
+	private static final String RSM="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100";
+
+	/**
+	 * Reusable Aggregate Model for Aggregate Business Information Entities (ABIE)
+	 */
+	private static final String RAM="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100";
+
+	/**
+	 * Unqualified Data Type
+	 */
+	private static final String UDT="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100";
+	
+	/**
+	 * Qualified Data Type
+	 */
+	private static final String QDT="urn:un:unece:uncefact:data:standard:QualifiedDataType:100";
+
 	private Map<String, String> namespaceMap = new HashMap<>();
 	 
 	/**
 	 * Create mappings.
 	 */
 	public CiiNamespacePrefixMapper() {
-		namespaceMap.put("urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100", "rsm");
-		namespaceMap.put("urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100", "ram");
-		namespaceMap.put("urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100", "udt");
-		namespaceMap.put("urn:un:unece:uncefact:data:standard:QualifiedDataType:100", "qdt");
+		namespaceMap.put(RSM, "rsm");
+		namespaceMap.put(RAM, "ram");
+		namespaceMap.put(UDT, "udt");
+		namespaceMap.put(QDT, "qdt");
 	}
 
 	/* (non-Javadoc)

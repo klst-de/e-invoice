@@ -125,6 +125,7 @@ UN/CEFACT hat folgende Modelle veröffentlicht:
 Die Modelle bilden die Core Component Library (CCL). 
 Übersicht in Anticipating and Following Technological Trends in eBusiness Data Exchanges
 Moscow,  7/8 December 2017 International Conference on Single Window
+und in https://unece.org/fileadmin/DAM/cefact/cf_forums/2018_China/ISCO_Domain.pdf
 
 weitere Kürzel:
 CCBDA : Core Component Business Document Assembly Technical Specification - beschreibt 
