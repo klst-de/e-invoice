@@ -60,6 +60,6 @@ public class Quantity extends QuantityType implements Rounding {
 	
 	@Override
 	public String toString() {
-		return getValue(RoundingMode.HALF_UP) + (getUnitCode()==null ? "" : " " + getUnitCode());
+		return getValue(RoundingMode.HALF_UP) + (getUnitCode()==null ? "" : getUnitCode());
 	}
 }

@@ -3,6 +3,7 @@ package com.klst.readme;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -49,7 +50,7 @@ public class ReadmeTest {
 	
 	static private AbstactTransformer ciiTransformer;
 	static private AbstactTransformer ublTransformer;
-	// UblCreditNoteTransformer for CreditNote!!! bot used
+	// UblCreditNoteTransformer for CreditNote!!! not used
 //	static private AbstactTransformer ublCNTransformer;
 	static private AbstactTransformer transformer;
 	
@@ -76,6 +77,55 @@ public class ReadmeTest {
 		commercialInvoiceTest();
 	}
 
+	private static final BigDecimal ONE = new BigDecimal(1);
+	
+	CoreInvoiceLine line00() {
+		// mandatory:
+		CoreInvoiceLine line = invoice.createInvoiceLine("1"    // invoice line number
+		  , new Quantity("XPP", new BigDecimal(1))              // 1 piece/XPP
+		  , new Amount(EUR, new BigDecimal(288.79))				// line net amount
+		  , new UnitPriceAmount(EUR, new BigDecimal(288.79))	// price
+		  , "Zeitschrift [...]"									// itemName
+		  , TaxCategoryCode.StandardRate, new BigDecimal(7));	// VAT category code, rate 7%
+		
+		// optional ...
+		line.setNote("Die letzte Abonnementslieferung");        // BT-127 note
+		line.setPeriod("2016-01-01", "2016-12-31");             // BG-26  line delivery period.
+		line.setOrderLineID("6171175.1");                       // BT-132 Referenced purchase order line
+		line.setUnitPriceAllowance(new UnitPriceAmount(EUR, new BigDecimal(21.21)) // priceDiscount
+				                  ,new UnitPriceAmount(EUR, new BigDecimal(310))); // grossPrice
+		return line;
+	}
+	
+	Quantity onePiece = new Quantity("XPP", new BigDecimal(1));
+	Amount amount01 = new Amount(EUR, new BigDecimal(26.07));
+	UnitPriceAmount price01 = new UnitPriceAmount(EUR, new BigDecimal(26.07));
+	BigDecimal rate7 = new BigDecimal(7);
+	
+	CoreInvoiceLine line01() {
+		CoreInvoiceLine line = invoice.createInvoiceLine("2"    // invoice line number
+		  , new Quantity("XPP", new BigDecimal(1))              // 1 piece/XPP
+		  , new Amount(EUR, new BigDecimal(26.07))				// line net amount
+		  , new UnitPriceAmount(EUR, new BigDecimal(26.07))		// price
+		  , "Porto + Versandkosten"								// itemName
+		  , TaxCategoryCode.StandardRate, new BigDecimal(7));	// VAT category code, rate 7%
+		return line;
+	}
+	void assertLine01(CoreInvoiceLine line) {
+		LOG.info("line:"+line.getId() + " Quantity:"+line.getQuantity() + " TotalAmount:"+line.getLineTotalAmount());
+		assertEquals("2", line.getId());
+		assertEquals(onePiece.getUnitCode(), line.getQuantity().getUnitCode());
+		assertEquals(onePiece.toString(), line.getQuantity().toString());
+		assertEquals(EUR, line.getLineTotalAmount().getCurrencyID());
+		assertEquals(amount01.toString(), line.getLineTotalAmount().toString());
+//		LOG.info("line.getUnitPriceAmount().getCurrencyID():"+line.getUnitPriceAmount().getCurrencyID());
+		assertEquals(EUR, line.getUnitPriceAmount().getCurrencyID());
+		assertEquals(price01.toString(), line.getUnitPriceAmount().toString());
+		assertEquals("Porto + Versandkosten", line.getItemName());
+		assertEquals(TaxCategoryCode.StandardRate, line.getTaxCategory());
+		assertEquals(rate7, line.getTaxRate());
+	}
+	
 	void commercialInvoiceTest() {
 		LOG.info("ublInvoice.Class:"+invoice.getClass());
 		invoice.setId("123456XX");
@@ -86,19 +136,9 @@ public class ReadmeTest {
 		invoice.setTaxCurrency(EUR);                         // optional
 		invoice.setOrderReference("1234567890");             // optional
 
-		CoreInvoiceLine line = invoice.createInvoiceLine("1"    // invoice line number
-		  , new Quantity("XPP", new BigDecimal(1))
-		  , new Amount(EUR, new BigDecimal(288.79))				// line net amount
-		  , new UnitPriceAmount(EUR, new BigDecimal(288.79))	// price
-		  , "Zeitschrift [...]"									// itemName
-		  , TaxCategoryCode.StandardRate, new BigDecimal(7));	// VAT category code, rate 7%
-		// optional ...
-		line.setNote("Die letzte Abonnementslieferung");        // BT-127 note
-		line.setPeriod("2016-01-01", "2016-12-31");             // BG-26  line delivery period.
-		line.setOrderLineID("6171175.1");                       // BT-132 Referenced purchase order line
-		line.setUnitPriceAllowance(new UnitPriceAmount(EUR, new BigDecimal(21.21)) // priceDiscount
-				                  ,new UnitPriceAmount(EUR, new BigDecimal(310))); // grossPrice
-		invoice.addLine(line);
+		// create lines and add to invoice:
+		invoice.addLine(line00());
+		invoice.addLine(line01());
 		  
 		// BusinessParty Seller aka Supplier
 		PostalAddress sellerAddress = invoice.createAddress(DE, "12345", "[Seller city]");
@@ -130,6 +170,7 @@ public class ReadmeTest {
 		assertEquals(TaxTypeCode.VAT, vb.getTaxType());
 		assertEquals(TaxCategoryCode.StandardRate, vb.getTaxCategoryCode());
 		assertEquals(ermUSt, vb.getTaxPercentage());
+		
 		String TobaccoTax = "AAD";
 		vb.setTaxType(TobaccoTax);
 		LOG.info(">>>>>>>>>>>> tax type AAD? : "+vb.getTaxType());
@@ -179,6 +220,10 @@ public class ReadmeTest {
 		assertEquals(12, tsTaxPointDate.toLocalDateTime().getMonthValue());
 		assertEquals(31, tsTaxPointDate.toLocalDateTime().getDayOfMonth());
 
+		List<CoreInvoiceLine> lines = invoice.getLines();
+		assertEquals(2, lines.size());
+		assertLine01(lines.get(1));
+		
 		byte[] xml = transformer.fromModel(invoice);
 		LOG.info(new String(xml));
 	}
