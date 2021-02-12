@@ -110,6 +110,52 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 0 .. 1 EffectiveSpecifiedPeriod Vertragliches Fälligkeitsdatum der Rechnung xs:sequence 
 1 .. 1 CompleteDateTime Vertragliches Fälligkeitsdatum der Rechnung xs:choice 
 1 .. 1 DateTimeString Vertragliches Fälligkeitsdatum der Rechnung, Wert required format Datum, Format
+
+--------------------------------------------------------------------------------------
+UN/CEFACT is the United Nations Centre for Trade Facilitation and Electronic Business.
+It was established by the United Nations Economic Commission for Europe (UNECE).
+
+UN/CEFACT hat folgende Modelle veröffentlicht:
+- BSP: BUY-SHIP-PAY domain model (contextualization of business artefacts and structures)
+-- subset of BSP: 
+-- Supply Chain REFERENCE DATA MODEL (SCRDM), 
+     darin die "derived businesss messages" Cross Industry Invoice (CII) und Cross Industry Order (CIO)
+-- Multi Modal Transport Semantic model (MMT RDM)
+
+Die Modelle bilden die Core Component Library (CCL). 
+Übersicht in Anticipating and Following Technological Trends in eBusiness Data Exchanges
+Moscow,  7/8 December 2017 International Conference on Single Window
+
+weitere Kürzel:
+CCBDA : Core Component Business Document Assembly Technical Specification - beschreibt 
+das Vorgehen beim Erstellen von Modellen. Auch Begriffe werden dort eingeführt und erläutert.
+BSP soll von "document centric" zu "process driven artefacts" führen (contextualized business artefacts).
+
+ABIE -Aggregate Business Information Entities
+ACC - Aggregate Core Component 
+qDT – Qualified DataType
+
+Supply Chain (SCRDM) subset of BuyShipPay (BSP) Master CCBDA Message Structure
+Core  Component Business Document Assembly Technical Specification (CCBDA).
+	
+CEFACT/DEC/2018: Supply Chain REFERENCE DATA MODEL (SCRDM) 
+Aufbau der SCRDM-Nachrichten, also CII und CIO:
+
+ - rsm:ExchangedDocumentContext
+ - rsm:ExchangedDocument
+ - rsm:SupplyChainTradeTransaction , darin
+ -- ( Referenced Document )       nicht in CII V100 : vll.: ram:AdditionalReferencedDocument
+ -- ram:IncludedSupplyChainTradeLineItem
+ -- ( Logistics Package )
+ -- ( Associated Document Line )
+ -- ( Product Group )
+ -- ram:ApplicableHeaderTradeAgreement
+ -- ram:ApplicableHeaderTradeDelivery
+ -- ram:ApplicableHeaderTradeSettlement
+
+PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B die wir verwende
+    CIO basiert auf eine neuere Version von SCRDM 103
+    
  */
 	
 	ApplicableHeaderTradeSettlement applicableHeaderTradeSettlement;
