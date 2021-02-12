@@ -39,7 +39,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProcuringProjectType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
@@ -86,8 +85,6 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		return TradeLineItem.createInvoiceLine(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 	}
 
-	private static final String NOT_IMPEMENTED = "NOT IMPEMENTED";
-	
 /*
 1 .. 1 ExchangedDocumentContext Prozesssteuerung BG-2 xs:sequence 
 0 .. 1 TestIndicator Testkennzeichen                  xs:choice 
@@ -178,10 +175,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 	
 	@Override
 	public String getId() {
-		return getId(this);
-	}
-	static String getId(CrossIndustryInvoiceType doc) {
-		return doc.getExchangedDocument().getID().getValue();
+		return super.getExchangedDocument().getID().getValue();
 	}
 
 	/* Invoice issue date                          BT-2  Date                  1 (mandatory) 
@@ -195,10 +189,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 
 	@Override
 	public Timestamp getIssueDateAsTimestamp() {
-		return getIssueDateAsTimestamp(this);
-	}
-	static Timestamp getIssueDateAsTimestamp(CrossIndustryInvoiceType doc) {
-		DateTimeType dateTime = doc.getExchangedDocument().getIssueDateTime();
+		DateTimeType dateTime = super.getExchangedDocument().getIssueDateTime();
 		return DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
 	}
 
@@ -211,10 +202,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 
 	@Override
 	public DocumentNameCode getTypeCode() {
-		return getTypeCode(this);
-	}
-	static DocumentNameCode getTypeCode(CrossIndustryInvoiceType doc) {
-		return DocumentNameCode.valueOf(doc.getExchangedDocument().getTypeCode());
+		return DocumentNameCode.valueOf(super.getExchangedDocument().getTypeCode());
 	}
 
 	// 1 .. 1 InvoiceCurrencyCode Code für die Rechnungswährung BT-5
@@ -331,10 +319,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 
 	@Override
 	public String getBuyerReferenceValue() {
-		return getBuyerReferenceValue(this);
-	}
-	static String getBuyerReferenceValue(CrossIndustryInvoiceType doc) {
-		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		TextType text = headerTradeAgreement.getBuyerReference();
 		return text==null ? null : text.getValue();
 	}
@@ -366,10 +351,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 
 	@Override
 	public Reference getProjectReference() {
-		return getProjectReference(this);
-	}
-	static Reference getProjectReference(CrossIndustryInvoiceType doc) {
-		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		ProcuringProjectType referencedDocument = headerTradeAgreement.getSpecifiedProcuringProject();
 		if(referencedDocument==null) return null;
 		return new ID(referencedDocument.getName()==null ? "" : referencedDocument.getName().getValue()
@@ -401,10 +383,7 @@ UBL:
 
 	@Override
 	public String getContractReference() {
-		return getContractReferenceID(this);
-	}
-	static String getContractReferenceID(CrossIndustryInvoiceType doc) {
-		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		ReferencedDocumentType referencedDocument = headerTradeAgreement.getContractReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();
 	}
@@ -426,10 +405,7 @@ UBL:
 
 	@Override
 	public String getPurchaseOrderReference() {
-		return getPurchaseOrderReference(this);
-	}
-	static String getPurchaseOrderReference(CrossIndustryInvoiceType doc) {
-		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		ReferencedDocumentType referencedDocument = headerTradeAgreement.getBuyerOrderReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
 	}
@@ -450,10 +426,7 @@ UBL:
 	}
 	@Override
 	public String getOrderReference() {
-		return getOrderReferenceID(this);
-	}
-	static String getOrderReferenceID(CrossIndustryInvoiceType doc) {
-		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		ReferencedDocumentType referencedDocument = headerTradeAgreement.getSellerOrderReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
 	}
@@ -469,10 +442,7 @@ UBL:
 	}
 	@Override
 	public String getReceiptReference() {
-		return getReceiptReference(this);
-	}
-	static String getReceiptReference(CrossIndustryInvoiceType doc) {
-		HeaderTradeDeliveryType headerTradeDelivery = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
+		HeaderTradeDeliveryType headerTradeDelivery = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
 		ReferencedDocumentType referencedDocument = headerTradeDelivery.getReceivingAdviceReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
 	}
@@ -488,10 +458,7 @@ UBL:
 	}
 	@Override
 	public String getDespatchAdviceReference() {
-		return getDespatchAdviceReference(this);
-	}
-	static String getDespatchAdviceReference(CrossIndustryInvoiceType doc) {
-		HeaderTradeDeliveryType headerTradeDelivery = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
+		HeaderTradeDeliveryType headerTradeDelivery = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
 		ReferencedDocumentType referencedDocument = headerTradeDelivery.getDespatchAdviceReferencedDocument();
 		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
 	}
@@ -587,12 +554,12 @@ UBL:
 		return createNote(null, content);
 	}
 
-	private void addNotes(ExchangedDocumentType ed) {
-		List<InvoiceNote> notes = Note.getInvoiceNotes(ed);
-		notes.forEach(note -> {
-			addNote(note);
-		});
-	}
+//	private void addNotes(ExchangedDocumentType ed) {
+//		List<InvoiceNote> notes = Note.getInvoiceNotes(ed);
+//		notes.forEach(note -> {
+//			addNote(note);
+//		});
+//	}
 	
 	@Override
 	public void addNote(InvoiceNote note) {
@@ -644,10 +611,7 @@ UBL:
 	// BG-2.BT-23 ++ 0..1 Business process type
 	@Override
 	public String getProcessType() {
-		return getProcessType(this);
-	}
-	static String getProcessType(CrossIndustryInvoiceType doc) {
-		List<DocumentContextParameterType> documentContextParameterList = doc.getExchangedDocumentContext().getBusinessProcessSpecifiedDocumentContextParameter();
+		List<DocumentContextParameterType> documentContextParameterList = super.getExchangedDocumentContext().getBusinessProcessSpecifiedDocumentContextParameter();
 		List<String> res = new ArrayList<String>(documentContextParameterList.size());
 		documentContextParameterList.forEach(documentContextParameter -> {
 			res.add(documentContextParameter.getID().getValue());
@@ -658,10 +622,7 @@ UBL:
 	// BG-2.BT-24 ++ 1..1 Specification identifier
 	@Override
 	public String getCustomization() {
-		return getCustomization(this);
-	}
-	static String getCustomization(CrossIndustryInvoiceType doc) {
-		List<DocumentContextParameterType> documentContextParameterList = doc.getExchangedDocumentContext().getGuidelineSpecifiedDocumentContextParameter();
+		List<DocumentContextParameterType> documentContextParameterList = super.getExchangedDocumentContext().getGuidelineSpecifiedDocumentContextParameter();
 		List<String> res = new ArrayList<String>(documentContextParameterList.size());
 		documentContextParameterList.forEach(documentContextParameter -> {
 			res.add(documentContextParameter.getID().getValue());
@@ -684,7 +645,7 @@ UBL:
 		if(getPrecedingInvoices().isEmpty()) {
 			applicableHeaderTradeSettlement.setInvoiceReferencedDocument((ReferencedDocument)precedingInvoice);
 		} else {
-			LOG.warning("You try to add a second Preceding Invoice. In CII there is only one BG-3. " + NOT_IMPEMENTED + " due to specification.");
+			LOG.warning("You try to add a second Preceding Invoice. In CII there is only one BG-3.");
 		}
 	}
 	@Override // implements BG3_PrecedingInvoiceReference
@@ -730,10 +691,7 @@ UBL:
 	}
 
 	public BG4_Seller getSeller() {
-		return getSellerParty(this);
-	}
-	static TradeParty getSellerParty(CrossIndustryInvoiceType doc) {
-		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		TradePartyType sellerParty = headerTradeAgreement.getSellerTradeParty();
 		return sellerParty==null ? null : new TradeParty(sellerParty);
 	}
@@ -755,10 +713,7 @@ UBL:
 	}
 
 	public BG7_Buyer getBuyer() {
-		return getBuyerParty(this);
-	}
-	static TradeParty getBuyerParty(CrossIndustryInvoiceType doc) {
-		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		TradePartyType buyerParty = headerTradeAgreement.getBuyerTradeParty();
 		return buyerParty==null ? null : new TradeParty(buyerParty);
 	}
@@ -795,7 +750,6 @@ UBL:
 	public void setPayee(BusinessParty party) {
 		LOG.info("setPayee BusinessParty party "+party);
 		applicableHeaderTradeSettlement.setPayee(party);
-		// ?????????????????????? TODO
 	}
 
 	public BusinessParty getPayee() {
@@ -824,10 +778,7 @@ UBL:
 	}
 
 	public BusinessParty getTaxRepresentative() {
-		return getTaxRepresentativeParty(this);
-	}
-	static TradeParty getTaxRepresentativeParty(CrossIndustryInvoiceType doc) {
-		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		TradePartyType party = headerTradeAgreement.getSellerTaxRepresentativeTradeParty();
 		return party==null ? null : new TradeParty(party);
 	}
@@ -873,10 +824,7 @@ UBL:
 
 	@Override
 	public Timestamp getStartDateAsTimestamp() {
-		return getStartDateAsTimestamp(applicableHeaderTradeSettlement);
-	}
-	static Timestamp getStartDateAsTimestamp(HeaderTradeSettlementType ahts) {
-		SpecifiedPeriodType specifiedPeriod = ahts.getBillingSpecifiedPeriod();
+		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
@@ -892,10 +840,7 @@ UBL:
 
 	@Override
 	public Timestamp getEndDateAsTimestamp() {
-		return getEndDateAsTimestamp(applicableHeaderTradeSettlement);
-	}
-	static Timestamp getEndDateAsTimestamp(HeaderTradeSettlementType ahts) {
-		SpecifiedPeriodType specifiedPeriod = ahts.getBillingSpecifiedPeriod();
+		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
