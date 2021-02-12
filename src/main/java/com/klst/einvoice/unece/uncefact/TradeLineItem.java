@@ -218,7 +218,8 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 	@Override
 	public Amount getLineTotalAmount() {
-		return new Amount(specifiedLineTradeSettlement.getSpecifiedTradeSettlementLineMonetarySummation().getLineTotalAmount().get(0).getValue());
+		AmountType amount = specifiedLineTradeSettlement.getSpecifiedTradeSettlementLineMonetarySummation().getLineTotalAmount().get(0);
+		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
 
 	/*
@@ -349,7 +350,8 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	// BG-29.BT-146 1..1 Item net price aka UnitPriceAmount
 	@Override
 	public UnitPriceAmount getUnitPriceAmount() {
-		return new UnitPriceAmount(specifiedLineTradeAgreement.getNetPriceProductTradePrice().getChargeAmount().get(0).getValue());
+		AmountType upa = specifiedLineTradeAgreement.getNetPriceProductTradePrice().getChargeAmount().get(0);
+		return new UnitPriceAmount(upa.getCurrencyID(), upa.getValue());
 	}
 
 	// 1..1 Item net price + UnitPriceQuantity BT-149+BT-149-0 + BT-150-0 optional

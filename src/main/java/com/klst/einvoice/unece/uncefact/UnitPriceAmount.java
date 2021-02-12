@@ -45,6 +45,7 @@ public class UnitPriceAmount extends Amount {
 	}
 
 	void copyTo(un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType amount) {
+		amount.setCurrencyID(this.getCurrencyID());
 		amount.setValue(this.getValue(RoundingMode.HALF_UP));
 	}
 
