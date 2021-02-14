@@ -644,10 +644,6 @@ daher: NOT_IMPEMENTED
 		// delegieren:
 		return Note.create(subjectCode, content);
 	}
-	@Override
-	public InvoiceNote createNote(String content) {
-		return createNote(null, content);
-	}
 	
 	@Override
 	public void addNote(InvoiceNote note) {
@@ -657,14 +653,6 @@ daher: NOT_IMPEMENTED
 		} else {
 			creditNote.getNote().add((NoteType)note);
 		}
-	}
-	@Override
-	public void addNote(String subjectCode, String content) {
-		addNote(createNote(subjectCode, content));
-	}
-	@Override
-	public void addNote(String content) {
-		addNote(createNote(content));
 	}
 
 	@Override

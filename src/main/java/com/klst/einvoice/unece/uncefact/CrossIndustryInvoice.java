@@ -596,29 +596,10 @@ UBL:
 		// delegieren:
 		return Note.create(subjectCode, content);
 	}
-	@Override
-	public InvoiceNote createNote(String content) {
-		return createNote(null, content);
-	}
-
-//	private void addNotes(ExchangedDocumentType ed) {
-//		List<InvoiceNote> notes = Note.getInvoiceNotes(ed);
-//		notes.forEach(note -> {
-//			addNote(note);
-//		});
-//	}
 	
 	@Override
 	public void addNote(InvoiceNote note) {
 		this.exchangedDocument.getIncludedNote().add((NoteType)note);
-	}
-	@Override
-	public void addNote(String subjectCode, String content) {
-		addNote(createNote(subjectCode, content));
-	}
-	@Override
-	public void addNote(String content) {
-		addNote(createNote(content));
 	}
 
 	@Override

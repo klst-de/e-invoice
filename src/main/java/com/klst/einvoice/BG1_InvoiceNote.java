@@ -37,13 +37,22 @@ public interface BG1_InvoiceNote extends InvoiceNoteFactory {
 	public List<InvoiceNote> getInvoiceNotes();
 
 	// factory methods
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public InvoiceNote createNote(String subjectCode, String content);
-	public InvoiceNote createNote(String content);
+	default InvoiceNote createNote(String content) {
+		return createNote((String)null, content);
+	}
 
 	// setter
 	public void addNote(InvoiceNote note);
-	public void addNote(String subjectCode, String content);
-	public void addNote(String content);
+	default void addNote(String subjectCode, String content) {
+		addNote(createNote(subjectCode, content));
+	}
+	default void addNote(String content) {
+		addNote((String)null, content);
+	}
 	
 }
