@@ -24,8 +24,11 @@ import javax.xml.validation.Validator;
 import org.xml.sax.SAXException;
 
 import com.klst.einvoice.ubl.GenericInvoice;
+
+//in java 1.8 'NamespacePrefixMapper' is not in API (restriction on required library ... jdk1.8.0_241\jre\lib\rt.jar')
+//Proposal JEP-320(http://openjdk.java.net/jeps/320) to remove the Java EE and CORBA modules from the JDK.
+//In Java SE 11, the module java.se.ee has been removed. To use JAX-WS and JAXB you need to add them to your project as separate libraries.
 // TODO in jaxb-ri com.sun.xml.bind.marshaller.NamespacePrefixMapper ohne internal
-// Discouraged access: The type 'NamespacePrefixMapper' is not API (restriction on required library ... jdk1.8.0_241\jre\lib\rt.jar')
 import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
