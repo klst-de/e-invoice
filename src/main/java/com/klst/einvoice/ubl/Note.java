@@ -6,16 +6,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.klst.einvoice.InvoiceNote;
+import com.klst.einvoice.InvoiceNoteFactory;
 
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
-import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
-import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
 /* implements UBL BG-1 INVOICE NOTE
  * to get all getInvoiceNotes use  CoreInvoice method 
  * public List<InvoiceNote> getInvoiceNotes()
  */
-public class Note extends NoteType implements InvoiceNote {
+public class Note extends NoteType implements InvoiceNote, InvoiceNoteFactory {
 
 //	static final String RESOURCE_PATH = "src/main/resources/";
 //	static LogManager logManager = LogManager.getLogManager(); // Singleton
@@ -41,10 +40,7 @@ public class Note extends NoteType implements InvoiceNote {
 		return content==null? null : new Note(subjectCode, content);
 	}
 
-	static List<InvoiceNote> getInvoiceNotes(Object doc) {
-		List<NoteType> list = null;
-		if(doc instanceof InvoiceType) list = ((InvoiceType)doc).getNote();
-		if(doc instanceof CreditNoteType) list = ((CreditNoteType)doc).getNote();
+	static List<InvoiceNote> getInvoiceNotes(List<NoteType> list) {
 		List<InvoiceNote> result = new ArrayList<InvoiceNote>(list.size());
 		list.forEach(note -> {
 			result.add(new Note(note));

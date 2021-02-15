@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.klst.einvoice.InvoiceNote;
+import com.klst.einvoice.InvoiceNoteFactory;
 import com.klst.einvoice.reflection.CopyCtor;
 
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
@@ -17,7 +17,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  * 
  * also implements BG-25.BT-127 0..n IncludedNote.Content
  */
-public class Note extends NoteType implements InvoiceNote {
+public class Note extends NoteType implements InvoiceNote, InvoiceNoteFactory {
 
 	@Override // implements NoteFactory
 	public InvoiceNote createNote(String subjectCode, String content) {
@@ -30,8 +30,7 @@ public class Note extends NoteType implements InvoiceNote {
 		return create(null, content);
 	}
 
-	static List<InvoiceNote> getInvoiceNotes(ExchangedDocumentType doc) {
-		List<NoteType> list = doc.getIncludedNote();
+	static List<InvoiceNote> getInvoiceNotes(List<NoteType> list) {
 		List<InvoiceNote> result = new ArrayList<InvoiceNote>(list.size());
 		list.forEach(note -> {
 			result.add(Note.create(note));

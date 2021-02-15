@@ -47,7 +47,7 @@ public interface InvoiceNote extends InvoiceNoteFactory {
 //	void setCode(String code); // not public ==> use factory
 //	void setNote(String content); // not public ==> use factory
 	
-// getter in CoreInvoice:
+// getter in BG1_InvoiceNote:
 //	public List<InvoiceNote> getInvoiceNotes();
 	
 	/**

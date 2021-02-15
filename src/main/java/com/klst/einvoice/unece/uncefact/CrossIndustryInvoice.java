@@ -605,7 +605,7 @@ UBL:
 	@Override
 	public List<InvoiceNote> getInvoiceNotes() {
 		// delegieren:
-		return Note.getInvoiceNotes(this.exchangedDocument);
+		return Note.getInvoiceNotes(this.exchangedDocument.getIncludedNote());
 	}
 	
 	/* PROCESS CONTROL                             BG-2                        1 (mandatory) 

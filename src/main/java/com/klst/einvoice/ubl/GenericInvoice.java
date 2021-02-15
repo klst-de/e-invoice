@@ -658,7 +658,7 @@ daher: NOT_IMPEMENTED
 	@Override
 	public List<InvoiceNote> getInvoiceNotes() {
 		// delegieren:
-		return isInvoiceType ? Note.getInvoiceNotes(invoice) : Note.getInvoiceNotes(creditNote);
+		return isInvoiceType ? Note.getInvoiceNotes(invoice.getNote()) : Note.getInvoiceNotes(creditNote.getNote());
 	}
 
 	// BG-2 + 1..1 PROCESS CONTROL
