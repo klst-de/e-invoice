@@ -181,11 +181,7 @@ PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B
 		getSupplyChainTradeTransaction().setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 	}
 
-	public CrossIndustryInvoice(String customization, DocumentNameCode documentNameCode) {
-		this(customization, null, documentNameCode);
-	}
-	
-	public CrossIndustryInvoice(String customization, String processType, DocumentNameCode documentNameCode) {
+	private CrossIndustryInvoice(String customization, String processType, DocumentNameCode documentNameCode) {
 		this(null);
 		setProcessControl(customization, processType);
 		

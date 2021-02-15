@@ -57,7 +57,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		LOG.info("\n (BG-2.BT-24)ProcessType="+testDoc.getProcessType() + " (BG-2.BT-24)Customization="+testDoc.getCustomization()
 			+ " (BT-3)TypeCode="+testDoc.getTypeCode());
 		// kein CII Testfile mit ProcessType!!!
-		CoreInvoice cii = new CrossIndustryInvoice(testDoc.getCustomization(), testDoc.getTypeCode());
+		CoreInvoice cii = CrossIndustryInvoice.getFactory().createInvoice(testDoc.getCustomization(), testDoc.getTypeCode());
 
 		cii.setId(testDoc.getId());
 		cii.setIssueDate(testDoc.getIssueDateAsTimestamp());

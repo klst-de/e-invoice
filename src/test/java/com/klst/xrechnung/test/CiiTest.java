@@ -22,6 +22,7 @@ import org.junit.runners.MethodSorters;
 
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG2_ProcessControl;
+import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PostalAddress;
@@ -112,7 +113,7 @@ java.lang.ArrayIndexOutOfBoundsException: 5
     	testAddress = null; //new Address("CC", "9-PC", "String city", "String street");
     }
     
-	CrossIndustryInvoice invoice;
+    CoreInvoice invoice;
 
 	@Before 
     public void setup() {
@@ -120,7 +121,7 @@ java.lang.ArrayIndexOutOfBoundsException: 5
 
     @Test
     public void cii0ctor() {
-    	invoice = new CrossIndustryInvoice(XRECHNUNG_2p0, DocumentNameCode.CommercialInvoice);
+    	invoice = CrossIndustryInvoice.getFactory().createInvoice(XRECHNUNG_2p0, DocumentNameCode.CommercialInvoice);
     	invoice.setId(ID);
     	assertEquals(ID, invoice.getId());
     	
@@ -234,8 +235,8 @@ java.lang.ArrayIndexOutOfBoundsException: 5
     public void ciixml_last() {
 //    	InvoiceFactory factory = new CreateCiiXXXInvoice("CII_business_example_01.xml");
 //    	InvoiceFactory factory = new CreateCiiXXXInvoice("cii001.xml");
-//    	InvoiceFactory factory = new CreateCiiXXXInvoice("02.04a-INVOICE_uncefact.xml");
-    	InvoiceFactory factory = new CreateCiiXXXInvoice("01.14a-INVOICE_uncefact.xml"); // TODO Payee weg
+    	InvoiceFactory factory = new CreateCiiXXXInvoice("03.05a-INVOICE_uncefact.xml");
+//    	InvoiceFactory factory = new CreateCiiXXXInvoice("01.04a-INVOICE_uncefact.xml");
 //    	InvoiceFactory factory = new CreateCiiXXXInvoice(CII_XML[CII_XML.length-1]);
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);
