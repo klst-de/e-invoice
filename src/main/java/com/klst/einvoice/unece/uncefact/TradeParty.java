@@ -106,7 +106,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	@Override
 	public IContact getIContact() {
 		List<TradeContactType> tradeContactList = super.getDefinedTradeContact();
-		return tradeContactList.isEmpty() ? null : new TradeContact(tradeContactList.get(0));
+		return tradeContactList.isEmpty() ? null : TradeContact.create(tradeContactList.get(0));
 	}
 
 	@Override
@@ -121,7 +121,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 
 	@Override
 	public IContact createContact(IContact contact) {
-		return new TradeContact((TradeContactType)contact);
+		return TradeContact.create((TradeContact)contact);
 	}
 
 	String getPartyName() {

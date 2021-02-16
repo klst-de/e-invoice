@@ -1,6 +1,7 @@
 package com.klst.einvoice.unece.uncefact;
 
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.reflection.CopyCtor;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeContactType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.UniversalCommunicationType;
@@ -9,20 +10,25 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class TradeContact extends TradeContactType implements IContact {
 
-	// copy ctor
-	TradeContact(TradeContactType contact) {
-		super();
-		if(contact.getPersonName()!=null) {
-			this.setContactPoint(contact.getPersonName().getValue());
-		}
-		UniversalCommunicationType universalCommunicationType = contact.getTelephoneUniversalCommunication();
-		if(universalCommunicationType==null) {
-			// darf nicht sein
+	static TradeContact create() {
+		return create((TradeContactType)null);
+	}
+	// copy factory
+	static TradeContact create(TradeContactType object) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(object instanceof TradeContactType && object.getClass()!=TradeContactType.class) {
+			// object is instance of a subclass of TradeContactType, but not TradeContactType itself
+			return (TradeContact)object;
 		} else {
-			this.setContactTelephone(universalCommunicationType.getCompleteNumber().getValue());
+			return new TradeContact(object); 
 		}
-		if(contact.getEmailURIUniversalCommunication()!=null) {
-			this.setContactEmail(contact.getEmailURIUniversalCommunication().getURIID().getValue());
+	}
+
+	// copy ctor
+	private TradeContact(TradeContactType contact) {
+		super();
+		if(contact!=null) {
+			CopyCtor.invokeCopy(this, contact);
 		}
 	}
 
