@@ -12,6 +12,7 @@ import com.klst.einvoice.BusinessPartyFactory;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.reflection.CopyCtor;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ContactType;
@@ -37,56 +38,33 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Registra
  */
 public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentativeParty {
 
-	private static final Logger LOG = Logger.getLogger(Party.class.getName());
-	
-	// wg. PostalAddressFactory, IContactFactory
-	Party() {
-		super();
+	static Party create() {
+		return create((PartyType)null);
 	}
-	
-	// copy ctor
-	Party(PartyType party) {
-		this();
-		LOG.fine("copy ctor (mandatory) name:"+getRegistrationName(party) + " (optional)trading name:"+getBusinessName(party)
-			+ " Address:"+getPostalAddress(party) + " Contact:"+getContact(party));
-		// name aka RegistrationName
-		// BG-4.BT-27  1..1 Seller name
-		// BG-7.BT-44  1..1  Buyer name
-		// BG-10.BT-59 1..1  Payee name
-		this.init(getRegistrationName(party), getBusinessName(party), getPostalAddress(party), getContact(party));
-//		setRegistrationName(getRegistrationName(party));
-		LOG.info("copy ctor Name:"+getRegistrationName() +" trading name:"+getBusinessName() + " Address:"+this.getAddress() + " Contact:"+this.getIContact());
-				
-		// BG-4.BT-28 ++ 0..1 Seller trading name
-		// BG-7.BT-45 ++ 0..1 Buyer trading name
-//		setBusinessName(getBusinessName(party));
-		
-		// BG-4.BT-29 ++ 0..n Seller identifier
-		// BG-7.BT-46 ++ 0..1 Buyer identifier
-		setIdentifier(getIdentifier(party));
-		
-		// BG-4.BT-30 0..1 Seller legal registration ID 
-		// BG-7.BT-47 0..1 Buyer legal registration identifier
-		setCompanyIdentifier(getCompanyIdentifier(party));
-
-		// 0..n wg. BT-31 Seller VAT identifier, BT-32 Seller tax registration identifier, 
-		//          BT-31-0, BT-32-0
-		List<Identifier> taxIdList = getTaxRegistrationIdentifier(party);
-		taxIdList.forEach(id -> {
-			addTaxRegistrationIdentifier(id);
-		});
-		
-		// BG-4.BT-33 0..1 additional legal info / not used for Buyer
-		setCompanyLegalForm(getCompanyLegalForm(party));
-		
-		// BG-4.BT-34 ++ 0..1 Seller electronic address
-		// BG-7.BT-49 ++ 0..1 Buyer electronic address
-		EndpointIDType endpointID = party.getEndpointID();
-		if(endpointID!=null) {
-			setUriUniversalCommunication(endpointID.getValue(), endpointID.getSchemeID());
+	// copy factory
+	static Party create(PartyType object) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(object instanceof PartyType && object.getClass()!=PartyType.class) {
+			// object is instance of a subclass of PartyType, but not PartyType itself
+			return (Party)object;
+		} else {
+			return new Party(object); 
 		}
 	}
+
+	private static final Logger LOG = Logger.getLogger(Party.class.getName());
 	
+	// copy ctor
+	private Party(PartyType party) {
+		super();
+		if(party!=null) {
+			CopyCtor.invokeCopy(this, party);
+			LOG.config("copy ctor:"+this);
+		}
+
+	}
+	
+	// in super existiert protected List<PartyLegalEntityType> partyLegalEntity
 	PartyLegalEntityType partyLegalEntity;
 	
 	/**
@@ -100,7 +78,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	 * @see BusinessPartyFactory
 	 */
 	Party(String name, String businessName, PostalAddress address, IContact contact) {
-		this();
+		super();
 		init(name, businessName, address, contact);
 	}
 	
@@ -115,7 +93,9 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	// PostalAddress
 	@Override
 	public PostalAddress getAddress() {
-		return getPostalAddress(this);
+		AddressType address = getPostalAddress();
+		if(address==null) return null; // defensiv, sollte nie null sein
+		return new Address(address);
 	}
 
 	@Override
@@ -127,12 +107,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		super.setPostalAddress(address);
 	}
 	
-	static PostalAddress getPostalAddress(PartyType party) {
-		AddressType address = party.getPostalAddress();
-		if(address==null) return null; // defensiv, sollte nie null sein
-		return new Address(address);
-	}
-
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
 		return new Address(countryCode, postalCode, city, null);
@@ -147,11 +121,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	// Contact
 	@Override
 	public IContact getIContact() {
-		return getContact(this);
-	}
-	static IContact getContact(PartyType party) {
-		ContactType contact = party.getContact();
-		return contact==null ? null : new Contact(contact);
+		return getContact()==null ? null : new Contact(getContact());
 	}
 
 	@Override
@@ -170,40 +140,37 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.
-	static final String DEFAULT_TAX_SCHEME = "VAT"; // ein möglicher BUG in UBL Spez!
-	static final String NO_CC = "??";
-	/**
-	 * Buyer/Seller VAT identifier - The VAT identifier (also known as VAT identification number).
-	 * <p>
-	 * VAT number prefixed by a country code based on EN ISO 3166-1 "Codes for the representation of names of countries and their subdivisions"
-	 * <p>
-	 * Cardinality: 0..1 (optional)
-	 * <br>ID:      BT-48
-	 * <br>Req.ID:  R45, R52, R57
-	 * 
-	 * @param registrationId Identifier
-	 */
-	@Override
-	public void setVATRegistrationId(String registrationId) {
-		if(registrationId==null) return;
-		// countryCode of the party (which is mandatory) as default prefix , see https://github.com/klst-de/e-invoice/issues/1
-		
-		PostalAddress address = getAddress();
-		String countryCode = address==null ? NO_CC : address.getCountryCode();
-		if(countryCode==NO_CC || registrationId.startsWith(countryCode)) {
-			addTaxRegistrationId(registrationId, DEFAULT_TAX_SCHEME);
-		} else {
-			LOG.warning("registrationId '"+registrationId+"' does not start with countryCode:"+countryCode + " - silently done.");
-			addTaxRegistrationId(countryCode+registrationId, DEFAULT_TAX_SCHEME);
-		}
-	}
+//	static final String DEFAULT_TAX_SCHEME = "VAT"; // ein möglicher BUG in UBL Spez!
+//	static final String NO_CC = "??";
+//	/*
+//	 * Buyer/Seller VAT identifier - The VAT identifier (also known as VAT identification number).
+//	 * <p>
+//	 * VAT number prefixed by a country code based on EN ISO 3166-1 "Codes for the representation of names of countries and their subdivisions"
+//	 * <p>
+//	 * Cardinality: 0..1 (optional)
+//	 * <br>ID:      BT-48
+//	 * <br>Req.ID:  R45, R52, R57
+//	 * 
+//	 * @param registrationId Identifier
+//	 */
+//	@Override
+//	public void setVATRegistrationId(String registrationId) {
+//		if(registrationId==null) return;
+//		// countryCode of the party (which is mandatory) as default prefix , see https://github.com/klst-de/e-invoice/issues/1
+//		
+//		PostalAddress address = getAddress();
+//		String countryCode = address==null ? NO_CC : address.getCountryCode();
+//		if(countryCode==NO_CC || registrationId.startsWith(countryCode)) {
+//			addTaxRegistrationId(registrationId, DEFAULT_TAX_SCHEME);
+//		} else {
+//			LOG.warning("registrationId '"+registrationId+"' does not start with countryCode:"+countryCode + " - silently done.");
+//			addTaxRegistrationId(countryCode+registrationId, DEFAULT_TAX_SCHEME);
+//		}
+//	}
 
 	@Override
 	public String getRegistrationName() {
-		return getRegistrationName(this);
-	}
-	static String getRegistrationName(PartyType party) {
-		List<PartyLegalEntityType> partyLegalEntityList = party.getPartyLegalEntity();
+		List<PartyLegalEntityType> partyLegalEntityList = getPartyLegalEntity();
 		if(partyLegalEntityList.isEmpty()) return null;
 		RegistrationNameType registrationName = partyLegalEntityList.get(0).getRegistrationName();
 		return registrationName==null ? null : registrationName.getValue();
@@ -220,10 +187,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	@Override
 	public String getBusinessName() {
-		return getBusinessName(this);
-	}
-	static String getBusinessName(PartyType party) {
-		List<PartyNameType> partyNameList = party.getPartyName();
+		List<PartyNameType> partyNameList = getPartyName();
 		return partyNameList.isEmpty() ? null : partyNameList.get(0).getName().getValue();
 	}
 
@@ -244,10 +208,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 	@Override
 	public Identifier getIdentifier() {
-		return getIdentifier(this);
-	}
-	static Identifier getIdentifier(PartyType party) {
-		List<PartyIdentificationType> partyIdentificationList = party.getPartyIdentification();
+		List<PartyIdentificationType> partyIdentificationList = getPartyIdentification();
 		return partyIdentificationList.isEmpty() ? null 
 				: new ID(partyIdentificationList.get(0).getID().getValue(), partyIdentificationList.get(0).getID().getSchemeID());
 	}
@@ -279,10 +240,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	
 	@Override
 	public Identifier getCompanyIdentifier() {
-		return getCompanyIdentifier(this);
-	}
-	static Identifier getCompanyIdentifier(PartyType party) {
-		List<PartyLegalEntityType> partyLegalEntityList = party.getPartyLegalEntity();
+		List<PartyLegalEntityType> partyLegalEntityList = getPartyLegalEntity();
 		if(partyLegalEntityList.isEmpty()) return null;
 		CompanyIDType companyID = partyLegalEntityList.get(0).getCompanyID();
 		return companyID==null ? null : new ID(companyID.getValue(), companyID.getSchemeID());
@@ -311,10 +269,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	@Override
 	public List<Identifier> getTaxRegistrationIdentifier() {
-		return getTaxRegistrationIdentifier(this);
-	}
-	static List<Identifier> getTaxRegistrationIdentifier(PartyType party) {
-		List<PartyTaxSchemeType> partyTaxSchemeList = party.getPartyTaxScheme();
+		List<PartyTaxSchemeType> partyTaxSchemeList = getPartyTaxScheme();
 		List<Identifier> result = new ArrayList<Identifier>(partyTaxSchemeList.size());
 		if(partyTaxSchemeList.isEmpty()) return result;
 		partyTaxSchemeList.forEach(partyTaxScheme -> {
@@ -368,10 +323,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	@Override
 	public String getCompanyLegalForm() {
-		return getCompanyLegalForm(this);
-	}
-	static String getCompanyLegalForm(PartyType party) {
-		List<PartyLegalEntityType> partyLegalEntityList = party.getPartyLegalEntity();
+		List<PartyLegalEntityType> partyLegalEntityList = getPartyLegalEntity();
 		if(partyLegalEntityList.isEmpty()) return null;
 		CompanyLegalFormType companyLegalForm = partyLegalEntityList.get(0).getCompanyLegalForm();
 		return companyLegalForm==null ? null : companyLegalForm.getValue();

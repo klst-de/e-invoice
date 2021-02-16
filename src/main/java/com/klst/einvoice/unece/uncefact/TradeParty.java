@@ -36,7 +36,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	static TradeParty create(TradePartyType object) {
 		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
 		if(object instanceof TradePartyType && object.getClass()!=TradePartyType.class) {
-			// object is instance of a subclass of TradeTaxType, but not TradeTaxType itself
+			// object is instance of a subclass of TradePartyType, but not TradePartyType itself
 			return (TradeParty)object;
 		} else {
 			return new TradeParty(object); 

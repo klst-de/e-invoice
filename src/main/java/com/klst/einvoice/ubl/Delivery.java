@@ -38,7 +38,7 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	public Delivery(DeliveryType delivery) {
 		this();
 		PartyType party = delivery.getDeliveryParty();
-		Party deliveryParty = party==null ? null : new Party(party);
+		Party deliveryParty = party==null ? null : Party.create(party);
 		String name = deliveryParty==null ? null : deliveryParty.getBusinessName();
 //		LOG.info("businessName:"+businessName);
 		
@@ -82,7 +82,7 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	
 	static Party getParty(DeliveryType delivery) {
 		PartyType party = delivery.getDeliveryParty();
-		return party==null ? null : new Party(party);
+		return party==null ? null : Party.create(party);
 	}
 
 	@Override

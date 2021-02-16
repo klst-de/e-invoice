@@ -756,7 +756,7 @@ daher: NOT_IMPEMENTED
 	@Override
 	public BG4_Seller getSeller() {
 		SupplierPartyType supplierParty = isInvoiceType ? invoice.getAccountingSupplierParty() : creditNote.getAccountingSupplierParty();
-		return supplierParty==null ? null : new Party(supplierParty.getParty());
+		return supplierParty==null ? null : Party.create(supplierParty.getParty());
 	}
 	
 	// BG-7 + 1..1 BUYER
@@ -780,7 +780,7 @@ daher: NOT_IMPEMENTED
 	public BG7_Buyer getBuyer() {
 		CustomerPartyType customerparty = isInvoiceType ? invoice.getAccountingCustomerParty() : creditNote.getAccountingCustomerParty();
 		if(customerparty==null) return null;
-		Party buyer = new Party(customerparty.getParty());
+		Party buyer = Party.create(customerparty.getParty());
 		// BG-7.BT-46 0..1 Buyer identifier                    + 0..1 Scheme identifier
 		// BG-7.BT-47 0..1 Buyer legal registration identifier + 0..1 Scheme identifier
 		List<PartyLegalEntityType> partyLegalEntityList = customerparty.getParty().getPartyLegalEntity();
@@ -814,7 +814,7 @@ daher: NOT_IMPEMENTED
 	@Override
 	public BusinessParty getPayee() {
 		PartyType party = isInvoiceType ? invoice.getPayeeParty() : creditNote.getPayeeParty();
-		return party==null ? null : new Party(party);
+		return party==null ? null : Party.create(party);
 	}
 
 	// BG-11 + 0..1 SELLER TAX REPRESENTATIVE PARTY
@@ -836,7 +836,7 @@ daher: NOT_IMPEMENTED
 	@Override
 	public BusinessParty getTaxRepresentative() {
 		PartyType party = isInvoiceType ? invoice.getTaxRepresentativeParty() : creditNote.getTaxRepresentativeParty();
-		return party==null ? null : new Party(party);
+		return party==null ? null : Party.create(party);
 	}
 	
 	// BG-13 + 0..1 DELIVERY INFORMATION
@@ -1489,26 +1489,26 @@ daher: NOT_IMPEMENTED
 	// BG-5 , BG-8 : POSTAL ADDRESS
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
-		Party party = new Party();
+		Party party = Party.create();
 		return party.createAddress(countryCode, postalCode, city);
 	}
 
 	@Override
 	public PostalAddress createAddress(PostalAddress address) {
-		Party party = new Party();
+		Party party = Party.create();
 		return party.createAddress(address);
 	}
 
 	// BG-6 , BG-9 CONTACT
 	@Override
 	public IContact createContact(String contactName, String contactTel, String contactMail) {
-		Party party = new Party();
+		Party party = Party.create();
 		return party.createContact(contactName, contactTel, contactMail);
 	}
 
 	@Override
 	public IContact createContact(IContact contact) {
-		Party party = new Party();
+		Party party = Party.create();
 		return party.createContact(contact);
 	}
 
@@ -1520,7 +1520,7 @@ daher: NOT_IMPEMENTED
 
 	@Override
 	public BusinessParty createParty(BusinessParty party) {
-		return new Party((PartyType)party);
+		return Party.create((Party)party);
 	}
 
 }
