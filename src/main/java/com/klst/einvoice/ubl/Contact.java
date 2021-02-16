@@ -1,6 +1,7 @@
 package com.klst.einvoice.ubl;
 
 import com.klst.einvoice.IContact;
+import com.klst.einvoice.reflection.CopyCtor;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ContactType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ElectronicMailType;
@@ -30,16 +31,26 @@ Seller contact email address                BT-43 Text                  1
 */
 public class Contact extends ContactType implements IContact {
 
-	Contact() {
-		super();
+	static Contact create() {
+		return create((ContactType)null);
 	}
-	
+	// copy factory
+	static Contact create(ContactType object) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(object instanceof ContactType && object.getClass()!=ContactType.class) {
+			// object is instance of a subclass of ContactType, but not ContactType itself
+			return (Contact)object;
+		} else {
+			return new Contact(object); 
+		}
+	}
+
 	// copy ctor
-	Contact(ContactType contact) {
-		this();
-		super.setName(contact.getName());
-		super.setTelephone(contact.getTelephone());
-		super.setElectronicMail(contact.getElectronicMail());
+	private Contact(ContactType contact) {
+		super();
+		if(contact!=null) {
+			CopyCtor.invokeCopy(this, contact);
+		}
 	}
 	
 	/**

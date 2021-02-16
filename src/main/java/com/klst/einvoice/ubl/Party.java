@@ -61,7 +61,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 			CopyCtor.invokeCopy(this, party);
 			LOG.config("copy ctor:"+this);
 		}
-
 	}
 	
 	// in super existiert protected List<PartyLegalEntityType> partyLegalEntity
@@ -121,7 +120,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	// Contact
 	@Override
 	public IContact getIContact() {
-		return getContact()==null ? null : new Contact(getContact());
+		return getContact()==null ? null : Contact.create(getContact());
 	}
 
 	@Override
@@ -136,7 +135,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	@Override
 	public IContact createContact(IContact contact) {
-		return new Contact((ContactType) contact);
+		return Contact.create((Contact)contact);
 	}
 
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.
