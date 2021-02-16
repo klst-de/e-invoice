@@ -1,5 +1,6 @@
 package com.klst.einvoice.unece.uncefact;
 
+import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.Reference;
 
@@ -13,7 +14,7 @@ Scheme identifier         : Conditional 	String         | GLN
 Scheme version identifier : Conditional 	String         | 1.0
  
  */
-public class ID extends IDType implements Identifier, Reference {
+public class ID extends IDType implements Identifier, Reference, GlobalIdentifier {
 
 	public ID(String content, String schemeID, String schemeVersionID) {
 		super();
@@ -62,13 +63,13 @@ public class ID extends IDType implements Identifier, Reference {
 		return super.getSchemeID();
 	}
 
-	@Override
+	@Override // implements GlobalIdentifier
 	public void setSchemeVersion(String versionId) {
 		if(versionId==null) return;
 		super.setSchemeVersionID(versionId);
 	}
 
-	@Override
+	@Override // implements GlobalIdentifier
 	public String getSchemeVersion() {
 		return super.getSchemeVersionID();
 	}

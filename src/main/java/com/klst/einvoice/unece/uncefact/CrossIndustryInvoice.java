@@ -717,7 +717,7 @@ UBL:
 	public BG4_Seller getSeller() {
 		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		TradePartyType sellerParty = headerTradeAgreement.getSellerTradeParty();
-		return sellerParty==null ? null : new TradeParty(sellerParty);
+		return sellerParty==null ? null : TradeParty.create(sellerParty);
 	}
 
 	/* BUYER                                       BG-7                        1 (mandatory) 
@@ -739,7 +739,7 @@ UBL:
 	public BG7_Buyer getBuyer() {
 		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		TradePartyType buyerParty = headerTradeAgreement.getBuyerTradeParty();
-		return buyerParty==null ? null : new TradeParty(buyerParty);
+		return buyerParty==null ? null : TradeParty.create(buyerParty);
 	}
 
 	/* PAYEE                                       BG-10                       0..1
@@ -778,7 +778,7 @@ UBL:
 
 	public BusinessParty getPayee() {
 		TradePartyType payeeParty = applicableHeaderTradeSettlement.getPayeeTradeParty();
-		return payeeParty==null ? null : new TradeParty(payeeParty);
+		return payeeParty==null ? null : TradeParty.create(payeeParty);
 	}
 
 	/* SELLER TAX REPRESENTATIVE PARTY             BG-11                       0..1
@@ -804,7 +804,7 @@ UBL:
 	public BusinessParty getTaxRepresentative() {
 		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		TradePartyType party = headerTradeAgreement.getSellerTaxRepresentativeTradeParty();
-		return party==null ? null : new TradeParty(party);
+		return party==null ? null : TradeParty.create(party);
 	}
 
 	/* DELIVERY INFORMATION                        BG-13                       0..1
@@ -1319,30 +1319,30 @@ Code Codename
 
 	@Override
 	public BusinessParty createParty(BusinessParty party) {
-		return new TradeParty((TradePartyType)party); 
+		return TradeParty.create((TradeParty)party); 
 	}
 
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
-		TradeParty party = new TradeParty();
+		TradeParty party = TradeParty.create();
 		return party.createAddress(countryCode, postalCode, city);
 	}
 
 	@Override
 	public PostalAddress createAddress(PostalAddress address) {
-		TradeParty party = new TradeParty();
+		TradeParty party = TradeParty.create();
 		return party.createAddress(address);
 	}
 
 	@Override
 	public IContact createContact(String contactName, String contactTel, String contactMail) {
-		TradeParty party = new TradeParty();
+		TradeParty party = TradeParty.create();
 		return party.createContact(contactName, contactTel, contactMail);
 	}
 
 	@Override
 	public IContact createContact(IContact contact) {
-		TradeParty party = new TradeParty();
+		TradeParty party = TradeParty.create();
 		return party.createContact(contact);
 	}
 

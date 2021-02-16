@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;

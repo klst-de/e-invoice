@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoiceLine;
+import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
@@ -178,13 +179,13 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	}
 
 	@Override
-	public void setLineObjectIdentifier(Identifier id) {
+	public void setLineObjectIdentifier(GlobalIdentifier id) {
 		if(id==null) return;
 		setLineObjectID(id.getContent(), id.getSchemeIdentifier(), id.getSchemeVersion());
 	}
 
 	@Override
-	public Identifier getLineObjectIdentifier() {
+	public GlobalIdentifier getLineObjectIdentifier() {
 		List<DocumentReferenceType> documentReference = isInvoiceLineType ? iLine.getDocumentReference() : cnLine.getDocumentReference();
 		return documentReference.isEmpty() ? null : new ID(documentReference.get(0).getID()); // get(0) wg. 0..1
 	}
@@ -614,7 +615,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	}
 
 	@Override
-	public Identifier getStandardIdentifier() {
+	public GlobalIdentifier getStandardIdentifier() {
 		ItemType item = isInvoiceLineType ? iLine.getItem() : cnLine.getItem();
 		ItemIdentificationType itemIdentification = item.getStandardItemIdentification();
 		if(itemIdentification==null) return null;
@@ -628,7 +629,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	
 	// BG-31.BT-158 +++ 0..n Item classification identifier
 	@Override
-	public void addClassificationID(Identifier id) {
+	public void addClassificationID(GlobalIdentifier id) {
 		addClassificationID(id.getContent(), id.getSchemeIdentifier(), id.getSchemeVersion());
 	}
 	@Override
@@ -661,13 +662,13 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	// BT-158-1   1..1 Scheme identifier
 	// BT-158-2   0..1 Scheme version identifier
 	@Override
-	public List<Identifier> getClassifications() {
+	public List<GlobalIdentifier> getClassifications() {
 		ItemType item = isInvoiceLineType ? iLine.getItem() : cnLine.getItem();
 		List<CommodityClassificationType> commodityClassifications = item.getCommodityClassification();
-		List<Identifier> result = new ArrayList<Identifier>(commodityClassifications.size());
+		List<GlobalIdentifier> result = new ArrayList<GlobalIdentifier>(commodityClassifications.size());
 		commodityClassifications.forEach(cc -> {
 			if(cc.getItemClassificationCode()!=null) {
-				Identifier id = new ID(cc.getItemClassificationCode().getValue(), cc.getItemClassificationCode().getListID()
+				GlobalIdentifier id = new ID(cc.getItemClassificationCode().getValue(), cc.getItemClassificationCode().getListID()
 						, cc.getItemClassificationCode().getListVersionID());
 				result.add(id);
 			}

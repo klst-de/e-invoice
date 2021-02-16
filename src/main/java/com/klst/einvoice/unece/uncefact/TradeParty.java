@@ -12,6 +12,7 @@ import com.klst.einvoice.BusinessPartyFactory;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.reflection.CopyCtor;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LegalOrganizationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
@@ -28,58 +29,31 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 // BG-11 + 0..1 SELLER TAX REPRESENTATIVE PARTY
 public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentativeParty { 
 
+	static TradeParty create() {
+		return create((TradePartyType)null);
+	}
+	// copy factory
+	static TradeParty create(TradePartyType object) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(object instanceof TradePartyType && object.getClass()!=TradePartyType.class) {
+			// object is instance of a subclass of TradeTaxType, but not TradeTaxType itself
+			return (TradeParty)object;
+		} else {
+			return new TradeParty(object); 
+		}
+	}
+
 	private static final Logger LOG = Logger.getLogger(TradeParty.class.getName());
 	
-	TradeParty() {
-		super();
-	}
-	
 	// copy ctor
-	TradeParty(TradePartyType party) {
-		this();
-		LegalOrganizationType legalOrganization = party.getSpecifiedLegalOrganization();
-		init( getPartyName(party) // aka RegistrationName
-			, getBusinessName(party)
-			, getPostalAddress(party)
-			, getContact(party)
-			);
-		
-		// BT-28 ++ 0..1 Seller trading name / TradingBusinessName
-		setBusinessName(legalOrganization==null ? null : legalOrganization.getTradingBusinessName()==null ? null : legalOrganization.getTradingBusinessName().getValue());
-
-		// BG-4.BT-29 ++ 0..n Seller identifier
-		// BG-7.BT-46 ++ 0..1 Buyer identifier
-		List<IDType> iDlist = party.getID();
-		iDlist.forEach(iD -> {
-			Identifier identifier = new ID(iD.getValue(), iD.getSchemeID());
-			this.setId(identifier.getContent(), identifier.getSchemeIdentifier());
-		});
-		
-		// BT-30 0..1 legal registration ID / BT-47 0..1 Buyer legal registration identifier
-		if(legalOrganization!=null) {
-			if(legalOrganization.getID()!=null) {
-				setCompanyIdentifier(new ID(legalOrganization.getID().getValue(), legalOrganization.getID().getSchemeID()));
-			}
+	private TradeParty(TradePartyType doc) {
+		super();
+		if(doc!=null) {
+			CopyCtor.invokeCopy(this, doc);
+			LOG.config("copy ctor:"+this);
 		}
-		
-		List<Identifier> taxRegistrationList = getTaxRegistrationIdentifier(party); // 0..n wg. BT-31, BT-32, BT-31-0, BT-32-0
-		taxRegistrationList.forEach(taxRegistration -> {
-			this.addTaxRegistrationIdentifier(taxRegistration);
-		});
-		
-		// BT-33 0..1 additional legal info / not used for Buyer
-		setCompanyLegalForm(party.getDescription().isEmpty() ? null : party.getDescription().get(0).getValue());
-		
-		// BT-34 ++ 0..1 Seller electronic address
-		List<UniversalCommunicationType> uriAddressList = party.getURIUniversalCommunication(); // 0..1
-		uriAddressList.forEach(uriAddress -> {
-			LOG.info("URIUniversalCommunication/BT-34:"+uriAddress.getURIID()); //
-			super.getURIUniversalCommunication().add(uriAddress);
-		});
 	}
-	
-	LegalOrganizationType legalOrganization;
-	
+
 	/**
 	 * ctor for BusinessParty - use BusinessPartyFactory method
 	 * 
@@ -91,12 +65,11 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	 * @see BusinessPartyFactory
 	 */
 	TradeParty(String name, String businessName, PostalAddress address, IContact contact) {
-		this();
+		super();
 		init(name, businessName, address, contact);
 	}
 	
 	void init(String registrationName, String businessName, PostalAddress address, IContact contact) {
-		legalOrganization = new LegalOrganizationType();
 		setPartyName(registrationName);
 		setBusinessName(businessName);
 		setAddress(address);
@@ -106,10 +79,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	// PostalAddress
 	@Override
 	public PostalAddress getAddress() {
-		return getPostalAddress(this);
-	}
-	static PostalAddress getPostalAddress(TradePartyType party) {
-		TradeAddressType address = party.getPostalTradeAddress();
+		TradeAddressType address = super.getPostalTradeAddress();
 		if(address==null) return null; // defensiv, sollte nie null sein
 		return new TradeAddress(address);
 	}
@@ -135,10 +105,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	// Contact
 	@Override
 	public IContact getIContact() {
-		return getContact(this);
-	}
-	static IContact getContact(TradePartyType party) {
-		List<TradeContactType> tradeContactList = party.getDefinedTradeContact();
+		List<TradeContactType> tradeContactList = super.getDefinedTradeContact();
 		return tradeContactList.isEmpty() ? null : new TradeContact(tradeContactList.get(0));
 	}
 
@@ -158,10 +125,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 
 	String getPartyName() {
-		return getPartyName(this);
-	}
-	static String getPartyName(TradePartyType party) {
-		return party.getName()==null ? null : party.getName().getValue();
+		return super.getName()==null ? null : getName().getValue();
 	}
 
 	void setPartyName(String name) {
@@ -181,21 +145,17 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 
 	@Override
 	public String getBusinessName() {
-		TextType text = legalOrganization.getTradingBusinessName();
-		return text==null ? null : text.getValue();
-	}
-	static String getBusinessName(TradePartyType party) {
-		LegalOrganizationType legalOrganization = party.getSpecifiedLegalOrganization();
-		if(legalOrganization==null) return null;
-		TextType text = legalOrganization.getTradingBusinessName();
+		TextType text = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getTradingBusinessName();
 		return text==null ? null : text.getValue();
 	}
 
 	@Override
 	public void setBusinessName(String name) {
 		if(name==null) return;
-		legalOrganization.setTradingBusinessName(new Text(name));
-		super.setSpecifiedLegalOrganization(legalOrganization);
+		if(super.getSpecifiedLegalOrganization()==null) {
+			setSpecifiedLegalOrganization(new LegalOrganizationType());
+		}
+		getSpecifiedLegalOrganization().setTradingBusinessName(new Text(name));
 	}
 
 	@Override // 0..n returns the first
@@ -225,12 +185,12 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 
 	@Override
 	public String getCompanyId() {
-		IDType id = legalOrganization.getID();
+		IDType id = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getID();
 		return id==null ? null : id.getValue();
 	}
 	@Override
 	public Identifier getCompanyIdentifier() {
-		IDType id = legalOrganization.getID();
+		IDType id = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getID();
 		return id==null ? null : new ID(id.getValue(), id.getSchemeID());
 	}
 
@@ -246,16 +206,15 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	@Override
 	public void setCompanyId(String name, String schemeID) {
 		if(name==null) return;
-		legalOrganization.setID(new ID(name, schemeID));
-		super.setSpecifiedLegalOrganization(legalOrganization);
+		if(super.getSpecifiedLegalOrganization()==null) {
+			setSpecifiedLegalOrganization(new LegalOrganizationType());
+		}
+		getSpecifiedLegalOrganization().setID(new ID(name, schemeID));
 	}
 
 	@Override
 	public List<Identifier> getTaxRegistrationIdentifier() {
-		return getTaxRegistrationIdentifier(this);
-	}
-	static List<Identifier> getTaxRegistrationIdentifier(TradePartyType party) {
-		List<TaxRegistrationType> taxRegistrationList = party.getSpecifiedTaxRegistration();
+		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
 		List<Identifier> result = new ArrayList<Identifier>(taxRegistrationList.size());
 		if(taxRegistrationList.isEmpty()) return result;
 		taxRegistrationList.forEach(taxRegistration -> {

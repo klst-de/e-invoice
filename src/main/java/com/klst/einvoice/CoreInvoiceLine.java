@@ -79,8 +79,8 @@ public interface CoreInvoiceLine extends BG26_InvoiceLinePeriod, BG32_ItemAttrib
 	public void setLineObjectID(String id, String schemeID, String schemeCode);
 	public void setLineObjectID(String id);
 	public void setLineObjectID(String id, String schemeID);
-	public void setLineObjectIdentifier(Identifier id);
-	public Identifier getLineObjectIdentifier();
+	public void setLineObjectIdentifier(GlobalIdentifier id);
+	public GlobalIdentifier getLineObjectIdentifier();
 
 	/**
 	 * Billed quantity and UoM of items (goods or services) that is charged in the Invoice line.
@@ -372,8 +372,8 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * @param schemeVersion, BT-158-2 0..1 Scheme version identifier - The version of the identification scheme.
 	 */
 	public void addClassificationID(String id, String schemeID, String schemeVersion);
-	public void addClassificationID(Identifier id);
-	public List<Identifier> getClassifications();
+	public void addClassificationID(GlobalIdentifier id);
+	public List<GlobalIdentifier> getClassifications();
 
 	/**
 	 * Item country of origin (optional part in 1..1 BG-31 ITEM INFORMATION)

@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoiceLine;
+import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.DateTimeFormats;
@@ -182,13 +183,13 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	@Override
-	public void setLineObjectIdentifier(Identifier id) {
+	public void setLineObjectIdentifier(GlobalIdentifier id) {
 		if(id==null) return;
 		setLineObjectID(id.getContent(), id.getSchemeIdentifier(), id.getSchemeVersion());
 	}
 
 	@Override
-	public Identifier getLineObjectIdentifier() {
+	public GlobalIdentifier getLineObjectIdentifier() {
 		List<ReferencedDocumentType> rds = specifiedLineTradeSettlement.getAdditionalReferencedDocument();
 		if(rds.isEmpty()) return null;
 		ReferencedDocumentType rd = rds.get(0);
@@ -286,10 +287,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 
 	@Override
 	public Timestamp getStartDateAsTimestamp() {
-		return getStartDateAsTimestamp(specifiedLineTradeSettlement);
-	}
-	static Timestamp getStartDateAsTimestamp(LineTradeSettlementType lts) {
-		SpecifiedPeriodType specifiedPeriod = lts.getBillingSpecifiedPeriod();
+		SpecifiedPeriodType specifiedPeriod = specifiedLineTradeSettlement.getBillingSpecifiedPeriod();
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
@@ -310,10 +308,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 
 	@Override
 	public Timestamp getEndDateAsTimestamp() {
-		return getEndDateAsTimestamp(specifiedLineTradeSettlement);
-	}
-	static Timestamp getEndDateAsTimestamp(LineTradeSettlementType lts) {
-		SpecifiedPeriodType specifiedPeriod = lts.getBillingSpecifiedPeriod();
+		SpecifiedPeriodType specifiedPeriod = specifiedLineTradeSettlement.getBillingSpecifiedPeriod();
 		if(specifiedPeriod==null) return null;
 		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
 		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
@@ -573,7 +568,7 @@ Bsp.
 
  */
 	@Override // 0 .. n BT-158
-	public void addClassificationID(Identifier id) {
+	public void addClassificationID(GlobalIdentifier id) {
 		addClassificationID(id.getContent(), id.getSchemeIdentifier(), id.getSchemeVersion());
 	}
 	@Override
@@ -590,13 +585,13 @@ Bsp.
 	}
 
 	@Override
-	public List<Identifier> getClassifications() {
+	public List<GlobalIdentifier> getClassifications() {
 		List<ProductClassificationType> productClassifications = specifiedTradeProduct.getDesignatedProductClassification();
-		List<Identifier> result = new ArrayList<Identifier>(productClassifications.size());
+		List<GlobalIdentifier> result = new ArrayList<GlobalIdentifier>(productClassifications.size());
 		productClassifications.forEach(pc -> {
 			CodeType code = pc.getClassCode();
 			if(code!=null) {
-				Identifier id = new ID(code.getValue(), code.getListID(), code.getListVersionID());
+				GlobalIdentifier id = new ID(code.getValue(), code.getListID(), code.getListVersionID());
 				result.add(id);
 			}
 		});

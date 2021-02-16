@@ -45,7 +45,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 			LOG.info("copy ctor:"+this);
 		}
 		TradePartyType tradeParty = super.getShipToTradeParty();
-		party = tradeParty==null ? null : new TradeParty(tradeParty);
+		party = tradeParty==null ? null : TradeParty.create(tradeParty);
 		LOG.fine("copy ctor ShipToTradeParty:"+party + " delivery.ActualDate ts:"+getActualDate());
 		setParty(party);	
 	}
@@ -73,7 +73,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 	
 	static TradeParty getParty(HeaderTradeDeliveryType delivery) {
 		TradePartyType party = delivery.getShipToTradeParty();
-		return party==null ? null : new TradeParty(party);
+		return party==null ? null : TradeParty.create(party);
 	}
 
 	@Override

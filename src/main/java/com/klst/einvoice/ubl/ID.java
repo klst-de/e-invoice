@@ -1,11 +1,12 @@
 package com.klst.einvoice.ubl;
 
+import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.Reference;
 
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 
-public class ID extends IDType implements Identifier, Reference {
+public class ID extends IDType implements Identifier, Reference, GlobalIdentifier {
 
 	ID(String content, String schemeID, String schemeVersionID) {
 		super();
@@ -46,13 +47,13 @@ public class ID extends IDType implements Identifier, Reference {
 		return super.getSchemeID();
 	}
 
-	@Override
+	@Override // implements GlobalIdentifier
 	public void setSchemeVersion(String versionId) {
 		if(versionId==null) return;
 		super.setSchemeVersionID(versionId);
 	}
 
-	@Override
+	@Override // implements GlobalIdentifier
 	public String getSchemeVersion() {
 		return super.getSchemeVersionID();
 	}

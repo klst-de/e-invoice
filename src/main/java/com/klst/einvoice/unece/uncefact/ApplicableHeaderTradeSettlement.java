@@ -728,7 +728,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	}
 	public TradeParty getPayeeTradeParty() {
 		TradePartyType party = super.getPayeeTradeParty();
-		return party==null ? null : new TradeParty(party);
+		return party==null ? null : TradeParty.create(party);
 	}
 	
 	// BG-14 ++ 0..1 INVOICING PERIOD

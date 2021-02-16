@@ -105,6 +105,8 @@ public interface BusinessParty {
 	public String getCompanyLegalForm();
 	public void setCompanyLegalForm(String name);
 	
+	// BG-4.BT-34 Seller electronic address
+	// BG-7.BT-49 Buyer electronic address
 	public Identifier getUriUniversalCommunication(); // kleingeschrieben, nicht URI!
 	public void setUriUniversalCommunication(Identifier id);
 	public void setUriUniversalCommunication(String name, String schemeID);
