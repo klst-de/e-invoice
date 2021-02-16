@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.reflection.CopyCtor;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
@@ -44,29 +45,28 @@ Anmerkung: Die Liste der zulässigen Länder ist bei der ISO 3166-1 „Codes for
  */
 public class Address extends AddressType implements PostalAddress {
 
+	static Address create() {
+		return create((AddressType)null);
+	}
+	// copy factory
+	static Address create(AddressType object) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(object instanceof AddressType && object.getClass()!=AddressType.class) {
+			// object is instance of a subclass of AddressType, but not AddressType itself
+			return (Address)object;
+		} else {
+			return new Address(object); 
+		}
+	}
+
 	private static final Logger LOG = Logger.getLogger(Address.class.getName());
 
-	Address() {
-		super();
-	}
-	
 	// copy ctor
-	Address(AddressType address) {
-		this();
-		// TODO testen
-		super.setCountry(address.getCountry());
-		super.setCountrySubentity(address.getCountrySubentity());
-		super.setRegion(address.getRegion());
-		super.setPostalZone(address.getPostalZone());
-		super.setCityName(address.getCityName());
-		super.setStreetName(address.getStreetName());
-		super.setBuildingName(address.getBuildingName());
-		List<AddressLineType> lines = super.getAddressLine();
-		List<AddressLineType> addressLines = address.getAddressLine();
-		addressLines.forEach(addressLine -> {
-			lines.add(addressLine);
-		});
-		super.setAdditionalStreetName(address.getAdditionalStreetName());
+	private Address(AddressType address) {
+		super();
+		if(address!=null) {
+			CopyCtor.invokeCopy(this, address);
+		}
 	}
 	
 	// [CII-DT-088] - StreetName shall not be used.
@@ -80,7 +80,7 @@ public class Address extends AddressType implements PostalAddress {
 	}
 	
 	Address(String countryCode, String regionCode, String postalCode, String city, String street, String building) {
-		this();
+		super();
 		setCountryCode(countryCode);
 
 		if(regionCode!=null) {

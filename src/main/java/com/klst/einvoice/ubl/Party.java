@@ -95,7 +95,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	public PostalAddress getAddress() {
 		AddressType address = getPostalAddress();
 		if(address==null) return null; // defensiv, sollte nie null sein
-		return new Address(address);
+		return Address.create(address);
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	@Override
 	public PostalAddress createAddress(PostalAddress address) {
-		return new Address((AddressType)address);
+		return Address.create((Address)address);
 	}
 
 

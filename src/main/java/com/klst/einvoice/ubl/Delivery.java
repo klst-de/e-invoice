@@ -104,7 +104,7 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 		
 		AddressType address = location.getAddress();
 		if(address==null) return null; // defensiv, sollte nie null sein
-		return new Address(address);
+		return Address.create(address);
 	}
 
 	@Override
