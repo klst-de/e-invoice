@@ -81,20 +81,6 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 		setReferenceCode(referenceTypeCode);
 	}
 	
-//	TODO in V3 löschen:
-	@Deprecated
-	@Override
-	public void setSupportingDocumentReference(String docRefId) { 
-		super.setIssuerAssignedID(new ID(docRefId));
-	}
-
-	@Deprecated
-	@Override
-	public String getSupportingDocumentReference() {
-		return super.getIssuerAssignedID().getValue();
-	}
-//	---------------------------- ENDE TODO
-
 	// BG-24.BT-123 ++ 0..1 Supporting document description
 	@Override
 	public void setSupportingDocumentDescription(String text) {

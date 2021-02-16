@@ -75,20 +75,6 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		return new ID(getId(this));
 	}
 	
-//	TODO in V3 löschen:
-	@Deprecated
-	@Override
-	public void setSupportingDocumentReference(String id) {
-		super.setID(new ID(id));
-	}
-
-	@Deprecated
-	@Override
-	public String getSupportingDocumentReference() {
-		return getId(this);
-	}
-//	---------------------------- ENDE TODO
-	
 	private static String getId(DocumentReferenceType documentReference) {
 		return documentReference.getID().getValue();
 	}

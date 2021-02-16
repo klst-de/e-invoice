@@ -53,20 +53,6 @@ public interface BG24_AdditionalSupportingDocs {
 	 * <p>
 	 * Business rule BR-52: Each Additional supporting document (BG-24) shall contain a 
 	 *                      Supporting document reference (BT-122).
-	 * @param id IssuerAssignedID, an identifier of the supporting document.
-	 * 
-	 * @see #setDocumentReference(Reference)
-	 */
-	@Deprecated
-	public void setSupportingDocumentReference(String id);
-	@Deprecated
-	public String getSupportingDocumentReference();
-
-	/**
-	 * set business term BT-122 (mandatory): Supporting document reference
-	 * <p>
-	 * Business rule BR-52: Each Additional supporting document (BG-24) shall contain a 
-	 *                      Supporting document reference (BT-122).
 	 * @param documentReference, an identifier of the supporting document.
 	 */
 	public void setDocumentReference(Reference documentReference);
