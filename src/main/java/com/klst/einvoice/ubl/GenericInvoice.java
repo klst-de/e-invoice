@@ -727,7 +727,7 @@ daher: NOT_IMPEMENTED
 		List<PrecedingInvoice> docRefList = new ArrayList<PrecedingInvoice>();
 		billingReferenceList.forEach(billingRef -> {
 			DocumentReferenceType docRef = billingRef.getInvoiceDocumentReference();
-			docRefList.add(new DocumentReference(docRef));
+			docRefList.add(DocumentReference.create(docRef));
 		});
 		return docRefList;
 	}

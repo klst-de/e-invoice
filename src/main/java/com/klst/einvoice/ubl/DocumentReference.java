@@ -5,12 +5,27 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.Reference;
+import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.DateTimeFormats;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDateType;
 
 public class DocumentReference extends DocumentReferenceType implements PrecedingInvoice {
+
+	static DocumentReference create() {
+		return create((DocumentReferenceType)null);
+	}
+	// copy factory
+	static DocumentReference create(DocumentReferenceType object) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(object instanceof DocumentReferenceType && object.getClass()!=DocumentReferenceType.class) {
+			// object is instance of a subclass of DocumentReferenceType, but not DocumentReferenceType itself
+			return (DocumentReference)object;
+		} else {
+			return new DocumentReference(object); 
+		}
+	}
 
 	// factory
 	static PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
@@ -19,26 +34,11 @@ public class DocumentReference extends DocumentReferenceType implements Precedin
 
 	private static final Logger LOG = Logger.getLogger(DocumentReference.class.getName());
 	
-	public DocumentReference(DocumentReferenceType doc) {
+	private DocumentReference(DocumentReferenceType doc) {
 		super();
 		if(doc!=null) {
-			super.setID(doc.getID());
-			super.setCopyIndicator(doc.getCopyIndicator());
-			super.setUUID(doc.getUUID());
-			super.setIssueDate(doc.getIssueDate());
-			super.setIssueTime(doc.getIssueTime());
-			super.setDocumentTypeCode(doc.getDocumentTypeCode());
-			super.setDocumentType(doc.getDocumentType());
-			super.xPath = doc.getXPath();
-			super.setLanguageID(doc.getLanguageID());
-			super.setLocaleCode(doc.getLocaleCode());
-			super.setVersionID(doc.getVersionID());
-			super.setDocumentStatusCode(doc.getDocumentStatusCode());
-			super.documentDescription = doc.getDocumentDescription();			
-			super.setAttachment(doc.getAttachment());
-			super.setValidityPeriod(doc.getValidityPeriod());
-			super.setIssuerParty(doc.getIssuerParty());
-			super.setResultOfVerification(doc.getResultOfVerification());
+			CopyCtor.invokeCopy(this, doc);
+			LOG.config("copy ctor:"+this);
 		}
 	}
 
