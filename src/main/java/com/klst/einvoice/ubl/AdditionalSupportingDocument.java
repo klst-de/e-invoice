@@ -2,6 +2,7 @@ package com.klst.einvoice.ubl;
 
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.Reference;
+import com.klst.einvoice.reflection.CopyCtor;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AttachmentType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
@@ -31,15 +32,25 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.URIType;
  */
 public class AdditionalSupportingDocument extends DocumentReferenceType implements BG24_AdditionalSupportingDocs {
 
-	// copy ctor
-	public AdditionalSupportingDocument(DocumentReferenceType doc) {
-		super();
-		EmbeddedDocumentBinaryObjectType embeddedDocumentBinaryObject = getEmbeddedDocumentBinaryObject(doc);
-		if(embeddedDocumentBinaryObject==null) {
-			init(getId(doc), getSupportingDocumentDescription(doc), getExternalDocumentLocation(doc));
+	static AdditionalSupportingDocument create() {
+		return create((DocumentReferenceType)null);
+	}
+	// copy factory
+	static AdditionalSupportingDocument create(DocumentReferenceType object) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(object instanceof DocumentReferenceType && object.getClass()!=DocumentReferenceType.class) {
+			// object is instance of a subclass of DocumentReferenceType, but not DocumentReferenceType itself
+			return (AdditionalSupportingDocument)object;
 		} else {
-			init(getId(doc), getSupportingDocumentDescription(doc), null);
-			setAttachedDocument(embeddedDocumentBinaryObject.getValue(), embeddedDocumentBinaryObject.getMimeCode(), embeddedDocumentBinaryObject.getFilename());
+			return new AdditionalSupportingDocument(object); 
+		}
+	}
+
+	// copy ctor
+	private AdditionalSupportingDocument(DocumentReferenceType doc) {
+		super();
+		if(doc!=null) {
+			CopyCtor.invokeCopy(this, doc);
 		}
 	}
 

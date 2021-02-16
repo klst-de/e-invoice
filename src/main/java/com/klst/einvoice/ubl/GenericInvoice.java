@@ -1443,7 +1443,7 @@ daher: NOT_IMPEMENTED
 		}
 		List<BG24_AdditionalSupportingDocs> resList = new ArrayList<BG24_AdditionalSupportingDocs>(additionalDocumentReferenceList.size());
 		additionalDocumentReferenceList.forEach(doc -> {
-			resList.add(new AdditionalSupportingDocument(doc));
+			resList.add(AdditionalSupportingDocument.create(doc));
 		});
 		return resList;
 	}
