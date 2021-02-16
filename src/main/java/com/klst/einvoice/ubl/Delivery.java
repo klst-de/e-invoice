@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.DateTimeFormats;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
@@ -28,29 +29,29 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
  */
 public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 
+	static Delivery create() {
+		return create((DeliveryType)null);
+	}
+	// copy factory
+	static Delivery create(DeliveryType object) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(object instanceof DeliveryType && object.getClass()!=DeliveryType.class) {
+			// object is instance of a subclass of DeliveryType, but not DeliveryType itself
+			return (Delivery)object;
+		} else {
+			return new Delivery(object); 
+		}
+	}
+
 	private static final Logger LOG = Logger.getLogger(Delivery.class.getName());
 	
-	Delivery() {
-		super();
-	}
-	
 	// copy ctor
-	public Delivery(DeliveryType delivery) {
-		this();
-		PartyType party = delivery.getDeliveryParty();
-		Party deliveryParty = party==null ? null : Party.create(party);
-		String name = deliveryParty==null ? null : deliveryParty.getBusinessName();
-//		LOG.info("businessName:"+businessName);
-		
-		init( name
-			, getActualDate(delivery)
-			, getPostalAddress(delivery)
-			, null
-			);
-		
-		LocationType location = delivery.getDeliveryLocation();
-		IDType iD = location==null ? null : location.getID();
-		setId(iD);
+	private Delivery(DeliveryType delivery) {
+		super();
+		if(delivery!=null) {
+			CopyCtor.invokeCopy(this, delivery);
+			LOG.config("copy ctor:"+this);
+		}
 	}
 
 	// BT-70 ++ 0..1 Deliver to party name
@@ -58,7 +59,7 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	// BT-72 ++ 0..1 Actual delivery date
 	// BG-15 ++ 0..1 DELIVER TO ADDRESS
 	public Delivery(String name, Timestamp ts, PostalAddress address, String locationId) {
-		this();
+		super();
 		init(name, ts, address, locationId);
 	}
 
@@ -77,17 +78,18 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	}
 	
 	Party getParty() {
-		return getParty(this);
-	}
-	
-	static Party getParty(DeliveryType delivery) {
-		PartyType party = delivery.getDeliveryParty();
+		PartyType party = getDeliveryParty();
 		return party==null ? null : Party.create(party);
 	}
-
+	
 	@Override
 	public PostalAddress getAddress() {
-		return getPostalAddress(this);
+		LocationType location = super.getDeliveryLocation();
+		if(location==null) return null; 
+		
+		AddressType address = location.getAddress();
+		if(address==null) return null; // defensiv, sollte nie null sein
+		return Address.create(address);
 	}
 
 	@Override
@@ -98,15 +100,6 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 		super.setDeliveryLocation(location);
 	}
 	
-	static PostalAddress getPostalAddress(DeliveryType delivery) {
-		LocationType location = delivery.getDeliveryLocation();
-		if(location==null) return null; 
-		
-		AddressType address = location.getAddress();
-		if(address==null) return null; // defensiv, sollte nie null sein
-		return Address.create(address);
-	}
-
 	@Override
 	public String getBusinessName() {
 		return getParty().getBusinessName();
@@ -152,12 +145,8 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 
 	@Override
 	public Timestamp getActualDate() {
-		return getActualDate(this);
+		ActualDeliveryDateType actualDeliveryDate = super.getActualDeliveryDate();
+		return actualDeliveryDate==null ? null : DateTimeFormats.xmlGregorianCalendarToTs(actualDeliveryDate.getValue());
 	}
 	
-	static Timestamp getActualDate(DeliveryType delivery) {
-	ActualDeliveryDateType actualDeliveryDate = delivery.getActualDeliveryDate();
-	return actualDeliveryDate==null ? null : DateTimeFormats.xmlGregorianCalendarToTs(actualDeliveryDate.getValue());
-	}
-
 }

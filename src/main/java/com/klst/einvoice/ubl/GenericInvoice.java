@@ -858,7 +858,7 @@ daher: NOT_IMPEMENTED
 	public BG13_DeliveryInformation getDelivery() {
 		List<DeliveryType> deliveryList = isInvoiceType ? invoice.getDelivery() : creditNote.getDelivery();
 		if(deliveryList.isEmpty()) return null;
-		return new Delivery(deliveryList.get(0));
+		return Delivery.create(deliveryList.get(0));
 	}
 
 	// BG-14 ++ 0..1 INVOICING PERIOD
