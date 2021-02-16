@@ -3,6 +3,7 @@ package com.klst.einvoice.unece.uncefact;
 import java.util.List;
 
 import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.reflection.CopyCtor;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CountryIDType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;
@@ -11,33 +12,26 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class TradeAddress extends TradeAddressType implements PostalAddress {
 
-	TradeAddress() {
-		super();
+	static TradeAddress create() {
+		return create((TradeAddressType)null);
+	}
+	// copy factory
+	static TradeAddress create(TradeAddressType object) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(object instanceof TradeAddressType && object.getClass()!=TradeAddressType.class) {
+			// object is instance of a subclass of TradeAddressType, but not TradeAddressType itself
+			return (TradeAddress)object;
+		} else {
+			return new TradeAddress(object); 
+		}
 	}
 
 	// copy ctor
-	TradeAddress(TradeAddressType address) {
-		this();
-		this.setCountryCode(address.getCountryID().getValue());
-		
-		List<TextType> regions = address.getCountrySubDivisionName();
-		if(regions.isEmpty()) {
-			// no region
-		} else {
-			this.setCountrySubdivision(regions.get(0).getValue());
+	private TradeAddress(TradeAddressType address) {
+		super();
+		if(address!=null) {
+			CopyCtor.invokeCopy(this, address);
 		}
-		
-		this.setPostCode(address.getPostcodeCode()==null ? null : address.getPostcodeCode().getValue());
-		
-		this.setCity(address.getCityName()==null ? null : address.getCityName().getValue());
-		
-		super.setStreetName(address.getStreetName());
-		super.setBuildingName(address.getBuildingName());
-		super.setBuildingNumber(address.getBuildingNumber());
-		
-		this.setAddressLine1( address.getLineOne()==null ? null : address.getLineOne().getValue() );
-		this.setAddressLine2( address.getLineTwo()==null ? null : address.getLineTwo().getValue() );
-		this.setAddressLine3( address.getLineThree()==null ? null : address.getLineThree().getValue() );
 	}
 	
 	TradeAddress(String countryCode, String postalCode, String city, String street) {
@@ -50,7 +44,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	}
 	
 	TradeAddress(String countryCode, String regionCode, String postalCode, String city, String street, String building) {
-		this();
+		super();
 		setCountryCode(countryCode);
 		
 		if(regionCode!=null) {
@@ -146,12 +140,12 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	
 	@Override
 	public String getCity() {
-		return super.getCityName().getValue();
+		return super.getCityName()==null ? null : super.getCityName().getValue();
 	}
 	
 	@Override
 	public String getPostCode() {
-		return super.getPostcodeCode().getValue();
+		return super.getPostcodeCode()==null ? null : super.getPostcodeCode().getValue();
 	}
 	
 	@Override
@@ -162,7 +156,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 
 	@Override
 	public String getCountryCode() {
-		return super.getCountryID().getValue();
+		return super.getCountryID()==null ? null : super.getCountryID().getValue();
 	}
 
 	@Override

@@ -81,7 +81,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	public PostalAddress getAddress() {
 		TradeAddressType address = super.getPostalTradeAddress();
 		if(address==null) return null; // defensiv, sollte nie null sein
-		return new TradeAddress(address);
+		return TradeAddress.create(address);
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 
 	@Override
 	public PostalAddress createAddress(PostalAddress address) {
-		return new TradeAddress((TradeAddressType)address);
+		return TradeAddress.create((TradeAddress)address);
 	}
 
 	// Contact
