@@ -132,12 +132,15 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return associatedDocumentLineDocument.getLineID().getValue();
 	}
 
-	@Override // 0 .. n IncludedNote.Content BT-127
+	@Override // Invoice line note BT-127 0..1 (optional)
 	public void setNote(String text) {
 		if(text==null) return;
-//		NoteType note = new NoteType();
-//		note.getContent().add(new Text(text)); // Kardinalität: 1 .. 1 TODO test
-		associatedDocumentLineDocument.getIncludedNote().add(Note.create(text));
+		Note note = Note.create(text);
+		if(associatedDocumentLineDocument.getIncludedNote().isEmpty()) {
+			associatedDocumentLineDocument.getIncludedNote().add(note);
+		} else {
+			associatedDocumentLineDocument.getIncludedNote().set(0, note);
+		}
 		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
 	}
 
