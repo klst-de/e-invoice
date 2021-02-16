@@ -2,6 +2,7 @@ package com.klst.einvoice.ubl;
 
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.DirectDebitFactory;
+import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.einvoice.unece.uncefact.IBANId;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
@@ -48,6 +49,20 @@ Bsp. ubl-tc434-example5.xml :
  */
 public class PaymentMandate extends PaymentMandateType implements DirectDebit, DirectDebitFactory {
 
+	static PaymentMandate create() {
+		return create((PaymentMandateType)null);
+	}
+	// copy factory
+	static PaymentMandate create(PaymentMandateType object) {
+		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+		if(object instanceof PaymentMandateType && object.getClass()!=PaymentMandateType.class) {
+			// object is instance of a subclass of PaymentMandateType, but not PaymentMandateType itself
+			return (PaymentMandate)object;
+		} else {
+			return new PaymentMandate(object); 
+		}
+	}
+
 	// implements PaymentCardFactory
 	public DirectDebit createDirectDebit(String mandateID, String bankAssignedCreditorID, IBANId iban) {
 		return create(mandateID, bankAssignedCreditorID, iban);
@@ -63,19 +78,10 @@ public class PaymentMandate extends PaymentMandateType implements DirectDebit, D
 		return new PaymentMandate(mandateID, bankAssignedCreditorID, debitedAccountID);
 	}
 
-	public PaymentMandate(PaymentMandateType doc) {
+	private PaymentMandate(PaymentMandateType doc) {
 		super();
 		if(doc!=null) {
-			super.setID(doc.getID());
-			super.setMandateTypeCode(doc.getMandateTypeCode());
-			super.setMaximumPaymentInstructionsNumeric(doc.getMaximumPaymentInstructionsNumeric());
-			super.setMaximumPaidAmount(doc.getMaximumPaidAmount());
-			super.setSignatureID(doc.getSignatureID());
-			super.setPayerParty(doc.getPayerParty());
-			super.setPayerFinancialAccount(doc.getPayerFinancialAccount());
-			super.setValidityPeriod(doc.getValidityPeriod());
-			super.setPaymentReversalPeriod(doc.getPaymentReversalPeriod());
-			super.clause = doc.getClause();
+			CopyCtor.invokeCopy(this, doc);
 		}
 	}
 	

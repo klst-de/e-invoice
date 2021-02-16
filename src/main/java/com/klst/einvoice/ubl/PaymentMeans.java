@@ -396,7 +396,7 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 
 	public DirectDebit getDirectDebit() {
 		if(super.getPaymentMandate()==null) return null;
-		PaymentMandate directDebit = new PaymentMandate(getPaymentMandate());
+		PaymentMandate directDebit = PaymentMandate.create(getPaymentMandate());
 		return directDebit;
 	}
 
