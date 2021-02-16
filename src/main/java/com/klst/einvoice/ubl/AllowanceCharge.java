@@ -167,10 +167,7 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 
 	@Override
 	public Amount getAmountWithoutTax() {
-		return getAmountWithoutTax(this);
-	}
-	private static Amount getAmountWithoutTax(AllowanceChargeType doc) {
-		AmountType amount = doc.getAmount();
+		AmountType amount = super.getAmount();
 		return amount==null? null : new Amount(amount.getCurrencyID(), amount.getValue());	
 	}
 
@@ -184,10 +181,7 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 
 	@Override
 	public Amount getAssessmentBase() {
-		return getAssessmentBase(this);
-	}
-	private static Amount getAssessmentBase(AllowanceChargeType doc) {
-		BaseAmountType amount = doc.getBaseAmount();
+		BaseAmountType amount = super.getBaseAmount();
 		return amount==null? null : new Amount(amount.getCurrencyID(), amount.getValue());	
 	}
 
@@ -201,10 +195,7 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 
 	@Override
 	public BigDecimal getPercentage() {
-		return getPercentage(this);
-	}
-	private static BigDecimal getPercentage(AllowanceChargeType doc) {
-		MultiplierFactorNumericType factor = doc.getMultiplierFactorNumeric();
+		MultiplierFactorNumericType factor = super.getMultiplierFactorNumeric();
 		return factor==null? null : factor.getValue();
 	}
 
@@ -253,10 +244,7 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 
 	@Override
 	public String getReasonText() {
-		return getReasonText(this);
-	}
-	private static String getReasonText(AllowanceChargeType doc) {
-		List<AllowanceChargeReasonType> list = doc.getAllowanceChargeReason();
+		List<AllowanceChargeReasonType> list = super.getAllowanceChargeReason();
 		return list.isEmpty()? null : list.get(0).getValue();
 	}
 
@@ -270,10 +258,7 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 
 	@Override
 	public String getReasoncode() {
-		return getReasoncode(this);
-	}
-	private static String getReasoncode(AllowanceChargeType doc) {
-		AllowanceChargeReasonCodeType code = doc.getAllowanceChargeReasonCode();
+		AllowanceChargeReasonCodeType code = super.getAllowanceChargeReasonCode();
 		return code==null? null : code.getValue();
 	}
 
