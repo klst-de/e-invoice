@@ -230,10 +230,12 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			ublInvoice.setPrecedingInvoiceReference(precedingInvoiceReference, "2013-03-10");
 		}
 
-		// Testfall 02.01a:
+		// Testfälle 01.15a , 02.01a:
 		Identifier identifierBT18 = testDoc.getInvoicedObjectIdentifier();
 		if(identifierBT18!=null) {
-			ublInvoice.setInvoicedObject(identifierBT18.getContent(), identifierBT18.getSchemeIdentifier());
+			ublInvoice.setInvoicedObjectIdentifier(identifierBT18);
+//			ublInvoice.setInvoicedObject(identifierBT18.getContent());
+//			ublInvoice.setInvoicedObject(identifierBT18.getContent(), identifierBT18.getSchemeIdentifier());
 		}
 
 		List<InvoiceNote> notes = testDoc.getInvoiceNotes();

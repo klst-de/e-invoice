@@ -38,12 +38,10 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 
 	// AdditionalSupportingDocument für BT-18, vll auch für BT-17
 	// für BT-18 DocumentNameCode.InvoicingDataSheet
-	static AdditionalSupportingDocument create(String docRefId, DocumentNameCode code, String schemeID) {
-		AdditionalSupportingDocument invoicedObject = new AdditionalSupportingDocument(docRefId, null, null);
-		invoicedObject.setingDocumentCode(code.getValueAsString());
-		invoicedObject.setReferenceCode(schemeID);
-		return invoicedObject;
+	static AdditionalSupportingDocument create(DocumentNameCode code, String docRefId, String schemeID) {
+		return new AdditionalSupportingDocument(code, docRefId, schemeID);
 	}
+	
 	static AdditionalSupportingDocument create() {
 		return create((DocumentReferenceType)null);
 	}
@@ -66,6 +64,12 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		}
 	}
 
+	private AdditionalSupportingDocument(DocumentNameCode code, String docRefId, String schemeID) {
+		super();
+		setDocumentCode(code);
+		setID(new ID(docRefId, schemeID));
+	}
+	
 	public AdditionalSupportingDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
 		super();
 		init(docRefId, description, null);
@@ -84,41 +88,33 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 	}
 	
 	void init(String docRefId, String description, String url) {
-//		setSupportingDocumentReference(docRefId);
 		super.setID(new ID(docRefId));
 		setSupportingDocumentDescription(description);
 		setExternalDocumentLocation(url);
 	}
 
-	private void setingDocumentCode(String code) {
+	// code ==  50 : isValidatedPricedTender() ==> BT-17
+	// code == 130 : isInvoicingDataSheet()    ==> BT-18	
+	private void setDocumentCode(DocumentNameCode code) {
 		if(code==null) return;
 		DocumentTypeCodeType documentTypeCode = new DocumentTypeCodeType();
-		documentTypeCode.setValue(code);
+		documentTypeCode.setValue(code.getValueAsString());
 		super.setDocumentTypeCode(documentTypeCode);
 	}
-	private String getDocumentCode() {	
-		return super.getDocumentTypeCode()==null ? null : getDocumentTypeCode().getValue();
-//		return super.getDocumentType()==null ? null : getDocumentType().getValue();
+	private DocumentNameCode getDocumentCode() {	
+		return super.getDocumentTypeCode()==null ? null : DocumentNameCode.valueOf(getDocumentTypeCode());
 	}
 /* 01.15a:
 	<cac:AdditionalDocumentReference>
 		<cbc:ID>OBJ999</cbc:ID>
-		<cbc:DocumentType>130</cbc:DocumentType>
+		<cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>  <!-- BT-18-0 -->
 	</cac:AdditionalDocumentReference>
  */
 	boolean isInvoicingDataSheet() {
 		if(getDocumentCode()==null) return false;
-		return getDocumentCode().equals(DocumentNameCode.InvoicingDataSheet.getValueAsString());
+		return getDocumentCode()==DocumentNameCode.InvoicingDataSheet;
 	}
 
-	// ReferenceTypeCode Kennung des Schemas BT-18-1
-	private void setReferenceCode(String schemeID) {
-		if(schemeID==null) return;
-		DocumentTypeType documentType = new DocumentTypeType(); // DocumentTypeType extends TextType
-		documentType.setValue(schemeID);
-		super.setDocumentType(documentType);
-	}
-	
 	// BG.24.BT-122
 	public void setDocumentReference(Reference docRefId) {
 		super.setID((ID)docRefId);

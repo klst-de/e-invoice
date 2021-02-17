@@ -544,16 +544,15 @@ UBL:
 	// BT-18 0..1 Invoiced object identifier
 	@Override
 	public void setInvoicedObject(String name, String schemeID) {
-		AdditionalSupportingDocument asDoc = AdditionalSupportingDocument.create(name, DocumentNameCode.InvoicingDataSheet, schemeID);
-		addSupportigDocument(asDoc);
+		addSupportigDocument(AdditionalSupportingDocument.create(DocumentNameCode.InvoicingDataSheet, name, schemeID));
 	}
 	@Override
 	public void setInvoicedObjectIdentifier(Identifier id) {
-		LOG.warning(NOT_IMPEMENTED);
+		setInvoicedObject(id.getContent(), id.getSchemeIdentifier());
 	}
 	@Override
 	public void setInvoicedObject(String name) {
-		LOG.warning(NOT_IMPEMENTED);
+		setInvoicedObject(name, null);
 	}
 	@Override
 	public String getInvoicedObject() {
