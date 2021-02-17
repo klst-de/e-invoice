@@ -64,29 +64,14 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	 * 
 	 * @see BusinessPartyFactory
 	 */
-	TradeParty(String name, String businessName, PostalAddress address, IContact contact) {
+	TradeParty(String registrationName, String businessName, PostalAddress address, IContact contact) {
 		super();
-		init(name, businessName, address, contact);
-	}
-	
-	void init(String registrationName, String businessName, PostalAddress address, IContact contact) {
 		setRegistrationName(registrationName);
 		setBusinessName(businessName);
 		setAddress(address);
 		if(contact!=null) setIContact(contact);
 	}
 
-	// der getter kann nicht getPartyName() heissen - das kollidiert mit super
-//	private String getPartyName() {
-//		return super.getName()==null ? null : getName().getValue();
-//	}
-//
-//	private void setPartyName(String name) {
-//		if(name==null) return;
-//		super.setName(new Text(name));
-//	}
-//	
-//
 	// PostalAddress
 	@Override
 	public PostalAddress getAddress() {
