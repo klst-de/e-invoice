@@ -146,13 +146,6 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 		return binaryObjects.get(0).getFilename();
 	}
 
-	private void setDocumentCode(String code) {
-		if(code==null) return;
-		DocumentCodeType documentCode = new DocumentCodeType();
-		documentCode.setValue(code);
-		super.setTypeCode(documentCode);
-	}
-
 	// ReferenceTypeCode Kennung des Schemas BT-18-1
 	private void setReferenceCode(String code) {
 		if(code==null) return;
@@ -161,7 +154,15 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 		super.setReferenceTypeCode(referenceCode);
 	}
 	
-	private String getSupportingDocumentCode() {
+	// code ==  50 : isValidatedPricedTender() ==> BT-17
+	// code == 130 : isInvoicingDataSheet()    ==> BT-18
+	private void setDocumentCode(String code) {
+		if(code==null) return;
+		DocumentCodeType documentCode = new DocumentCodeType();
+		documentCode.setValue(code);
+		super.setTypeCode(documentCode);
+	}
+	private String getDocumentCode() {
 		DocumentCodeType documentCode = super.getTypeCode();
 		if(documentCode==null) {
 			// ===> isPrecedingInvoice
@@ -195,25 +196,25 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	}
 
 	boolean isPrecedingInvoice() {
-		return (getSupportingDocumentCode()==null);
+		return (getDocumentCode()==null);
 	}
 	
 //	Der Code  50 "Price/sales catalogue response" wird benutzt, 
 //	um die Ausschreibung oder das Los zu referenzieren. (BT-17)
 //	.  50 . Validated priced tender
 	boolean isValidatedPricedTender() {
-		return getSupportingDocumentCode().equals(DocumentNameCode.ValidatedPricedTender.getValueAsString());
+		return getDocumentCode().equals(DocumentNameCode.ValidatedPricedTender.getValueAsString());
 	}
 //	Der Code 130 "Rechnungsdatenblatt" wird benutzt, 
 //	um eine vom Verkäufer angegebene Kennung für ein Objekt zu referenzieren. (BT-18)
 //	. 130 . Invoicing data sheet / Rechnungsdatenblatt
 	boolean isInvoicingDataSheet() {
-		return getSupportingDocumentCode().equals(DocumentNameCode.InvoicingDataSheet.getValueAsString());
+		return getDocumentCode().equals(DocumentNameCode.InvoicingDataSheet.getValueAsString());
 	}
 //	Der Code 916 "Referenzpapier" wird benutzt, um die Kennung der rechnungsbegründenden Unterlage zu referenzieren. (BT-122)
 //	. 916 . Related document / Referenzpapier
 	boolean isRelatedDocument() {
-		return getSupportingDocumentCode().equals(DocumentNameCode.RelatedDocument.getValueAsString());
+		return getDocumentCode().equals(DocumentNameCode.RelatedDocument.getValueAsString());
 	}
 	
 }
