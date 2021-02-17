@@ -88,9 +88,9 @@ import com.klst.untdid.codelist.DateTimeFormats;
  */
 public interface BG13_DeliveryInformation {
 	
-	// BT-70 ++ 0..1 Deliver to party name
-	public String getBusinessName();
-	public void setBusinessName(String name);
+	// BT-70 0..1 Deliver to party name
+	public String getName();
+	public void setName(String name);
 	
 	// BT-71 ++ 0..1 Deliver to location identifier
 	public String getId(); // kleingeschrieben, nicht ID!

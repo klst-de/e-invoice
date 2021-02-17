@@ -206,7 +206,7 @@ public class UblTest {
     	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), delivery.getActualDate());    // 2018-04-13+01:00 "yyyy-[m]m-[d]d hh:mm:ss[.f...]"
     	assertEquals("68", delivery.getId()); 
     	assertEquals("[DE (Bayern), 98765, [Deliver to city]]", delivery.getAddress().toString());
-    	assertEquals("[Deliver to party name]", delivery.getBusinessName()); 
+    	assertEquals("[Deliver to party name]", delivery.getName()); 
     	
     	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getStartDateAsTimestamp()); 
     	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getEndDateAsTimestamp()); 
@@ -320,7 +320,7 @@ public class UblTest {
 	@Test
     public void ublZZZ() {
 //    	InvoiceFactory factory = new CreateUblXXXInvoice("01.05a-INVOICE_ubl.xml");
-    	InvoiceFactory factory = new CreateUblXXXInvoice("ubl-tc434-example8.xml");
+    	InvoiceFactory factory = new CreateUblXXXInvoice("ubl-tc434-example5.xml");
     	byte[] bytes = factory.toUbl(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);

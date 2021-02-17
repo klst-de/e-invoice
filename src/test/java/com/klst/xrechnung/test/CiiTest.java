@@ -190,7 +190,7 @@ java.lang.ArrayIndexOutOfBoundsException: 5
     	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), delivery.getActualDate());    // 2018-04-13+01:00 "yyyy-[m]m-[d]d hh:mm:ss[.f...]"
     	assertEquals("68", delivery.getId()); 
     	assertEquals("[DE (Bayern), 98765, [Deliver to city]]", delivery.getAddress().toString());
-    	assertEquals("[Deliver to party name]", delivery.getBusinessName()); 
+    	assertEquals("[Deliver to party name]", delivery.getName()); 
     	
     	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), cii.getStartDateAsTimestamp()); 
     	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), cii.getEndDateAsTimestamp()); 
@@ -235,8 +235,8 @@ java.lang.ArrayIndexOutOfBoundsException: 5
     public void ciixml_last() {
 //    	InvoiceFactory factory = new CreateCiiXXXInvoice("CII_business_example_01.xml");
 //    	InvoiceFactory factory = new CreateCiiXXXInvoice("cii001.xml");
-    	InvoiceFactory factory = new CreateCiiXXXInvoice("03.05a-INVOICE_uncefact.xml");
-//    	InvoiceFactory factory = new CreateCiiXXXInvoice("01.04a-INVOICE_uncefact.xml");
+//    	InvoiceFactory factory = new CreateCiiXXXInvoice("03.05a-INVOICE_uncefact.xml");
+    	InvoiceFactory factory = new CreateCiiXXXInvoice("01.14a-INVOICE_uncefact.xml");
 //    	InvoiceFactory factory = new CreateCiiXXXInvoice(CII_XML[CII_XML.length-1]);
     	byte[] bytes = factory.toCii(); // the xml
     	String xml = new String(bytes);

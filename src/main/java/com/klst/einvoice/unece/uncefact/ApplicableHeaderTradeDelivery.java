@@ -88,14 +88,14 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 	}
 
 	@Override
-	public String getBusinessName() {
+	public String getName() {
 		if(party==null) return null;
-		return party.getPartyName();
+		return party.getRegistrationName();
 	}
 
 	@Override
-	public void setBusinessName(String name) {
-		party.setBusinessName(name);	
+	public void setName(String name) {
+		party.setRegistrationName(name);	
 	}
 
 	@Override
@@ -136,7 +136,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("[Deliver to party name=");
-		stringBuilder.append(getBusinessName()==null ? "null" : getBusinessName());
+		stringBuilder.append(getName()==null ? "null" : getName());
 		stringBuilder.append(", Location identifier=");
 		stringBuilder.append(getId()==null ? "null" : getId());
 		stringBuilder.append(", Actual delivery date=");

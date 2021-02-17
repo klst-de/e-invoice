@@ -101,12 +101,12 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	}
 	
 	@Override
-	public String getBusinessName() {
+	public String getName() {
 		return getParty().getBusinessName();
 	}
 
 	@Override
-	public void setBusinessName(String name) {
+	public void setName(String name) {
 		getParty().setBusinessName(name);
 	}
 

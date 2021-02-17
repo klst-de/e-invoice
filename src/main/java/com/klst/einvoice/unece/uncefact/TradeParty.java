@@ -70,12 +70,23 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 	
 	void init(String registrationName, String businessName, PostalAddress address, IContact contact) {
-		setPartyName(registrationName);
+		setRegistrationName(registrationName);
 		setBusinessName(businessName);
 		setAddress(address);
 		if(contact!=null) setIContact(contact);
 	}
 
+	// der getter kann nicht getPartyName() heissen - das kollidiert mit super
+//	private String getPartyName() {
+//		return super.getName()==null ? null : getName().getValue();
+//	}
+//
+//	private void setPartyName(String name) {
+//		if(name==null) return;
+//		super.setName(new Text(name));
+//	}
+//	
+//
 	// PostalAddress
 	@Override
 	public PostalAddress getAddress() {
@@ -124,23 +135,15 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		return TradeContact.create((TradeContact)contact);
 	}
 
-	String getPartyName() {
-		return super.getName()==null ? null : getName().getValue();
-	}
-
-	void setPartyName(String name) {
-		if(name==null) return;
-		super.setName(new Text(name));
-	}
-	
 	@Override
 	public String getRegistrationName() {
-		return getPartyName();
+		return super.getName()==null ? null : getName().getValue();
 	}
 
 	@Override
 	public void setRegistrationName(String name) {
-		setPartyName(name);
+		if(name==null) return;
+		super.setName(new Text(name));
 	}
 
 	@Override
