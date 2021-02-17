@@ -524,7 +524,7 @@ UBL:
 		return documentReferenceList.get(0).getID().getValue();
 	}
 	
-	// BT-17 + 0..1 Tender or lot reference
+	// BT-17 + 0..1 Tender or lot reference // oder doch wie BT-18 TODO
 	@Override
 	public void setTenderOrLotReference(String docRefId) {
 		if(docRefId==null) return; // optional
@@ -541,10 +541,11 @@ UBL:
 		return documentReferenceList.get(0).getID().getValue();
 	}
 	
-	// BT-18 + 0..1 Invoiced object identifier
+	// BT-18 0..1 Invoiced object identifier
 	@Override
 	public void setInvoicedObject(String name, String schemeID) {
-		LOG.warning(NOT_IMPEMENTED); // TODO
+		AdditionalSupportingDocument asDoc = AdditionalSupportingDocument.create(name, DocumentNameCode.InvoicingDataSheet, schemeID);
+		addSupportigDocument(asDoc);
 	}
 	@Override
 	public void setInvoicedObjectIdentifier(Identifier id) {
@@ -556,14 +557,31 @@ UBL:
 	}
 	@Override
 	public String getInvoicedObject() {
-		LOG.warning(NOT_IMPEMENTED);
-		return null;
+		Identifier id = getInvoicedObjectIdentifier();
+		return id==null ? null : id.getContent();
 	}
 	@Override
 	public Identifier getInvoicedObjectIdentifier() {
-		LOG.warning(NOT_IMPEMENTED);
-		return null;
+		List<DocumentReferenceType> additionalDocumentReferenceList;
+		if(isInvoiceType) {
+			additionalDocumentReferenceList = invoice.getAdditionalDocumentReference();
+		} else {
+			additionalDocumentReferenceList = creditNote.getAdditionalDocumentReference();
+		}
+		List<BG24_AdditionalSupportingDocs> resList = new ArrayList<BG24_AdditionalSupportingDocs>(additionalDocumentReferenceList.size());
+		additionalDocumentReferenceList.forEach(doc -> {
+			AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(doc);
+			if(asd.isInvoicingDataSheet()) {
+				// das sind BT-18 docs
+				resList.add(asd);
+				LOG.info(">>>>>>>>>>das sind BT-18 docs Reference:"+asd.getDocumentReference().getContent());
+			} else {
+				LOG.info("das sind keine BT-18 docs "+asd.getDocumentReference().getContent());
+			}
+		});
+		return resList.isEmpty() ? null : resList.get(0).getDocumentReference();
 	}
+	
 	// BT-19 + 0..1 Buyer accounting reference
 /* keine kosit Beispiele
 example-peppol-ubl.xml : ...
@@ -788,8 +806,7 @@ daher: NOT_IMPEMENTED
 			if(companyID!=null) {
 				LOG.fine("BG7_Buyer companyID="+companyID.getValue() + " SchemeID="+companyID.getSchemeID());
 			}
-		}
-		
+		}		
 		return buyer;
 	}
 	
@@ -1443,7 +1460,12 @@ daher: NOT_IMPEMENTED
 		}
 		List<BG24_AdditionalSupportingDocs> resList = new ArrayList<BG24_AdditionalSupportingDocs>(additionalDocumentReferenceList.size());
 		additionalDocumentReferenceList.forEach(doc -> {
-			resList.add(AdditionalSupportingDocument.create(doc));
+			AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(doc);
+			if(asd.isInvoicingDataSheet()) {
+				// das sind BT-18 docs
+			} else {
+				resList.add(asd);
+			}
 		});
 		return resList;
 	}

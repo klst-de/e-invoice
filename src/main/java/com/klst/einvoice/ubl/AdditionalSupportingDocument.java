@@ -3,11 +3,14 @@ package com.klst.einvoice.ubl;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.Reference;
 import com.klst.einvoice.reflection.CopyCtor;
+import com.klst.untdid.codelist.DocumentNameCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AttachmentType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ExternalReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentDescriptionType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentTypeCodeType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentTypeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EmbeddedDocumentBinaryObjectType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.URIType;
 
@@ -29,9 +32,18 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.URIType;
  * Attached document/Attached document Mime code                           1
  * Attached document/Attached document Filename                            1
  * 
+ * BT-18 : wenn isInvoicingDataSheet()
  */
 public class AdditionalSupportingDocument extends DocumentReferenceType implements BG24_AdditionalSupportingDocs {
 
+	// AdditionalSupportingDocument für BT-18, vll auch für BT-17
+	// für BT-18 DocumentNameCode.InvoicingDataSheet
+	static AdditionalSupportingDocument create(String docRefId, DocumentNameCode code, String schemeID) {
+		AdditionalSupportingDocument invoicedObject = new AdditionalSupportingDocument(docRefId, null, null);
+		invoicedObject.setingDocumentCode(code.getValueAsString());
+		invoicedObject.setReferenceCode(schemeID);
+		return invoicedObject;
+	}
 	static AdditionalSupportingDocument create() {
 		return create((DocumentReferenceType)null);
 	}
@@ -78,6 +90,35 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		setExternalDocumentLocation(url);
 	}
 
+	private void setingDocumentCode(String code) {
+		if(code==null) return;
+		DocumentTypeCodeType documentTypeCode = new DocumentTypeCodeType();
+		documentTypeCode.setValue(code);
+		super.setDocumentTypeCode(documentTypeCode);
+	}
+	private String getDocumentCode() {	
+		return super.getDocumentTypeCode()==null ? null : getDocumentTypeCode().getValue();
+//		return super.getDocumentType()==null ? null : getDocumentType().getValue();
+	}
+/* 01.15a:
+	<cac:AdditionalDocumentReference>
+		<cbc:ID>OBJ999</cbc:ID>
+		<cbc:DocumentType>130</cbc:DocumentType>
+	</cac:AdditionalDocumentReference>
+ */
+	boolean isInvoicingDataSheet() {
+		if(getDocumentCode()==null) return false;
+		return getDocumentCode().equals(DocumentNameCode.InvoicingDataSheet.getValueAsString());
+	}
+
+	// ReferenceTypeCode Kennung des Schemas BT-18-1
+	private void setReferenceCode(String schemeID) {
+		if(schemeID==null) return;
+		DocumentTypeType documentType = new DocumentTypeType(); // DocumentTypeType extends TextType
+		documentType.setValue(schemeID);
+		super.setDocumentType(documentType);
+	}
+	
 	// BG.24.BT-122
 	public void setDocumentReference(Reference docRefId) {
 		super.setID((ID)docRefId);

@@ -231,9 +231,10 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		}
 
 		// Testfall 02.01a:
-		Identifier identifier = testDoc.getInvoicedObjectIdentifier();
-		ublInvoice.setInvoicedObjectIdentifier(identifier); // (optional) BT-18
-//		ublInvoice.setInvoicedObject("Test", "AAA"); // (optional) BT-18  NOT IMPLEMENTED: TODO
+		Identifier identifierBT18 = testDoc.getInvoicedObjectIdentifier();
+		if(identifierBT18!=null) {
+			ublInvoice.setInvoicedObject(identifierBT18.getContent(), identifierBT18.getSchemeIdentifier());
+		}
 
 		List<InvoiceNote> notes = testDoc.getInvoiceNotes();
 		notes.forEach(invoiceNote -> {

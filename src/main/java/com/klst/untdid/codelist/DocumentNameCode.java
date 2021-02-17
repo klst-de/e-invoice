@@ -3,8 +3,7 @@ package com.klst.untdid.codelist;
 import java.util.HashMap;
 import java.util.Map;
 
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditNoteTypeCodeType;
-import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InvoiceTypeCodeType;
+import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.CodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
 
 /* urn:xoev-de:kosit:codeliste:untdid.1001
@@ -95,16 +94,11 @@ public enum DocumentNameCode {
         return map.get(code);
     }
 
-    public static DocumentNameCode valueOf(InvoiceTypeCodeType ublCode) {
-    	int code = Integer.parseInt(ublCode.getValue());
+    public static DocumentNameCode valueOf(CodeType codeType) {
+    	int code = Integer.parseInt(codeType.getValue());
         return valueOf(code);
     }
-
-    public static DocumentNameCode valueOf(CreditNoteTypeCodeType ublCode) {
-    	int code = Integer.parseInt(ublCode.getValue());
-        return valueOf(code);
-    }
-
+    
     public static DocumentNameCode valueOf(DocumentCodeType ciiCode) {
     	int code = Integer.parseInt(ciiCode.getValue());
         return valueOf(code);
