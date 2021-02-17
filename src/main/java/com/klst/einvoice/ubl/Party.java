@@ -139,33 +139,33 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.
-//	static final String DEFAULT_TAX_SCHEME = "VAT"; // ein möglicher BUG in UBL Spez!
-//	static final String NO_CC = "??";
-//	/*
-//	 * Buyer/Seller VAT identifier - The VAT identifier (also known as VAT identification number).
-//	 * <p>
-//	 * VAT number prefixed by a country code based on EN ISO 3166-1 "Codes for the representation of names of countries and their subdivisions"
-//	 * <p>
-//	 * Cardinality: 0..1 (optional)
-//	 * <br>ID:      BT-48
-//	 * <br>Req.ID:  R45, R52, R57
-//	 * 
-//	 * @param registrationId Identifier
-//	 */
-//	@Override
-//	public void setVATRegistrationId(String registrationId) {
-//		if(registrationId==null) return;
-//		// countryCode of the party (which is mandatory) as default prefix , see https://github.com/klst-de/e-invoice/issues/1
-//		
-//		PostalAddress address = getAddress();
-//		String countryCode = address==null ? NO_CC : address.getCountryCode();
-//		if(countryCode==NO_CC || registrationId.startsWith(countryCode)) {
-//			addTaxRegistrationId(registrationId, DEFAULT_TAX_SCHEME);
-//		} else {
-//			LOG.warning("registrationId '"+registrationId+"' does not start with countryCode:"+countryCode + " - silently done.");
-//			addTaxRegistrationId(countryCode+registrationId, DEFAULT_TAX_SCHEME);
-//		}
-//	}
+	static final String DEFAULT_TAX_SCHEME = "VAT"; // ein möglicher BUG in UBL Spez!
+	static final String NO_CC = "??";
+	/*
+	 * Buyer/Seller VAT identifier - The VAT identifier (also known as VAT identification number).
+	 * <p>
+	 * VAT number prefixed by a country code based on EN ISO 3166-1 "Codes for the representation of names of countries and their subdivisions"
+	 * <p>
+	 * Cardinality: 0..1 (optional)
+	 * <br>ID:      BT-48
+	 * <br>Req.ID:  R45, R52, R57
+	 * 
+	 * @param registrationId Identifier
+	 */
+	@Override
+	public void setVATRegistrationId(String registrationId) {
+		if(registrationId==null) return;
+		// countryCode of the party (which is mandatory) as default prefix , see https://github.com/klst-de/e-invoice/issues/1
+		
+		PostalAddress address = getAddress();
+		String countryCode = address==null ? NO_CC : address.getCountryCode();
+		if(countryCode==NO_CC || registrationId.startsWith(countryCode)) {
+			addTaxRegistrationId(registrationId, DEFAULT_TAX_SCHEME);
+		} else {
+			LOG.warning("registrationId '"+registrationId+"' does not start with countryCode:"+countryCode + " - silently done.");
+			addTaxRegistrationId(countryCode+registrationId, DEFAULT_TAX_SCHEME);
+		}
+	}
 
 	@Override
 	public String getRegistrationName() {

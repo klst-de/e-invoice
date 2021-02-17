@@ -200,16 +200,8 @@ public class PartyTest {
     
     @Test
     public void ublGetNameOfDelieveryParty() {
-//    	List<Delivery> deliveries = invoice.getDeliveries();
-//		LOG.info("Deliveries #:"+ deliveries.size());
-//		assertTrue(deliveries.size()==1);
-//		Party deliveryParty = deliveries.get(0).getParty();
-//		assertNotNull(deliveryParty);
-//		List<PartyNameType> names = deliveryParty.getPartyName();
-//		assertTrue(names.size()==1);
-//    	assertEquals("Schulungsanbieter", names.get(0).getName().getValue());
     	BG13_DeliveryInformation delivery = invoice.getDelivery();
-    	assertEquals("Schulungsanbieter", delivery.getBusinessName());
+    	assertEquals("Schulungsanbieter", delivery.getName());
     	
     	PostalAddress address = delivery.getAddress();
 		LOG.info("Delivery LocationAddress:" + address);
