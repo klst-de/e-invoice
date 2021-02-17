@@ -11,6 +11,12 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
  * United Nations Trade Data Interchange Directory (UNTDID), http://www.unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tredi2.htm
  * UN/EDIFACT 1001  Document name code
 
+     220   Order
+              Document/message by means of which a buyer initiates a
+              transaction with a seller involving the supply of goods
+              or services as specified, according to conditions set
+              out in an offer, or otherwise known to the buyer.
+              
      326   Partial invoice
               Document/message specifying details of an incomplete invoice.
      380   Commercial invoice
@@ -25,10 +31,24 @@ import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
               (1111) Document/message in which a seller specifies the amount of commission, 
               the percentage of the invoice amount, or some other basis for the calculation of the
               commission to which a sales agent is entitled.
+-----------------
+     50    Validated priced tender
+              A validated priced tender.
+
+     130   Invoicing data sheet
+              Document/message issued within an enterprise containing
+              data about goods sold, to be used as the basis for the
+              preparation of an invoice.
+
+     916   Related document
+              Document that has a relationship with the stated
+              document/message.
 
  */
 public enum DocumentNameCode {
 	
+	Order					(220),
+
 	PartialConstructionInvoice 		(875),
 	PartialFinalConstructionInvoice	(876),
 	FinalConstructionInvoice 		(877),
@@ -38,7 +58,12 @@ public enum DocumentNameCode {
 	CorrectedInvoice 		(384),
 	SelfbilledInvoice		(389),
 	CreditNote 				(381),
-	CommissionNote 			(382);
+	CommissionNote 			(382),
+	
+	// used for AdditionalSupportingDocs:
+	ValidatedPricedTender   ( 50),	// BT-17 "Price/sales catalogue response" / Ausschreibung oder das Los
+	InvoicingDataSheet      (130),	// AdditionalSupportingDoc is BT-18 / Rechnungsdatenblatt
+	RelatedDocument         (916);	// AdditionalSupportingDoc is BG-24 / Related document / Referenzpapier
 	
 	/**
 	 * @see <A HREF="http://www.unece.org/trade/untdid/d13b/tred/tred1001.htm">UN/EDIFACT 1001</A>

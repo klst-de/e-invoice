@@ -7,6 +7,7 @@ import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.Reference;
 import com.klst.untdid.codelist.DateTimeFormats;
+import com.klst.untdid.codelist.DocumentNameCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
@@ -47,10 +48,6 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 		return rd;
 	}
 	
-	static final String ValidatedPricedTender = "50";
-	static final String InvoicingDataSheet = "130";
-	static final String RelatedDocument = "916";
-
 	public ReferencedDocument(IDType issuerAssignedID, FormattedDateTimeType ftd) {
 		super();
 		super.setIssuerAssignedID(issuerAssignedID);
@@ -67,11 +64,14 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	 * @param docRefId, BG-24.BT-122 (mandatory BT business term) Supporting document reference
 	 */
 	public ReferencedDocument(String docRefId) {
-		this(docRefId, RelatedDocument);
+		this(docRefId, DocumentNameCode.RelatedDocument);
 	}
 	// nicht public!
-	ReferencedDocument(String docRefId, String code) {
+	ReferencedDocument(String docRefId, DocumentNameCode code) {
 		this(docRefId, code, null);
+	}
+	ReferencedDocument(String docRefId, DocumentNameCode code, String referenceTypeCode) {
+		this(docRefId, code.getValueAsString(), referenceTypeCode);
 	}
 	ReferencedDocument(String docRefId, String code, String referenceTypeCode) {
 		super();
@@ -146,7 +146,7 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 		return binaryObjects.get(0).getFilename();
 	}
 
-	void setDocumentCode(String code) {
+	private void setDocumentCode(String code) {
 		if(code==null) return;
 		DocumentCodeType documentCode = new DocumentCodeType();
 		documentCode.setValue(code);
@@ -154,7 +154,7 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	}
 
 	// ReferenceTypeCode Kennung des Schemas BT-18-1
-	void setReferenceCode(String code) {
+	private void setReferenceCode(String code) {
 		if(code==null) return;
 		ReferenceCodeType referenceCode = new ReferenceCodeType();
 		referenceCode.setValue(code);
@@ -202,18 +202,18 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 //	um die Ausschreibung oder das Los zu referenzieren. (BT-17)
 //	.  50 . Validated priced tender
 	boolean isValidatedPricedTender() {
-		return getSupportingDocumentCode().equals(ValidatedPricedTender);
+		return getSupportingDocumentCode().equals(DocumentNameCode.ValidatedPricedTender.getValueAsString());
 	}
 //	Der Code 130 "Rechnungsdatenblatt" wird benutzt, 
 //	um eine vom Verkäufer angegebene Kennung für ein Objekt zu referenzieren. (BT-18)
 //	. 130 . Invoicing data sheet / Rechnungsdatenblatt
 	boolean isInvoicingDataSheet() {
-		return getSupportingDocumentCode().equals(InvoicingDataSheet);
+		return getSupportingDocumentCode().equals(DocumentNameCode.InvoicingDataSheet.getValueAsString());
 	}
 //	Der Code 916 "Referenzpapier" wird benutzt, um die Kennung der rechnungsbegründenden Unterlage zu referenzieren. (BT-122)
 //	. 916 . Related document / Referenzpapier
 	boolean isRelatedDocument() {
-		return getSupportingDocumentCode().equals(RelatedDocument);
+		return getSupportingDocumentCode().equals(DocumentNameCode.RelatedDocument.getValueAsString());
 	}
 	
 }

@@ -510,7 +510,7 @@ UBL:
 	@Override
 	public void setTenderOrLotReference(String docRefId) {
 		if(docRefId==null) return; // optional
-		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId, ReferencedDocument.ValidatedPricedTender);
+		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId, DocumentNameCode.ValidatedPricedTender);
 		addSupportigDocument(referencedDocument);
 	}
 	@Override
@@ -540,7 +540,7 @@ UBL:
 	@Override
 	public void setInvoicedObject(String name, String code) {
 		if(name==null) return; // optional
-		ReferencedDocument referencedDocument = new ReferencedDocument(name, ReferencedDocument.InvoicingDataSheet, code);
+		ReferencedDocument referencedDocument = new ReferencedDocument(name, DocumentNameCode.InvoicingDataSheet, code);
 		addSupportigDocument(referencedDocument);
 	}
 	@Override
@@ -1231,7 +1231,7 @@ Code Codename
 			// documentCode.getValue() == 916 ==> BT-122
 			// sonst ist es BT-17 oder BT-18
 			LOG.fine("referencedDocument DocumentCode="+documentCode.getValue()+" IssuerAssignedID="+issuerAssignedID.getValue());
-			ReferencedDocument rd = new ReferencedDocument(issuerAssignedID.getValue(), documentCode.getValue());
+			ReferencedDocument rd = new ReferencedDocument(issuerAssignedID.getValue(), documentCode.getValue(), null);
 			
 			List<TextType> texts = refDoc.getName();
 			texts.forEach(text -> {
