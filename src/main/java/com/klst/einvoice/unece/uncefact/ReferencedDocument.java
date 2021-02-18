@@ -42,7 +42,12 @@ ReferencedDocument kapselt auch BT-3, BT-17 und BT-18
 public class ReferencedDocument extends ReferencedDocumentType implements BG24_AdditionalSupportingDocs, PrecedingInvoice {
 
 	// factory for BG-3
-	static PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
+	@Override
+	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
+		return create(docRefId, ts);
+	}
+
+	static ReferencedDocument create(String docRefId, Timestamp ts) {
 		ReferencedDocument rd = new ReferencedDocument(docRefId, (String)null, (String)null);
 		rd.setDate(ts);
 		return rd;

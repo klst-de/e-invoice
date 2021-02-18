@@ -751,7 +751,7 @@ daher: NOT_IMPEMENTED
 	// BG-3 + 0..n PRECEDING INVOICE REFERENCE / implements BG3_PrecedingInvoiceReference factory
 	@Override
 	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
-		return DocumentReference.createPrecedingInvoiceReference(docRefId, ts);
+		return DocumentReference.create(docRefId, ts);
 	}
 	@Override // implements BG3_PrecedingInvoiceReference
 	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice) {

@@ -18,7 +18,7 @@ import com.klst.untdid.codelist.DateTimeFormats;
  * <br>Rule ID: 	
  * <br>Request ID: 	R11, R12
  */
-public interface PrecedingInvoice {
+public interface PrecedingInvoice extends PrecedingInvoiceFactory{
 	
 	/**
 	 * Preceding Invoice reference

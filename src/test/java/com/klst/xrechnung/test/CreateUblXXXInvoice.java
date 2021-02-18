@@ -21,6 +21,7 @@ import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentInstructions;
+import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.ubl.GenericLine;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -223,7 +224,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setTenderOrLotReference(testDoc.getTenderOrLotReference()); // BT-17 + 0..1
 
 		// 0..n BG3_PrecedingInvoiceReference:
-		String precedingInvoiceReference = testDoc.getPrecedingInvoiceReference();
+		List<PrecedingInvoice> precedingInvoices = testDoc.getPrecedingInvoices();
+		String precedingInvoiceReference = precedingInvoices.isEmpty() ? null : precedingInvoices.get(0).getDocumentReference().getName();
 		if(precedingInvoiceReference!=null) {
 			LOG.info("BG3_PrecedingInvoiceReference: "+precedingInvoiceReference);
 			// Datum erfunden TODO

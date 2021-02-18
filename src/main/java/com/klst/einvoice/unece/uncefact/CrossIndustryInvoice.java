@@ -662,7 +662,7 @@ UBL:
 	// BG-3 + 0..n PRECEDING INVOICE REFERENCE / implements BG3_PrecedingInvoiceReference factory
 	@Override
 	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
-		return ReferencedDocument.createPrecedingInvoiceReference(docRefId, ts);
+		return ReferencedDocument.create(docRefId, ts);
 	}
 	@Override // implements BG3_PrecedingInvoiceReference
 	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice) {

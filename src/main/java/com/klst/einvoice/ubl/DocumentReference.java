@@ -13,6 +13,15 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDat
 
 public class DocumentReference extends DocumentReferenceType implements PrecedingInvoice {
 
+	// factory
+	@Override
+	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
+		return create(docRefId, ts);
+	}
+	static DocumentReference create(String docRefId, Timestamp ts) {
+		return new DocumentReference(new ID(docRefId), ts);
+	}
+
 	static DocumentReference create() {
 		return create((DocumentReferenceType)null);
 	}
@@ -25,11 +34,6 @@ public class DocumentReference extends DocumentReferenceType implements Precedin
 		} else {
 			return new DocumentReference(object); 
 		}
-	}
-
-	// factory
-	static PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
-		return new DocumentReference(new ID(docRefId), ts);
 	}
 
 	private static final Logger LOG = Logger.getLogger(DocumentReference.class.getName());

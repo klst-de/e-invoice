@@ -27,26 +27,8 @@ import com.klst.untdid.codelist.DateTimeFormats;
  * 
  * @see PrecedingInvoice
  */
-public interface BG3_PrecedingInvoiceReference {
+public interface BG3_PrecedingInvoiceReference extends PrecedingInvoiceFactory {
 	
-	@Deprecated
-	default String getPrecedingInvoiceReference() {
-		List<PrecedingInvoice> list = getPrecedingInvoices();
-		if(list.isEmpty()) return null;
-		return list.get(0).getDocumentReference().getName();
-	}
-	
-	// factory 
-	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts);
-	
-	default PrecedingInvoice createPrecedingInvoiceReference(String docRefId, String ymd) {
-		return createPrecedingInvoiceReference(docRefId, ymd==null? null : DateTimeFormats.ymdToTs(ymd));
-	}
-	
-	default PrecedingInvoice createPrecedingInvoiceReference(String docRefId) {
-		return createPrecedingInvoiceReference(docRefId, (Timestamp)null);
-	}
-
 	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice);
 	public List<PrecedingInvoice> getPrecedingInvoices();
 
