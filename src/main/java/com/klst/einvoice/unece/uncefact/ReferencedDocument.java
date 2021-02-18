@@ -43,7 +43,7 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 
 	// factory for BG-3
 	static PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
-		ReferencedDocument rd = new ReferencedDocument(docRefId, null);
+		ReferencedDocument rd = new ReferencedDocument(docRefId, (String)null, (String)null);
 		rd.setDate(ts);
 		return rd;
 	}

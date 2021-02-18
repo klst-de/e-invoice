@@ -524,30 +524,57 @@ UBL:
 		return documentReferenceList.get(0).getID().getValue();
 	}
 	
-	// BT-17 + 0..1 Tender or lot reference // oder doch wie BT-18 TODO
+	// BT-17 0..1 Tender or lot reference
 	@Override
 	public void setTenderOrLotReference(String docRefId) {
-		if(docRefId==null) return; // optional
-		DocumentReferenceType documentReference = new DocumentReferenceType();
-		documentReference.setID(new ID(docRefId));
-		List<DocumentReferenceType> documentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
-		documentReferenceList.add(documentReference);
+		if(docRefId==null) return;
+		addSupportigDocument(AdditionalSupportingDocument.create(DocumentNameCode.ValidatedPricedTender, docRefId, null));
 	}
-
 	@Override
 	public String getTenderOrLotReference() {
-		List<DocumentReferenceType> documentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
-		if(documentReferenceList.isEmpty()) return null;
-		return documentReferenceList.get(0).getID().getValue();
+		List<DocumentReferenceType> additionalDocumentReferenceList;
+		if(isInvoiceType) {
+			additionalDocumentReferenceList = invoice.getAdditionalDocumentReference();
+		} else {
+			additionalDocumentReferenceList = creditNote.getAdditionalDocumentReference();
+		}
+		List<BG24_AdditionalSupportingDocs> resList = new ArrayList<BG24_AdditionalSupportingDocs>(additionalDocumentReferenceList.size());
+		additionalDocumentReferenceList.forEach(doc -> {
+			AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(doc);
+			if(asd.isValidatedPricedTender()) {
+				// das sind BT-17 docs
+				resList.add(asd);
+			}
+		});
+		return resList.isEmpty() ? null : resList.get(0).getDocumentReference().getContent();
+		
 	}
+	// alternative implementierung:
+//	@Override
+//	public void setTenderOrLotReference(String docRefId) {
+//		if(docRefId==null) return; // optional
+//		DocumentReferenceType documentReference = new DocumentReferenceType();
+//		documentReference.setID(new ID(docRefId));
+//		List<DocumentReferenceType> documentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
+//		documentReferenceList.add(documentReference);
+//	}
+//
+//	@Override
+//	public String getTenderOrLotReference() {
+//		List<DocumentReferenceType> documentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
+//		if(documentReferenceList.isEmpty()) return null;
+//		return documentReferenceList.get(0).getID().getValue();
+//	}
 	
 	// BT-18 0..1 Invoiced object identifier
 	@Override
 	public void setInvoicedObject(String name, String schemeID) {
+		if(name==null) return;
 		addSupportigDocument(AdditionalSupportingDocument.create(DocumentNameCode.InvoicingDataSheet, name, schemeID));
 	}
 	@Override
 	public void setInvoicedObjectIdentifier(Identifier id) {
+		if(id==null) return;
 		setInvoicedObject(id.getContent(), id.getSchemeIdentifier());
 	}
 	@Override
@@ -573,9 +600,6 @@ UBL:
 			if(asd.isInvoicingDataSheet()) {
 				// das sind BT-18 docs
 				resList.add(asd);
-				LOG.info(">>>>>>>>>>das sind BT-18 docs Reference:"+asd.getDocumentReference().getContent());
-			} else {
-				LOG.info("das sind keine BT-18 docs "+asd.getDocumentReference().getContent());
 			}
 		});
 		return resList.isEmpty() ? null : resList.get(0).getDocumentReference();
@@ -1460,7 +1484,9 @@ daher: NOT_IMPEMENTED
 		List<BG24_AdditionalSupportingDocs> resList = new ArrayList<BG24_AdditionalSupportingDocs>(additionalDocumentReferenceList.size());
 		additionalDocumentReferenceList.forEach(doc -> {
 			AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(doc);
-			if(asd.isInvoicingDataSheet()) {
+			if(asd.isValidatedPricedTender()) {
+				// das sind BT-17 docs
+			} else if(asd.isInvoicingDataSheet()) {
 				// das sind BT-18 docs
 			} else {
 				resList.add(asd);

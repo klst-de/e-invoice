@@ -70,7 +70,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		setID(new ID(docRefId, schemeID));
 	}
 	
-	public AdditionalSupportingDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
+	AdditionalSupportingDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
 		super();
 		init(docRefId, description, null);
 		setAttachedDocument(content, mimeCode, filename);
@@ -82,12 +82,12 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 	 * @param description, optional
 	 * @param url, optional
 	 */
-	public AdditionalSupportingDocument(String docRefId, String description, String url) {
+	AdditionalSupportingDocument(String docRefId, String description, String url) {
 		super();
 		init(docRefId, description, url);
 	}
 	
-	void init(String docRefId, String description, String url) {
+	private void init(String docRefId, String description, String url) {
 		super.setID(new ID(docRefId));
 		setSupportingDocumentDescription(description);
 		setExternalDocumentLocation(url);
@@ -113,6 +113,10 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 	boolean isInvoicingDataSheet() {
 		if(getDocumentCode()==null) return false;
 		return getDocumentCode()==DocumentNameCode.InvoicingDataSheet;
+	}
+	boolean isValidatedPricedTender() {
+		if(getDocumentCode()==null) return false;
+		return getDocumentCode()==DocumentNameCode.ValidatedPricedTender;
 	}
 
 	// BG.24.BT-122

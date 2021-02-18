@@ -231,9 +231,10 @@ public class UblTest {
     	String orderReference = ublInvoice.getOrderReference();
     	assertNotNull(orderReference);
     	assertEquals("ABC123456789", orderReference); 
-    	String tenderOrLotReference = ublInvoice.getTenderOrLotReference();
-    	assertNotNull(tenderOrLotReference);
-    	assertEquals("ANG987654321", tenderOrLotReference); 
+// diese Implementierung rausgenommen
+//    	String tenderOrLotReference = ublInvoice.getTenderOrLotReference();
+//    	assertNotNull(tenderOrLotReference);
+//    	assertEquals("ANG987654321", tenderOrLotReference); 
    	
     	List<BG24_AdditionalSupportingDocs> asdList = ublInvoice.getAdditionalSupportingDocuments();
     	assertEquals(1, asdList.size());
@@ -320,7 +321,8 @@ public class UblTest {
 	@Test
     public void ublZZZ() {
 //    	InvoiceFactory factory = new CreateUblXXXInvoice("01.05a-INVOICE_ubl.xml");
-    	InvoiceFactory factory = new CreateUblXXXInvoice("ubl-tc434-example5.xml");
+    	InvoiceFactory factory = new CreateUblXXXInvoice("01.15a-INVOICE_ubl.xml");
+//    	InvoiceFactory factory = new CreateUblXXXInvoice("ubl-tc434-example5.xml");
     	byte[] bytes = factory.toUbl(); // the xml
     	String xml = new String(bytes);
     	LOG.info("xml=\n"+xml);
