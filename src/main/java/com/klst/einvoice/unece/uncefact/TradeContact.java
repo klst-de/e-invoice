@@ -47,10 +47,6 @@ public class TradeContact extends TradeContactType implements IContact {
 		setContactEmail(contactMail);
 	}
 	
-	TradeContact(IContact contact) {
-		this(contact.getContactPoint(), contact.getContactTelephone(), contact.getContactEmail());
-	}
-
 	@Override
 	public void setContactPoint(String name) {
 		TextType cName = new TextType();
