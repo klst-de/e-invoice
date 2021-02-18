@@ -31,10 +31,10 @@ package com.klst.einvoice;
  * Die Postanschrift des Käufers muss einen Ländercode der Käuferanschrift (BT-55) enthalten.
  * 
  */
-public interface BG8_BuyerPostalAddress extends PostalAddress {
+public interface BG8_BuyerPostalAddress extends BusinessPartnerAddress {
 	
-	// BG-8 1..1 BUYER POSTAL ADDRESS
-	public PostalAddress getAddress();
-	public void setAddress(PostalAddress address);
+//	// BG-8 1..1 BUYER POSTAL ADDRESS
+//	public PostalAddress getAddress();
+//	public void setAddress(PostalAddress address);
 	
 }

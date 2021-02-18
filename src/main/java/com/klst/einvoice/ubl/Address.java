@@ -123,7 +123,7 @@ public class Address extends AddressType implements PostalAddress {
 		return streetName.getValue();
 	}
 	
-	public String getAdditionalStreet() { // total optional, nicht in XRechnung
+	public String getAdditionalStreet() { // optional, nicht in XRechnung
 		AdditionalStreetNameType streetName = super.getAdditionalStreetName();
 		if(streetName==null) {
 			return null;
@@ -173,15 +173,15 @@ public class Address extends AddressType implements PostalAddress {
 		setAddressLine(3, addressLine);
 	}
 
-	@Override
-	public void setCity(String city) {
+//	@Override
+	private void setCity(String city) {
 		CityNameType cityName = new CityNameType();
 		cityName.setValue(city);
 		this.setCityName(cityName);
 	}
 
-	@Override
-	public void setPostCode(String postCode) {
+//	@Override
+	private void setPostCode(String postCode) {
 		PostalZoneType postalZone = new PostalZoneType();
 		postalZone.setValue(postCode);
 		this.setPostalZone(postalZone);
@@ -195,8 +195,8 @@ public class Address extends AddressType implements PostalAddress {
 		super.setCountrySubentity(countrySubentity);
 	}
 
-	@Override
-	public void setCountryCode(String countryCode) {
+//	@Override
+	private void setCountryCode(String countryCode) {
 		CountryType country = new CountryType();
 		IdentificationCodeType identificationCode = new IdentificationCodeType();
 		identificationCode.setValue(countryCode);

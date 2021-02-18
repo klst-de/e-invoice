@@ -80,7 +80,7 @@ dto UBL:
  * ... 
  * 
  */
-public interface BG4_Seller extends BusinessParty, PostalAddressFactory, BG6_SellerContact {
+public interface BG4_Seller extends BusinessParty, BG5_SellerPostalAddress, BG6_SellerContact {
 	
 	// BT-27 ++ 1..1 Seller name / ram:Name / UBL: <cac:PartyName><cbc:Name> 
 
@@ -143,9 +143,9 @@ public interface BG4_Seller extends BusinessParty, PostalAddressFactory, BG6_Sel
 	// CII in Doku steht : DefinedTradeContact.URIUniversalCommunication
 	//     in Beispielen : <ram:DefinedTradeContact><ram:EmailURIUniversalCommunication><ram:URIID>
 	
-	// BG-5 ++ 1..1 SELLER POSTAL ADDRESS
-	public PostalAddress getAddress();
-	public void setAddress(PostalAddress address);
+	// BG-5 1..1 SELLER POSTAL ADDRESS
+//	public PostalAddress getAddress();
+//	public void setAddress(PostalAddress address);
 
 	// BG-6 0..1 SELLER CONTACT
 //	public IContact getIContact();

@@ -100,15 +100,15 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 		super.setLineThree(line);
 	}
 
-	@Override
-	public void setCity(String city) {
+//	@Override
+	private void setCity(String city) {
 		TextType cityName = new TextType();
 		cityName.setValue(city);
 		this.setCityName(cityName);
 	}
 
-	@Override
-	public void setPostCode(String postCode) {
+//	@Override
+	private void setPostCode(String postCode) {
 		CodeType postcode = new CodeType();
 		postcode.setValue(postCode);
 		this.setPostcodeCode(postcode);
@@ -121,8 +121,8 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 		this.getCountrySubDivisionName().add(region);
 	}
 
-	@Override
-	public void setCountryCode(String countryCode) {
+//	@Override
+	private void setCountryCode(String countryCode) {
 		CountryIDType countryID = new CountryIDType();
 		countryID.setValue(countryCode);
 //		countryID.setSchemeID("ISO 3166-1"); // TODO countryCode mit ISO
@@ -168,12 +168,12 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 		return super.getCountryID()==null ? null : super.getCountryID().getValue();
 	}
 
-	@Override
+//	@Override
 	public String getStreet() {
 		return super.getStreetName()==null ? null : super.getStreetName().getValue();
 	}
 
-	@Override
+//	@Override
 	public String getBuilding() {
 		return super.getBuildingNumber()==null ? null : super.getBuildingNumber().getValue();
 	}
