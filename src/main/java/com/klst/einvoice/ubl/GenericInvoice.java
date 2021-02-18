@@ -1539,12 +1539,6 @@ daher: NOT_IMPEMENTED
 		return party.createAddress(countryCode, postalCode, city);
 	}
 
-	@Override
-	public PostalAddress createAddress(PostalAddress address) {
-		Party party = Party.create();
-		return party.createAddress(address);
-	}
-
 	// BG-6 , BG-9 CONTACT
 	@Override
 	public IContact createContact(String contactName, String contactTel, String contactMail) {

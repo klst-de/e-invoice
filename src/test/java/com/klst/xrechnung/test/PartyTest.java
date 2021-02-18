@@ -162,7 +162,7 @@ public class PartyTest {
     private static final String HESSEN = "Hessen";
     @Test
     public void ublCopyAddress() {
-    	PostalAddress address = supplierparty.createAddress(supplierparty.getAddress()); // copy
+    	PostalAddress address = Address.createPostalAddress((Address)supplierparty.getAddress());
     	assertEquals("[Seller address line 1]", address.getStreet());
     	address.setCountrySubdivision(HESSEN);
     	assertEquals(HESSEN, address.getCountrySubdivision());

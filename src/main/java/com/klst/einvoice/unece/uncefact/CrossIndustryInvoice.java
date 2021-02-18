@@ -1329,12 +1329,6 @@ Code Codename
 	}
 
 	@Override
-	public PostalAddress createAddress(PostalAddress address) {
-		TradeParty party = TradeParty.create();
-		return party.createAddress(address);
-	}
-
-	@Override
 	public IContact createContact(String contactName, String contactTel, String contactMail) {
 		TradeParty party = TradeParty.create();
 		return party.createContact(contactName, contactTel, contactMail);

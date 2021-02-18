@@ -20,9 +20,4 @@ public interface PostalAddressFactory {
 	 */
 	public PostalAddress createAddress(String countryCode, String postalCode, String city);
 	
-	/**
-	 * copy PostalAddress
-	 * 
-	 */
-	public PostalAddress createAddress(PostalAddress address);
 }

@@ -49,6 +49,9 @@ public class Address extends AddressType implements PostalAddress {
 		return create((AddressType)null);
 	}
 	// copy factory
+	public static PostalAddress createPostalAddress(AddressType object) {
+		return create(object);
+	}
 	static Address create(AddressType object) {
 		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
 		if(object instanceof AddressType && object.getClass()!=AddressType.class) {

@@ -111,11 +111,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		return new Address(countryCode, postalCode, city, null);
 	}
 
-	@Override
-	public PostalAddress createAddress(PostalAddress address) {
-		return Address.create((Address)address);
-	}
-
 
 	// Contact
 	@Override
