@@ -29,13 +29,9 @@ public interface BusinessPartyFactory {
 	 * @see IContact
 	 */
 	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact);
+	
 	default BusinessParty createParty(String name, PostalAddress address, IContact contact) {
 		return createParty(name, null, address, contact);
 	}
 	
-	/**
-	 * copy BusinessParty
-	 * 
-	 */
-	public BusinessParty createParty(BusinessParty party);
 }

@@ -1318,11 +1318,6 @@ Code Codename
 	}
 
 	@Override
-	public BusinessParty createParty(BusinessParty party) {
-		return TradeParty.create((TradeParty)party); 
-	}
-
-	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
 		TradeParty party = TradeParty.create();
 		return party.createAddress(countryCode, postalCode, city);

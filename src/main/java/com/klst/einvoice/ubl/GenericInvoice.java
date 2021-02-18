@@ -1552,9 +1552,4 @@ daher: NOT_IMPEMENTED
 		return new Party(name, tradingName, address, contact); 
 	}
 
-	@Override
-	public BusinessParty createParty(BusinessParty party) {
-		return Party.create((Party)party);
-	}
-
 }
