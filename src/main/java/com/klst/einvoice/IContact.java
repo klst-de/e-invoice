@@ -32,9 +32,10 @@ BT-58 | +++   | 0..1        | Buyer contact email address         | An e-mail ad
  */
 public interface IContact extends IContactFactory {
 
-	public void setContactPoint(String name);
-	public void setContactTelephone(String contactTel);
-	public void setContactEmail(String contactMail);
+	// use factory
+//	public void setContactPoint(String name);
+//	public void setContactTelephone(String contactTel);
+//	public void setContactEmail(String contactMail);
 
 	public String getContactPoint();
 	public String getContactTelephone();

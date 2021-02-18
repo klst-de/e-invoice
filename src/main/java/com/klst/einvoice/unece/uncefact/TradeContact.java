@@ -56,15 +56,15 @@ public class TradeContact extends TradeContactType implements IContact {
 		setContactEmail(contactMail);
 	}
 	
-	@Override
-	public void setContactPoint(String name) {
+//	@Override
+	void setContactPoint(String name) {
 		TextType cName = new TextType();
 		cName.setValue(name);	
 		super.setPersonName(cName);
 	}
 
-	@Override
-	public void setContactTelephone(String contactTel) {
+//	@Override
+	void setContactTelephone(String contactTel) {
 		TextType telephoneNo = new TextType();
 		telephoneNo.setValue(contactTel);	
 		UniversalCommunicationType telephone = new UniversalCommunicationType();
@@ -72,8 +72,8 @@ public class TradeContact extends TradeContactType implements IContact {
 		super.setTelephoneUniversalCommunication(telephone);
 	}
 
-	@Override
-	public void setContactEmail(String contactMail) {
+//	@Override
+	void setContactEmail(String contactMail) {
 		IDType uri = new IDType();
 		uri.setValue(contactMail);
 		UniversalCommunicationType electronicMail = new UniversalCommunicationType();

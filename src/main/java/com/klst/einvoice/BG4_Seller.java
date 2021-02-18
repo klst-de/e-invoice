@@ -80,7 +80,7 @@ dto UBL:
  * ... 
  * 
  */
-public interface BG4_Seller extends BusinessParty, PostalAddressFactory, IContactFactory {
+public interface BG4_Seller extends BusinessParty, PostalAddressFactory, BG6_SellerContact {
 	
 	// BT-27 ++ 1..1 Seller name / ram:Name / UBL: <cac:PartyName><cbc:Name> 
 
@@ -147,8 +147,8 @@ public interface BG4_Seller extends BusinessParty, PostalAddressFactory, IContac
 	public PostalAddress getAddress();
 	public void setAddress(PostalAddress address);
 
-	// BG-6 ++ 0..1 SELLER CONTACT
-	public IContact getIContact();
-	public void setIContact(IContact contact);
+	// BG-6 0..1 SELLER CONTACT
+//	public IContact getIContact();
+//	public void setIContact(IContact contact);
 	
 }

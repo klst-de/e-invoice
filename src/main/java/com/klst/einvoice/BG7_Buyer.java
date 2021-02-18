@@ -39,8 +39,7 @@ package com.klst.einvoice;
  * BR-DE-9  : Postleitzahl der Erwerberanschrift
  * Das Element „Buyer post code“ (BT-53) muss übermittelt werden.
  */
-// TODO Idee runter zu ubl und cii und public raus ?!
-public interface BG7_Buyer extends BusinessParty, PostalAddressFactory, IContactFactory {
+public interface BG7_Buyer extends BusinessParty, PostalAddressFactory, BG9_BuyerContact {
 	
 /*
 
@@ -68,7 +67,7 @@ public interface BG7_Buyer extends BusinessParty, PostalAddressFactory, IContact
 	public void setAddress(PostalAddress address);
 	
 	// BG-9 ++ 0..1 BUYER CONTACT
-	public IContact getIContact();
-	public void setIContact(IContact contact);
+//	public IContact getIContact();
+//	public void setIContact(IContact contact);
 
 }

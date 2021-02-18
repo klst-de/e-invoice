@@ -93,22 +93,22 @@ public class Contact extends ContactType implements IContact {
 		this(contact.getContactPoint(), contact.getContactTelephone(), contact.getContactEmail());
 	}
 
-	@Override
-	public void setContactPoint(String name) {
+//	@Override
+	void setContactPoint(String name) {
 		NameType cName = new NameType();
 		cName.setValue(name);	
 		this.setName(cName);
 	}
 
-	@Override
-	public void setContactTelephone(String contactTel) {
+//	@Override
+	void setContactTelephone(String contactTel) {
 		TelephoneType telephone = new TelephoneType();
 		telephone.setValue(contactTel);
 		this.setTelephone(telephone);
 	}
 
-	@Override
-	public void setContactEmail(String contactMail) {
+//	@Override
+	void setContactEmail(String contactMail) {
 		ElectronicMailType electronicMail = new ElectronicMailType();
 		electronicMail.setValue(contactMail);
 		this.setElectronicMail(electronicMail);
