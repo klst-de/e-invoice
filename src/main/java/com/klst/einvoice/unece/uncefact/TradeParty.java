@@ -90,7 +90,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
-		return new TradeAddress(countryCode, postalCode, city, null);
+		return TradeAddress.create(countryCode, postalCode, city);
 	}
 
 

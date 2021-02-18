@@ -12,6 +12,15 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class TradeAddress extends TradeAddressType implements PostalAddress {
 
+	@Override // implements PostalAddressFactory
+	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+		return create(countryCode, postalCode, city);
+	}
+	
+	static TradeAddress create(String countryCode, String postalCode, String city) {
+		return new TradeAddress(countryCode, postalCode, city, null);
+	}
+
 	static TradeAddress create() {
 		return create((TradeAddressType)null);
 	}
@@ -34,16 +43,16 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 		}
 	}
 	
-	TradeAddress(String countryCode, String postalCode, String city, String street) {
+	private TradeAddress(String countryCode, String postalCode, String city, String street) {
 		this(countryCode, null, postalCode, city, street, null);
 	}
 	
 	// building nicht in XRechnung-v1-2-0.pdf dokumentiert
-	TradeAddress(String countryCode, String postalCode, String city, String street, String building) {
+	private TradeAddress(String countryCode, String postalCode, String city, String street, String building) {
 		this(countryCode, null, postalCode, city, street, building);
 	}
 	
-	TradeAddress(String countryCode, String regionCode, String postalCode, String city, String street, String building) {
+	private TradeAddress(String countryCode, String regionCode, String postalCode, String city, String street, String building) {
 		super();
 		setCountryCode(countryCode);
 		

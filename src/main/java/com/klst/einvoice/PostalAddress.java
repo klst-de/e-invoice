@@ -59,7 +59,7 @@ for the representation of names of
 countries and their subdivisions”.
                                                               
  */
-public interface PostalAddress {
+public interface PostalAddress extends PostalAddressFactory {
 
 	public void setAddressLine1(String addressLine);
 	public void setAddressLine2(String addressLine);

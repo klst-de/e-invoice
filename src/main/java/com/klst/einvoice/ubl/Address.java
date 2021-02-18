@@ -45,6 +45,15 @@ Anmerkung: Die Liste der zulässigen Länder ist bei der ISO 3166-1 „Codes for
  */
 public class Address extends AddressType implements PostalAddress {
 
+	@Override // implements PostalAddressFactory
+	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+		return create(countryCode, postalCode, city);
+	}
+	
+	static Address create(String countryCode, String postalCode, String city) {
+		return new Address(countryCode, postalCode, city, null);
+	}
+
 	static Address create() {
 		return create((AddressType)null);
 	}
@@ -73,16 +82,16 @@ public class Address extends AddressType implements PostalAddress {
 	}
 	
 	// [CII-DT-088] - StreetName shall not be used.
-	Address(String countryCode, String postalCode, String city, String street) {
+	private	Address(String countryCode, String postalCode, String city, String street) {
 		this(countryCode, null, postalCode, city, street, null);
 	}
 	
 	// building nicht in XRechnung-v1-2-0.pdf dokumentiert, [CII-DT-094] - BuildingNumber shall not be used.
-	Address(String countryCode, String postalCode, String city, String street, String building) {
+	private Address(String countryCode, String postalCode, String city, String street, String building) {
 		this(countryCode, null, postalCode, city, street, building);
 	}
 	
-	Address(String countryCode, String regionCode, String postalCode, String city, String street, String building) {
+	private Address(String countryCode, String regionCode, String postalCode, String city, String street, String building) {
 		super();
 		setCountryCode(countryCode);
 
