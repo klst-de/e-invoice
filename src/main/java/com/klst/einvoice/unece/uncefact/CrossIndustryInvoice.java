@@ -1340,10 +1340,4 @@ Code Codename
 		return party.createContact(contactName, contactTel, contactMail);
 	}
 
-	@Override
-	public IContact createContact(IContact contact) {
-		TradeParty party = TradeParty.create();
-		return party.createContact(contact);
-	}
-
 }

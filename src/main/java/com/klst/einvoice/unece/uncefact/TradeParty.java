@@ -116,11 +116,6 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 
 	@Override
-	public IContact createContact(IContact contact) {
-		return TradeContact.create((TradeContact)contact);
-	}
-
-	@Override
 	public String getRegistrationName() {
 		return super.getName()==null ? null : getName().getValue();
 	}

@@ -1552,12 +1552,6 @@ daher: NOT_IMPEMENTED
 		return party.createContact(contactName, contactTel, contactMail);
 	}
 
-	@Override
-	public IContact createContact(IContact contact) {
-		Party party = Party.create();
-		return party.createContact(contact);
-	}
-
 	// BG-4 , BG-7 , BG-10 , BG-11 , BG-13 : SELLER, BUYER, ...
 	@Override
 	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {

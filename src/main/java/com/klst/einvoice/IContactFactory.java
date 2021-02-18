@@ -19,9 +19,4 @@ public interface IContactFactory {
 	 */
 	public IContact createContact(String contactName, String contactTel, String contactMail);
 	
-	/**
-	 * copy Contact
-	 * 
-	 */
-	public IContact createContact(IContact contact);
 }

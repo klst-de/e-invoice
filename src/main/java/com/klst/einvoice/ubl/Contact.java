@@ -35,6 +35,9 @@ public class Contact extends ContactType implements IContact {
 		return create((ContactType)null);
 	}
 	// copy factory
+	public static IContact createIContact(ContactType object) {
+		return create(object);
+	}
 	static Contact create(ContactType object) {
 		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
 		if(object instanceof ContactType && object.getClass()!=ContactType.class) {

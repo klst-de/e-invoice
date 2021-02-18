@@ -133,11 +133,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		return new Contact(contactName, contactTel, contactMail);
 	}
 
-	@Override
-	public IContact createContact(IContact contact) {
-		return Contact.create((Contact)contact);
-	}
-
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.
 	static final String DEFAULT_TAX_SCHEME = "VAT"; // ein möglicher BUG in UBL Spez!
 	static final String NO_CC = "??";
