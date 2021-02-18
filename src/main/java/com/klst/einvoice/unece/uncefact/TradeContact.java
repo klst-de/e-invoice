@@ -10,6 +10,15 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class TradeContact extends TradeContactType implements IContact {
 
+	@Override // implements IContactFactory
+	public IContact createContact(String contactName, String contactTel, String contactMail) {
+		return create(contactName, contactTel, contactMail);
+	}
+	
+	static TradeContact create(String contactName, String contactTel, String contactMail) {
+		return new TradeContact(contactName, contactTel, contactMail);
+	}
+	
 	static TradeContact create() {
 		return create((TradeContactType)null);
 	}
@@ -41,7 +50,7 @@ public class TradeContact extends TradeContactType implements IContact {
 	 * @param contactTel mandatory text
 	 * @param contactMail mandatory text
 	 */
-	TradeContact(String contactName, String contactTel, String contactMail) {
+	private TradeContact(String contactName, String contactTel, String contactMail) {
 		setContactPoint(contactName);
 		setContactTelephone(contactTel);
 		setContactEmail(contactMail);

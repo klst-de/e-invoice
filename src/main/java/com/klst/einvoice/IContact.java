@@ -30,7 +30,7 @@ BT-56 | +++   | 0..1        | Buyer contact point                 | A contact po
 BT-57 | +++   | 0..1        | Buyer contact telephone number      | A phone number for the contact point.
 BT-58 | +++   | 0..1        | Buyer contact email address         | An e-mail address for the contact point.
  */
-public interface IContact {
+public interface IContact extends IContactFactory {
 
 	public void setContactPoint(String name);
 	public void setContactTelephone(String contactTel);

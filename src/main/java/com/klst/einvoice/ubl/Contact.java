@@ -31,6 +31,15 @@ Seller contact email address                BT-43 Text                  1
 */
 public class Contact extends ContactType implements IContact {
 
+	@Override // implements IContactFactory
+	public IContact createContact(String contactName, String contactTel, String contactMail) {
+		return create(contactName, contactTel, contactMail);
+	}
+	
+	static Contact create(String contactName, String contactTel, String contactMail) {
+		return new Contact(contactName, contactTel, contactMail);
+	}
+
 	static Contact create() {
 		return create((ContactType)null);
 	}
@@ -63,7 +72,7 @@ public class Contact extends ContactType implements IContact {
 	 * @param contactTel mandatory item
 	 * @param contactMail mandatory item
 	 */
-	Contact(String contactName, String contactTel, String contactMail) {
+	private Contact(String contactName, String contactTel, String contactMail) {
 		// Seller contact point                        BT-41 Text                  1 (mandatory)
 		// Buyer contact point                         BT-56 Text                  0..1
 		//  Angaben zu Ansprechpartner oder Kontaktstelle (wie z. B. Name einer Person, Abteilungs- oder Bürobezeichnung):

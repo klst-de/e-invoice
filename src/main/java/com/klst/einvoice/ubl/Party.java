@@ -125,7 +125,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 
 	@Override
 	public IContact createContact(String contactName, String contactTel, String contactMail) {
-		return new Contact(contactName, contactTel, contactMail);
+		return Contact.create(contactName, contactTel, contactMail);
 	}
 
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.

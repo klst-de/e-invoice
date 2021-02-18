@@ -7,15 +7,14 @@ package com.klst.einvoice;
  * 
  * @see <a href="https://java-design-patterns.com/patterns/abstract-factory/">java-design-patterns</a> for patterns abstract-factory
  */
-
 public interface IContactFactory {
 	
 	/**
 	 * ctor for Contact
 	 * 
-	 * @param contactName text
-	 * @param contactTel text
-	 * @param contactMail text
+	 * @param contactName - a contact point for a legal entity or person.
+	 * @param contactTel - a phone number for the contact point.
+	 * @param contactMail - an e-mail address for the contact point.
 	 */
 	public IContact createContact(String contactName, String contactTel, String contactMail);
 	
