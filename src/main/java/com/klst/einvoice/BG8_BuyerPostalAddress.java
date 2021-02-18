@@ -33,8 +33,4 @@ package com.klst.einvoice;
  */
 public interface BG8_BuyerPostalAddress extends BusinessPartnerAddress {
 	
-//	// BG-8 1..1 BUYER POSTAL ADDRESS
-//	public PostalAddress getAddress();
-//	public void setAddress(PostalAddress address);
-	
 }

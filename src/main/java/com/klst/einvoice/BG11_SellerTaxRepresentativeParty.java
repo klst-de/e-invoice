@@ -41,8 +41,7 @@ package com.klst.einvoice;
  * In der Rechnung muss mindestens eines der Elemente „Seller VAT identifier“ (BT-31),
  *  „Seller tax registration identifier“ (BT-32) oder „SELLER TAX REPRESENTATIVE PARTY“ (BG-11) übermittelt werden.
  */
-//TODO Idee runter zu ubl und cii und public raus ?!
-public interface BG11_SellerTaxRepresentativeParty extends BusinessParty {
+public interface BG11_SellerTaxRepresentativeParty extends BusinessParty, BG12_SellerTaxRepresentativeAddress {
 	
 	// BT-62 ++ 1..1 Seller tax representative name
 	
