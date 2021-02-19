@@ -3,7 +3,7 @@ package com.klst.einvoice;
 /**
  * SELLER or BUYER POSTAL ADDRESS, used in BG12_SellerTaxRepresentativeAddress too
  */
-public interface BusinessPartnerAddress extends PostalAddress {
+public interface BusinessPartyAddress extends PostalAddress {
 	
 	public PostalAddress getAddress();
 	public void setAddress(PostalAddress address);

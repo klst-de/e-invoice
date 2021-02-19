@@ -16,6 +16,6 @@ package com.klst.einvoice;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for (en)EN_16931_1_2017 rule and request IDs
  */
-public interface BG9_BuyerContact extends BusinessPartnerContact {
+public interface BG9_BuyerContact extends BusinessPartyContact {
 	
 }

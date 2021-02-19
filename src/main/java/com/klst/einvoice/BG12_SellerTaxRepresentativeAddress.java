@@ -38,6 +38,6 @@ package com.klst.einvoice;
  * Steuerbevollmächtigtenanschrift (BT-69) enthalten.
  * 
  */
-public interface BG12_SellerTaxRepresentativeAddress extends BusinessPartnerAddress {
+public interface BG12_SellerTaxRepresentativeAddress extends BusinessPartyAddress {
 	
 }

@@ -3,7 +3,7 @@ package com.klst.einvoice;
 /**
  * SELLER or BUYER CONTACT
  */
-public interface BusinessPartnerContact extends IContact {
+public interface BusinessPartyContact extends IContact {
 	
 	public IContact getIContact();
 	public void setIContact(IContact contact);

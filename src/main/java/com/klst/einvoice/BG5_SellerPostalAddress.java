@@ -37,6 +37,6 @@ package com.klst.einvoice;
  * Das Element „Seller post code“ (BT-38) muss übermittelt werden.
  * 
  */
-public interface BG5_SellerPostalAddress extends BusinessPartnerAddress {
+public interface BG5_SellerPostalAddress extends BusinessPartyAddress {
 	
 }
