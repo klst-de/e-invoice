@@ -5,8 +5,6 @@ import com.klst.einvoice.reflection.CopyCtor;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeContactType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.UniversalCommunicationType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class TradeContact extends TradeContactType implements IContact {
 
@@ -54,28 +52,17 @@ public class TradeContact extends TradeContactType implements IContact {
 		setContactEmail(contactMail);
 	}
 	
-//	@Override
-	public void setContactPoint(String name) {
-//		TextType cName = new TextType();
-//		cName.setValue(name);	
-//		super.setPersonName(cName);
+	private void setContactPoint(String name) {
 		super.setPersonName(Text.create(name));
 	}
 
-//	@Override
-	public void setContactTelephone(String contactTel) {
-//		TextType telephoneNo = new TextType();
-//		telephoneNo.setValue(contactTel);	
+	private void setContactTelephone(String contactTel) {
 		UniversalCommunicationType telephone = new UniversalCommunicationType();
 		telephone.setCompleteNumber(Text.create(contactTel));
 		super.setTelephoneUniversalCommunication(telephone);
 	}
 
-//	@Override
 	public void setContactEmail(String contactMail) {
-//		IDType uri = new IDType();
-//		uri.setValue(contactMail);
-//		IDType uri = new ID(contactMail);	
 		UniversalCommunicationType electronicMail = new UniversalCommunicationType();
 		electronicMail.setURIID(new ID(contactMail));
 		super.setEmailURIUniversalCommunication(electronicMail);

@@ -10,11 +10,13 @@ package com.klst.einvoice;
 public interface IContactFactory {
 	
 	/**
-	 * ctor for Contact
+	 * creates business group (BG) CONTACT
 	 * 
 	 * @param contactName - a contact point for a legal entity or person.
 	 * @param contactTel - a phone number for the contact point.
 	 * @param contactMail - an e-mail address for the contact point.
+	 * 
+	 * @see IContact
 	 */
 	public IContact createContact(String contactName, String contactTel, String contactMail);
 	
