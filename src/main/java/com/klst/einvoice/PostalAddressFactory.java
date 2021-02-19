@@ -13,7 +13,7 @@ public interface PostalAddressFactory {
 	/**
 	 * factory for PostalAddress
 	 * 
-	 * @param countryCode according to ISO 3166-1
+	 * @param countryCode - mandatory and according to ISO 3166-1
 	 * @param postalCode such as a ZIP code or a post code
 	 * @param city - the city, town or village, where the address is located
 	 */
