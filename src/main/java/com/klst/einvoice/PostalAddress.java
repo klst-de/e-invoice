@@ -1,7 +1,7 @@
 package com.klst.einvoice;
 
 /**
- * BG-5 , BG-8 : POSTAL ADDRESS
+ * BG-5 , BG-8 , BG-12 : POSTAL ADDRESS
  * <p>
  * A group (BG) of business terms (BT) providing information about the business partner.
  * 
