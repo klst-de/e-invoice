@@ -81,33 +81,23 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 
 	@Override
 	public void setAddressLine1(String addressLine) {
-		TextType line = new TextType();
-		line.setValue(addressLine);
-		super.setLineOne(line);
+		super.setLineOne(Text.create(addressLine));
 	}
 
 	@Override
 	public void setAddressLine2(String addressLine) {
-		TextType line = new TextType();
-		line.setValue(addressLine);
-		super.setLineTwo(line);
+		super.setLineTwo(Text.create(addressLine));
 	}
 
 	@Override
 	public void setAddressLine3(String addressLine) {
-		TextType line = new TextType();
-		line.setValue(addressLine);
-		super.setLineThree(line);
+		super.setLineThree(Text.create(addressLine));
 	}
 
-//	@Override
 	private void setCity(String city) {
-		TextType cityName = new TextType();
-		cityName.setValue(city);
-		this.setCityName(cityName);
+		super.setCityName(Text.create(city));
 	}
 
-//	@Override
 	private void setPostCode(String postCode) {
 		CodeType postcode = new CodeType();
 		postcode.setValue(postCode);
@@ -121,11 +111,10 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 		this.getCountrySubDivisionName().add(region);
 	}
 
-//	@Override
 	private void setCountryCode(String countryCode) {
 		CountryIDType countryID = new CountryIDType();
 		countryID.setValue(countryCode);
-//		countryID.setSchemeID("ISO 3166-1"); // TODO countryCode mit ISO
+//		countryID.setSchemeID("ISO 3166-1"); // countryCode mit ISO check in qualifieddatatype._103
 		this.setCountryID(countryID);
 	}
 
