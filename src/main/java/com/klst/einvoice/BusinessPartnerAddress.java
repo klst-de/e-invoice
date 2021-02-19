@@ -1,7 +1,7 @@
 package com.klst.einvoice;
 
 /**
- * SELLER or BUYER POSTAL ADDRESS
+ * SELLER or BUYER POSTAL ADDRESS, used in BG12_SellerTaxRepresentativeAddress too
  */
 public interface BusinessPartnerAddress extends PostalAddress {
 	

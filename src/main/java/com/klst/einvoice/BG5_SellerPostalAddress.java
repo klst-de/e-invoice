@@ -30,6 +30,12 @@ package com.klst.einvoice;
  * BR-9     : Postanschrift des Verkäufers
  * Eine Postanschrift des Verkäufers (BG-5) muss einen Ländercode der Verkäuferanschrift (BT-40) enthalten.
  * 
+ * BR-DE-3  : Stadt der Verkäuferanschrift
+ * Das Element „Seller city“ (BT-37) muss übermittelt werden.
+ * 
+ * BR-DE-4  : Postleitzahl der Verkäuferanschrift
+ * Das Element „Seller post code“ (BT-38) muss übermittelt werden.
+ * 
  */
 public interface BG5_SellerPostalAddress extends BusinessPartnerAddress {
 	

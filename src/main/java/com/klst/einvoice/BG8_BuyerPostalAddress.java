@@ -30,6 +30,12 @@ package com.klst.einvoice;
  * BR-11    : Postanschrift des Käufers
  * Die Postanschrift des Käufers muss einen Ländercode der Käuferanschrift (BT-55) enthalten.
  * 
+ * BR-DE-8  : Stadt der Erwerberanschrift
+ * Das Element „Buyer city“ (BT-52) muss übermittelt werden.
+ * 
+ * BR-DE-9  : Postleitzahl der Erwerberanschrift
+ * Das Element „Buyer post code“ (BT-53) muss übermittelt werden.
+ * 
  */
 public interface BG8_BuyerPostalAddress extends BusinessPartnerAddress {
 	

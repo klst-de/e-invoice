@@ -8,11 +8,10 @@ package com.klst.einvoice;
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for BGs, BTs, rules and request IDs
  * @see <a href="https://java-design-patterns.com/patterns/abstract-factory/">java-design-patterns</a> for patterns abstract-factory
  */
-
 public interface PostalAddressFactory {
 	
 	/**
-	 * ctor for PostalAddress
+	 * factory for PostalAddress
 	 * 
 	 * @param countryCode according to ISO 3166-1
 	 * @param postalCode such as a ZIP code or a post code
