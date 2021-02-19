@@ -2,8 +2,9 @@ package com.klst.einvoice;
 
 /**
  * abstract-factory, aka Kit for 
- * BG-5 SELLER POSTAL ADDRESS ,
- * BG-8 BUYER POSTAL ADDRESS 
+ * BG-5  SELLER POSTAL ADDRESS ,
+ * BG-8  BUYER POSTAL ADDRESS , 
+ * BG-12 SELLER TAX REPRESENTATIVE POSTAL ADDRESS
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for BGs, BTs, rules and request IDs
  * @see <a href="https://java-design-patterns.com/patterns/abstract-factory/">java-design-patterns</a> for patterns abstract-factory
