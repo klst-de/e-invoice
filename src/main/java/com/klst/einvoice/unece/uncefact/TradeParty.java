@@ -119,7 +119,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	@Override
 	public void setRegistrationName(String name) {
 		if(name==null) return;
-		super.setName(new Text(name));
+		super.setName(Text.create(name));
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		if(super.getSpecifiedLegalOrganization()==null) {
 			setSpecifiedLegalOrganization(new LegalOrganizationType());
 		}
-		getSpecifiedLegalOrganization().setTradingBusinessName(new Text(name));
+		getSpecifiedLegalOrganization().setTradingBusinessName(Text.create(name));
 	}
 
 	@Override // 0..n returns the first
@@ -225,7 +225,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	@Override
 	public void setCompanyLegalForm(String name) {
 		if(name==null) return;
-		super.getDescription().add(new Text(name));
+		super.getDescription().add(Text.create(name));
 	}
 
 	@Override // 0..1 also genügt der erste

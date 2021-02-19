@@ -42,13 +42,11 @@ public class TradeContact extends TradeContactType implements IContact {
 	}
 
 	/**
-	 * ctor for Seller Contact which is mandatory group / BG-6
+	 * ctor for Seller or Buyer Contact
 	 * 
-	 * BUYER CONTACT group / BG-9 is optional 0..1
-	 * 
-	 * @param contactName mandatory text
-	 * @param contactTel mandatory text
-	 * @param contactMail mandatory text
+	 * @param contactName
+	 * @param contactTel
+	 * @param contactMail
 	 */
 	private TradeContact(String contactName, String contactTel, String contactMail) {
 		setContactPoint(contactName);
@@ -57,27 +55,29 @@ public class TradeContact extends TradeContactType implements IContact {
 	}
 	
 //	@Override
-	void setContactPoint(String name) {
-		TextType cName = new TextType();
-		cName.setValue(name);	
-		super.setPersonName(cName);
+	public void setContactPoint(String name) {
+//		TextType cName = new TextType();
+//		cName.setValue(name);	
+//		super.setPersonName(cName);
+		super.setPersonName(Text.create(name));
 	}
 
 //	@Override
-	void setContactTelephone(String contactTel) {
-		TextType telephoneNo = new TextType();
-		telephoneNo.setValue(contactTel);	
+	public void setContactTelephone(String contactTel) {
+//		TextType telephoneNo = new TextType();
+//		telephoneNo.setValue(contactTel);	
 		UniversalCommunicationType telephone = new UniversalCommunicationType();
-		telephone.setCompleteNumber(telephoneNo);
+		telephone.setCompleteNumber(Text.create(contactTel));
 		super.setTelephoneUniversalCommunication(telephone);
 	}
 
 //	@Override
-	void setContactEmail(String contactMail) {
-		IDType uri = new IDType();
-		uri.setValue(contactMail);
+	public void setContactEmail(String contactMail) {
+//		IDType uri = new IDType();
+//		uri.setValue(contactMail);
+//		IDType uri = new ID(contactMail);	
 		UniversalCommunicationType electronicMail = new UniversalCommunicationType();
-		electronicMail.setURIID(uri);
+		electronicMail.setURIID(new ID(contactMail));
 		super.setEmailURIUniversalCommunication(electronicMail);
 	}
 	

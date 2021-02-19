@@ -91,7 +91,7 @@ public class ReferencedDocument extends ReferencedDocumentType implements BG24_A
 	public void setSupportingDocumentDescription(String text) {
 		if(text==null) return;
 		if(super.getName().isEmpty()) {
-			super.getName().add(new Text(text));
+			super.getName().add(Text.create(text));
 		} else {
 			super.getName().get(0).setValue(text);
 		}

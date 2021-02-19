@@ -270,7 +270,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	@Override
 	public void setReasonText(String text) {
 		if(text==null) return;		
-		Text allowanceChargeReasonCode = new Text(text);
+		Text allowanceChargeReasonCode = Text.create(text);
 		super.setReason(allowanceChargeReasonCode);
 	}
 

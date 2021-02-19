@@ -334,7 +334,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	@Override
 	public void setRemittanceInformation(String text) { 
 		if(text==null) return;
-		super.getPaymentReference().add(new Text(text));
+		super.getPaymentReference().add(Text.create(text));
 	}
 
 	@Override

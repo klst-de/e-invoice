@@ -131,7 +131,7 @@ INFORMATION: List<?> getter : getDescription
 		return list.get(0).getValue();
 	}
 	public void setPaymentTerm(String description) {
-		if(description!=null) super.getDescription().add(new Text(description));
+		if(description!=null) super.getDescription().add(Text.create(description));
 	}
 
 	// BG-19.BT-89 0..1 Mandate reference identifier, DirectDebitMandateID

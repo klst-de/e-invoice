@@ -163,7 +163,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 	// BT-82 
 	void setPaymentMeansText(String text) {
 		if(text!=null) {
-			super.getInformation().add(new Text(text));
+			super.getInformation().add(Text.create(text));
 		}
 	}
 	String getPaymentMeansText() {
@@ -275,7 +275,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 	public void setPaymentAccountName(String name) {
 		if(name==null) return;
 		if(this.isCreditTransfer()) {
-			super.getPayeePartyCreditorFinancialAccount().setAccountName(new Text(name));	
+			super.getPayeePartyCreditorFinancialAccount().setAccountName(Text.create(name));	
 		}
 	}
 

@@ -337,7 +337,7 @@ keine Beispiele für Tests!
 	@Override
 	public void setTaxExemption(String text, String codeId) {
 		if(text!=null) {
-			super.setExemptionReason(new Text(text));
+			super.setExemptionReason(Text.create(text));
 		}
 		if(codeId!=null) {
 			CodeType code = new CodeType();

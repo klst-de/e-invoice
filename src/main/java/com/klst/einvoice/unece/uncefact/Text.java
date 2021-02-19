@@ -1,5 +1,7 @@
 package com.klst.einvoice.unece.uncefact;
 
+import com.klst.einvoice.reflection.CopyCtor;
+
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 /**
@@ -17,9 +19,27 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  */
 public class Text extends TextType {
 
-	public Text(String value) {
-		super();
+	static Text create(String value) {
+		return new Text(value); 
+	}
+	static Text create(TextType object) {
+		if(object instanceof TextType && object.getClass()!=TextType.class) {
+			// object is instance of a subclass of TextType, but not TextType itself
+			return (Text)object;
+		} else {
+			return new Text(object); 
+		}
+	}
+
+	private Text(String value) {
 		super.setValue(value);
+	}
+	
+	private Text(TextType object) {
+		super();
+		if (object != null) {
+			CopyCtor.invokeCopy(this, object);
+		}
 	}
 	
 }

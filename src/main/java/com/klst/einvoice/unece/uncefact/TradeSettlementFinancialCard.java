@@ -104,7 +104,7 @@ public class TradeSettlementFinancialCard extends TradeSettlementFinancialCardTy
 	@Override
 	public void setCardHolderName(String name) {
 		if(name==null) return;
-		super.setCardholderName(new Text(name));	
+		super.setCardholderName(Text.create(name));	
 	}
 
 	@Override

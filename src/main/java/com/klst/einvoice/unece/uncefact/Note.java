@@ -87,7 +87,7 @@ public class Note extends NoteType implements InvoiceNote, InvoiceNoteFactory {
 
 	void setNote(String content) {
 		if(content==null) return; // defensiv, sollte nicht vorkommen
-		super.getContent().add(new Text(content));
+		super.getContent().add(Text.create(content));
 	}
 
 }

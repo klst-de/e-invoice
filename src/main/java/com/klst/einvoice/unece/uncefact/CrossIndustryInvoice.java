@@ -352,7 +352,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	public void setBuyerReference(String reference) {
 		if(reference==null) return;
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setBuyerReference(new Text(reference));
+		headerTradeAgreement.setBuyerReference(Text.create(reference));
 		// TODO hier Leitweg-ID
 		
 		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
@@ -382,7 +382,7 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 		if(docRefId==null) return; // optional
 		ProcuringProjectType procuringProject = new ProcuringProjectType();
 		procuringProject.setID(new ID(docRefId));
-		procuringProject.setName(new Text(name));
+		procuringProject.setName(Text.create(name));
 		
 		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
 		headerTradeAgreement.setSpecifiedProcuringProject(procuringProject);

@@ -474,7 +474,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 
 	// BG-31.BT-153 1..1 SpecifiedTradeProduct.Name
 	void setItemName(String text) {
-		specifiedTradeProduct.getName().add(new Text(text));
+		specifiedTradeProduct.getName().add(Text.create(text));
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
 
@@ -486,7 +486,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	@Override // 0 .. 1 SpecifiedTradeProduct.Description BT-154 Bsp: <ram:Description>Zeitschrift Inland</ram:Description>
 	public void setDescription(String text) {
 		if(text==null) return;
-		specifiedTradeProduct.setDescription(new Text(text));
+		specifiedTradeProduct.setDescription(Text.create(text));
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
 
@@ -622,8 +622,8 @@ Bsp.
 	public void addItemAttribute(String name, String value) {
 		if(name==null) return; // darf nicht sein, denn BT-160 + BT-161 sind mandatory 
 		ProductCharacteristicType productCharacteristics = new ProductCharacteristicType();
-		productCharacteristics.getDescription().add(new Text(name)); //nur eine wg. 1..1
-		productCharacteristics.getValue().add(new Text(value)); //nur eine wg. 1..1
+		productCharacteristics.getDescription().add(Text.create(name)); //nur eine wg. 1..1
+		productCharacteristics.getValue().add(Text.create(value)); //nur eine wg. 1..1
 		specifiedTradeProduct.getApplicableProductCharacteristic().add(productCharacteristics);
 		super.setSpecifiedTradeProduct(specifiedTradeProduct);
 	}
