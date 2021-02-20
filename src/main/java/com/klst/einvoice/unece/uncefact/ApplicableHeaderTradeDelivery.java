@@ -16,6 +16,11 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 // TODO rename to HeaderTradeDelivery
 public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType implements BG13_DeliveryInformation {
 
+	@Override
+	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+		return TradeAddress.create(countryCode, postalCode, city);
+	}
+	
 	// factory
 	static ApplicableHeaderTradeDelivery create(String name, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
 		return new ApplicableHeaderTradeDelivery(name, ts, address, locationId, schemeId);
@@ -146,4 +151,5 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 		stringBuilder.append("]");
 		return stringBuilder.toString();
 	}
+
 }

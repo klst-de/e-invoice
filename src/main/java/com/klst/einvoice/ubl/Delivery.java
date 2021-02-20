@@ -29,6 +29,11 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
  */
 public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 
+	@Override
+	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
+		return Address.create(countryCode, postalCode, city);
+	}
+
 	static Delivery create() {
 		return create((DeliveryType)null);
 	}

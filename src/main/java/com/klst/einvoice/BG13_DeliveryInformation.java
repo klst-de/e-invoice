@@ -86,7 +86,7 @@ import com.klst.untdid.codelist.DateTimeFormats;
     </cac:Delivery>
 
  */
-public interface BG13_DeliveryInformation {
+public interface BG13_DeliveryInformation extends BG15_DeliverToAddress {
 	
 	// BT-70 0..1 Deliver to party name
 	public String getName();
@@ -107,7 +107,7 @@ public interface BG13_DeliveryInformation {
 	// BG-14 ++ 0..1 INVOICING PERIOD
 	
 	// BG-15 ++ 0..1 DELIVER TO ADDRESS
-	public PostalAddress getAddress();
-	public void setAddress(PostalAddress address);
+//	public PostalAddress getAddress();
+//	public void setAddress(PostalAddress address);
 
 }
