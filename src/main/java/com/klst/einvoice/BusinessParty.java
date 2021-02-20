@@ -15,17 +15,33 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Part
  */
 
 public interface BusinessParty extends BusinessPartyFactory {
-	
+
+	// use factory: createParty(String name, String tradingName, PostalAddress address, IContact contact);
+	// instead setter:
+//	public void setRegistrationName(String name);
+
 	// BG-4.BT-27  1..1 Seller name
-	// BG-7.BT-44  1..1  Buyer name
-	// BG-10.BT-59 1..1  Payee name
+	// BG-7.BT-44  1..1 Buyer name
+	// BG-10.BT-59 1..1 Payee name
 	// BG-11.BT-62 1..1 Seller tax representative name
 	// BG-13.BT-70 0..1 Deliver to party name
+	/**
+	 * The full formal name by which the Business Party is registered in the national registry of legal entities 
+	 * or as a Taxable person or otherwise trades as a person or persons.
+	 * 
+	 * @return Business Party name
+	 */
 	public String getRegistrationName();
-	public void setRegistrationName(String name);
 	
 	// BG-4.BT-28  0..1 Seller trading name (also known as Business name)
 	// BG-7.BT-45  0..1  Buyer trading name
+	/**
+	 * A name by which the Business Party is known, other than registration name 
+	 * (also known as Business name). 
+	 * This may be used if different from the registration name. 
+	 * 
+	 * @return Business Party trading name
+	 */
 	public String getBusinessName();
 	public void setBusinessName(String name);
 	
@@ -34,30 +50,47 @@ public interface BusinessParty extends BusinessPartyFactory {
 	// BG-10.BT-60 0..1  Payee identifier
 	public String getId(); // kleingeschrieben, nicht ID!
 	public Identifier getIdentifier();
-	public void setIdentifier(Identifier id);
-	public void setId(String name);
+
 	public void setId(String name, String schemeID);
+	default void setId(String name) {
+		setId(name, null);
+	}
+	default void setIdentifier(Identifier id) {
+		if(id!=null) setId(id.getContent(), id.getSchemeIdentifier());
+	}
 
 	// BG-4.BT-30  0..1 Seller legal registration identifier 
 	// BG-7.BT-47  0..1  Buyer legal registration identifier
 	// BG-10.BT-61 0..1  Payee legal registration identifier
 	public String getCompanyId();
 	public Identifier getCompanyIdentifier();
-	public void setCompanyIdentifier(Identifier id);
-	public void setCompanyId(String name);
+	
 	public void setCompanyId(String name, String schemeID);
+	default void setCompanyId(String name) {
+		setCompanyId(name, null);
+	}
+	default void setCompanyIdentifier(Identifier id) {
+		if(id!=null) setCompanyId(id.getContent(), id.getSchemeIdentifier());
+	}
 	
 	// BG-4.BT-31  0..1 Seller VAT identifier mit schemeID BT-31-0 "VA" in CII, aber "VAT" in UBL (BUG)
 	// BG-4.BT-32  0..1 Seller tax registration identifier mit schemeID BT-32-0 "FC"
 	// BG-7.BT-48  0..1  Buyer VAT identifier
 	// BG-11.BT-63 1..1 Seller tax representative VAT identifier
-//	public String getTaxRegistrationId(String schemeID); // raus
 	
 	// usually the list contains one element, for BG-4 can be two BT-31+BT-32
 	// in BG-7, BG-11 ist nur ein Eintrag ==> VAT
 	public List<Identifier> getTaxRegistrationIdentifier();
-	public void addTaxRegistrationIdentifier(Identifier id);
+
 	public void addTaxRegistrationId(String name, String schemeID);
+	default void addTaxRegistrationIdentifier(Identifier id) {
+		if(id!=null) addTaxRegistrationId(id.getContent(), id.getSchemeIdentifier());
+	}
+	
+	// BG-4.BT-30 0..1 Seller legal registration identifier
+	// BG-7.BT-47 0..1 Buyer legal registration identifier
+	public String getCompanyLegalForm();
+	public void setCompanyLegalForm(String name);
 	
 	/**
 	 * VAT identifier - The VAT identifier (also known as VAT identification number).
@@ -102,13 +135,24 @@ public interface BusinessParty extends BusinessPartyFactory {
 		return null;
 	}
 
-	public String getCompanyLegalForm();
-	public void setCompanyLegalForm(String name);
-	
 	// BG-4.BT-34 Seller electronic address
 	// BG-7.BT-49 Buyer electronic address
 	public Identifier getUriUniversalCommunication(); // kleingeschrieben, nicht URI!
-	public void setUriUniversalCommunication(Identifier id);
+	
+	/**
+	 * set electronic address for Seller (BG-4.BT-34) or Buyer (BG-7.BT-49)
+	 * <p>
+	 * Identifies the Seller's electronic address to which the application level response 
+	 * to the invoice may be delivered.
+	 * <p>
+	 * Identifies the Buyer's electronic address to which the invoice is delivered.
+	 * 
+	 * @param name - electronic address
+	 * @param schemeID - shall be chosen from a list to be maintained by the Connecting Europe Facility.
+	 */
 	public void setUriUniversalCommunication(String name, String schemeID);
-		
+	default void setUriUniversalCommunication(Identifier id) {
+		if(id!=null) setUriUniversalCommunication(id.getContent(), id.getSchemeIdentifier());
+	}
+	
 }

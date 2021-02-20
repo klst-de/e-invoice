@@ -125,8 +125,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		return super.getName()==null ? null : getName().getValue();
 	}
 
-	@Override
-	public void setRegistrationName(String name) {
+	void setRegistrationName(String name) {
 		if(name==null) return;
 		super.setName(Text.create(name));
 	}
@@ -157,15 +156,6 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 
 	@Override
-	public void setId(String name) {
-		setId(name, null);
-	}
-	@Override
-	public void setIdentifier(Identifier id) {
-		if(id==null) return;
-		setId(id.getContent(), id.getSchemeIdentifier());
-	}
-	@Override
 	public void setId(String name, String schemeID) {
 		if(name==null) return;
 		super.getID().add(new ID(name, schemeID));
@@ -182,15 +172,6 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		return id==null ? null : new ID(id.getValue(), id.getSchemeID());
 	}
 
-	@Override
-	public void setCompanyIdentifier(Identifier id) {
-		if(id==null) return;
-		setCompanyId(id.getContent(), id.getSchemeIdentifier());
-	}
-	@Override
-	public void setCompanyId(String name) {
-		setCompanyId(name, null);
-	}
 	@Override
 	public void setCompanyId(String name, String schemeID) {
 		if(name==null) return;
@@ -211,11 +192,6 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		return result;
 	}
 	
-	@Override
-	public void addTaxRegistrationIdentifier(Identifier id) {
-		if(id==null) return;
-		addTaxRegistrationId(id.getContent(), id.getSchemeIdentifier());
-	}
 	@Override
 	public void addTaxRegistrationId(String name, String schemeID) {
 		if(name==null) return;
@@ -244,12 +220,6 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 		return new ID(uriList.get(0).getURIID().getValue(), uriList.get(0).getURIID().getSchemeID()); 
 	}
 
-	@Override
-	public void setUriUniversalCommunication(Identifier id) {
-		if(id==null) return;
-		setUriUniversalCommunication(id.getContent(), id.getSchemeIdentifier());
-	}
-	
 	@Override
 	public void setUriUniversalCommunication(String name, String schemeID) {
 		if(name==null) return;

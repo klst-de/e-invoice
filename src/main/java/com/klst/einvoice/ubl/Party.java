@@ -174,8 +174,7 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		return registrationName==null ? null : registrationName.getValue();
 	}
 
-	@Override
-	public void setRegistrationName(String name) {
+	private void setRegistrationName(String name) {
 		if(name==null) return;
 		RegistrationNameType registrationName = new RegistrationNameType();
 		registrationName.setValue(name);
@@ -212,17 +211,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 
 	@Override
-	public void setIdentifier(Identifier id) {
-		if(id==null) return;
-		setId(id.getContent(), id.getSchemeIdentifier());
-	}
-	
-	@Override
-	public void setId(String name) {
-		setId(name, null);
-	}
-
-	@Override
 	public void setId(String name, String schemeID) {
 		if(name==null) return;
 		PartyIdentificationType partyIdentification = new PartyIdentificationType();
@@ -242,17 +230,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 		if(partyLegalEntityList.isEmpty()) return null;
 		CompanyIDType companyID = partyLegalEntityList.get(0).getCompanyID();
 		return companyID==null ? null : new ID(companyID.getValue(), companyID.getSchemeID());
-	}
-
-	@Override
-	public void setCompanyId(String name) {
-		setCompanyId(name, null);
-	}
-
-	@Override
-	public void setCompanyIdentifier(Identifier id) {
-		if(id==null) return;
-		setCompanyId(id.getContent(), id.getSchemeIdentifier());
 	}
 
 	@Override
@@ -282,14 +259,8 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	}
 
 	@Override
-	public void addTaxRegistrationIdentifier(Identifier id) {
-		if(id==null) return;
-		addTaxRegistrationId(id.getContent(), id.getSchemeIdentifier());
-	}
-	@Override
 	public void addTaxRegistrationId(String name, String schemeID) { 
 /*
-
       <cac:PartyTaxScheme>
         <cbc:CompanyID>ATU123456789</cbc:CompanyID>
         <cac:TaxScheme>
@@ -302,7 +273,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
           <cbc:ID>FC</cbc:ID>
         </cac:TaxScheme>
       </cac:PartyTaxScheme>
-
  */
 		if(name==null) return;
 		CompanyIDType companyID = new CompanyIDType();
@@ -340,12 +310,6 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	public Identifier getUriUniversalCommunication() {
 		EndpointIDType endpointID = super.getEndpointID();
 		return endpointID==null ? null : new ID(endpointID.getValue(), endpointID.getSchemeID());
-	}
-
-	@Override
-	public void setUriUniversalCommunication(Identifier id) {
-		if(id==null) return;
-		setUriUniversalCommunication(id.getContent(), id.getSchemeIdentifier());
 	}
 
 	@Override
