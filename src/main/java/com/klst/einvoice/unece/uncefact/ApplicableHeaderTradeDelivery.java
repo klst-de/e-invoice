@@ -54,7 +54,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 	
 	private ApplicableHeaderTradeDelivery(String businessName, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
 		LOG.info("BT-70/businessName:"+businessName + " BT-72/Timestamp:"+ts + " BG-15 ++ 0..1 DELIVER TO ADDRESS:"+address + " BT-71/locationId:"+locationId);
-		party = new TradeParty(null, businessName, address, null);
+		party = TradeParty.create(null, businessName, address, null);
 		party.setId(locationId);
 		if(schemeId!=null) party.getGlobalID().add(new ID(schemeId));
 		setParty(party);		

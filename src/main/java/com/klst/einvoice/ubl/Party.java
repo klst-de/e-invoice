@@ -8,6 +8,7 @@ import com.klst.einvoice.BG10_Payee;
 import com.klst.einvoice.BG11_SellerTaxRepresentativeParty;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
+import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.BusinessPartyFactory;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
@@ -37,6 +38,14 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Registra
  * PartyLegalEntity
  */
 public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentativeParty {
+
+	@Override  // implements BusinessPartyFactory
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+		return create(name, tradingName, address, contact);
+	}
+	static Party create(String name, String tradingName, PostalAddress address, IContact contact) {
+		return new Party(name, tradingName, address, contact);
+	}
 
 	static Party create() {
 		return create((PartyType)null);
@@ -76,12 +85,12 @@ public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Paye
 	 * 
 	 * @see BusinessPartyFactory
 	 */
-	Party(String name, String businessName, PostalAddress address, IContact contact) {
+	private Party(String name, String businessName, PostalAddress address, IContact contact) {
 		super();
 		init(name, businessName, address, contact);
 	}
 	
-	void init(String registrationName, String businessName, PostalAddress address, IContact contact) {
+	private void init(String registrationName, String businessName, PostalAddress address, IContact contact) {
 		partyLegalEntity = new PartyLegalEntityType();
 		setRegistrationName(registrationName);
 		setBusinessName(businessName);

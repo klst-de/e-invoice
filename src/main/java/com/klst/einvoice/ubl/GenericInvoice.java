@@ -1531,25 +1531,26 @@ daher: NOT_IMPEMENTED
 		return resultLines;
 	}
 
-	// -------------------------------------------------------
+	// ----------------- factories to delegate
 	// BG-5 , BG-8 : POSTAL ADDRESS
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
-		Party party = Party.create();
-		return party.createAddress(countryCode, postalCode, city);
+		Party factory = Party.create();
+		return factory.createAddress(countryCode, postalCode, city);
 	}
 
 	// BG-6 , BG-9 CONTACT
 	@Override
 	public IContact createContact(String contactName, String contactTel, String contactMail) {
-		Party party = Party.create();
-		return party.createContact(contactName, contactTel, contactMail);
+		Party factory = Party.create();
+		return factory.createContact(contactName, contactTel, contactMail);
 	}
 
 	// BG-4 , BG-7 , BG-10 , BG-11 , BG-13 : SELLER, BUYER, ...
 	@Override
 	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
-		return new Party(name, tradingName, address, contact); 
+		Party factory = Party.create();
+		return factory.createParty(name, tradingName, address, contact);
 	}
 
 }

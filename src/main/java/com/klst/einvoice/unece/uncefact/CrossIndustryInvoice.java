@@ -1311,22 +1311,23 @@ Code Codename
 		return headerTradeAgreement;
 	}	
 
-	// ----------------- gemeinsam mit TradeParty : delegate
+	// ----------------- factories to delegate
 	@Override
 	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
-		return new TradeParty(name, tradingName, address, contact); 
+		TradeParty factory = TradeParty.create();
+		return factory.createParty(name, tradingName, address, contact); 
 	}
 
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
-		TradeParty party = TradeParty.create();
-		return party.createAddress(countryCode, postalCode, city);
+		TradeParty factory = TradeParty.create();
+		return factory.createAddress(countryCode, postalCode, city);
 	}
 
 	@Override
 	public IContact createContact(String contactName, String contactTel, String contactMail) {
-		TradeParty party = TradeParty.create();
-		return party.createContact(contactName, contactTel, contactMail);
+		TradeParty factory = TradeParty.create();
+		return factory.createContact(contactName, contactTel, contactMail);
 	}
 
 }

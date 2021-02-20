@@ -14,7 +14,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Part
  * <br> BG-13 + 0..1 DELIVERY INFORMATION / BT-70 BT-71 ShipToTradeParty
  */
 
-public interface BusinessParty {
+public interface BusinessParty extends BusinessPartyFactory {
 	
 	// BG-4.BT-27  1..1 Seller name
 	// BG-7.BT-44  1..1  Buyer name

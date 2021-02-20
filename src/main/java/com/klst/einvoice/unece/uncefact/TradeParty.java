@@ -8,6 +8,7 @@ import com.klst.einvoice.BG10_Payee;
 import com.klst.einvoice.BG11_SellerTaxRepresentativeParty;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
+import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.BusinessPartyFactory;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
@@ -29,8 +30,16 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 // BG-11 + 0..1 SELLER TAX REPRESENTATIVE PARTY
 public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentativeParty { 
 
-	static TradeParty create() {
-		return create((TradePartyType)null);
+	@Override  // implements BusinessPartyFactory
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+		return create(name, tradingName, address, contact);
+	}
+	static TradeParty create(String name, String tradingName, PostalAddress address, IContact contact) {
+		return new TradeParty(name, tradingName, address, contact);
+	}
+
+	static TradeParty create() { // aka factory
+		return new TradeParty((TradePartyType)null);
 	}
 	// copy factory
 	static TradeParty create(TradePartyType object) {
@@ -64,7 +73,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	 * 
 	 * @see BusinessPartyFactory
 	 */
-	TradeParty(String registrationName, String businessName, PostalAddress address, IContact contact) {
+	private TradeParty(String registrationName, String businessName, PostalAddress address, IContact contact) {
 		super();
 		setRegistrationName(registrationName);
 		setBusinessName(businessName);
