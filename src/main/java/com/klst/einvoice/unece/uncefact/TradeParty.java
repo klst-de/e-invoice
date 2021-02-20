@@ -28,7 +28,8 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 // BG-7 + 1..1 BUYER
 // BG-10 + 0..1 PAYEE
 // BG-11 + 0..1 SELLER TAX REPRESENTATIVE PARTY
-public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentativeParty { 
+public class TradeParty extends TradePartyType 
+		implements BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentativeParty { 
 
 	@Override  // implements BusinessPartyFactory
 	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
@@ -53,7 +54,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 	}
 
 	private static final Logger LOG = Logger.getLogger(TradeParty.class.getName());
-	
+
 	// copy ctor
 	private TradeParty(TradePartyType doc) {
 		super();
@@ -91,10 +92,7 @@ public class TradeParty extends TradePartyType implements BG4_Seller, BG7_Buyer,
 
 	@Override
 	public void setAddress(PostalAddress address) {
-		if(address!=null) setAddress((TradeAddressType)address);
-	}
-	void setAddress(TradeAddressType address) {
-		super.setPostalTradeAddress(address);
+		if(address!=null) super.setPostalTradeAddress((TradeAddress)address);
 	}
 	
 	@Override

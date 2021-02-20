@@ -12,10 +12,6 @@ package com.klst.einvoice;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for (en)EN_16931_1_2017 rule and request IDs
  */
-
-// CII:
-// 1 .. 1 BuyerTradeParty  Käufer                                        BG-7
-
 /*  (de) rules / Geschäftsregel:
  * 
  * BR-7     : Käufer 
@@ -39,7 +35,7 @@ package com.klst.einvoice;
  * BR-DE-9  : Postleitzahl der Erwerberanschrift
  * Das Element „Buyer post code“ (BT-53) muss übermittelt werden.
  */
-public interface BG7_Buyer extends BusinessParty, PostalAddressFactory, BG9_BuyerContact {
+public interface BG7_Buyer extends BusinessParty, BG8_BuyerPostalAddress, BG9_BuyerContact {
 	
 /*
 
@@ -63,8 +59,8 @@ public interface BG7_Buyer extends BusinessParty, PostalAddressFactory, BG9_Buye
 	// ...
 	
 	// BG-8 ++ 1..1 BUYER POSTAL ADDRESS
-	public PostalAddress getAddress();
-	public void setAddress(PostalAddress address);
+//	public PostalAddress getAddress();
+//	public void setAddress(PostalAddress address);
 	
 	// BG-9 ++ 0..1 BUYER CONTACT
 //	public IContact getIContact();
