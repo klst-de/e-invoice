@@ -33,7 +33,8 @@ Eine andere mögliche Namensgebung wären die Profilnamen mit Hierarhie
 
  */
 public interface CoreInvoice extends CoreInvoiceFactory, BG1_InvoiceNote, BG2_ProcessControl, BG3_PrecedingInvoiceReference, BG14_InvoicingPeriod, 
-	PaymentInstructionsFactory, CreditTransferFactory, PaymentCardFactory, DirectDebitFactory, BG22_DocumentTotals, 
+	PaymentInstructionsFactory, CreditTransferFactory, PaymentCardFactory, DirectDebitFactory, 
+	BG22_DocumentTotals, BG23_VatBreakdown, 
 	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
 
 	/**
@@ -620,21 +621,11 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge);
 	public List<AllowancesAndCharges> getAllowancesAndCharges();
 	
-	/**
-	 * Factory method to create Business Group VAT BREAKDOWN BG-23
-	 * 
-	 * @param taxableAmount (mandatory) VAT category taxable amount
-	 * @param taxAmount     (mandatory) VAT category tax amount
-	 * @param code          (mandatory) VAT category code 
-	 * @param percent                   VAT category rate
-	 * 
-	 * @return VatBreakdown object
-	 */
-	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode code, BigDecimal percent);
-
 	// VAT BREAKDOWN BG-23 1..* (mandatory)
-	public void addVATBreakDown(VatBreakdown vatBreakdown);
-	public List<VatBreakdown> getVATBreakDowns();
+	// Factory method to create Business Group VAT BREAKDOWN BG-23
+//	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode code, BigDecimal percent);
+//	public void addVATBreakDown(VatBreakdown vatBreakdown);
+//	public List<VatBreakdown> getVATBreakDowns();
 	
 	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	// BG-24.BT-122 ++ 1..1 Supporting document reference
