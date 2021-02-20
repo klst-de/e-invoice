@@ -1,15 +1,12 @@
 package com.klst.einvoice;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
-import com.klst.untdid.codelist.TaxCategoryCode;
 
 /*
 
