@@ -13,11 +13,11 @@ Beispiel: Anschrift
 ```
 
 Aus elementaren Komponenten wird mittels einer factory Methode eine neue Komponente gebaut.
+So entstehen aus Adressen und Kontaktdaten und weiteren elementaren Dataten wie Handelsname, Steuernummer, ... Geschäftspartenerobjekte füe Käufer und Verkäufer:
 
 ```
    PostalAddress --- extends ---> PostalAddressFactory
-                <---- create -----
-         ^
+         ^      <---- create -----
          |
          |
 BusinessPartyAddress 
@@ -25,11 +25,20 @@ BusinessPartyAddress
          |
          |
 BG8_BuyerPostalAddress           
-
-
-        Contact <---------------> ContactFactory
-  BusinessParty <---------------> BusinessPartyFactory
-
-BG7_Buyer extends BusinessParty, PostalAddressFactory, BG9_BuyerContact !!!!
-BG8_BuyerPostalAddress extends BusinessPartyAddress
+^
+|
+|       Contact <---------------> ContactFactory
+|          ^
+|          |
+|          |
+|  BusinessPartyContact
+|          ^
+|          |
+|          |
++->BG9_BuyerContact
+|
+|
++->BusinessParty <---------------> BusinessPartyFactory
+|
+BG7_Buyer extends BusinessParty, BG8_BuyerPostalAddress, BG9_BuyerContact
 ```
