@@ -54,6 +54,7 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Proj
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.SupplierPartyType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSubtotalType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxTotalType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.AccountingCostType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.AllowanceTotalAmountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.BuyerReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ChargeTotalAmountType;
@@ -606,51 +607,25 @@ UBL:
 	}
 	
 	// BT-19 + 0..1 Buyer accounting reference
-/* keine kosit Beispiele
-example-peppol-ubl.xml : ...
-  <cac:AccountingSupplierParty>
-    <!-- Die Lieferantennummer/Kreditorennummer: -->
-    <!-- The ID of your company in the systems of the government: -->
-    <cbc:CustomerAssignedAccountID>11011011</cbc:CustomerAssignedAccountID>
+/* keine kosit Beispiele, dafür https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/270
 
-ABER: [UBL-CR-138]-A UBL invoice should not include the AccountingSupplierParty CustomerAssignedAccountID
-daher: NOT_IMPEMENTED
+ubl-tc434-example2.xml :
+    <cbc:AccountingCost>Project cost code 123</cbc:AccountingCost>
+
  */
 	public void setBuyerAccountingReference(Reference reference) {
-		LOG.warning(NOT_IMPEMENTED); // TODO
-		return;
-//		if(reference==null) return;
-//		// falls das peppol Beispiel zutrifft muss die Implementierung setBuyer berücksichtigen:
-//		CustomerAssignedAccountIDType caaID = new CustomerAssignedAccountIDType();
-//		caaID.setValue(reference.getName());
-//		
-//		if(isInvoiceType) {
-//			CustomerPartyType customerparty = invoice.getAccountingCustomerParty();
-//			if(customerparty==null) {
-//				customerparty = new CustomerPartyType();
-//				customerparty.setCustomerAssignedAccountID(caaID);
-//			} else {
-//				customerparty.setCustomerAssignedAccountID(caaID);
-//			}
-//			invoice.setAccountingCustomerParty(customerparty);
-//		} else {
-//			CustomerPartyType customerparty = creditNote.getAccountingCustomerParty();
-//			if(customerparty==null) {
-//				customerparty = new CustomerPartyType();
-//				customerparty.setCustomerAssignedAccountID(caaID);
-//			} else {
-//				customerparty.setCustomerAssignedAccountID(caaID);
-//			}
-//			creditNote.setAccountingCustomerParty(customerparty);
-//		}
+		if(reference==null) return;
+		AccountingCostType accountingCost = new AccountingCostType();
+		accountingCost.setValue(reference.getContent());
+		if(isInvoiceType) {
+			invoice.setAccountingCost(accountingCost);
+		} else {
+			creditNote.setAccountingCost(accountingCost);
+		}
 	}
 	public Reference getBuyerAccountingReference() {
-		LOG.warning(NOT_IMPEMENTED); // TODO
-		return null;
-//		CustomerPartyType customerparty = isInvoiceType ? invoice.getAccountingCustomerParty() : creditNote.getAccountingCustomerParty();
-//		if(customerparty==null) return null;
-//		CustomerAssignedAccountIDType caaID = customerparty.getCustomerAssignedAccountID();
-//		return caaID==null ? null : new ID(caaID.getValue());
+		AccountingCostType accountingCost = isInvoiceType ? invoice.getAccountingCost() : creditNote.getAccountingCost();
+		return accountingCost==null ? null : new ID(accountingCost.getValue());
 	}
 	
 	// BT-20 + 0..1 Payment terms

@@ -222,6 +222,15 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setReceiptReference(testDoc.getReceiptReference()); // BT-15 + 0..1
 		ublInvoice.setDespatchAdviceReference(testDoc.getDespatchAdviceReference()); // BT-16 + 0..1
 		ublInvoice.setTenderOrLotReference(testDoc.getTenderOrLotReference()); // BT-17 + 0..1
+		// BT-18 + 0..1
+		// Testfälle 01.15a , 02.01a:
+		Identifier identifierBT18 = testDoc.getInvoicedObjectIdentifier();
+		if(identifierBT18!=null) {
+			ublInvoice.setInvoicedObjectIdentifier(identifierBT18);
+//			ublInvoice.setInvoicedObject(identifierBT18.getContent());
+//			ublInvoice.setInvoicedObject(identifierBT18.getContent(), identifierBT18.getSchemeIdentifier());
+		}
+		ublInvoice.setBuyerAccountingReference(testDoc.getBuyerAccountingReference()); // BT-19 + 0..1
 
 		// 0..n BG3_PrecedingInvoiceReference:
 		List<PrecedingInvoice> precedingInvoices = testDoc.getPrecedingInvoices();
@@ -230,14 +239,6 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			LOG.info("BG3_PrecedingInvoiceReference: "+precedingInvoiceReference);
 			// Datum erfunden TODO
 			ublInvoice.setPrecedingInvoiceReference(precedingInvoiceReference, "2013-03-10");
-		}
-
-		// Testfälle 01.15a , 02.01a:
-		Identifier identifierBT18 = testDoc.getInvoicedObjectIdentifier();
-		if(identifierBT18!=null) {
-			ublInvoice.setInvoicedObjectIdentifier(identifierBT18);
-//			ublInvoice.setInvoicedObject(identifierBT18.getContent());
-//			ublInvoice.setInvoicedObject(identifierBT18.getContent(), identifierBT18.getSchemeIdentifier());
 		}
 
 		List<InvoiceNote> notes = testDoc.getInvoiceNotes();
