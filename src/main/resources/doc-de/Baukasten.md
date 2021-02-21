@@ -1,6 +1,6 @@
 # Baukasten (de)
 
-Die e-order und e-invoice sind modular aufgebaut.
+Die e-order und e-invoice Schnittstelle ist modular aufgebaut.
 
 ![](../image/lego.jpg)
 
