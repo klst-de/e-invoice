@@ -61,6 +61,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ChargeTo
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CompanyIDType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CreditNoteTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.CustomizationIDType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DescriptionCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentCurrencyCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EndDateType;
@@ -87,8 +88,6 @@ import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.DateType;
 public class GenericInvoice <T> implements CoreInvoice  {
 
 	private static final Logger LOG = Logger.getLogger(GenericInvoice.class.getName());
-	
-	private static final String NOT_IMPEMENTED = "NOT IMPEMENTED";
 	
 	T t;
 	boolean isInvoiceType = false;
@@ -280,28 +279,41 @@ public class GenericInvoice <T> implements CoreInvoice  {
 		return taxPointDate==null ? null : DateTimeFormats.xmlGregorianCalendarToTs(taxPointDate.getValue());
 	}
 
-	// BT-8 + 0..1 Value added tax point date code
+	// BT-8 0..1 Value added tax point date code
 	/* Folgende Codes aus der Codeliste UNTDID 2005 werden verwendet:
 	 *   3 (Invoice document issue date time)
 	 *  35 (Delivery date/time, actual)
 	 * 432 (Paid to date)
+	 * see a567a52 in ConnectingEurope/eInvoicing-EN16931
+	 * 
 	 * Das Informationselement „Value added tax point date code“ (BT-8) wird verwendet, 
 	 * wenn das Informationselement „Value added tax point date“ (BT-7) zum Zeitpunkt der Rechnungsstellung noch nicht bekannt ist.
 	 * Die Anwendung von BT-7 und 8 schließen sich gegenseitig aus.
 	 * 
-0 .. n ApplicableTradeTax Umsatzsteueraufschlüsselung BG-23
-0 .. 1 DueDateTypeCode Code für das Datum der Steuerfälligkeit BT-8
+CII:
+0 .. 1 DueDateTypeCode Code für das Datum der Steuerfälligkeit BT-8 Values: 5 29 72 aus UNTDID 2475
+-  5: Ausstellungsdatum des Rechnungsbelegs
+- 29: Liefertermin, Ist-Zustand
+- 72: Bis heute bezahlt
+
 	 */
 	// In Deutschland ist das Liefer- und Leistungsdatum maßgebend (BT-72)
-	// keine Beispiele 
+	// keine Beispiele in kosit
 	@Override
 	public void setTaxPointDateCode(String code) {
-		LOG.warning(NOT_IMPEMENTED); // in ubl nicht definiert
+		if(code==null) return; // optional
+		DescriptionCodeType descriptionCode = new DescriptionCodeType();
+		descriptionCode.setValue(code);
+		PeriodType period = getPeriod0();
+		period.getDescriptionCode().add(descriptionCode);
 	}
 	@Override
 	public String getTaxPointDateCode() {
-		LOG.warning(NOT_IMPEMENTED); // in ubl nicht definiert
-		return null;	
+		List<PeriodType> list = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
+		if(list.isEmpty()) return null;
+		List<DescriptionCodeType> dcList = list.get(0).getDescriptionCode();
+		if(dcList.isEmpty()) return null;
+		return dcList.get(0).getValue();
 	}
 	
 	// BT-9 + 0..1 Payment due date
@@ -878,11 +890,11 @@ ubl-tc434-example2.xml :
 
 	// BG-14 ++ 0..1 INVOICING PERIOD
 	List<PeriodType> periodList = null;
-	PeriodType getPeriod0() {
+	private PeriodType getPeriod0() {
 		if(periodList==null) {
 			periodList = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
 			if(periodList.isEmpty()) {
-				LOG.fine("BG-14 0..1 INVOICING PERIOD isEmpty");
+				LOG.fine("BT-8 0..1 TaxPointDateCode / BG-14 0..1 INVOICING PERIOD isEmpty");
 				PeriodType period = new PeriodType();
 				periodList.add(period);
 			}
