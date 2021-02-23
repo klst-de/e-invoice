@@ -118,22 +118,23 @@ public class TradeParty extends TradePartyType
 		return TradeContact.create(contactName, contactTel, contactMail);
 	}
 
+	// (registration)Name BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
 	@Override
 	public String getRegistrationName() {
 		return super.getName()==null ? null : getName().getValue();
 	}
-
+	// nicht public, da im ctor
 	void setRegistrationName(String name) {
 		if(name==null) return;
 		super.setName(Text.create(name));
 	}
 
+	// businessName       BT-28 0..1 Handelsname des Verkäufers / Seller trading name
 	@Override
 	public String getBusinessName() {
 		TextType text = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getTradingBusinessName();
 		return text==null ? null : text.getValue();
 	}
-
 	@Override
 	public void setBusinessName(String name) {
 		if(name==null) return;
@@ -143,20 +144,43 @@ public class TradeParty extends TradePartyType
 		getSpecifiedLegalOrganization().setTradingBusinessName(Text.create(name));
 	}
 
+	// BT-29 ++ 0..n Seller identifier ( mit Schema )         / Kennung des Verkäufers
 	@Override // 0..n returns the first
+/*
+ID vs GlobalID
+Anwendung: 
+Wenn der Verkäufer eine Global ID hat, soll diese genutzt werden. 
+Ansonsten wird das Feld ID genutzt.
+ */
 	public Identifier getIdentifier() {
-		List<IDType> list = this.getID();
-		return list.isEmpty() ? null : new ID(list.get(0).getValue(), list.get(0).getSchemeID());
+		List<IDType> listGlobalID = super.getGlobalID();
+		if(listGlobalID.isEmpty()) { // Ansonsten wird das Feld ID genutzt:
+			List<IDType> list = this.getID();
+			return list.isEmpty() ? null : new ID(list.get(0).getValue(), list.get(0).getSchemeID());
+		} else {
+			return listGlobalID.isEmpty() ? null : new ID(listGlobalID.get(0).getValue(), listGlobalID.get(0).getSchemeID());
+		}
 	}
+	@Override
 	public String getId() {
-		List<IDType> list = this.getID();
-		return list.isEmpty() ? null : list.get(0).getValue();
+		List<IDType> listGlobalID = super.getGlobalID();
+		if(listGlobalID.isEmpty()) { // Ansonsten wird das Feld ID genutzt:
+			List<IDType> list = this.getID();
+			return list.isEmpty() ? null : list.get(0).getValue();
+		} else {
+			// wenn getSchemeID existiert, dann macht weglassen wenig Sinn!
+			return listGlobalID.isEmpty() ? null : listGlobalID.get(0).getValue();
+		}
 	}
-
 	@Override
 	public void setId(String name, String schemeID) {
 		if(name==null) return;
-		super.getID().add(new ID(name, schemeID));
+		// mit schemeID ==> GlobalID
+		if(schemeID==null) {
+			super.getID().add(new ID(name, schemeID));
+		} else {
+			super.getGlobalID().add(new ID(name, schemeID));
+		}
 	}
 
 	@Override
