@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.BG10_Payee;
-import com.klst.einvoice.BG11_SellerTaxRepresentativeParty;
+import com.klst.einvoice.BG11_SellerTaxRepresentative;
 import com.klst.einvoice.BG4_Seller;
 import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
@@ -37,7 +37,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Registra
  * PartyTaxScheme
  * PartyLegalEntity
  */
-public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentativeParty {
+public class Party extends PartyType implements BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentative {
 
 	@Override  // implements BusinessPartyFactory
 	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
