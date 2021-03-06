@@ -9,19 +9,20 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.DirectDebit;
-import com.klst.einvoice.GlobalIdentifier;
-import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
-import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
+import com.klst.einvoice.BusinessPartyAddress;
+import com.klst.einvoice.BusinessPartyContact;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PrecedingInvoice;
+import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.ubl.GenericLine;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -131,11 +132,13 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		LOG.info("ublInvoice "+ublInvoice);
 		
 		ublInvoice.setSeller(testDoc.getSeller());
-		LOG.info("Seller Address and Contact "+ublInvoice.getSeller().getAddress() + " "+ublInvoice.getSeller().getIContact());
-		BG7_Buyer buyer = testDoc.getBuyer();
+		LOG.info("Seller Address and Contact "+((BusinessPartyAddress)ublInvoice.getSeller()).getAddress() 
+				+ " "+((BusinessPartyContact)ublInvoice.getSeller()).getIContact());
+		BusinessParty buyer = testDoc.getBuyer();
 		ublInvoice.setBuyer(testDoc.getBuyer());
 		LOG.info("Buyer UriUniversalCommunication:" + buyer.getUriUniversalCommunication());
-		LOG.info("Buyer Address and Contact "+ublInvoice.getBuyer().getAddress() + " "+ublInvoice.getBuyer().getIContact());
+		LOG.info("Buyer Address and Contact "+((BusinessPartyAddress)ublInvoice.getBuyer()).getAddress() 
+				+ " "+((BusinessPartyContact)ublInvoice.getBuyer()).getIContact());
 		
 		makeOptionals(ublInvoice, testDoc);
 		

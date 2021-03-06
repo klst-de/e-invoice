@@ -532,7 +532,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	// BG-4 + 1..1 SELLER @see BG4_Seller
 	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm);
 	public void setSeller(BusinessParty party);
-	public BG4_Seller getSeller();
+	public BusinessParty getSeller();
 	
 	// BG-5 ++ 1..1 SELLER POSTAL ADDRESS @see PostalAddress
 	// BG-6 ++ 0..1 SELLER CONTACT @see IContact
@@ -540,7 +540,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	// BG-7 + 1..1 BUYER @see BG7_Buyer
 	public void setBuyer(String name, PostalAddress address, IContact contact);
 	public void setBuyer(BusinessParty party);
-	public BG7_Buyer getBuyer();
+	public BusinessParty getBuyer();
 	
 	// BG-8 ++ 1..1 BUYER POSTAL ADDRESS @see PostalAddress
 	// BG-9 ++ 0..1 BUYER CONTACT @see IContact

@@ -9,15 +9,15 @@ import java.util.logging.Logger;
 
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.DirectDebit;
-import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
-import com.klst.einvoice.BG4_Seller;
-import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
+import com.klst.einvoice.BusinessPartyAddress;
+import com.klst.einvoice.BusinessPartyContact;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.DirectDebit;
+import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentInstructions;
@@ -83,10 +83,10 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		});
 
 
-		BG4_Seller testSellerParty = testDoc.getSeller();
+		BusinessParty testSellerParty = testDoc.getSeller();
 		BusinessParty sellerParty = cii.createParty( testSellerParty.getRegistrationName()     // BT-27 String name
-				                          , testSellerParty.getAddress()              // TradeAddress address
-				                          , testSellerParty.getIContact()             // TradeContact contact
+				                          , ((BusinessPartyAddress)testSellerParty).getAddress()              // TradeAddress address
+				                          , ((BusinessPartyContact)testSellerParty).getIContact()             // TradeContact contact
 				                          );
 		sellerParty.setBusinessName(testSellerParty.getBusinessName()) ; // BT-28
 		sellerParty.setIdentifier(testSellerParty.getIdentifier()); // BT-29
@@ -127,7 +127,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 				);
 		cii.setSeller(sellerParty);
 
-		BG7_Buyer buyerParty = testDoc.getBuyer();
+		BusinessParty buyerParty = testDoc.getBuyer();
 		if(((TradeParty)buyerParty).getSpecifiedTaxRegistration().isEmpty()) {
 			LOG.warning("BG-7 buyerParty.SpecifiedTaxRegistration().isEmpty() mandatory!" );
 		} else {
@@ -139,7 +139,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 					);
 //			buyerParty.setUriUniversalCommunication(buyerTradeParty.getUriUniversalCommunication(), null); // TODO
 		}
-		LOG.info("buyerParty:"+buyerParty.getBusinessName() + " Address:"+buyerParty.getAddress());
+		LOG.info("buyerParty:"+buyerParty.getBusinessName() + " Address:"+((BusinessPartyAddress)buyerParty).getAddress());
 		cii.setBuyer(buyerParty);
 
 		// Cardinality: 0..n EN16931-ID: BG-24
