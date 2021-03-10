@@ -39,7 +39,9 @@ So this is the main difference between UBL-invoice and CII:
 - in CII both documents are defineed in the same XML schema with different document types
 - in UBL there are two XML schemas, which are very similar
 
-Cross Industry Invoice (CII) was the first UN/CEFACT schama derived from the process oriented Supply Chain Reference Data Model [SCRDM](https://www.unescap.org/sites/default/files/Session%202_SCRDM_UNCEFACT.pdf). In 2019 the Cross Industry Order (CIO) schema was published. Both has similar Structure:
+The next difference is the target usage. In factur-x/ZUGFeRD CII can be delivered as xml or hybrid pdf invoice.
+
+Cross Industry Invoice (CII) was the first UN/CEFACT schema derived from the process oriented Supply Chain Reference Data Model [SCRDM](https://www.unescap.org/sites/default/files/Session%202_SCRDM_UNCEFACT.pdf). In 2019 the Cross Industry Order (CIO) schema was published. Both messages has similar structure:
 
 ![](../image/CIOvsCII.PNG)
 
