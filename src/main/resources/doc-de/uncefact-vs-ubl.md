@@ -43,6 +43,3 @@ Cross Industry Invoice (CII) was the first UN/CEFACT schama derived from the pro
 
 ![](../image/CIOvsCII.PNG)
 
-
-The UN/CEFACT SCRDM Supply Chain Reference Data Model is already in use -the Cross Industry Invoice is the first message derived from it.
-TODO: Bild -Struktur SDRM, Quelle: http://staging2.unece.org.net4all.ch/fileadmin/DAM/uncefact/RSM/RSM_CII_CCBDA_CrossIndustryInvoice_v1.0.pdf
