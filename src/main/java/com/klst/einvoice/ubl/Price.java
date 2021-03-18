@@ -2,6 +2,7 @@ package com.klst.einvoice.ubl;
 
 import java.util.logging.Logger;
 
+import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
@@ -78,7 +79,7 @@ public class Price extends PriceType {
 //	BG-29.BT-148 +++ 0..1 Item gross price
 	void setPriceDiscount(Amount priceDiscount, Amount grossPrice) {
 		if(super.getAllowanceCharge().isEmpty()) {
-			AllowanceCharge ac = AllowanceCharge.createAllowance(priceDiscount, grossPrice, null);
+			AllowanceCharge ac = AllowanceCharge.create(AllowancesAndCharges.ALLOWANCE, priceDiscount, grossPrice, null);
 			super.getAllowanceCharge().add(ac);
 		} else {
 			AllowanceCharge ac = AllowanceCharge.create(getAllowanceCharge().get(0)); 

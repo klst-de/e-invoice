@@ -117,7 +117,7 @@ CII: ApplicableHeaderTradeSettlement ...
   0 .. 1 RateApplicablePercent Umsatzsteuersatz 
           für den Zu- oder Abschlag auf Dokumentenebene                                BT-96  , BT-103
  */
-public interface AllowancesAndCharges extends ITaxCategory {
+public interface AllowancesAndCharges extends AllowancesOrChargesFactory, ITaxCategory {
 	
 	public static final boolean ALLOWANCE = false;
 	public static final boolean CHARGE = true;

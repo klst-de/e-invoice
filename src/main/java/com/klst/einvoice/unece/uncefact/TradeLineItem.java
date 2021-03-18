@@ -409,7 +409,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	public void setUnitPriceAllowance(UnitPriceAmount priceDiscount, UnitPriceAmount grossPrice) {
 		if(priceDiscount==null && grossPrice==null) return;
 		if(priceDiscount!=null) {
-			TradeAllowanceCharge ac = TradeAllowanceCharge.createAllowance(priceDiscount,null,null);
+			TradeAllowanceCharge ac = TradeAllowanceCharge.create(AllowancesAndCharges.ALLOWANCE, priceDiscount,null,null);
 			if(specifiedLineTradeAgreement.getGrossPriceProductTradePrice()==null) {
 				specifiedLineTradeAgreement.setGrossPriceProductTradePrice(new TradePriceType());
 			}

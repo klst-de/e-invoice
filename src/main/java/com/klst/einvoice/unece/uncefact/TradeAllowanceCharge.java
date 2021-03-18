@@ -55,12 +55,22 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	private static final String NO_TRADETAX_ELEMENT = "No TradeTax. Expected one element.";
 	private static final Logger LOG = Logger.getLogger(TradeAllowanceCharge.class.getName());
 
-	/**
+	// factory:
+	@Override
+	public AllowancesAndCharges createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
+	}
+	@Override
+	public AllowancesAndCharges createCharge(Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
+	}
+
+	/*
 	 * used in TradeLineItem
 	 * @see TradeLineItem#setUnitPriceAllowance
 	 */
-	static TradeAllowanceCharge createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
-		return new TradeAllowanceCharge(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
+	static TradeAllowanceCharge create(boolean chargeIndicator, Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return new TradeAllowanceCharge(chargeIndicator, amount, baseAmount, percentage);
 	}
 	static TradeAllowanceCharge create() {
 		return new TradeAllowanceCharge(null);

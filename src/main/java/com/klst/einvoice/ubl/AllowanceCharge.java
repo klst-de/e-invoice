@@ -72,12 +72,22 @@ ubl-tc434-example5.xml :
  */
 public class AllowanceCharge extends AllowanceChargeType implements AllowancesAndCharges {
 
-	/**
+	// factory:
+	@Override
+	public AllowancesAndCharges createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
+	}
+	@Override
+	public AllowancesAndCharges createCharge(Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
+	}
+
+	/*
 	 * used in (Line)Price
 	 * @see Price#setPriceDiscount
 	 */
-	static AllowanceCharge createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
-		return new AllowanceCharge(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
+	static AllowanceCharge create(boolean chargeIndicator, Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return new AllowanceCharge(chargeIndicator, amount, baseAmount, percentage);
 	}
 	static AllowanceCharge create() {
 		return new AllowanceCharge(null);
