@@ -318,7 +318,14 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * BG-27 0..n INVOICE LINE ALLOWANCES
 	 * BG-28 0..n INVOICE LINE CHARGES
 	 */
-	
+	@Override
+	public AllowancesAndCharges createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return TradeAllowanceCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
+	}
+	@Override
+	public AllowancesAndCharges createCharge(Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return TradeAllowanceCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
+	}
 	@Override
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
 		if(allowanceOrCharge==null) return; // optional

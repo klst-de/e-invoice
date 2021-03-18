@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BusinessPartyAddress;
 import com.klst.einvoice.BusinessPartyContact;
 import com.klst.einvoice.CoreInvoice;
@@ -111,6 +112,16 @@ public class ReadmeTest {
 		  , new UnitPriceAmount(EUR, new BigDecimal(26.07))		// price
 		  , "Porto + Versandkosten"								// itemName
 		  , TaxCategoryCode.StandardRate, new BigDecimal(7));	// VAT category code, rate 7%
+		
+		// BG-27 0..n LINE ALLOWANCES:
+		BigDecimal tenPerCent = new BigDecimal(10);
+		line.addAllowance(new Amount(new BigDecimal(6.00)), new Amount(new BigDecimal(60.00)), tenPerCent);
+		// BG-28 0..n LINE CHARGES:
+		AllowancesAndCharges charge = line.createCharge(new Amount(new BigDecimal(6.00)), new Amount(new BigDecimal(60.00)), tenPerCent);
+		charge.setReasoncode("64");                // UNTDID 5189 code
+		charge.setReasonText("Special agreement");
+		line.addAllowanceCharge(charge);
+		
 		return line;
 	}
 	void assertLine01(CoreInvoiceLine line) {
