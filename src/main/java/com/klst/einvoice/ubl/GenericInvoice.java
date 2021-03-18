@@ -10,8 +10,6 @@ import java.util.logging.Logger;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
-import com.klst.einvoice.BG4_Seller;
-import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
@@ -781,7 +779,7 @@ ubl-tc434-example2.xml :
 	}
 	
 	@Override
-	public BG4_Seller getSeller() {
+	public BusinessParty getSeller() {
 		SupplierPartyType supplierParty = isInvoiceType ? invoice.getAccountingSupplierParty() : creditNote.getAccountingSupplierParty();
 		return supplierParty==null ? null : Party.create(supplierParty.getParty());
 	}
@@ -804,7 +802,7 @@ ubl-tc434-example2.xml :
 	}
 	
 	@Override
-	public BG7_Buyer getBuyer() {
+	public BusinessParty getBuyer() {
 		CustomerPartyType customerparty = isInvoiceType ? invoice.getAccountingCustomerParty() : creditNote.getAccountingCustomerParty();
 		if(customerparty==null) return null;
 		Party buyer = Party.create(customerparty.getParty());

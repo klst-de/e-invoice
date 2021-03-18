@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.klst.einvoice.BG10_Payee;
-import com.klst.einvoice.BG11_SellerTaxRepresentative;
-import com.klst.einvoice.BG4_Seller;
-import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
+import com.klst.einvoice.BusinessPartyAddress;
+import com.klst.einvoice.BusinessPartyContact;
 import com.klst.einvoice.BusinessPartyFactory;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
@@ -28,8 +26,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 // BG-7 + 1..1 BUYER
 // BG-10 + 0..1 PAYEE
 // BG-11 + 0..1 SELLER TAX REPRESENTATIVE PARTY
-public class TradeParty extends TradePartyType 
-		implements BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentative { 
+public class TradeParty extends TradePartyType implements BusinessParty, BusinessPartyAddress, BusinessPartyContact { 
 
 	@Override  // implements BusinessPartyFactory
 	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {

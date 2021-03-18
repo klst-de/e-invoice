@@ -229,11 +229,11 @@ public class ReadmeTest {
 		assertEquals(1, invoice.getInvoiceNotes().size());
 		assertEquals(ADU, invoice.getInvoiceNotes().get(0).getCode());
 		  
-		assertEquals(contactName, ((BusinessPartyContact)invoice.getSeller()).getIContact().getContactPoint());
-		assertEquals(contactTel , ((BusinessPartyContact)invoice.getSeller()).getIContact().getContactTelephone());
-		assertEquals(contactMail, ((BusinessPartyContact)invoice.getSeller()).getIContact().getContactEmail());		
-		assertEquals(DE, ((BusinessPartyAddress)invoice.getSeller()).getAddress().getCountryCode());
-		assertEquals(DE, ((BusinessPartyAddress)invoice.getBuyer()) .getAddress().getCountryCode());
+		assertEquals(contactName, invoice.getSeller().getIContact().getContactPoint());
+		assertEquals(contactTel , invoice.getSeller().getIContact().getContactTelephone());
+		assertEquals(contactMail, invoice.getSeller().getIContact().getContactEmail());		
+		assertEquals(DE, invoice.getSeller().getAddress().getCountryCode());
+		assertEquals(DE, invoice.getBuyer(). getAddress().getCountryCode());
 		
 		Timestamp tsTaxPointDate = invoice.getTaxPointDateAsTimestamp();  // Test wg. sequenzproblem
 		LocalDateTime ldtTaxPointDate = tsTaxPointDate==null ? null : tsTaxPointDate.toLocalDateTime();

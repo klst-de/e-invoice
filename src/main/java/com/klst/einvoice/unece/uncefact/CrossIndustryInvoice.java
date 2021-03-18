@@ -9,8 +9,6 @@ import java.util.logging.Logger;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
-import com.klst.einvoice.BG4_Seller;
-import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
@@ -714,7 +712,7 @@ UBL:
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
 	}
 
-	public BG4_Seller getSeller() {
+	public BusinessParty getSeller() {
 		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		TradePartyType sellerParty = headerTradeAgreement.getSellerTradeParty();
 		return sellerParty==null ? null : TradeParty.create(sellerParty);
@@ -736,7 +734,7 @@ UBL:
 		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
 	}
 
-	public BG7_Buyer getBuyer() {
+	public BusinessParty getBuyer() {
 		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		TradePartyType buyerParty = headerTradeAgreement.getBuyerTradeParty();
 		return buyerParty==null ? null : TradeParty.create(buyerParty);

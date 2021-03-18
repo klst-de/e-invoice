@@ -41,12 +41,14 @@ package com.klst.einvoice;
  * In der Rechnung muss mindestens eines der Elemente „Seller VAT identifier“ (BT-31),
  *  „Seller tax registration identifier“ (BT-32) oder „SELLER TAX REPRESENTATIVE PARTY“ (BG-11) übermittelt werden.
  */
-public interface BG11_SellerTaxRepresentative extends BusinessParty, BG12_SellerTaxRepresentativeAddress {
+public interface BG11_SellerTaxRepresentative {
 	
-	// BT-62 ++ 1..1 Seller tax representative name
-	
-	// BG-12 ++ 1..1 SELLER TAX REPRESENTATIVE POSTAL ADDRESS
-	
+	// BT-62 ++ 1..1 Seller tax representative name	
+	// BG-12 ++ 1..1 SELLER TAX REPRESENTATIVE POSTAL ADDRESS	
 	// BT-63 ++ 1..1 Seller tax representative VAT identifier
 	
+	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID);
+	public void setTaxRepresentative(BusinessParty party);
+	public BusinessParty getTaxRepresentative();
+
 }

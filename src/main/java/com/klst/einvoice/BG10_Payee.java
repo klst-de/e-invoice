@@ -28,7 +28,7 @@ package com.klst.einvoice;
  * muss seine Firmierung/sein Name in der Rechnung (BT-59) angegeben werden.
  * 
  */
-public interface BG10_Payee extends BusinessParty {
+public interface BG10_Payee {
 	
 /*
 CII:
@@ -72,5 +72,9 @@ ubl-tc434-example2.xml:
     </cac:PayeeParty>
 
  */
+
+	public void setPayee(String name, String id, String companyId);
+	public void setPayee(BusinessParty party);
+	public BusinessParty getPayee();
 
 }

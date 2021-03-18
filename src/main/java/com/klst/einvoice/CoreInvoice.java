@@ -29,7 +29,8 @@ Eine andere mögliche Namensgebung wären die Profilnamen mit Hierarhie
  - CoreInvoiceExtended extends CoreInvoiceEN16931              -- Erweiterung der EN 16931-1
 
  */
-public interface CoreInvoice extends CoreInvoiceFactory, BG1_InvoiceNote, BG2_ProcessControl, BG3_PrecedingInvoiceReference, BG14_InvoicingPeriod, 
+public interface CoreInvoice extends CoreInvoiceFactory, BG1_InvoiceNote, BG2_ProcessControl, BG3_PrecedingInvoiceReference, 
+	BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentative, BG14_InvoicingPeriod, 
 	PaymentInstructionsFactory, CreditTransferFactory, PaymentCardFactory, DirectDebitFactory,
 	BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
 	BG22_DocumentTotals, BG23_VatBreakdown, 
@@ -531,18 +532,10 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	// BG-3 + 0..n PRECEDING INVOICE REFERENCE @see BG3_PrecedingInvoiceReference
 
 	// BG-4 + 1..1 SELLER @see BG4_Seller
-	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm);
-	public void setSeller(BusinessParty party);
-	public BusinessParty getSeller();
-	
 	// BG-5 ++ 1..1 SELLER POSTAL ADDRESS @see PostalAddress
 	// BG-6 ++ 0..1 SELLER CONTACT @see IContact
 
 	// BG-7 + 1..1 BUYER @see BG7_Buyer
-	public void setBuyer(String name, PostalAddress address, IContact contact);
-	public void setBuyer(BusinessParty party);
-	public BusinessParty getBuyer();
-	
 	// BG-8 ++ 1..1 BUYER POSTAL ADDRESS @see PostalAddress
 	// BG-9 ++ 0..1 BUYER CONTACT @see IContact
 	
@@ -551,17 +544,10 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * CII: name ist (registration)Name
 	 * UBL: name ist businessName
 	 */
-	public void setPayee(String name, String id, String companyId);
-	public void setPayee(BusinessParty party);
-	public BusinessParty getPayee();
 	
 	// BG-11 + 0..1 SELLER TAX REPRESENTATIVE PARTY @see BG11_SellerTaxRepresentativeParty
-	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID);
-	public void setTaxRepresentative(BusinessParty party);
-	public BusinessParty getTaxRepresentative();
-	
 	// BG-12 ++ 1..1 SELLER TAX REPRESENTATIVE POSTAL ADDRESS @see PostalAddress
-	
+
 	// BG-13 + 0..1 DELIVERY INFORMATION @see BG13_DeliveryInformation
 	/**
 	 * set DELIVERY INFORMATION

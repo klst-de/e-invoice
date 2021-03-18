@@ -14,8 +14,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.BG4_Seller;
-import com.klst.einvoice.BG7_Buyer;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.BusinessPartyAddress;
 import com.klst.einvoice.BusinessPartyContact;
@@ -223,7 +221,7 @@ public class PartyTest {
     	String Umsatzsteuernummer = "DE123456789";
     	PostalAddress address = invoice.createAddress("DE", "plz", "city");
     	LOG.info("Umsatzsteuernummer:"+ Umsatzsteuernummer);
-    	BG4_Seller party = (BG4_Seller) invoice.createParty("customer", address, null);
+    	BusinessParty party = invoice.createParty("customer", address, null);
     	assertTrue(party.getTaxRegistrationIdentifier().isEmpty());
 //    	party.addTaxRegistrationId("DE123456789", "VAT"); // Umsatzsteuernummer
     	party.setVATRegistrationId("123456789");
@@ -239,7 +237,7 @@ public class PartyTest {
     public void ublParty1Seller() {
     	LOG.info("supplierparty:"+ supplierparty);
     	assertNotNull(supplierparty);
-    	PostalAddress address = ((BusinessPartyAddress)supplierparty).getAddress();
+    	PostalAddress address = supplierparty.getAddress();
     	IContact contact = ((BusinessPartyContact)supplierparty).getIContact();
     	assertNotNull(address);
     	assertNotNull(contact);
@@ -269,13 +267,13 @@ public class PartyTest {
     public void ublParty2Buyer() {
     	LOG.info("customerparty:"+ customerparty);
     	assertNotNull(customerparty);
-    	PostalAddress address = ((BusinessPartyAddress)customerparty).getAddress();
+    	PostalAddress address = customerparty.getAddress();
     	assertNotNull(address);
     	LOG.info("customerparty address:" + address);
     	assertNull(((BusinessPartyContact)customerparty).getIContact());
     	invoice.setBuyer("buyerName", testAddress, null); //contact);
     	LOG.info("testAddress:" + testAddress);
-    	BG7_Buyer buyerparty = (BG7_Buyer)invoice.getBuyer();
+    	BusinessParty buyerparty = invoice.getBuyer();
     	LOG.info("testAddress:" + testAddress +", buyer address:" + buyerparty.getAddress() + " contact:"+buyerparty.getIContact());
     	assertEquals(testAddress.getCountryCode(), buyerparty.getAddress().getCountryCode());	
     	assertNull(buyerparty.getIContact());

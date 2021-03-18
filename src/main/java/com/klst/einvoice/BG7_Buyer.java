@@ -35,35 +35,10 @@ package com.klst.einvoice;
  * BR-DE-9  : Postleitzahl der Erwerberanschrift
  * Das Element „Buyer post code“ (BT-53) muss übermittelt werden.
  */
-public interface BG7_Buyer extends BusinessParty, BG8_BuyerPostalAddress, BG9_BuyerContact {
+public interface BG7_Buyer {
 	
-/*
-
-            <ram:BuyerTradeParty>
-                <ram:ID>138</ram:ID>
-                <ram:Name>[Buyer name]</ram:Name>
-                <ram:SpecifiedLegalOrganization>
-                    <ram:ID>GmbH</ram:ID>
-                </ram:SpecifiedLegalOrganization>
-                <ram:DefinedTradeContact> ... </ram:DefinedTradeContact>
-                <ram:PostalTradeAddress> ... </ram:PostalTradeAddress>
-                <ram:SpecifiedTaxRegistration>
-                    <ram:ID schemeID="VA">DE12345ABC</ram:ID>
-                </ram:SpecifiedTaxRegistration>
-            </ram:BuyerTradeParty>
-
-
-
- */
-	// BT-44 ++ 1..1 Buyer name / ram:Name / UBL: <cac:PartyLegalEntity><cbc:RegistrationName>
-	// ...
-	
-	// BG-8 ++ 1..1 BUYER POSTAL ADDRESS
-//	public PostalAddress getAddress();
-//	public void setAddress(PostalAddress address);
-	
-	// BG-9 ++ 0..1 BUYER CONTACT
-//	public IContact getIContact();
-//	public void setIContact(IContact contact);
+	public void setBuyer(String name, PostalAddress address, IContact contact);
+	public void setBuyer(BusinessParty party);
+	public BusinessParty getBuyer();
 
 }
