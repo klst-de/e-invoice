@@ -6,8 +6,8 @@ import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 /**
- * Common Interface for optional DOCUMENT LEVEL ALLOWANCES (BG-20) and CHARGES (BG-21) and
- *                               INVOICE LINE ALLOWANCES (BG-27) and CHARGES (BG-28)
+ * Common Interface for ALLOWANCES and CHARGES
+ *
  * <p>
  * BG-20 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
  * <br>

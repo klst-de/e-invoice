@@ -30,7 +30,8 @@ Eine andere mögliche Namensgebung wären die Profilnamen mit Hierarhie
 
  */
 public interface CoreInvoice extends CoreInvoiceFactory, BG1_InvoiceNote, BG2_ProcessControl, BG3_PrecedingInvoiceReference, BG14_InvoicingPeriod, 
-	PaymentInstructionsFactory, CreditTransferFactory, PaymentCardFactory, DirectDebitFactory, 
+	PaymentInstructionsFactory, CreditTransferFactory, PaymentCardFactory, DirectDebitFactory,
+	BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
 	BG22_DocumentTotals, BG23_VatBreakdown, 
 	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
 
@@ -606,17 +607,15 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 // CopyIndicator . Datentyp: udt:IndicatorType . Kardinalität: 0 .. 1 , nur EXTENDED
 // LanguageID Sprachkennzeichen . Datentyp: udt:IDType . Kardinalität: 0 .. 1 , nur EXTENDED
 	
-	/**
-	 * add an allowance or charge
-	 * <p>
-	 * BG-20 + 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
-	 * <br>
-	 * BG-21 + 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
+	/*
 	 * 
-	 * @param allowanceOrCharge
+	 * BG-20 + 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
+	 * BG20_DocumentLevelAllowences
+	 * 
+	 * BG-21 + 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
+	 * BG21_DocumentLevelCharges.java
+	 * 
 	 */
-	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge);
-	public List<AllowancesAndCharges> getAllowancesAndCharges();
 	
 	// VAT BREAKDOWN BG-23 1..* (mandatory)
 	// Factory method to create Business Group VAT BREAKDOWN BG-23

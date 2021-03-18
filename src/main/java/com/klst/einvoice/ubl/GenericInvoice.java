@@ -1136,6 +1136,15 @@ ubl-tc434-example2.xml :
 	// BG-20 + 0..n DOCUMENT LEVEL ALLOWANCES / ABSCHLÄGE
 	// BG-21 + 0..n DOCUMENT LEVEL CHARGES / ZUSCHLÄGE
 	@Override
+	public AllowancesAndCharges createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return AllowanceCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
+	}
+	@Override
+	public AllowancesAndCharges createCharge(Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return AllowanceCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
+	}
+
+	@Override
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
 		if(isInvoiceType) {
 			invoice.getAllowanceCharge().add((AllowanceChargeType)allowanceOrCharge);

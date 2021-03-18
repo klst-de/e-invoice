@@ -942,6 +942,14 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 
 	// BG-20 + BG-21- 0..n
 	@Override
+	public AllowancesAndCharges createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return TradeAllowanceCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
+	}
+	@Override
+	public AllowancesAndCharges createCharge(Amount amount, Amount baseAmount, BigDecimal percentage) {
+		return TradeAllowanceCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
+	}
+	@Override
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
 		applicableHeaderTradeSettlement.addAllowanceCharge(allowanceOrCharge);
 	}
