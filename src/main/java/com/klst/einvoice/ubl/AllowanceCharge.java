@@ -211,6 +211,8 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 
 	@Override
 	public void setTaxType(String code) {
+		if(code==null) return;
+		if(taxCategory==null) taxCategory = TaxCategory.create(null); 
 		taxCategory.setTaxType(code);
 	}
 
@@ -221,11 +223,13 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 
 	@Override
 	public void setTaxCategoryCode(String code) {
+		if(taxCategory==null) taxCategory = TaxCategory.create(null); 
 		taxCategory.setTaxCategoryCode(code);
 	}
 
 	@Override
 	public void setTaxCategoryCode(TaxCategoryCode code) {
+		if(taxCategory==null) taxCategory = TaxCategory.create(null); 
 		taxCategory.setTaxCategoryCode(code);
 	}
 
@@ -236,6 +240,7 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 
 	@Override
 	public void setTaxPercentage(BigDecimal percentage) {
+		if(taxCategory==null) taxCategory = TaxCategory.create(null); 
 		taxCategory.setTaxPercentage(percentage);
 	}
 

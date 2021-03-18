@@ -53,6 +53,7 @@ CII: ApplicableHeaderTradeSettlement ...
 public class TradeAllowanceCharge extends TradeAllowanceChargeType implements AllowancesAndCharges {
 
 	private static final String NO_TRADETAX_ELEMENT = "No TradeTax. Expected one element.";
+	private static final String CREATE_TRADETAX_ELEMENT = " Create TradeTax silently.";
 	private static final Logger LOG = Logger.getLogger(TradeAllowanceCharge.class.getName());
 
 	// factory:
@@ -212,21 +213,20 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	public void setTaxType(String type) {
 		TradeTax tradeTax = getFirstCategoryTradeTax(this);
 		if(tradeTax==null) {
-			LOG.warning(NO_TRADETAX_ELEMENT);
+			LOG.warning(NO_TRADETAX_ELEMENT + CREATE_TRADETAX_ELEMENT);
+			tradeTax = TradeTax.create();
+			tradeTax.setTaxType(type);
+			super.getCategoryTradeTax().add(tradeTax);
+		} else {
+			tradeTax.setTaxType(type);
 		}
-		tradeTax.setTaxType(type);
 	}
 
 	@Override // liefert immer "VAT"
 	public String getTaxType() {
-//		return getTaxType(this);
 		TradeTax tradeTax = getFirstCategoryTradeTax(this);
 		return tradeTax==null? null : tradeTax.getTaxType();
 	}
-//	static String getTaxType(TradeAllowanceChargeType tradeAllowanceCharge) {
-//		TradeTax tradeTax = getFirstCategoryTradeTax(tradeAllowanceCharge);
-//		return tradeTax==null? null : tradeTax.getTaxType();
-//	}
 
 	// BT-95, BT-102 1..1 (mandatory) Document level allowance/charge VAT category code
 	@Override
@@ -238,21 +238,20 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	public void setTaxCategoryCode(String category) {
 		TradeTax tradeTax = getFirstCategoryTradeTax(this);
 		if(tradeTax==null) {
-			LOG.warning(NO_TRADETAX_ELEMENT);
+			LOG.warning(NO_TRADETAX_ELEMENT + CREATE_TRADETAX_ELEMENT);
+			tradeTax = TradeTax.create();
+			tradeTax.setTaxCategoryCode(category);
+			super.getCategoryTradeTax().add(tradeTax);
+		} else {
+			tradeTax.setTaxCategoryCode(category);
 		}
-		tradeTax.setTaxCategoryCode(category);
 	}
 
 	@Override
 	public TaxCategoryCode getTaxCategoryCode() {
-//		return getTaxCategoryCode(this);
 		TradeTax tradeTax = getFirstCategoryTradeTax(this);
 		return tradeTax==null? null : tradeTax.getTaxCategoryCode();
 	}
-//	static TaxCategoryCode getTaxCategoryCode(TradeAllowanceChargeType tradeAllowanceCharge) {
-//		TradeTax tradeTax = getFirstCategoryTradeTax(tradeAllowanceCharge);
-//		return tradeTax==null? null : tradeTax.getTaxCategoryCode();
-//	}
 
 	// BT-96, BT-103 0..1 Document level allowance/charge VAT rate
 	@Override
@@ -260,21 +259,20 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		if(percentage==null) return;
 		TradeTax tradeTax = getFirstCategoryTradeTax(this);
 		if(tradeTax==null) {
-			LOG.warning(NO_TRADETAX_ELEMENT);
+			LOG.warning(NO_TRADETAX_ELEMENT + CREATE_TRADETAX_ELEMENT);
+			tradeTax = TradeTax.create();
+			tradeTax.setTaxPercentage(percentage);
+			super.getCategoryTradeTax().add(tradeTax);
+		} else {
+			tradeTax.setTaxPercentage(percentage);
 		}
-		tradeTax.setTaxPercentage(percentage);
 	}
 
 	@Override
 	public BigDecimal getTaxPercentage() {
-//		return getTaxPercentage(this);
 		TradeTax tradeTax = getFirstCategoryTradeTax(this);
 		return tradeTax==null? null : tradeTax.getTaxPercentage();
 	}
-//	static BigDecimal getTaxPercentage(TradeAllowanceChargeType tradeAllowanceCharge) {
-//		TradeTax tradeTax = getFirstCategoryTradeTax(tradeAllowanceCharge);
-//		return tradeTax==null? null : tradeTax.getTaxPercentage();
-//	}
 
 	// BT-97, BT-104 0..1 Document level allowance/charge reason
 	@Override

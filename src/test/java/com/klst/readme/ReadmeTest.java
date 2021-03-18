@@ -207,6 +207,15 @@ public class ReadmeTest {
 			assertEquals(3, invoice.getPrecedingInvoices().size());
 		}
 		
+		// BG-20 0..n DOCUMENT LEVEL ALLOWANCE:
+		BigDecimal tenPerCent = new BigDecimal(10);
+		AllowancesAndCharges allowance = invoice.createAllowance(new Amount(new BigDecimal(31)), new Amount(new BigDecimal(310)), tenPerCent);
+		allowance.setReasoncode("64");
+		allowance.setReasonText("SPECIAL AGREEMENT");
+		allowance.setTaxType(TaxTypeCode.VAT);
+		allowance.setTaxCategoryCode(TaxCategoryCode.StandardRate);
+		allowance.setTaxPercentage(new BigDecimal(20));
+		invoice.addAllowanceCharge(allowance);
 		
 		assertEquals(CoreInvoice.PROFILE_XRECHNUNG, invoice.getCustomization());
 		assertThat(invoice.getProcessType()).isNull();
