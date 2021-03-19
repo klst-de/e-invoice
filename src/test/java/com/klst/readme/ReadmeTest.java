@@ -229,9 +229,9 @@ public class ReadmeTest {
 		assertEquals(1, invoice.getInvoiceNotes().size());
 		assertEquals(ADU, invoice.getInvoiceNotes().get(0).getCode());
 		  
-		assertEquals(contactName, invoice.getSeller().getIContact().getContactPoint());
-		assertEquals(contactTel , invoice.getSeller().getIContact().getContactTelephone());
-		assertEquals(contactMail, invoice.getSeller().getIContact().getContactEmail());		
+		assertEquals(contactName, invoice.getSeller().getBPContact().getContactPoint());
+		assertEquals(contactTel , invoice.getSeller().getBPContact().getContactTelephone());
+		assertEquals(contactMail, invoice.getSeller().getBPContact().getContactEmail());		
 		assertEquals(DE, invoice.getSeller().getAddress().getCountryCode());
 		assertEquals(DE, invoice.getBuyer(). getAddress().getCountryCode());
 		

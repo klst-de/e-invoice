@@ -136,8 +136,8 @@ public class PartyTest {
     	invoice.setBuyer(name, address, contact);
     	BusinessParty party = invoice.getBuyer();
 		assertEquals(name, party.getRegistrationName());
-		assertEquals(address, ((BusinessPartyAddress)party).getAddress());
-		assertEquals(contact, ((BusinessPartyContact)party).getIContact());
+		assertEquals(address, party.getAddress());
+		assertEquals(contact, party.getBPContact());
    }
 
     @Test
@@ -150,7 +150,7 @@ public class PartyTest {
 
     @Test
     public void ublGetAddress() {
-    	PostalAddress address = ((BusinessPartyAddress)supplierparty).getAddress();
+    	PostalAddress address = supplierparty.getAddress();
     	LOG.info("address:"+address);
 //        <cac:PostalAddress>
 //        <cbc:StreetName>[Seller address line 1]</cbc:StreetName>
@@ -168,7 +168,7 @@ public class PartyTest {
     private static final String HESSEN = "Hessen";
     @Test
     public void ublCopyAddress() {
-    	PostalAddress a = ((BusinessPartyAddress)supplierparty).getAddress();
+    	PostalAddress a = supplierparty.getAddress();
     	PostalAddress address = Address.createPostalAddress((AddressType)a);
     	assertEquals("[Seller address line 1]", address.getStreet());
     	address.setCountrySubdivision(HESSEN);
@@ -177,7 +177,7 @@ public class PartyTest {
 
     @Test
     public void ublGetContact() {
-    	IContact contact = ((BusinessPartyContact)supplierparty).getIContact();
+    	IContact contact = supplierparty.getBPContact();
     	LOG.info("supplierparty.Contact:" + contact);
 //        <cbc:Name>[Seller contact person]</cbc:Name>
 //        <cbc:Telephone>+49 123456789</cbc:Telephone>
@@ -238,7 +238,7 @@ public class PartyTest {
     	LOG.info("supplierparty:"+ supplierparty);
     	assertNotNull(supplierparty);
     	PostalAddress address = supplierparty.getAddress();
-    	IContact contact = ((BusinessPartyContact)supplierparty).getIContact();
+    	IContact contact = supplierparty.getBPContact();
     	assertNotNull(address);
     	assertNotNull(contact);
     	
@@ -257,10 +257,10 @@ public class PartyTest {
     	invoice.setSeller("sellerRegistrationName", testAddress, null, null, null); //contact, companyId, companyLegalForm);
     	LOG.info("testAddress (zum überschreiben):" + testAddress);
     	BusinessParty sellerparty = invoice.getSeller();
-    	LOG.info("seller address:" + ((BusinessPartyAddress)sellerparty).getAddress()
-    		+ " contact:"+((BusinessPartyContact)sellerparty).getIContact());
-    	assertEquals(testAddress.getCountryCode(), ((BusinessPartyAddress)sellerparty).getAddress().getCountryCode());	
-    	assertNull(((BusinessPartyContact)sellerparty).getIContact());
+    	LOG.info("seller address:" + sellerparty.getAddress()
+    		+ " contact:"+sellerparty.getBPContact());
+    	assertEquals(testAddress.getCountryCode(), sellerparty.getAddress().getCountryCode());	
+    	assertNull(sellerparty.getBPContact());
     }
     
     @Test
@@ -270,13 +270,13 @@ public class PartyTest {
     	PostalAddress address = customerparty.getAddress();
     	assertNotNull(address);
     	LOG.info("customerparty address:" + address);
-    	assertNull(((BusinessPartyContact)customerparty).getIContact());
+    	assertNull(customerparty.getBPContact());
     	invoice.setBuyer("buyerName", testAddress, null); //contact);
     	LOG.info("testAddress:" + testAddress);
     	BusinessParty buyerparty = invoice.getBuyer();
-    	LOG.info("testAddress:" + testAddress +", buyer address:" + buyerparty.getAddress() + " contact:"+buyerparty.getIContact());
+    	LOG.info("testAddress:" + testAddress +", buyer address:" + buyerparty.getAddress() + " contact:"+buyerparty.getBPContact());
     	assertEquals(testAddress.getCountryCode(), buyerparty.getAddress().getCountryCode());	
-    	assertNull(buyerparty.getIContact());
+    	assertNull(buyerparty.getBPContact());
     }
     
     @Test

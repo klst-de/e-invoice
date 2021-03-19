@@ -26,7 +26,7 @@ public interface BusinessParty extends BusinessPartyFactory {
 	/* 
 	 * a shortcut for getIContact()
 	 */
-	default IContact getIContact() {
+	default IContact getBPContact() {
 		return ((BusinessPartyContact)this).getIContact();
 	}
 
