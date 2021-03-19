@@ -155,4 +155,29 @@ Zu dieser Gruppe gehört der **Preisrabatt**. Dieser muss bereits im "Nettopreis
 
 Ein Positionsabschlag kann als Rabatt 2. Ordnung angesehen werden. Bei Abschlägen und Zuschlägen/**Gebühren** (BT-141) kann ein Grund (BT-144) angegeben werden. Der zur Berechnung der Gesamtsumme verwendete Preis ist jedoch immer der Nettopreis (BT-146).
 
-TODO Beispiel
+Beispiele:
+- einfacher Abschlag auf Positionsebene (BG-27) durch Methode `addAllowance`
+- Zuschlag auf Positionsbenbe (BG-28) mit optionaler Angabe der Gründe als Text oder Code aus UNTDID 5189
+- Abschlag auf Rechnungsebene (BG-20) mit Steuerangeben
+
+```java
+		// BG-27 0..n LINE ALLOWANCES:
+BigDecimal tenPerCent = new BigDecimal(10);
+line.addAllowance(new Amount(new BigDecimal(6.00)), new Amount(new BigDecimal(60.00)), tenPerCent);
+		// BG-28 0..n LINE CHARGES:
+AllowancesAndCharges charge = line.createCharge(new Amount(new BigDecimal(6.00)), new Amount(new BigDecimal(60.00)), tenPerCent);
+charge.setReasoncode("64");                // UNTDID 5189 code
+charge.setReasonText("Special agreement");
+line.addAllowanceCharge(charge);
+...
+		// BG-20 0..n DOCUMENT LEVEL ALLOWANCE:
+BigDecimal tenPerCent = new BigDecimal(10);
+AllowancesAndCharges allowance = invoice.createAllowance(new Amount(new BigDecimal(31)), new Amount(new BigDecimal(310)), tenPerCent);
+allowance.setReasoncode("64");
+allowance.setReasonText("SPECIAL AGREEMENT");
+allowance.setTaxType(TaxTypeCode.VAT);
+allowance.setTaxCategoryCode(TaxCategoryCode.StandardRate);
+allowance.setTaxPercentage(new BigDecimal(20));
+invoice.addAllowanceCharge(allowance);
+
+```
