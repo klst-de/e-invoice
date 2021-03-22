@@ -17,7 +17,7 @@ Compare [UN/CEFACT xml-schemas](https://unece.org/trade/uncefact/xml-schemas) wi
 ```
 
 - thus UBL is **document oriented**
-- UBL is part of [ebXML}(https://en.wikipedia.org/wiki/EbXML), a family of frameworks developed by OASIS and UN/CEFACT
+- UBL is part of [ebXML](https://en.wikipedia.org/wiki/EbXML), a family of frameworks developed by OASIS and UN/CEFACT
 - in an [agreement between OASIS and UN/CEFACT](http://ubl.xml.org/ebXML) OASIS declared not to release further versions of UBL ...
 - in _the expectation that UN/CEFACT will produce its own integrated set of XML schemas_
 - the first [UN/CEFACT XML schemas](https://unece.org/trade/uncefact/xml-schemas) were document oriented as well
