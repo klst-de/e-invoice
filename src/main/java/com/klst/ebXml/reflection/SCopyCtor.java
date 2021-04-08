@@ -1,5 +1,4 @@
 package com.klst.ebXml.reflection;
-//package com.klst.ebXml.reflection; TODO
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -41,6 +40,10 @@ public class SCopyCtor {
 		// un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100
 		getterFieldMap.put("getID", "id");
 		getterFieldMap.put("getURIUniversalCommunication", "uriUniversalCommunication");
+		
+		// org.opentrans.xmlschema._2
+		getterFieldMap.put("getEMAILAndPUBLICKEY", "emailAndPUBLICKEY");
+
 	}
 	
 	Map<String, Field> fieldsByName = new HashMap<String, Field>();
@@ -54,7 +57,7 @@ public class SCopyCtor {
 			Field field = fields[i];
 			if(Modifier.isPublic(field.getModifiers()) || Modifier.isProtected(field.getModifiers())) {
 				Field prev = fieldsByName.put(otype.getCanonicalName()+TYPE_NAME_SEPARATOR+field.getName(), field);
-				if(prev==null) LOG.info("added "+otype.getCanonicalName()+TYPE_NAME_SEPARATOR+field.getName());
+				if(prev==null) LOG.fine("added "+otype.getCanonicalName()+TYPE_NAME_SEPARATOR+field.getName());
 			}
 		}
 		if(type.getSuperclass()==null || type.getSuperclass()==Object.class) {
@@ -89,7 +92,7 @@ public class SCopyCtor {
 				String methodName = method.getName();
 				if(methodName.startsWith(prefix) && method.getParameterCount()==parameterCount) {
 					Method prev = methodByName.put(otype.getCanonicalName()+TYPE_NAME_SEPARATOR+methodName, method);
-					if(prev==null) LOG.info("added "+otype.getCanonicalName()+TYPE_NAME_SEPARATOR+methodName);
+					if(prev==null) LOG.fine("added "+otype.getCanonicalName()+TYPE_NAME_SEPARATOR+methodName);
 				}
 			}
 		}
@@ -102,8 +105,7 @@ public class SCopyCtor {
 	/* obj class extends doc class! Bsp: class HeaderTradeDelivery extends HeaderTradeDeliveryType
 	 * Initialisiert alle Felder von obj mit den Werten von doc per setter/getter, also: obj.setXXX(doc.getXXX())
 	 * - setXXX und getXXX müssen in doc class definiert sein 
-	 * - BUGS:
-	 * -- funktioniert nicht wenn setXXX/getXXX in super von doc definiert sind, 
+	 * -- auch wenn setXXX/getXXX in super von doc definiert sind, 
 	 *    Bsp. OT Remarks extends REMARKS, super class REMARKS extends TypeMLSTRING64000 extends DtMLSTRING
 	 *    getValue() kommt aus DtMLSTRING
 	 */
@@ -112,7 +114,7 @@ public class SCopyCtor {
 		getFieldsByName(doc.getClass());
 		getSettersByName(doc.getClass());
 		getGettersByName(doc.getClass());
-		List<String> getterNames = new ArrayList<>(gettersByName.keySet()); // viel zu viele!! TODO
+		List<String> getterNames = new ArrayList<>(gettersByName.keySet());
 		// es interessieren nur die der Klasse doc.getClass() und die der Oberklassen dazu
 		for(int i=0; i<getterNames.size(); i++) {
 			String getterName = getterNames.get(i);
@@ -127,7 +129,7 @@ public class SCopyCtor {
 			if(settersByName.containsKey(setterKey)) {
 				Method setter = settersByName.get(setterKey); // potentieller Setter muss den Parameter == Result des getters haben
 				if(getter.getReturnType()==setter.getParameterTypes()[0]) {						
-					LOG.info(setterName+" ( "+getterName+" ) ");
+					LOG.fine(setterName+" ( "+getterName+"() ) ");
 					try {
 						setter.invoke(obj, getter.invoke(doc)); // obj.setXXX( doc.getXXX() )
 				    } catch (Exception e) {
@@ -149,12 +151,12 @@ public class SCopyCtor {
 					setFieldValueWithReflection(obj, doc, field, getter);
 				} else {
 					// in openTrans ist es anders (auch mit Ausnahmen)
-					//List<?> alloworchargedescr zu  getALLOWORCHARGEDESCR nicht gefunden.
-					//        alloworchargedescr
-					fieldName = getFieldnameLowerCase(getterName);
-					if(getterName.equals("getEMAILAndPUBLICKEY")) fieldName = "emailAndPUBLICKEY";
+					//ALLOWORCHARGE::List<?> alloworchargedescr = getALLOWORCHARGEDESCR
+					//ADDRESS::List<?> emailandpublickey zu getEMAILAndPUBLICKEY nicht gefunden.
+					fieldName = getFieldnameLowerCase(getterName);					
 					
-					LOG.info(doc.getClass().getSimpleName()+"::List<?> "+fieldName+" = "+getterName);
+					LOG.fine(doc.getClass().getSimpleName()+"::List<?> "+fieldName+" = "+getterName+"()");
+					fieldNameWithTypePrefix = doc.getClass().getCanonicalName()+TYPE_NAME_SEPARATOR+fieldName;
 					if(fieldsByName.containsKey(fieldNameWithTypePrefix)) {
 						Field field = fieldsByName.get(fieldNameWithTypePrefix);
 						setFieldValueWithReflection(obj, doc, field, getter);
@@ -185,7 +187,9 @@ public class SCopyCtor {
 		int length = get.length();
 		return getterName.substring(length, length+1).toLowerCase()+getterName.substring(length+1);
 	}
-	private static String getFieldnameLowerCase(String getterName) {
+	private String getFieldnameLowerCase(String getterName) {
+		String fieldname = getterFieldMap.get(getterName);
+		if(fieldname!=null) return fieldname;
 		int length = get.length();
 		return getterName.substring(length, getterName.length()).toLowerCase();
 	}
