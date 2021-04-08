@@ -13,8 +13,8 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainEventType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
-// TODO rename to HeaderTradeDelivery
-public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType implements BG13_DeliveryInformation {
+
+public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements BG13_DeliveryInformation {
 
 	@Override
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {
@@ -22,28 +22,28 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 	}
 	
 	// factory
-	static ApplicableHeaderTradeDelivery create(String name, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
-		return new ApplicableHeaderTradeDelivery(name, ts, address, locationId, schemeId);
+	static HeaderTradeDelivery create(String name, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
+		return new HeaderTradeDelivery(name, ts, address, locationId, schemeId);
 	}
 
-	static ApplicableHeaderTradeDelivery create() {
-		return new ApplicableHeaderTradeDelivery(null);
+	static HeaderTradeDelivery create() {
+		return new HeaderTradeDelivery(null);
 	}
 	// copy factory
-	static ApplicableHeaderTradeDelivery create(HeaderTradeDeliveryType object) {
+	static HeaderTradeDelivery create(HeaderTradeDeliveryType object) {
 		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
 		if(object instanceof HeaderTradeDeliveryType && object.getClass()!=HeaderTradeDeliveryType.class) {
 			// object is instance of a subclass of HeaderTradeDeliveryType, but not HeaderTradeDeliveryType itself
-			return (ApplicableHeaderTradeDelivery)object;
+			return (HeaderTradeDelivery)object;
 		} else {
-			return new ApplicableHeaderTradeDelivery(object); 
+			return new HeaderTradeDelivery(object); 
 		}
 	}
 
-	private static final Logger LOG = Logger.getLogger(ApplicableHeaderTradeDelivery.class.getName());
+	private static final Logger LOG = Logger.getLogger(HeaderTradeDelivery.class.getName());
 	
 	// copy ctor
-	private ApplicableHeaderTradeDelivery(HeaderTradeDeliveryType delivery) {
+	private HeaderTradeDelivery(HeaderTradeDeliveryType delivery) {
 		super();
 		if(delivery!=null) {
 			SCopyCtor.getInstance().invokeCopy(this, delivery);
@@ -57,7 +57,7 @@ public class ApplicableHeaderTradeDelivery extends HeaderTradeDeliveryType imple
 
 	private TradeParty party;
 	
-	private ApplicableHeaderTradeDelivery(String businessName, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
+	private HeaderTradeDelivery(String businessName, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
 		LOG.info("BT-70/businessName:"+businessName + " BT-72/Timestamp:"+ts + " BG-15 ++ 0..1 DELIVER TO ADDRESS:"+address + " BT-71/locationId:"+locationId);
 		party = TradeParty.create(null, businessName, address, null);
 		party.setId(locationId);

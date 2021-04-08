@@ -157,7 +157,7 @@ PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B
     
  */
 	
-	ApplicableHeaderTradeSettlement applicableHeaderTradeSettlement;
+	HeaderTradeSettlement applicableHeaderTradeSettlement;
 	HeaderTradeDeliveryType applicableHeaderTradeDelivery;
 //	ExchangedDocumentType exchangedDocument; // in super
 	
@@ -168,12 +168,12 @@ PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B
 			LOG.config("copy ctor:"+this);
 		}
 		if(super.getSupplyChainTradeTransaction()==null) {
-			applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create();
-			applicableHeaderTradeDelivery = ApplicableHeaderTradeDelivery.create();
+			applicableHeaderTradeSettlement = HeaderTradeSettlement.create();
+			applicableHeaderTradeDelivery = HeaderTradeDelivery.create();
 			super.setSupplyChainTradeTransaction(new SupplyChainTradeTransactionType());
 		} else {
-			applicableHeaderTradeSettlement = ApplicableHeaderTradeSettlement.create(getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
-			applicableHeaderTradeDelivery = ApplicableHeaderTradeDelivery.create(getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery());
+			applicableHeaderTradeSettlement = HeaderTradeSettlement.create(getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
+			applicableHeaderTradeDelivery = HeaderTradeDelivery.create(getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery());
 		}
 		getSupplyChainTradeTransaction().setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
 		getSupplyChainTradeTransaction().setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
@@ -820,7 +820,7 @@ UBL:
 	 */
 	@Override
 	public void setDelivery(String name, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
-		applicableHeaderTradeDelivery = ApplicableHeaderTradeDelivery.create(name, ts, address, locationId, schemeId);
+		applicableHeaderTradeDelivery = HeaderTradeDelivery.create(name, ts, address, locationId, schemeId);
 		supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 	}
 	
@@ -833,7 +833,7 @@ UBL:
 	public BG13_DeliveryInformation getDelivery() {
 		HeaderTradeDeliveryType headerTradeDelivery = supplyChainTradeTransaction.getApplicableHeaderTradeDelivery();
 		if(headerTradeDelivery==null) return null;
-		return ApplicableHeaderTradeDelivery.create(headerTradeDelivery);
+		return HeaderTradeDelivery.create(headerTradeDelivery);
 	}
 
 	// BG-14.BT-73 +++ 0..1 Invoicing period start date

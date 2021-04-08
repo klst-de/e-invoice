@@ -138,7 +138,7 @@ in ram:ApplicableHeaderTradeSettlement stecken auch BT-5, BT-6
             </ram:SpecifiedTradeSettlementPaymentMeans>
 
  */
-public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType 
+public class HeaderTradeSettlement extends HeaderTradeSettlementType 
 	implements PaymentInstructions, PaymentInstructionsFactory, CreditTransferFactory
 		, DirectDebit, DirectDebitFactory {
 
@@ -148,23 +148,23 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		return create(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
-	static ApplicableHeaderTradeSettlement create(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+	static HeaderTradeSettlement create(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
-		return new ApplicableHeaderTradeSettlement(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
+		return new HeaderTradeSettlement(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
 	}
 	
-	private static final Logger LOG = Logger.getLogger(ApplicableHeaderTradeSettlement.class.getName());
+	private static final Logger LOG = Logger.getLogger(HeaderTradeSettlement.class.getName());
 	
-	static ApplicableHeaderTradeSettlement create() {
-		return new ApplicableHeaderTradeSettlement(null);
+	static HeaderTradeSettlement create() {
+		return new HeaderTradeSettlement(null);
 	}
 	// copy ctor:
-	static ApplicableHeaderTradeSettlement create(HeaderTradeSettlementType object) {
+	static HeaderTradeSettlement create(HeaderTradeSettlementType object) {
 		if(object instanceof HeaderTradeSettlementType && object.getClass()!=HeaderTradeSettlementType.class) {
 			// object is instance of a subclass of HeaderTradeSettlementType, but not HeaderTradeSettlementType itself
-			return (ApplicableHeaderTradeSettlement)object;
+			return (HeaderTradeSettlement)object;
 		} else {
-			return new ApplicableHeaderTradeSettlement(object); 
+			return new HeaderTradeSettlement(object); 
 		}
 	}
 	
@@ -176,7 +176,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 	TradeTax tradeTax = null;
 
 	// copy ctor
-	private ApplicableHeaderTradeSettlement(HeaderTradeSettlementType doc) {
+	private HeaderTradeSettlement(HeaderTradeSettlementType doc) {
 		super();
 		if(doc!=null) {
 			SCopyCtor.getInstance().invokeCopy(this, doc);
@@ -199,7 +199,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 /*
 in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
  */
-	private ApplicableHeaderTradeSettlement(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
+	private HeaderTradeSettlement(PaymentMeansEnum code, String paymentMeansText, String remittanceInformation
 			, List<CreditTransfer> creditTransfer, PaymentCard paymentCard, DirectDebit directDebit) {
 		super();
 		init(code, paymentMeansText, remittanceInformation, creditTransfer, paymentCard, directDebit);
@@ -509,7 +509,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		setMandateReferencedID(bg19_directDebit.getMandateReferencedID());       // BG-19.BT-89 0..1
 		setBankAssignedCreditorID(bg19_directDebit.getBankAssignedCreditorID()); // BG-19.BT-90 0..1
 //		                                                                         // BG-19.BT-91 0..1 :
-		TradeSettlementPaymentMeansType dd = ((ApplicableHeaderTradeSettlement)bg19_directDebit).getSpecifiedTradeSettlementPaymentMeans().get(0);
+		TradeSettlementPaymentMeansType dd = ((HeaderTradeSettlement)bg19_directDebit).getSpecifiedTradeSettlementPaymentMeans().get(0);
 		if(this.getSpecifiedTradeSettlementPaymentMeans().isEmpty()) {
 			getSpecifiedTradeSettlementPaymentMeans().add(dd);
 		} else {
