@@ -1,8 +1,8 @@
 package com.klst.einvoice.ubl;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.DirectDebitFactory;
-import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.einvoice.unece.uncefact.IBANId;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;
@@ -81,7 +81,7 @@ public class PaymentMandate extends PaymentMandateType implements DirectDebit, D
 	private PaymentMandate(PaymentMandateType doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 		}
 	}
 	

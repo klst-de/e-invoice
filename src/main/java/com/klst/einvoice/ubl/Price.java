@@ -2,8 +2,8 @@ package com.klst.einvoice.ubl;
 
 import java.util.logging.Logger;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
@@ -58,7 +58,7 @@ public class Price extends PriceType {
 	private Price(PriceType doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 			LOG.fine("copy ctor:"+this);			
 		}
 	}

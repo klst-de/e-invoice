@@ -1,7 +1,7 @@
 package com.klst.einvoice.ubl;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.IContact;
-import com.klst.einvoice.reflection.CopyCtor;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ContactType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ElectronicMailType;
@@ -61,7 +61,7 @@ public class Contact extends ContactType implements IContact {
 	private Contact(ContactType contact) {
 		super();
 		if(contact!=null) {
-			CopyCtor.invokeCopy(this, contact);
+			SCopyCtor.getInstance().invokeCopy(this, contact);
 		}
 	}
 	

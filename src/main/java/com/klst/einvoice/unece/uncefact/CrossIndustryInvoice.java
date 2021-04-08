@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
@@ -23,7 +24,6 @@ import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.Reference;
 import com.klst.einvoice.VatBreakdown;
-import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
@@ -164,7 +164,7 @@ PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B
 	private CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 			LOG.config("copy ctor:"+this);
 		}
 		if(super.getSupplyChainTradeTransaction()==null) {

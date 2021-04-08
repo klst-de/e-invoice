@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.Identifier;
-import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.TaxCategoryCode;
 import com.klst.untdid.codelist.TaxTypeCode;
@@ -76,7 +76,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	private TradeLineItem(SupplyChainTradeLineItemType line) {
 		super();
 		if(line!=null) {
-			CopyCtor.invokeCopy(this, line);
+			SCopyCtor.getInstance().invokeCopy(this, line);
 			//LOG.fine("copy ctor:"+this);
 		}
 		if(specifiedLineTradeSettlement.getApplicableTradeTax().isEmpty()) {

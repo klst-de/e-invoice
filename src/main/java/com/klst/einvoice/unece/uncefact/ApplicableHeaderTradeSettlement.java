@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CreditTransfer;
@@ -14,7 +15,6 @@ import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PaymentInstructionsFactory;
-import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CurrencyCodeType;
@@ -179,7 +179,7 @@ public class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType
 	private ApplicableHeaderTradeSettlement(HeaderTradeSettlementType doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 			
 			TradePaymentTermsType tpt = doc.getSpecifiedTradePaymentTerms().isEmpty() ? null : doc.getSpecifiedTradePaymentTerms().get(0);
 			tradePaymentTerms = TradePaymentTerms.create(tpt);

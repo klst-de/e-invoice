@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.ITaxCategory;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.VatBreakdownFactory;
-import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.TaxCategoryCode;
 import com.klst.untdid.codelist.TaxTypeCode;
@@ -50,7 +50,7 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 	private TaxSubtotal(TaxSubtotalType doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 			LOG.fine("copy ctor:"+this);	
 		}
 	}

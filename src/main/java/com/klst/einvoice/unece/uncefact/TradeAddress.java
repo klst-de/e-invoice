@@ -2,8 +2,8 @@ package com.klst.einvoice.unece.uncefact;
 
 import java.util.List;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.PostalAddress;
-import com.klst.einvoice.reflection.CopyCtor;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CountryIDType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;
@@ -39,7 +39,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	private TradeAddress(TradeAddressType address) {
 		super();
 		if(address!=null) {
-			CopyCtor.invokeCopy(this, address);
+			SCopyCtor.getInstance().invokeCopy(this, address);
 		}
 	}
 	

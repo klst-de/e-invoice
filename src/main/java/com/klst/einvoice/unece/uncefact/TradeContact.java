@@ -1,7 +1,7 @@
 package com.klst.einvoice.unece.uncefact;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.IContact;
-import com.klst.einvoice.reflection.CopyCtor;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeContactType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.UniversalCommunicationType;
@@ -35,7 +35,7 @@ public class TradeContact extends TradeContactType implements IContact {
 	private TradeContact(TradeContactType contact) {
 		super();
 		if(contact!=null) {
-			CopyCtor.invokeCopy(this, contact);
+			SCopyCtor.getInstance().invokeCopy(this, contact);
 		}
 	}
 

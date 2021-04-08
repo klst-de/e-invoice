@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.AllowanceChargeReasonCodeType;
@@ -98,7 +98,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	private TradeAllowanceCharge(TradeAllowanceChargeType tradeAllowanceCharge) {
 		super();
 		if(tradeAllowanceCharge!=null) {
-			CopyCtor.invokeCopy(this, tradeAllowanceCharge);
+			SCopyCtor.getInstance().invokeCopy(this, tradeAllowanceCharge);
 			if(getCategoryTradeTax().isEmpty()) {
 				LOG.warning(NO_TRADETAX_ELEMENT);
 			}

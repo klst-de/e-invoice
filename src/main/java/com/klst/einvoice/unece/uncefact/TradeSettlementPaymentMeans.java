@@ -2,10 +2,10 @@ package com.klst.einvoice.unece.uncefact;
 
 import java.util.logging.Logger;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DebitedAccountID;
 import com.klst.einvoice.PaymentCard;
-import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
@@ -116,7 +116,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 	private TradeSettlementPaymentMeans(TradeSettlementPaymentMeansType tradeSettlementPaymentMeans) {
 		super();
 		if(tradeSettlementPaymentMeans!=null) {
-			CopyCtor.invokeCopy(this, tradeSettlementPaymentMeans);
+			SCopyCtor.getInstance().invokeCopy(this, tradeSettlementPaymentMeans);
 			LOG.fine("copy ctor:"+this);
 		}
 	}

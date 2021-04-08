@@ -2,9 +2,9 @@ package com.klst.einvoice.unece.uncefact;
 
 import java.util.logging.Logger;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentCardFactory;
-import com.klst.einvoice.reflection.CopyCtor;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementFinancialCardType;
 
@@ -54,7 +54,7 @@ public class TradeSettlementFinancialCard extends TradeSettlementFinancialCardTy
 	private TradeSettlementFinancialCard(TradeSettlementFinancialCardType financialCard) {
 		super();
 		if(financialCard!=null) {
-			CopyCtor.invokeCopy(this, financialCard);
+			SCopyCtor.getInstance().invokeCopy(this, financialCard);
 			LOG.fine("copy ctor:"+this);
 		}
 	}

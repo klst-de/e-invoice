@@ -3,9 +3,9 @@ package com.klst.einvoice.ubl;
 import java.sql.Timestamp;
 import java.util.logging.Logger;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.Reference;
-import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.DateTimeFormats;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
@@ -41,7 +41,7 @@ public class DocumentReference extends DocumentReferenceType implements Precedin
 	private DocumentReference(DocumentReferenceType doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 			LOG.config("copy ctor:"+this);
 		}
 	}

@@ -1,8 +1,8 @@
 package com.klst.einvoice.ubl;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.Reference;
-import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.DocumentNameCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AttachmentType;
@@ -59,7 +59,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 	private AdditionalSupportingDocument(DocumentReferenceType doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 		}
 	}
 

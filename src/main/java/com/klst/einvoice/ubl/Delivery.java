@@ -3,9 +3,9 @@ package com.klst.einvoice.ubl;
 import java.sql.Timestamp;
 import java.util.logging.Logger;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.PostalAddress;
-import com.klst.einvoice.reflection.CopyCtor;
 import com.klst.untdid.codelist.DateTimeFormats;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
@@ -54,7 +54,7 @@ public class Delivery extends DeliveryType implements BG13_DeliveryInformation {
 	private Delivery(DeliveryType delivery) {
 		super();
 		if(delivery!=null) {
-			CopyCtor.invokeCopy(this, delivery);
+			SCopyCtor.getInstance().invokeCopy(this, delivery);
 			LOG.config("copy ctor:"+this);
 		}
 	}

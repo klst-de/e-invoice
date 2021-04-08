@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.klst.einvoice.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.untdid.codelist.DateTimeFormats;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
@@ -68,7 +68,7 @@ public class TradePaymentTerms extends TradePaymentTermsType {
 	private TradePaymentTerms(TradePaymentTermsType doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 			LOG.fine("copy ctor:"+this);
 		}
 	}

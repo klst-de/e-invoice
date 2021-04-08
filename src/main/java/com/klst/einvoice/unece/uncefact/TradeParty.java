@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.BusinessPartyAddress;
 import com.klst.einvoice.BusinessPartyContact;
@@ -11,7 +12,6 @@ import com.klst.einvoice.BusinessPartyFactory;
 import com.klst.einvoice.IContact;
 import com.klst.einvoice.Identifier;
 import com.klst.einvoice.PostalAddress;
-import com.klst.einvoice.reflection.CopyCtor;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LegalOrganizationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
@@ -56,7 +56,7 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 	private TradeParty(TradePartyType doc) {
 		super();
 		if(doc!=null) {
-			CopyCtor.invokeCopy(this, doc);
+			SCopyCtor.getInstance().invokeCopy(this, doc);
 			LOG.config("copy ctor:"+this);
 		}
 	}

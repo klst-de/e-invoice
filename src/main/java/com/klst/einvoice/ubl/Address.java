@@ -3,8 +3,8 @@ package com.klst.einvoice.ubl;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.PostalAddress;
-import com.klst.einvoice.reflection.CopyCtor;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
@@ -77,7 +77,7 @@ public class Address extends AddressType implements PostalAddress {
 	private Address(AddressType address) {
 		super();
 		if(address!=null) {
-			CopyCtor.invokeCopy(this, address);
+			SCopyCtor.getInstance().invokeCopy(this, address);
 		}
 	}
 	

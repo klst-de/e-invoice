@@ -3,9 +3,9 @@ package com.klst.einvoice.unece.uncefact;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.InvoiceNoteFactory;
-import com.klst.einvoice.reflection.CopyCtor;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
@@ -57,7 +57,7 @@ public class Note extends NoteType implements InvoiceNote, InvoiceNoteFactory {
 	private Note(NoteType note) {
 		super();
 		if(note!=null) {
-			CopyCtor.invokeCopy(this, note);
+			SCopyCtor.getInstance().invokeCopy(this, note);
 		}
 	}
 

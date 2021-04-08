@@ -1,6 +1,6 @@
 package com.klst.einvoice.unece.uncefact;
 
-import com.klst.einvoice.reflection.CopyCtor;
+import com.klst.ebXml.reflection.SCopyCtor;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
@@ -38,7 +38,7 @@ public class Text extends TextType {
 	private Text(TextType object) {
 		super();
 		if (object != null) {
-			CopyCtor.invokeCopy(this, object);
+			SCopyCtor.getInstance().invokeCopy(this, object);
 		}
 	}
 	
