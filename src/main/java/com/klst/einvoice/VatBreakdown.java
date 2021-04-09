@@ -3,7 +3,6 @@ package com.klst.einvoice;
 import java.math.BigDecimal;
 
 import com.klst.edoc.api.IAmount;
-import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
 /**
