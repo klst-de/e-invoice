@@ -3,7 +3,8 @@ package com.klst.einvoice.unece.uncefact;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import com.klst.einvoice.Rounding;
+import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.IQuantity;
 
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType;
 
@@ -24,24 +25,46 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Qua
  * The quantity of items (goods or services) that is charged in the Invoice line.
  * 
  */
-public class Quantity extends QuantityType implements Rounding {
+public class Quantity extends QuantityType implements IQuantity {
+
+	@Override
+	public IQuantity createQuantity(String unitCode, BigDecimal quantity) {
+		return create(unitCode, quantity);
+	}
+
+	static Quantity create(String unitCode, BigDecimal quantity) {
+		return new Quantity(unitCode, quantity);
+	}
 
 	// in EN 16931-1:2017/A1:2019 + AC:2020 entfällt die Einschränkung:
 	//  „Typ repräsentiert eine Fließkommazahl ohne Limitierung der Anzahl an Nachkommastellen.“ 
 	public static final int SCALE = 4;
 	
-	Quantity() {
-		super();
+	static Quantity create() {
+		return new Quantity(null); 
+	}
+	// copy factory
+	static Quantity create(QuantityType object) {
+		if(object instanceof QuantityType && object.getClass()!=QuantityType.class) {
+			// object is instance of a subclass of QuantityType, but not QuantityType itself
+			return (Quantity)object;
+		} else {
+			return new Quantity(object); 
+		}
 	}
 
-	public Quantity(BigDecimal quantity) {
-		this(null, quantity);
+	// copy ctor
+	private Quantity(QuantityType object) {
+		super();
+		if(object!=null) {
+			SCopyCtor.getInstance().invokeCopy(this, object);
+		}
 	}
 
 	public Quantity(String unitCode, BigDecimal quantity) {
-		this();
-		this.setUnitCode(unitCode);
-		this.setValue(quantity);
+		super();
+		super.setUnitCode(unitCode);
+		super.setValue(quantity.setScale(SCALE, RoundingMode.HALF_UP));
 	}
 
 	void copyTo(un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType quantity) {
@@ -49,10 +72,6 @@ public class Quantity extends QuantityType implements Rounding {
 		quantity.setValue(this.getValue(RoundingMode.HALF_UP));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.klst.cius.Rounding#getValue(java.math.RoundingMode)
-	 */
 	@Override
 	public BigDecimal getValue(RoundingMode roundingMode) {
 		return getValue().setScale(SCALE, roundingMode);
@@ -62,4 +81,5 @@ public class Quantity extends QuantityType implements Rounding {
 	public String toString() {
 		return getValue(RoundingMode.HALF_UP) + (getUnitCode()==null ? "" : getUnitCode());
 	}
+
 }
