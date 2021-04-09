@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.edoc.api.IAmount;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
@@ -1412,7 +1413,7 @@ ubl-tc434-example2.xml :
 	}
 	
 	@Override
-	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode code, BigDecimal percent) {
+	public VatBreakdown createVATBreakDown(IAmount taxableAmount, IAmount taxAmount, TaxCategoryCode code, BigDecimal percent) {
 		return TaxSubtotal.create(taxableAmount, taxAmount, code, percent);
 	}
 

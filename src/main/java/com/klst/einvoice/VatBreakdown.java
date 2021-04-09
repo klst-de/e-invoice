@@ -2,6 +2,7 @@ package com.klst.einvoice;
 
 import java.math.BigDecimal;
 
+import com.klst.edoc.api.IAmount;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.untdid.codelist.TaxCategoryCode;
 
@@ -59,8 +60,8 @@ public interface VatBreakdown extends ITaxCategory {
 	 * @param Amount
 	 */
 	// BT-116 1..1 BasisAmount Steuerbasisbetrag
-	public void setTaxBaseAmount(Amount taxBaseAmount); // use ctor
-	public Amount getTaxBaseAmount();
+	public void setTaxBaseAmount(IAmount taxBaseAmount); // use ctor
+	public IAmount getTaxBaseAmount();
 
 	/**
 	 * VAT category tax amount
@@ -78,8 +79,8 @@ public interface VatBreakdown extends ITaxCategory {
 	 * @param Amount
 	 */
 	// BT-117 1..1 CalculatedAmount Kategoriespezifischer Steuerbetrag
-	public void setCalculatedTaxAmount(Amount taxAmount); // use ctor
-	public Amount getCalculatedTaxAmount();
+	public void setCalculatedTaxAmount(IAmount taxAmount); // use ctor
+	public IAmount getCalculatedTaxAmount();
 	
 	/**
 	 * Value added tax. 

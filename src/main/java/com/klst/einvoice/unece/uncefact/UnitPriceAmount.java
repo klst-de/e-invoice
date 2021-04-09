@@ -32,35 +32,12 @@ public class UnitPriceAmount extends Amount {
 	//  „Typ repräsentiert eine Fließkommazahl ohne Limitierung der Anzahl an Nachkommastellen.“ 
 	public static final int SCALE = 4;
 	
-	UnitPriceAmount() {
-		super();
-	}
-
 	public UnitPriceAmount(BigDecimal amount) {
-		super(amount);
+		this(null, amount);
 	}
 
 	public UnitPriceAmount(String currencyID, BigDecimal amount) {
-		super(currencyID, amount);
-	}
-
-	void copyTo(un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType amount) {
-		amount.setCurrencyID(this.getCurrencyID());
-		amount.setValue(this.getValue(RoundingMode.HALF_UP));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.klst.un.unece.uncefact.Amount#getValue(java.math.RoundingMode)
-	 */
-	@Override
-	public BigDecimal getValue(RoundingMode roundingMode) {
-		return getValue().setScale(SCALE, roundingMode);
-	}
-	
-	@Override
-	public String toString() {
-		return getCurrencyID()==null ? ""+getValue(RoundingMode.HALF_UP) : getCurrencyID() + getValue(RoundingMode.HALF_UP);
+		super(currencyID, SCALE, RoundingMode.HALF_UP, amount);
 	}
 
 }

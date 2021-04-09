@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.klst.edoc.api.IAmount;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BusinessParty;
@@ -357,8 +358,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
         vbdList.forEach(tradeTax -> {
-        	Amount taxBaseAmount = tradeTax.getTaxBaseAmount();
-        	Amount calculatedTaxAmount = tradeTax.getCalculatedTaxAmount();
+        	IAmount taxBaseAmount = tradeTax.getTaxBaseAmount();
+        	IAmount calculatedTaxAmount = tradeTax.getCalculatedTaxAmount();
             LOG.info("taxBaseAmount="+taxBaseAmount + " calculatedTaxAmount="+calculatedTaxAmount);
         	VatBreakdown vatBreakdown = ublInvoice.createVATBreakDown( taxBaseAmount,
         			calculatedTaxAmount,
