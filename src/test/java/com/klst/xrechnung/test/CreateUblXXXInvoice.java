@@ -9,6 +9,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.Identifier;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BusinessParty;
@@ -19,7 +20,6 @@ import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.GlobalIdentifier;
-import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PrecedingInvoice;
