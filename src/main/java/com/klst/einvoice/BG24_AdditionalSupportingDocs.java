@@ -1,5 +1,7 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.Reference;
+
 /**
  * BG-24 ADDITIONAL SUPPORTING DOCUMENTS
  * <p>

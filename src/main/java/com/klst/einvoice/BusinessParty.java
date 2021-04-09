@@ -2,6 +2,8 @@ package com.klst.einvoice;
 
 import java.util.List;
 
+import com.klst.edoc.api.Identifier;
+
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyType;
 
 /**

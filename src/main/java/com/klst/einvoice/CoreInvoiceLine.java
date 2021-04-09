@@ -3,6 +3,7 @@ package com.klst.einvoice;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.klst.edoc.api.Identifier;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;

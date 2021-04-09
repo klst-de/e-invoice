@@ -1,8 +1,8 @@
 package com.klst.einvoice.unece.uncefact;
 
+import com.klst.edoc.api.Identifier;
+import com.klst.edoc.api.Reference;
 import com.klst.einvoice.GlobalIdentifier;
-import com.klst.einvoice.Identifier;
-import com.klst.einvoice.Reference;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 

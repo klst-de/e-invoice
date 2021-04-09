@@ -2,6 +2,7 @@ package com.klst.einvoice;
 
 import java.sql.Timestamp;
 
+import com.klst.edoc.api.Reference;
 import com.klst.untdid.codelist.DateTimeFormats;
 
 /**

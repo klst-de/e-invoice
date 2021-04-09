@@ -4,8 +4,8 @@ import java.sql.Timestamp;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.Reference;
 import com.klst.einvoice.PrecedingInvoice;
-import com.klst.einvoice.Reference;
 import com.klst.untdid.codelist.DateTimeFormats;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
