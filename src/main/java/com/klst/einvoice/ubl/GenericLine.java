@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.Identifier;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoiceLine;
@@ -45,7 +46,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PercentType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.StartDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ValueType;
-import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.DateType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.QuantityType;
 
 public class GenericLine<T> implements CoreInvoiceLine {
@@ -274,8 +274,11 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return accountingCost==null ? null : accountingCost.getValue();
 	}
 
-	// BG-26 ++ 0..1 INVOICE LINE PERIOD
-	// BG-26.BT-134 +++ 0..1 Invoice line period start date / Das Datum, an dem der Rechnungszeitraum der betreffenden Rechnungsposition beginnt.
+	// BG-26 0..1 INVOICE LINE PERIOD
+	@Override
+	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		return Period.create(start, end);
+	}
 	List<PeriodType> periodList = null;
 	PeriodType getPeriod0() {
 		if(periodList==null) {
@@ -289,6 +292,15 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return periodList.get(0);
 	}
 	@Override
+	public IPeriod getLineDeliveryPeriod() {
+		return Period.create(getPeriod0());
+	}
+	@Override
+	public void setLineDeliveryPeriod(IPeriod period) {
+		setStartDate(period.getStartDateAsTimestamp());
+		setEndDate(period.getEndDateAsTimestamp());
+	}
+	// BG-26.BT-134 +++ 0..1 Invoice line period start date / Das Datum, an dem der Rechnungszeitraum der betreffenden Rechnungsposition beginnt.
 	public void setStartDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		StartDateType date = new StartDateType();
@@ -297,17 +309,20 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		period.setStartDate(date);
 	}
 	
-	@Override
-	public Timestamp getStartDateAsTimestamp() {
-		List<PeriodType> list = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
-		if(list.isEmpty()) return null;
-		DateType date = (DateType)list.get(0).getStartDate();
-		if(date==null) return null;
-		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
-	}
+//	@Override
+//	public Timestamp getStartDateAsTimestamp() {
+//		List<PeriodType> list = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
+//		if(list.isEmpty()) return null;
+//		DateType date = (DateType)list.get(0).getStartDate();
+//		if(date==null) return null;
+//		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
+//	}
 	
-	// BG-26.BT-135 +++ 0..1 Invoice line period end date
 	@Override
+	public void setLineDeliveryDate(Timestamp timestamp) {
+		setEndDate(timestamp);
+	}
+	// BG-26.BT-135 0..1 Invoice line period end date
 	public void setEndDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		EndDateType date = new EndDateType();
@@ -315,14 +330,18 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		PeriodType period = getPeriod0();
 		period.setEndDate(date);
 	}
-	
+
 	@Override
-	public Timestamp getEndDateAsTimestamp() {
-		List<PeriodType> list = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
-		if(list.isEmpty()) return null;
-		DateType date = (DateType)list.get(0).getEndDate();
-		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
+	public Timestamp getLineDeliveryDateAsTimestamp() {
+		return getLineDeliveryPeriod().getEndDateAsTimestamp();
 	}
+
+//	public Timestamp getEndDateAsTimestamp() {
+//		List<PeriodType> list = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
+//		if(list.isEmpty()) return null;
+//		DateType date = (DateType)list.get(0).getEndDate();
+//		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
+//	}
 	
 	/*
 	 * BG-27 0..n INVOICE LINE ALLOWANCES

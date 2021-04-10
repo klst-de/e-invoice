@@ -208,8 +208,8 @@ public class UblTest {
     	assertEquals("[DE (Bayern), 98765, [Deliver to city]]", delivery.getAddress().toString());
     	assertEquals("[Deliver to party name]", delivery.getName()); 
     	
-    	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getStartDateAsTimestamp()); 
-    	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getEndDateAsTimestamp()); 
+    	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getDeliveryPeriod().getStartDateAsTimestamp()); 
+    	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getDeliveryDateAsTimestamp()); 
 	}
 
 	@Test

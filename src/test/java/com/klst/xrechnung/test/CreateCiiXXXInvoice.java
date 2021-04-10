@@ -274,9 +274,8 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp()); // BT-9 & BT-20 (optional)
 
 		// es ist entscheidend, dass die setter nach cii.setPaymentInstructions ausgeführt werden!!!!!!!!!!!!!!!
-		LOG.info("testDoc.StartDateAsTimestamp "+ testDoc.getStartDateAsTimestamp());
-		cii.setStartDate(testDoc.getStartDateAsTimestamp());
-		cii.setEndDate(testDoc.getEndDateAsTimestamp());
+		LOG.info("testDoc.StartDateAsTimestamp "+ testDoc.getDeliveryPeriod().getStartDateAsTimestamp());
+		cii.setDeliveryPeriod(testDoc.getDeliveryPeriod());
 
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");
@@ -350,8 +349,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
         	line.setNote(testLine.getNote()); // opt BT-127
         	line.setLineObjectIdentifier(testLine.getLineObjectIdentifier()); // opt BT-128
     		line.setBuyerAccountingReference(testLine.getBuyerAccountingReference()); // BG-26.BT-133
-    		line.setStartDate(testLine.getStartDateAsTimestamp()); // BG-26.BT-134
-    		line.setEndDate(testLine.getEndDateAsTimestamp()); // BG-26.BT-135
+    		line.setLineDeliveryPeriod(testLine.getLineDeliveryPeriod()); // BG-26
 
 			List<AllowancesAndCharges> allowancesAndCharges = testLine.getAllowancesAndCharges();
 			LOG.info("(optional) line AllowancesAndCharges #:"+allowancesAndCharges.size());

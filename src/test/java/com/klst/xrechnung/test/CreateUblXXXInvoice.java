@@ -128,8 +128,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setDocumentCurrency(testDoc.getDocumentCurrency());
 		ublInvoice.setTaxCurrency(testDoc.getTaxCurrency());
 		ublInvoice.setBuyerReference(testDoc.getBuyerReferenceValue());
-		ublInvoice.setStartDate(testDoc.getStartDateAsTimestamp()); // optional
-		ublInvoice.setEndDate(testDoc.getEndDateAsTimestamp()); // optional
+		ublInvoice.setDeliveryPeriod(testDoc.getDeliveryPeriod());  // BG-14 optional
 		LOG.info("ublInvoice "+ublInvoice);
 		
 		ublInvoice.setSeller(testDoc.getSeller());
@@ -273,8 +272,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			}
 		}
 		ublInvoice.setTaxRepresentative(testDoc.getTaxRepresentative());
-		ublInvoice.setStartDate(testDoc.getStartDateAsTimestamp());
-		ublInvoice.setEndDate(testDoc.getEndDateAsTimestamp());
+		ublInvoice.setDeliveryPeriod(testDoc.getDeliveryPeriod());
 		ublInvoice.setDelivery(testDoc.getDelivery());
 		
 		List<BG24_AdditionalSupportingDocs> asDocList = testDoc.getAdditionalSupportingDocuments();
@@ -399,9 +397,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			}
 			
 			// opt:
-			targetLine.setBuyerAccountingReference(testLine.getBuyerAccountingReference()); // BG-26.BT-133
-			targetLine.setStartDate(testLine.getStartDateAsTimestamp()); // optional BG-26
-			targetLine.setEndDate(testLine.getEndDateAsTimestamp());     // optional BG-26
+			targetLine.setBuyerAccountingReference(testLine.getBuyerAccountingReference()); // BG-25.BT-133
+			targetLine.setLineDeliveryPeriod(testLine.getLineDeliveryPeriod());     // optional BG-26
 			
 			// BG-29:BT-149-0 0..1 , BT-150-0
 			Quantity baseQuantity = testLine.getBaseQuantity();

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.Reference;
 import com.klst.einvoice.AllowancesAndCharges;
@@ -82,7 +83,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxInclu
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPointDateType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
-import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.DateType;
 
 public class GenericInvoice <T> implements CoreInvoice  {
 
@@ -887,7 +887,11 @@ ubl-tc434-example2.xml :
 		return Delivery.create(deliveryList.get(0));
 	}
 
-	// BG-14 ++ 0..1 INVOICING PERIOD
+	// BG-14 0..1 INVOICING PERIOD
+	@Override
+	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		return Period.create(start, end);
+	}
 	List<PeriodType> periodList = null;
 	private PeriodType getPeriod0() {
 		if(periodList==null) {
@@ -900,8 +904,16 @@ ubl-tc434-example2.xml :
 		} 
 		return periodList.get(0);
 	}
-	// BG-14.BT-73 +++ 0..1 Invoicing period start date
 	@Override
+	public IPeriod getDeliveryPeriod() {
+		return Period.create(getPeriod0());
+	}
+	@Override
+	public void setDeliveryPeriod(IPeriod period) {
+		setStartDate(period.getStartDateAsTimestamp());
+		setEndDate(period.getEndDateAsTimestamp());
+	}
+	// BG-14.BT-73 0..1 Invoicing period start date
 	public void setStartDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		StartDateType date = new StartDateType();
@@ -910,17 +922,18 @@ ubl-tc434-example2.xml :
 		period.setStartDate(date);
 	}
 	
+//	public Timestamp getStartDateAsTimestamp() {
+//		List<PeriodType> list = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
+//		if(list.isEmpty()) return null;
+//		DateType date = (DateType)list.get(0).getStartDate();
+//		if(date==null) return null;
+//		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
+//	}
 	@Override
-	public Timestamp getStartDateAsTimestamp() {
-		List<PeriodType> list = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
-		if(list.isEmpty()) return null;
-		DateType date = (DateType)list.get(0).getStartDate();
-		if(date==null) return null;
-		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
+	public void setDeliveryDate(Timestamp timestamp) {
+		setEndDate(timestamp);
 	}
-	
-	// BG-14.BT-74 +++ 0..1 Invoicing period end date
-	@Override
+	// BG-14.BT-74 0..1 Invoicing period end date
 	public void setEndDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		EndDateType date = new EndDateType();
@@ -928,15 +941,18 @@ ubl-tc434-example2.xml :
 		PeriodType period = getPeriod0();
 		period.setEndDate(date);
 	}
-	
 	@Override
-	public Timestamp getEndDateAsTimestamp() {
-		List<PeriodType> list = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
-		if(list.isEmpty()) return null;
-		DateType date = (DateType)list.get(0).getEndDate();
-		if(date==null) return null;
-		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
+	public Timestamp getDeliveryDateAsTimestamp() {
+		return getDeliveryPeriod().getEndDateAsTimestamp();
 	}
+	
+//	public Timestamp getEndDateAsTimestamp() {
+//		List<PeriodType> list = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
+//		if(list.isEmpty()) return null;
+//		DateType date = (DateType)list.get(0).getEndDate();
+//		if(date==null) return null;
+//		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
+//	}
 	
 	// BG-16 + 0..1 PAYMENT INSTRUCTIONS / Zahlungsanweisungen
 	// factory delegate to PaymentMeans

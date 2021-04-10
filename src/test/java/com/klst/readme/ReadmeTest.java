@@ -3,7 +3,6 @@ package com.klst.readme;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -15,8 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.BusinessPartyAddress;
-import com.klst.einvoice.BusinessPartyContact;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.IContact;
@@ -93,7 +90,7 @@ public class ReadmeTest {
 		
 		// optional ...
 		line.setNote("Die letzte Abonnementslieferung");        // BT-127 note
-		line.setPeriod("2016-01-01", "2016-12-31");             // BG-26  line delivery period.
+		line.setLineDeliveryPeriod("2016-01-01", "2016-12-31"); // BG-26  line delivery period.
 		line.setOrderLineID("6171175.1");                       // BT-132 Referenced purchase order line
 		line.setUnitPriceAllowance(new UnitPriceAmount(EUR, new BigDecimal(21.21)) // priceDiscount
 				                  ,new UnitPriceAmount(EUR, new BigDecimal(310))); // grossPrice

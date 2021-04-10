@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.Reference;
 import com.klst.einvoice.AllowancesAndCharges;
@@ -837,37 +838,59 @@ UBL:
 		return HeaderTradeDelivery.create(headerTradeDelivery);
 	}
 
-	// BG-14.BT-73 +++ 0..1 Invoicing period start date
+	// BG-14.BT-73 0..1 Invoicing period
 	@Override
+	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		return SpecifiedPeriod.create(start, end);
+	}
+	@Override
+	public void setDeliveryPeriod(IPeriod period) {
+		if(period==null) return;
+		setStartDate(period.getStartDateAsTimestamp());
+		setEndDate(period.getEndDateAsTimestamp());
+	}
+	@Override
+	public IPeriod getDeliveryPeriod() {
+		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
+		if(specifiedPeriod==null) return null;
+		return SpecifiedPeriod.create(specifiedPeriod);
+	}
+
+	// BG-14.BT-73 +++ 0..1 Invoicing period start date
 	public void setStartDate(Timestamp ts) {
 		if(ts==null) return;
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		applicableHeaderTradeSettlement.getBillingSpecifiedPeriod().setStartDateTime(dateTime);
 	}
-
-	@Override
-	public Timestamp getStartDateAsTimestamp() {
-		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
-		if(specifiedPeriod==null) return null;
-		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
-		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
-	}
+//	public Timestamp getStartDateAsTimestamp() {
+//		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
+//		if(specifiedPeriod==null) return null;
+//		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
+//		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
+//	}
 	
-	// BG-14.BT-74 +++ 0..1 Invoicing period end date
 	@Override
+	public void setDeliveryDate(Timestamp timestamp) {
+		setEndDate(timestamp);
+	}
+	@Override
+	public Timestamp getDeliveryDateAsTimestamp() {
+//		return getEndDateAsTimestamp();
+		IPeriod period = getDeliveryPeriod();
+		return period==null ? null : period.getEndDateAsTimestamp();
+	}
+	// BG-14.BT-74 +++ 0..1 Invoicing period end date
 	public void setEndDate(Timestamp ts) {
 		if(ts==null) return;
 		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
 		applicableHeaderTradeSettlement.getBillingSpecifiedPeriod().setEndDateTime(dateTime);
 	}
-
-	@Override
-	public Timestamp getEndDateAsTimestamp() {
-		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
-		if(specifiedPeriod==null) return null;
-		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
-		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
-	}
+//	public Timestamp getEndDateAsTimestamp() {
+//		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
+//		if(specifiedPeriod==null) return null;
+//		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
+//		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
+//	}
 
 /*
 
