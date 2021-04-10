@@ -74,4 +74,15 @@ public class Period extends PeriodType implements IPeriod {
 		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[start:");
+		stringBuilder.append(getStartDateAsTimestamp()==null ? "null" : getStartDateAsTimestamp());
+		stringBuilder.append(", end:");
+		stringBuilder.append(getEndDateAsTimestamp()==null ? "null" : getEndDateAsTimestamp());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
+	}
+
 }
