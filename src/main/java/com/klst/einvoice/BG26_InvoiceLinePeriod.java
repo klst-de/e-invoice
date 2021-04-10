@@ -24,11 +24,23 @@ import com.klst.edoc.untdid.DateTimeFormats;
  */
 public interface BG26_InvoiceLinePeriod extends IPeriodFactory {
 
-	public void setLineDeliveryDate(Timestamp timestamp);
+	/**
+	 * To specify exact one date for the shipment, both sub-elements start and end should be the equal.
+	 * @param timestamp
+	 */
+	default void setLineDeliveryDate(Timestamp timestamp) {
+		setLineDeliveryPeriod(createPeriod(timestamp, timestamp));
+	}
 	default void setLineDeliveryDate(String ymd) {
 		if(ymd!=null) setLineDeliveryDate(DateTimeFormats.ymdToTs(ymd));
 	}
-	public Timestamp getLineDeliveryDateAsTimestamp();
+	default Timestamp getLineDeliveryDateAsTimestamp() {
+		IPeriod period = getLineDeliveryPeriod();
+		if(period==null) return null;
+		if(period.getStartDateAsTimestamp().equals(period.getEndDateAsTimestamp())) return period.getEndDateAsTimestamp();
+		return null;
+
+	}
 
 	public void setLineDeliveryPeriod(IPeriod period);
 	default void setLineDeliveryPeriod(Timestamp start, Timestamp end) {

@@ -888,11 +888,21 @@ ubl-tc434-example2.xml :
 	}
 
 	// BG-14 0..1 INVOICING PERIOD
-	@Override
+//	@Override // comment to show the java-doc
+	/**
+	 * factory method to create BG-14 INVOICING PERIOD
+	 * 
+	 * @param start - The initial date of delivery of goods or services.
+	 * @param end - The date on which the delivery of goods or services was completed.
+	 * @return IPeriod - aka delivery period
+	 * 
+	 * @see com.klst.einvoice.BG14_InvoicingPeriod
+	 * @see com.klst.edoc.api.IPeriod
+	 */
 	public IPeriod createPeriod(Timestamp start, Timestamp end) {
 		return Period.create(start, end);
 	}
-	List<PeriodType> periodList = null;
+	private List<PeriodType> periodList = null;
 	private PeriodType getPeriod0() {
 		if(periodList==null) {
 			periodList = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
@@ -914,7 +924,7 @@ ubl-tc434-example2.xml :
 		setEndDate(period.getEndDateAsTimestamp());
 	}
 	// BG-14.BT-73 0..1 Invoicing period start date
-	public void setStartDate(Timestamp ts) {
+	private void setStartDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		StartDateType date = new StartDateType();
 		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
@@ -922,37 +932,14 @@ ubl-tc434-example2.xml :
 		period.setStartDate(date);
 	}
 	
-//	public Timestamp getStartDateAsTimestamp() {
-//		List<PeriodType> list = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
-//		if(list.isEmpty()) return null;
-//		DateType date = (DateType)list.get(0).getStartDate();
-//		if(date==null) return null;
-//		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
-//	}
-	@Override
-	public void setDeliveryDate(Timestamp timestamp) {
-		setEndDate(timestamp);
-	}
 	// BG-14.BT-74 0..1 Invoicing period end date
-	public void setEndDate(Timestamp ts) {
+	private void setEndDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		EndDateType date = new EndDateType();
 		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
 		PeriodType period = getPeriod0();
 		period.setEndDate(date);
 	}
-	@Override
-	public Timestamp getDeliveryDateAsTimestamp() {
-		return getDeliveryPeriod().getEndDateAsTimestamp();
-	}
-	
-//	public Timestamp getEndDateAsTimestamp() {
-//		List<PeriodType> list = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
-//		if(list.isEmpty()) return null;
-//		DateType date = (DateType)list.get(0).getEndDate();
-//		if(date==null) return null;
-//		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
-//	}
 	
 	// BG-16 + 0..1 PAYMENT INSTRUCTIONS / Zahlungsanweisungen
 	// factory delegate to PaymentMeans

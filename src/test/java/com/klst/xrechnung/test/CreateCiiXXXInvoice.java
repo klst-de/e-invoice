@@ -268,14 +268,14 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		if(testDoc.getTaxCurrency()!=null) {                    // BT-6
 			cii.setTaxCurrency(testDoc.getTaxCurrency());
 		}
-		cii.setTaxCurrency(testDoc.getTaxCurrency()); // BT-6 + 0..1 (optional)
+		cii.setTaxCurrency(testDoc.getTaxCurrency()); // BT-6 0..1 (optional)
 
 		LOG.info("testDoc.getPaymentTerm():"+testDoc.getPaymentTerm() + " testDoc.getDueDateAsTimestamp():"+testDoc.getDueDateAsTimestamp());
 		cii.setPaymentTermsAndDate(testDoc.getPaymentTerm(), testDoc.getDueDateAsTimestamp()); // BT-9 & BT-20 (optional)
 
 		// es ist entscheidend, dass die setter nach cii.setPaymentInstructions ausgeführt werden!!!!!!!!!!!!!!!
-		LOG.info("testDoc.StartDateAsTimestamp "+ testDoc.getDeliveryPeriod().getStartDateAsTimestamp());
-		cii.setDeliveryPeriod(testDoc.getDeliveryPeriod());
+		LOG.info("testDoc.StartDateAsTimestamp "+ testDoc.getDeliveryPeriod());
+		cii.setDeliveryPeriod(testDoc.getDeliveryPeriod()); // BG-14 0..1 INVOICING PERIOD
 
         List<VatBreakdown> vbdList = testDoc.getVATBreakDowns();
         LOG.info("VATBreakDown starts for "+vbdList.size() + " VATBreakDowns.");

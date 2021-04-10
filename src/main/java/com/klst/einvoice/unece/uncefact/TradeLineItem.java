@@ -27,7 +27,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductCharacteristicType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductClassificationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAllowanceChargeType;
@@ -37,7 +36,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementLineMonetarySummationType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
 
 /**
@@ -271,74 +269,33 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	}
 
 	// BG-26 0..1 INVOICE LINE PERIOD 
-	@Override
+//	@Override // comment to show the java-doc
+	/**
+	 * factory method to create BG-26 INVOICE LINE PERIOD 
+	 * 
+	 * @param start - The date is the first day of the period.
+	 * @param end - The date is the last day of the period.
+	 * @return IPeriod - aka delivery period
+	 * 
+	 * @see com.klst.einvoice.BG26_InvoiceLinePeriod
+	 * @see com.klst.edoc.api.IPeriod
+	 */
 	public IPeriod createPeriod(Timestamp start, Timestamp end) {
 		return SpecifiedPeriod.create(start, end);
 	}
 	@Override
 	public void setLineDeliveryPeriod(IPeriod period) {
 		if(period==null) return;
-		setStartDate(period.getStartDateAsTimestamp());
-		setEndDate(period.getEndDateAsTimestamp());
+		specifiedLineTradeSettlement.setBillingSpecifiedPeriod((SpecifiedPeriod)period);
 	}
 	@Override
 	public IPeriod getLineDeliveryPeriod() {
-		SpecifiedPeriodType specifiedPeriod = specifiedLineTradeSettlement.getBillingSpecifiedPeriod();
-		if(specifiedPeriod==null) return null;
-		return SpecifiedPeriod.create(specifiedPeriod);
+		if(specifiedLineTradeSettlement.getBillingSpecifiedPeriod()==null) return null;
+		return SpecifiedPeriod.create(specifiedLineTradeSettlement.getBillingSpecifiedPeriod());
 	}
 	
 	// BG-26.BT-134 0..1 Invoice line period start date
-	public void setStartDate(Timestamp ts) {
-		if(ts==null) return;
-		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		if(specifiedLineTradeSettlement.getBillingSpecifiedPeriod()==null) {
-//			LOG.info("creating SpecifiedPeriodType and setBillingSpecifiedPeriod");
-			SpecifiedPeriodType sp = new SpecifiedPeriodType();
-			sp.setStartDateTime(dateTime);
-			specifiedLineTradeSettlement.setBillingSpecifiedPeriod(sp);
-		} else {
-			specifiedLineTradeSettlement.getBillingSpecifiedPeriod().setStartDateTime(dateTime);
-		}
-	}
-
-//	public Timestamp getStartDateAsTimestamp() {
-//		SpecifiedPeriodType specifiedPeriod = specifiedLineTradeSettlement.getBillingSpecifiedPeriod();
-//		if(specifiedPeriod==null) return null;
-//		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
-//		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
-//	}
-
-	public Timestamp getLineDeliveryDateAsTimestamp() {
-		IPeriod period = getLineDeliveryPeriod();
-		return period==null ? null : period.getEndDateAsTimestamp();
-
-	}
-
-	@Override
-	public void setLineDeliveryDate(Timestamp timestamp) {
-		setEndDate(timestamp);
-	}
 	// BG-26.BT-135 0..1 Invoice line period end date
-	public void setEndDate(Timestamp ts) {
-		if(ts==null) return;
-		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		if(specifiedLineTradeSettlement.getBillingSpecifiedPeriod()==null) {
-			SpecifiedPeriodType sp = new SpecifiedPeriodType();
-			sp.setStartDateTime(dateTime);
-			specifiedLineTradeSettlement.setBillingSpecifiedPeriod(sp);			
-		} else {
-			specifiedLineTradeSettlement.getBillingSpecifiedPeriod().setEndDateTime(dateTime);
-		}
-	}
-
-//	@Override
-//	public Timestamp getEndDateAsTimestamp() {
-//		SpecifiedPeriodType specifiedPeriod = specifiedLineTradeSettlement.getBillingSpecifiedPeriod();
-//		if(specifiedPeriod==null) return null;
-//		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
-//		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
-//	}
 
 	/*
 	 * BG-27 0..n INVOICE LINE ALLOWANCES

@@ -275,7 +275,17 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	}
 
 	// BG-26 0..1 INVOICE LINE PERIOD
-	@Override
+//	@Override // comment to show the java-doc
+	/**
+	 * factory method to create BG-26 INVOICE LINE PERIOD 
+	 * 
+	 * @param start - The date is the first day of the period.
+	 * @param end - The date is the last day of the period.
+	 * @return IPeriod - aka delivery period
+	 * 
+	 * @see com.klst.einvoice.BG26_InvoiceLinePeriod
+	 * @see com.klst.edoc.api.IPeriod
+	 */
 	public IPeriod createPeriod(Timestamp start, Timestamp end) {
 		return Period.create(start, end);
 	}
@@ -301,7 +311,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		setEndDate(period.getEndDateAsTimestamp());
 	}
 	// BG-26.BT-134 +++ 0..1 Invoice line period start date / Das Datum, an dem der Rechnungszeitraum der betreffenden Rechnungsposition beginnt.
-	public void setStartDate(Timestamp ts) {
+	private void setStartDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		StartDateType date = new StartDateType();
 		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
@@ -309,21 +319,8 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		period.setStartDate(date);
 	}
 	
-//	@Override
-//	public Timestamp getStartDateAsTimestamp() {
-//		List<PeriodType> list = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
-//		if(list.isEmpty()) return null;
-//		DateType date = (DateType)list.get(0).getStartDate();
-//		if(date==null) return null;
-//		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
-//	}
-	
-	@Override
-	public void setLineDeliveryDate(Timestamp timestamp) {
-		setEndDate(timestamp);
-	}
 	// BG-26.BT-135 0..1 Invoice line period end date
-	public void setEndDate(Timestamp ts) {
+	private void setEndDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		EndDateType date = new EndDateType();
 		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
@@ -331,18 +328,6 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		period.setEndDate(date);
 	}
 
-	@Override
-	public Timestamp getLineDeliveryDateAsTimestamp() {
-		return getLineDeliveryPeriod().getEndDateAsTimestamp();
-	}
-
-//	public Timestamp getEndDateAsTimestamp() {
-//		List<PeriodType> list = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
-//		if(list.isEmpty()) return null;
-//		DateType date = (DateType)list.get(0).getEndDate();
-//		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
-//	}
-	
 	/*
 	 * BG-27 0..n INVOICE LINE ALLOWANCES
 	 * BG-28 0..n INVOICE LINE CHARGES

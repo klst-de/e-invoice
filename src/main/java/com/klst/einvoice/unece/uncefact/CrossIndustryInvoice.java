@@ -42,7 +42,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProcuringProjectType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
@@ -838,59 +837,33 @@ UBL:
 		return HeaderTradeDelivery.create(headerTradeDelivery);
 	}
 
-	// BG-14.BT-73 0..1 Invoicing period
-	@Override
+	// BG-14 0..1 Invoicing period
+//	@Override // comment to show the java-doc
+	/**
+	 * factory method to create BG-14 INVOICING PERIOD
+	 * 
+	 * @param start - The initial date of delivery of goods or services.
+	 * @param end - The date on which the delivery of goods or services was completed.
+	 * @return IPeriod - aka delivery period
+	 * 
+	 * @see com.klst.einvoice.BG14_InvoicingPeriod
+	 * @see com.klst.edoc.api.IPeriod
+	 */
 	public IPeriod createPeriod(Timestamp start, Timestamp end) {
 		return SpecifiedPeriod.create(start, end);
 	}
 	@Override
 	public void setDeliveryPeriod(IPeriod period) {
-		if(period==null) return;
-		setStartDate(period.getStartDateAsTimestamp());
-		setEndDate(period.getEndDateAsTimestamp());
+		// delegieren:
+		applicableHeaderTradeSettlement.setDeliveryPeriod(period);
 	}
 	@Override
 	public IPeriod getDeliveryPeriod() {
-		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
-		if(specifiedPeriod==null) return null;
-		return SpecifiedPeriod.create(specifiedPeriod);
+		return applicableHeaderTradeSettlement.getDeliveryPeriod();
 	}
 
-	// BG-14.BT-73 +++ 0..1 Invoicing period start date
-	public void setStartDate(Timestamp ts) {
-		if(ts==null) return;
-		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		applicableHeaderTradeSettlement.getBillingSpecifiedPeriod().setStartDateTime(dateTime);
-	}
-//	public Timestamp getStartDateAsTimestamp() {
-//		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
-//		if(specifiedPeriod==null) return null;
-//		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
-//		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
-//	}
-	
-	@Override
-	public void setDeliveryDate(Timestamp timestamp) {
-		setEndDate(timestamp);
-	}
-	@Override
-	public Timestamp getDeliveryDateAsTimestamp() {
-//		return getEndDateAsTimestamp();
-		IPeriod period = getDeliveryPeriod();
-		return period==null ? null : period.getEndDateAsTimestamp();
-	}
-	// BG-14.BT-74 +++ 0..1 Invoicing period end date
-	public void setEndDate(Timestamp ts) {
-		if(ts==null) return;
-		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		applicableHeaderTradeSettlement.getBillingSpecifiedPeriod().setEndDateTime(dateTime);
-	}
-//	public Timestamp getEndDateAsTimestamp() {
-//		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
-//		if(specifiedPeriod==null) return null;
-//		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
-//		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
-//	}
+	// BG-14.BT-73 0..1 Invoicing period start date
+	// BG-14.BT-74 0..1 Invoicing period end date
 
 /*
 
