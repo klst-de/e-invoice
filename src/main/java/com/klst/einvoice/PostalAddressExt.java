@@ -19,8 +19,12 @@ import com.klst.edoc.api.PostalAddress;
  */
 public interface PostalAddressExt extends PostalAddress {
 
-	public void setStreet(String street);
-	public void setBuilding(String building);
+	default void setStreet(String street) {
+		return;
+	}
+	default void setBuilding(String building) {
+		return;
+	}
 	
 	public String getStreet();
 	public String getBuilding();
