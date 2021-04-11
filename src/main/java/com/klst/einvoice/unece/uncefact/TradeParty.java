@@ -171,6 +171,10 @@ Ansonsten wird das Feld ID genutzt.
 	}
 	@Override
 	public void setId(String name, String schemeID) {
+		addId(name, schemeID);
+	}
+	@Override
+	public void addId(String name, String schemeID) {
 		if(name==null) return;
 		// mit schemeID ==> GlobalID
 		if(schemeID==null) {

@@ -28,14 +28,14 @@ public interface BusinessParty extends BusinessPartyFactory {
 	default PostalAddress getAddress() {
 		return ((BusinessPartyAddress)this).getAddress();
 	}
-
+	
 	/* 
-	 * a shortcut for getIContact()
+	 * a shortcut for getContactInfo()
 	 */
 	default ContactInfo getBPContact() {
 		return ((BusinessPartyContact)this).getContactInfo();
 	}
-
+	
 	// use factory: createParty(String name, String tradingName, PostalAddress address, IContact contact);
 	// instead setter:
 //	public void setRegistrationName(String name);
@@ -71,6 +71,7 @@ public interface BusinessParty extends BusinessPartyFactory {
 	public String getId(); // kleingeschrieben, nicht ID!
 	public Identifier getIdentifier();
 
+	public void addId(String name, String schemeID); // wg. 1..n https://github.com/klst-de/e-invoice/issues/27
 	public void setId(String name, String schemeID);
 	default void setId(String name) {
 		setId(name, null);

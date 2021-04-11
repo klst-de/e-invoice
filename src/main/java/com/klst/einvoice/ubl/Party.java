@@ -196,6 +196,9 @@ public class Party extends PartyType implements BusinessParty, BusinessPartyAddr
 		super.getPartyName().add(partyName);
 	}
 
+	// BG-4.BT-29  0..n Seller identifier / Kennung des Verkäufers
+	// BG-7.BT-46  0..1  Buyer identifier
+	// BG-10.BT-60 0..1  Payee identifier
 	@Override
 	public String getId() {
 		List<PartyIdentificationType> partyIdentificationList = super.getPartyIdentification();
@@ -209,11 +212,15 @@ public class Party extends PartyType implements BusinessParty, BusinessPartyAddr
 	}
 
 	@Override
-	public void setId(String name, String schemeID) {
+	public void addId(String name, String schemeID) {
 		if(name==null) return;
 		PartyIdentificationType partyIdentification = new PartyIdentificationType();
 		partyIdentification.setID(new ID(name, schemeID));
 		super.getPartyIdentification().add(partyIdentification);
+	}
+	@Override
+	public void setId(String name, String schemeID) {
+		addId(name, schemeID);
 	}
 
 	@Override
