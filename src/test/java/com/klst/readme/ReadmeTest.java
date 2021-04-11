@@ -16,6 +16,7 @@ import org.junit.Test;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.einvoice.AllowancesAndCharges;
+import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.PrecedingInvoice;
@@ -157,8 +158,13 @@ public class ReadmeTest {
 		String contactTel  = "+49 1234-5678";
 		String contactMail = "seller@email.de";
 		ContactInfo sellerContact = invoice.createContactInfo(contactName, contactTel, contactMail);
-		invoice.setSeller("[Seller name]", sellerAddress, sellerContact, 
-				"[HRA-Eintrag]", "123/456/7890, HRA-Eintrag in […]");
+//		invoice.setSeller("[Seller name]", sellerAddress, sellerContact, 
+//				"[HRA-Eintrag]", "123/456/7890, HRA-Eintrag in […]");
+		// alternativ:
+		BusinessParty seller = invoice.createParty("[Seller name]", null, sellerAddress, sellerContact);
+		seller.setCompanyId("[HRA-Eintrag]");
+		seller.setCompanyLegalForm("123/456/7890, HRA-Eintrag in […]");
+		invoice.setSeller(seller);
 		  
 		// BusinessParty Buyer aka Customer 
 		PostalAddress buyerAddress = invoice.createAddress(DE, "12345", "[Buyer city]");
