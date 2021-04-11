@@ -3,7 +3,7 @@ package com.klst.einvoice.unece.uncefact;
 import java.util.List;
 
 import com.klst.ebXml.reflection.SCopyCtor;
-import com.klst.einvoice.PostalAddress;
+import com.klst.edoc.api.PostalAddress;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CountryIDType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;

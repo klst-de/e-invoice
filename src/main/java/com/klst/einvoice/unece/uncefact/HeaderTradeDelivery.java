@@ -4,9 +4,9 @@ import java.sql.Timestamp;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.PostalAddress;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BusinessParty;
-import com.klst.einvoice.PostalAddress;
 import com.klst.untdid.codelist.DateTimeFormats;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;

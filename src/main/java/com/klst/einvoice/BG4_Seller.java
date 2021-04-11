@@ -1,5 +1,6 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.PostalAddress;
 import com.klst.untdid.codelist.ReferenceCode;
 
 /**

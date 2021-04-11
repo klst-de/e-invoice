@@ -1,5 +1,7 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.PostalAddress;
+
 /**
  * abstract-factory, aka Kit for BusinessParty (BP) 
  * <br> BG-4 + 1..1 SELLER 

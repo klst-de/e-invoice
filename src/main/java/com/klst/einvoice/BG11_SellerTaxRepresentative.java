@@ -1,5 +1,7 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.PostalAddress;
+
 /**
  * BG-11 + 0..1 SELLER TAX REPRESENTATIVE PARTY
  * <p>

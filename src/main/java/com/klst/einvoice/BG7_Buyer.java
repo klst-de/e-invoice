@@ -1,5 +1,7 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.PostalAddress;
+
 /**
  * BG-7 + 1..1 BUYER
  * <p>

@@ -13,11 +13,11 @@ import java.util.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.klst.edoc.api.PostalAddress;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.IContact;
-import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.ubl.GenericInvoice;

@@ -1,5 +1,7 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.PostalAddress;
+
 /**
  * SELLER or BUYER POSTAL ADDRESS, used in BG12_SellerTaxRepresentativeAddress too
  */
@@ -67,13 +69,13 @@ public interface BusinessPartyAddress extends PostalAddress {
 	}
 
 	// do not use (not defined in EN_16931_1)
-	@Override
-	default String getStreet() {
-		return getAddress()==null ? null : getAddress().getStreet();
-	}
-	@Override
-	default String getBuilding() {
-		return getAddress()==null ? null : getAddress().getBuilding();
-	}
+//	@Override
+//	default String getStreet() {
+//		return getAddress()==null ? null : getAddress().getStreet();
+//	}
+//	@Override
+//	default String getBuilding() {
+//		return getAddress()==null ? null : getAddress().getBuilding();
+//	}
 
 }
