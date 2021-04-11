@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.BusinessPartyAddress;
+import com.klst.edoc.api.BusinessPartyContact;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.einvoice.BusinessParty;
-import com.klst.einvoice.BusinessPartyAddress;
-import com.klst.einvoice.BusinessPartyContact;
 import com.klst.einvoice.BusinessPartyFactory;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;

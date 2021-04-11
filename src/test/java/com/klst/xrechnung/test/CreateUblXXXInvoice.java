@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.klst.edoc.api.BusinessPartyAddress;
+import com.klst.edoc.api.BusinessPartyContact;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.Identifier;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.BusinessParty;
-import com.klst.einvoice.BusinessPartyAddress;
-import com.klst.einvoice.BusinessPartyContact;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;

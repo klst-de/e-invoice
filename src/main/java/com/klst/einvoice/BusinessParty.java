@@ -2,6 +2,8 @@ package com.klst.einvoice;
 
 import java.util.List;
 
+import com.klst.edoc.api.BusinessPartyAddress;
+import com.klst.edoc.api.BusinessPartyContact;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;

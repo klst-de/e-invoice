@@ -1,5 +1,7 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.BusinessPartyAddress;
+
 /**
  * DELIVER TO ADDRESS
  * <p>
