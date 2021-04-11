@@ -13,11 +13,11 @@ import java.util.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
-import com.klst.einvoice.IContact;
 import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.ubl.GenericInvoice;
@@ -156,13 +156,13 @@ public class ReadmeTest {
 		String contactName = "nicht vorhanden";
 		String contactTel  = "+49 1234-5678";
 		String contactMail = "seller@email.de";
-		IContact sellerContact = invoice.createContact(contactName, contactTel, contactMail);
+		ContactInfo sellerContact = invoice.createContactInfo(contactName, contactTel, contactMail);
 		invoice.setSeller("[Seller name]", sellerAddress, sellerContact, 
 				"[HRA-Eintrag]", "123/456/7890, HRA-Eintrag in […]");
 		  
 		// BusinessParty Buyer aka Customer 
 		PostalAddress buyerAddress = invoice.createAddress(DE, "12345", "[Buyer city]");
-		IContact buyerContact = null;                           // (optional)
+		ContactInfo buyerContact = null;                           // (optional)
 		invoice.setBuyer("[Buyer name]", buyerAddress, buyerContact);
 		
 		String taxPointDate = "2016-12-31";

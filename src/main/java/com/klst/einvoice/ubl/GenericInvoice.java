@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.Identifier;
@@ -20,7 +21,6 @@ import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
-import com.klst.einvoice.IContact;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
@@ -762,7 +762,7 @@ ubl-tc434-example2.xml :
 	
 	// BG-4 + 1..1 SELLER
 	@Override
-	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm) {
 		BusinessParty party = createParty(name, address, contact); 
 		party.setCompanyId(companyId);
 		party.setCompanyLegalForm(companyLegalForm);
@@ -787,7 +787,7 @@ ubl-tc434-example2.xml :
 	
 	// BG-7 + 1..1 BUYER
 	@Override
-	public void setBuyer(String name, PostalAddress address, IContact contact) {
+	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = createParty(name, address, contact); 
 		setBuyer(party);
 	}
@@ -1539,14 +1539,14 @@ ubl-tc434-example2.xml :
 
 	// BG-6 , BG-9 CONTACT
 	@Override
-	public IContact createContact(String contactName, String contactTel, String contactMail) {
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
 		Party factory = Party.create();
-		return factory.createContact(contactName, contactTel, contactMail);
+		return factory.createContactInfo(contactName, contactTel, contactMail);
 	}
 
 	// BG-4 , BG-7 , BG-10 , BG-11 , BG-13 : SELLER, BUYER, ...
 	@Override
-	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		Party factory = Party.create();
 		return factory.createParty(name, tradingName, address, contact);
 	}

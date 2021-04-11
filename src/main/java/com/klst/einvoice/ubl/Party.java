@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.BusinessPartyAddress;
 import com.klst.einvoice.BusinessPartyContact;
 import com.klst.einvoice.BusinessPartyFactory;
-import com.klst.einvoice.IContact;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ContactType;
@@ -38,10 +38,10 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Registra
 public class Party extends PartyType implements BusinessParty, BusinessPartyAddress, BusinessPartyContact {
 
 	@Override  // implements BusinessPartyFactory
-	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		return create(name, tradingName, address, contact);
 	}
-	static Party create(String name, String tradingName, PostalAddress address, IContact contact) {
+	static Party create(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		return new Party(name, tradingName, address, contact);
 	}
 
@@ -83,12 +83,12 @@ public class Party extends PartyType implements BusinessParty, BusinessPartyAddr
 	 * 
 	 * @see BusinessPartyFactory
 	 */
-	private Party(String name, String businessName, PostalAddress address, IContact contact) {
+	private Party(String name, String businessName, PostalAddress address, ContactInfo contact) {
 		super();
 		init(name, businessName, address, contact);
 	}
 	
-	private void init(String registrationName, String businessName, PostalAddress address, IContact contact) {
+	private void init(String registrationName, String businessName, PostalAddress address, ContactInfo contact) {
 		partyLegalEntity = new PartyLegalEntityType();
 		setRegistrationName(registrationName);
 		setBusinessName(businessName);
@@ -121,17 +121,17 @@ public class Party extends PartyType implements BusinessParty, BusinessPartyAddr
 
 	// Contact
 	@Override
-	public IContact getIContact() {
+	public ContactInfo getIContact() {
 		return getContact()==null ? null : Contact.create(getContact());
 	}
 
 	@Override
-	public void setIContact(IContact contact) {
+	public void setIContact(ContactInfo contact) {
 		super.setContact((ContactType)contact);	
 	}
 
 	@Override
-	public IContact createContact(String contactName, String contactTel, String contactMail) {
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
 		return Contact.create(contactName, contactTel, contactMail);
 	}
 

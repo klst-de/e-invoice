@@ -1,5 +1,6 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 
 /**
@@ -30,9 +31,9 @@ public interface BusinessPartyFactory {
 	 * @see PostalAddress
 	 * @see IContact
 	 */
-	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact);
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact);
 	
-	default BusinessParty createParty(String name, PostalAddress address, IContact contact) {
+	default BusinessParty createParty(String name, PostalAddress address, ContactInfo contact) {
 		return createParty(name, null, address, contact);
 	}
 	

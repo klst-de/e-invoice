@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.Identifier;
@@ -20,7 +21,6 @@ import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
-import com.klst.einvoice.IContact;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
@@ -696,7 +696,7 @@ UBL:
 	 * @param companyId optional / Seller legal registration identifier, BT-30/R52
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
 	 */
-	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm) {
 		                               // BT-27 , BG-5   , BG-6          , BT-30    , BT-33
 		BusinessParty party = createParty(name, address, contact); //, companyId, companyLegalForm);
 		party.setCompanyId(companyId);
@@ -722,7 +722,7 @@ UBL:
 	/* BUYER                                       BG-7                        1 (mandatory) 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Erwerber liefern.
 	 */
-	public void setBuyer(String name, PostalAddress address, IContact contact) {
+	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = createParty(name, address, contact); // BT-44, BG-8, BG-9
 		setBuyer(party);
 	}
@@ -1316,7 +1316,7 @@ Code Codename
 
 	// ----------------- factories to delegate
 	@Override
-	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		TradeParty factory = TradeParty.create();
 		return factory.createParty(name, tradingName, address, contact); 
 	}
@@ -1328,9 +1328,9 @@ Code Codename
 	}
 
 	@Override
-	public IContact createContact(String contactName, String contactTel, String contactMail) {
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
 		TradeParty factory = TradeParty.create();
-		return factory.createContact(contactName, contactTel, contactMail);
+		return factory.createContactInfo(contactName, contactTel, contactMail);
 	}
 
 }

@@ -1,12 +1,14 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.ContactInfo;
+
 /**
  * SELLER or BUYER CONTACT
  */
-public interface BusinessPartyContact extends IContact {
+public interface BusinessPartyContact extends ContactInfo {
 	
-	public IContact getIContact();
-	public void setIContact(IContact contact);
+	public ContactInfo getIContact();
+	public void setIContact(ContactInfo contact);
 
 	@Override
 	default String getContactPoint() {

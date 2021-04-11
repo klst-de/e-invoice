@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.klst.edoc.api.ContactInfoFactory;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.PostalAddressFactory;
@@ -38,7 +39,7 @@ public interface CoreInvoice extends CoreInvoiceFactory, BG1_InvoiceNote, BG2_Pr
 	PaymentInstructionsFactory, CreditTransferFactory, PaymentCardFactory, DirectDebitFactory,
 	BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
 	BG22_DocumentTotals, BG23_VatBreakdown, 
-	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
+	PostalAddressFactory, ContactInfoFactory, BusinessPartyFactory {
 
 	/**
 	 * Invoice number   - A unique identification of the Invoice.

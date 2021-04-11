@@ -13,12 +13,12 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.BusinessPartyContact;
 import com.klst.einvoice.CoreInvoice;
-import com.klst.einvoice.IContact;
 import com.klst.einvoice.PostalAddressExt;
 import com.klst.einvoice.ubl.Address;
 import com.klst.einvoice.ubl.Contact;
@@ -180,7 +180,7 @@ public class PartyTest {
 
     @Test
     public void ublGetContact() {
-    	IContact contact = supplierparty.getBPContact();
+    	ContactInfo contact = supplierparty.getBPContact();
     	LOG.info("supplierparty.Contact:" + contact);
 //        <cbc:Name>[Seller contact person]</cbc:Name>
 //        <cbc:Telephone>+49 123456789</cbc:Telephone>
@@ -192,7 +192,7 @@ public class PartyTest {
     
     @Test
     public void ublSetContact() {
-    	IContact contact = ((Party)supplierparty).createContact("contactName", "contactTel", "contactMail");
+    	ContactInfo contact = ((Party)supplierparty).createContactInfo("contactName", "contactTel", "contactMail");
     	LOG.info("contact:" + contact);
     	assertEquals("contactName", contact.getContactPoint());
     	assertEquals("contactTel", contact.getContactTelephone());
@@ -201,8 +201,8 @@ public class PartyTest {
     
     @Test
     public void ublCopyContact() {
-    	IContact c = ((BusinessPartyContact)supplierparty).getIContact();
-    	IContact contact = Contact.createIContact((ContactType)c);
+    	ContactInfo c = ((BusinessPartyContact)supplierparty).getIContact();
+    	ContactInfo contact = Contact.createIContact((ContactType)c);
     	LOG.info("contact:" + contact);
     	assertEquals("[Seller contact person]", contact.getContactPoint());
     	assertEquals("+49 123456789", contact.getContactTelephone());
@@ -241,7 +241,7 @@ public class PartyTest {
     	LOG.info("supplierparty:"+ supplierparty);
     	assertNotNull(supplierparty);
     	PostalAddress address = supplierparty.getAddress();
-    	IContact contact = supplierparty.getBPContact();
+    	ContactInfo contact = supplierparty.getBPContact();
     	assertNotNull(address);
     	assertNotNull(contact);
     	

@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.BusinessPartyAddress;
 import com.klst.einvoice.BusinessPartyContact;
 import com.klst.einvoice.BusinessPartyFactory;
-import com.klst.einvoice.IContact;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LegalOrganizationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TaxRegistrationType;
@@ -29,10 +29,10 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 public class TradeParty extends TradePartyType implements BusinessParty, BusinessPartyAddress, BusinessPartyContact { 
 
 	@Override  // implements BusinessPartyFactory
-	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		return create(name, tradingName, address, contact);
 	}
-	static TradeParty create(String name, String tradingName, PostalAddress address, IContact contact) {
+	static TradeParty create(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		return new TradeParty(name, tradingName, address, contact);
 	}
 
@@ -71,7 +71,7 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 	 * 
 	 * @see BusinessPartyFactory
 	 */
-	private TradeParty(String registrationName, String businessName, PostalAddress address, IContact contact) {
+	private TradeParty(String registrationName, String businessName, PostalAddress address, ContactInfo contact) {
 		super();
 		setRegistrationName(registrationName);
 		setBusinessName(businessName);
@@ -100,18 +100,18 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 
 	// Contact
 	@Override
-	public IContact getIContact() {
+	public ContactInfo getIContact() {
 		List<TradeContactType> tradeContactList = super.getDefinedTradeContact();
 		return tradeContactList.isEmpty() ? null : TradeContact.create(tradeContactList.get(0));
 	}
 
 	@Override
-	public void setIContact(IContact contact) {
+	public void setIContact(ContactInfo contact) {
 		super.getDefinedTradeContact().add((TradeContact)contact);	
 	}
 
 	@Override
-	public IContact createContact(String contactName, String contactTel, String contactMail) {
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
 		return TradeContact.create(contactName, contactTel, contactMail);
 	}
 

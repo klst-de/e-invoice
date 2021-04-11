@@ -1,15 +1,15 @@
 package com.klst.einvoice.unece.uncefact;
 
 import com.klst.ebXml.reflection.SCopyCtor;
-import com.klst.einvoice.IContact;
+import com.klst.edoc.api.ContactInfo;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeContactType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.UniversalCommunicationType;
 
-public class TradeContact extends TradeContactType implements IContact {
+public class TradeContact extends TradeContactType implements ContactInfo {
 
-	@Override // implements IContactFactory
-	public IContact createContact(String contactName, String contactTel, String contactMail) {
+	@Override // Factory
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
 		return create(contactName, contactTel, contactMail);
 	}
 	
