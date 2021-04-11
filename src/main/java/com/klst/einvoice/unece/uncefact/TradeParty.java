@@ -216,6 +216,10 @@ Ansonsten wird das Feld ID genutzt.
 	}
 	
 	@Override
+	public void setTaxRegistrationId(String name, String schemeID) {
+		addTaxRegistrationId(name, schemeID);
+	}
+	@Override
 	public void addTaxRegistrationId(String name, String schemeID) {
 		if(name==null) return;
 		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();

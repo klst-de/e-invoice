@@ -264,6 +264,11 @@ public class Party extends PartyType implements BusinessParty, BusinessPartyAddr
 	}
 
 	@Override
+	public void setTaxRegistrationId(String name, String schemeID) {
+		addTaxRegistrationId(name, schemeID);
+	}
+
+	@Override
 	public void addTaxRegistrationId(String name, String schemeID) { 
 /*
       <cac:PartyTaxScheme>

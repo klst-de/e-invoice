@@ -103,6 +103,7 @@ public interface BusinessParty extends BusinessPartyFactory {
 	// in BG-7, BG-11 ist nur ein Eintrag ==> VAT
 	public List<Identifier> getTaxRegistrationIdentifier();
 
+	public void setTaxRegistrationId(String name, String schemeID);
 	public void addTaxRegistrationId(String name, String schemeID);
 	default void addTaxRegistrationIdentifier(Identifier id) {
 		if(id!=null) addTaxRegistrationId(id.getContent(), id.getSchemeIdentifier());
@@ -167,11 +168,7 @@ public interface BusinessParty extends BusinessPartyFactory {
 	 * @see BG4_Seller#setTaxRegistrationId(String)
 	 */
 	default void setVATRegistrationId(String name) {
-		if(this instanceof PartyType) {
-			addTaxRegistrationId(name, "VAT");
-		} else {
-			addTaxRegistrationId(name, "VA");
-		}		
+		setTaxRegistrationId(name, "VA");
 	}
 	
 	// in BG-4 gibt es set/getTaxRegistrationId() für BT-32 , für alle BP BT-31:
