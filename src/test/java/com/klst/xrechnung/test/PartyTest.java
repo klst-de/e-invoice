@@ -201,7 +201,7 @@ public class PartyTest {
     
     @Test
     public void ublCopyContact() {
-    	ContactInfo c = ((BusinessPartyContact)supplierparty).getIContact();
+    	ContactInfo c = ((BusinessPartyContact)supplierparty).getContactInfo();
     	ContactInfo contact = Contact.createIContact((ContactType)c);
     	LOG.info("contact:" + contact);
     	assertEquals("[Seller contact person]", contact.getContactPoint());

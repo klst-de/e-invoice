@@ -93,7 +93,7 @@ public class Party extends PartyType implements BusinessParty, BusinessPartyAddr
 		setRegistrationName(registrationName);
 		setBusinessName(businessName);
 		setAddress(address);
-		setIContact(contact);
+		setContactInfo(contact);
 	}
 	
 	// PostalAddress
@@ -121,12 +121,12 @@ public class Party extends PartyType implements BusinessParty, BusinessPartyAddr
 
 	// Contact
 	@Override
-	public ContactInfo getIContact() {
+	public ContactInfo getContactInfo() {
 		return getContact()==null ? null : Contact.create(getContact());
 	}
 
 	@Override
-	public void setIContact(ContactInfo contact) {
+	public void setContactInfo(ContactInfo contact) {
 		super.setContact((ContactType)contact);	
 	}
 

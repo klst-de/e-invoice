@@ -86,7 +86,7 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		BusinessParty testSellerParty = testDoc.getSeller();
 		BusinessParty sellerParty = cii.createParty( testSellerParty.getRegistrationName()     // BT-27 String name
 				                          , ((BusinessPartyAddress)testSellerParty).getAddress()              // TradeAddress address
-				                          , ((BusinessPartyContact)testSellerParty).getIContact()             // TradeContact contact
+				                          , ((BusinessPartyContact)testSellerParty).getContactInfo()             // TradeContact contact
 				                          );
 		sellerParty.setBusinessName(testSellerParty.getBusinessName()) ; // BT-28
 		sellerParty.setIdentifier(testSellerParty.getIdentifier()); // BT-29

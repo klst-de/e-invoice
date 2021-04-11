@@ -76,7 +76,7 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 		setRegistrationName(registrationName);
 		setBusinessName(businessName);
 		setAddress(address);
-		if(contact!=null) setIContact(contact);
+		if(contact!=null) setContactInfo(contact);
 	}
 
 	// PostalAddress
@@ -100,13 +100,13 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 
 	// Contact
 	@Override
-	public ContactInfo getIContact() {
+	public ContactInfo getContactInfo() {
 		List<TradeContactType> tradeContactList = super.getDefinedTradeContact();
 		return tradeContactList.isEmpty() ? null : TradeContact.create(tradeContactList.get(0));
 	}
 
 	@Override
-	public void setIContact(ContactInfo contact) {
+	public void setContactInfo(ContactInfo contact) {
 		super.getDefinedTradeContact().add((TradeContact)contact);	
 	}
 

@@ -7,20 +7,20 @@ import com.klst.edoc.api.ContactInfo;
  */
 public interface BusinessPartyContact extends ContactInfo {
 	
-	public ContactInfo getIContact();
-	public void setIContact(ContactInfo contact);
+	public ContactInfo getContactInfo();
+	public void setContactInfo(ContactInfo contact);
 
 	@Override
 	default String getContactPoint() {
-		return getIContact()==null ? null : getIContact().getContactPoint();
+		return getContactInfo()==null ? null : getContactInfo().getContactPoint();
 	}
 	@Override
 	default String getContactTelephone() {
-		return getIContact()==null ? null : getIContact().getContactTelephone();
+		return getContactInfo()==null ? null : getContactInfo().getContactTelephone();
 	}
 	@Override
 	default String getContactEmail() {
-		return getIContact()==null ? null : getIContact().getContactEmail();
+		return getContactInfo()==null ? null : getContactInfo().getContactEmail();
 	}
 
 }

@@ -133,12 +133,12 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		
 		ublInvoice.setSeller(testDoc.getSeller());
 		LOG.info("Seller Address and Contact "+((BusinessPartyAddress)ublInvoice.getSeller()).getAddress() 
-				+ " "+((BusinessPartyContact)ublInvoice.getSeller()).getIContact());
+				+ " "+((BusinessPartyContact)ublInvoice.getSeller()).getContactInfo());
 		BusinessParty buyer = testDoc.getBuyer();
 		ublInvoice.setBuyer(testDoc.getBuyer());
 		LOG.info("Buyer UriUniversalCommunication:" + buyer.getUriUniversalCommunication());
 		LOG.info("Buyer Address and Contact "+((BusinessPartyAddress)ublInvoice.getBuyer()).getAddress() 
-				+ " "+((BusinessPartyContact)ublInvoice.getBuyer()).getIContact());
+				+ " "+((BusinessPartyContact)ublInvoice.getBuyer()).getContactInfo());
 		
 		makeOptionals(ublInvoice, testDoc);
 		

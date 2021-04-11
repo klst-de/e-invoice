@@ -31,7 +31,7 @@ public interface BusinessParty extends BusinessPartyFactory {
 	 * a shortcut for getIContact()
 	 */
 	default ContactInfo getBPContact() {
-		return ((BusinessPartyContact)this).getIContact();
+		return ((BusinessPartyContact)this).getContactInfo();
 	}
 
 	// use factory: createParty(String name, String tradingName, PostalAddress address, IContact contact);
