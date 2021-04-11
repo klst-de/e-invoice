@@ -55,6 +55,18 @@ Das folgende Beispiel definiert den Verkäufer und den Käufer und damit erfüll
 ...
 ```
 
+Die Methode `setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm)` ist eine Kurzschreibweise für `setSeller(BusinessParty party)`:
+
+```java
+   // alternativ:
+   String sellerName = "[Seller name]";  // BT-27 formelle Name des Verkäufers
+   String tradingName = null;            // BT-28 Handelsname des Verkäufers
+   BusinessParty seller = invoice.createParty(sellerName, tradingName, sellerAddress, sellerContact);
+   seller.setCompanyId("[HRA-Eintrag]"); // BT-29 Kennung des Verkäufers
+   seller.setCompanyLegalForm("123/456/7890, HRA-Eintrag in […]"); // BT-30 rechtliche Registrierung
+   invoice.setSeller(seller);
+```
+
 Die Adresse der Käufers ist einfach zu vervollständigen: `setAddressLine1(...)`. Auch die optionalen Kontaktdaten lassen sich einfach ergänzen:
 
 ```java
