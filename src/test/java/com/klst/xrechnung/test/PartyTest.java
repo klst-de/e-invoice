@@ -13,13 +13,13 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.klst.edoc.api.PostalAddress;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BusinessParty;
-import com.klst.einvoice.BusinessPartyAddress;
 import com.klst.einvoice.BusinessPartyContact;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.IContact;
-import com.klst.einvoice.PostalAddress;
+import com.klst.einvoice.PostalAddressExt;
 import com.klst.einvoice.ubl.Address;
 import com.klst.einvoice.ubl.Contact;
 import com.klst.einvoice.ubl.GenericInvoice;
@@ -150,7 +150,7 @@ public class PartyTest {
 
     @Test
     public void ublGetAddress() {
-    	PostalAddress address = supplierparty.getAddress();
+    	PostalAddressExt address = (PostalAddressExt) supplierparty.getAddress();
     	LOG.info("address:"+address);
 //        <cac:PostalAddress>
 //        <cbc:StreetName>[Seller address line 1]</cbc:StreetName>
@@ -168,8 +168,11 @@ public class PartyTest {
     private static final String HESSEN = "Hessen";
     @Test
     public void ublCopyAddress() {
-    	PostalAddress a = supplierparty.getAddress();
-    	PostalAddress address = Address.createPostalAddress((AddressType)a);
+    	LOG.info("supplierParty Class.CanonicalName:"+supplierParty.getClass().getCanonicalName());
+    	LOG.info("supplierparty Class.CanonicalName:"+supplierparty.getClass().getCanonicalName());
+    	LOG.info("getAddress() Class.CanonicalName:"+supplierparty.getAddress().getClass().getCanonicalName());
+    	PostalAddressExt a = (PostalAddressExt) supplierparty.getAddress();
+    	PostalAddressExt address = (PostalAddressExt) Address.createPostalAddress((AddressType)a);
     	assertEquals("[Seller address line 1]", address.getStreet());
     	address.setCountrySubdivision(HESSEN);
     	assertEquals(HESSEN, address.getCountrySubdivision());
