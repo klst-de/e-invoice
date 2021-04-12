@@ -15,6 +15,7 @@ import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
@@ -27,7 +28,6 @@ import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.VatBreakdown;
-import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.PaymentMeansEnum;
 import com.klst.untdid.codelist.TaxCategoryCode;
 

@@ -16,6 +16,7 @@ import org.junit.Test;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
@@ -29,7 +30,6 @@ import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CiiTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
-import com.klst.untdid.codelist.DocumentNameCode;
 import com.klst.untdid.codelist.TaxCategoryCode;
 import com.klst.untdid.codelist.TaxTypeCode;
 

@@ -2,8 +2,8 @@ package com.klst.einvoice.ubl;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Reference;
+import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
-import com.klst.untdid.codelist.DocumentNameCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AttachmentType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
@@ -100,7 +100,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		documentTypeCode.setValue(code.getValueAsString());
 		super.setDocumentTypeCode(documentTypeCode);
 	}
-	private DocumentNameCode getDocumentCode() {	
+	private DocumentNameCode getDocumentCode() {
 		return super.getDocumentTypeCode()==null ? null : DocumentNameCode.valueOf(getDocumentTypeCode());
 	}
 /* 01.15a:
