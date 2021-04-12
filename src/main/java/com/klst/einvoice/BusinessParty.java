@@ -7,6 +7,7 @@ import com.klst.edoc.api.BusinessPartyContact;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
+import com.klst.untdid.codelist.ReferenceCode;
 
 /**
  * A common interface for
@@ -47,7 +48,7 @@ public interface BusinessParty extends BusinessPartyFactory {
 	 * The full formal name by which the Business Party is registered in the national registry of legal entities 
 	 * or as a Taxable person or otherwise trades as a person or persons.
 	 * 
-	 * @return Business Party name
+	 * @return Business Party registration name
 	 */
 	public String getRegistrationName();
 	
@@ -160,7 +161,7 @@ public interface BusinessParty extends BusinessPartyFactory {
 	 * @see BusinessParty#setVATRegistrationId(String)
 	 */
 	default void setTaxRegistrationId(String name) {
-		addTaxRegistrationId(name, BG4_Seller.FC.getValue());
+		addTaxRegistrationId(name, ReferenceCode.FiscalNumber.getValue());
 	}
 	// BG-4.BT-32 ++ 0..1 Seller tax registration identifier , @see BT-31
 	default String getTaxRegistrationId() {
@@ -169,16 +170,11 @@ public interface BusinessParty extends BusinessPartyFactory {
 //		if(list.size()==1) return list.get(0).getContent();
 		for (int i=0; i<list.size(); i++) {
 			Identifier id = list.get(i);
-			if(id.getSchemeIdentifier().startsWith(BG4_Seller.FC.getValue())) return id.getContent();
+			if(id.getSchemeIdentifier().startsWith(ReferenceCode.FiscalNumber.getValue())) return id.getContent();
 		}
 		return null;
 	}
 
-	// BG-4.BT-30 0..1 Seller legal registration identifier
-	// BG-7.BT-47 0..1 Buyer legal registration identifier
-	public String getCompanyLegalForm();
-	public void setCompanyLegalForm(String name);
-	
 	/**
 	 * VAT identifier - The VAT identifier (also known as VAT identification number).
 	 * <p>
@@ -218,6 +214,15 @@ public interface BusinessParty extends BusinessPartyFactory {
 		return null;
 	}
 
+	// BG-4.BT-33 0..1 Seller additional legal information
+	/**
+	 * Additional legal information relevant for the Seller. Such as share capital.
+	 * 
+	 * @return Text
+	 */
+	public String getCompanyLegalForm();
+	public void setCompanyLegalForm(String name);
+	
 	// BG-4.BT-34 Seller electronic address
 	// BG-7.BT-49 Buyer electronic address
 	public Identifier getUriUniversalCommunication(); // kleingeschrieben, nicht URI!

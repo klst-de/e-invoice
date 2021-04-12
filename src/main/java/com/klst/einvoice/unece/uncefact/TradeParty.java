@@ -115,7 +115,12 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 		return TradeContact.create(contactName, contactTel, contactMail);
 	}
 
-	// (registration)Name BT-27 1..1 Name des Verkäufers   / BT-44 1..1 Name des Käufers
+	// (registration)Name
+	// BG-4.BT-27  1..1 Seller name
+	// BG-7.BT-44  1..1 Buyer name
+	// BG-10.BT-59 1..1 Payee name
+	// BG-11.BT-62 1..1 Seller tax representative name
+	// BG-13.BT-70 0..1 Deliver to party name
 	@Override
 	public String getRegistrationName() {
 		return super.getName()==null ? null : getName().getValue();
@@ -126,7 +131,9 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 		super.setName(Text.create(name));
 	}
 
-	// businessName       BT-28 0..1 Handelsname des Verkäufers / Seller trading name
+	// businessName
+	// BG-4.BT-28  0..1 Seller trading name (also known as Business name)
+	// BG-7.BT-45  0..1  Buyer trading name
 	@Override
 	public String getBusinessName() {
 		TextType text = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getTradingBusinessName();
@@ -141,7 +148,9 @@ public class TradeParty extends TradePartyType implements BusinessParty, Busines
 		getSpecifiedLegalOrganization().setTradingBusinessName(Text.create(name));
 	}
 
-	// BT-29 ++ 0..n Seller identifier ( mit Schema )         / Kennung des Verkäufers
+	// BG-4.BT-29  0..n Seller identifier
+	// BG-7.BT-46  0..1  Buyer identifier
+	// BG-10.BT-60 0..1  Payee identifier
 	@Override // 0..n returns the first
 /*
 ID vs GlobalID
@@ -184,6 +193,9 @@ Ansonsten wird das Feld ID genutzt.
 		}
 	}
 
+	// BG-4.BT-30  0..1 Seller legal registration identifier 
+	// BG-7.BT-47  0..1  Buyer legal registration identifier
+	// BG-10.BT-61 0..1  Payee legal registration identifier
 	@Override
 	public String getCompanyId() {
 		IDType id = super.getSpecifiedLegalOrganization()==null ? null : getSpecifiedLegalOrganization().getID();
@@ -204,6 +216,10 @@ Ansonsten wird das Feld ID genutzt.
 		getSpecifiedLegalOrganization().setID(new ID(name, schemeID));
 	}
 
+	// BG-4.BT-31  0..1 Seller VAT identifier mit schemeID BT-31-0 "VA"
+	// BG-4.BT-32  0..1 Seller tax registration identifier mit schemeID BT-32-0 "FC"
+	// BG-7.BT-48  0..1  Buyer VAT identifier
+	// BG-11.BT-63 1..1 Seller tax representative VAT identifier
 	@Override
 	public List<Identifier> getTaxRegistrationIdentifier() {
 		List<TaxRegistrationType> taxRegistrationList = super.getSpecifiedTaxRegistration();
@@ -228,6 +244,7 @@ Ansonsten wird das Feld ID genutzt.
 		taxRegistrationList.add(taxRegistration);
 	}
 
+	// BG-4.BT-33 0..1 Seller additional legal information
 	@Override // 0..1 also genügt der erste
 	public String getCompanyLegalForm() {
 		List<TextType> textList = super.getDescription();
@@ -240,6 +257,8 @@ Ansonsten wird das Feld ID genutzt.
 		super.getDescription().add(Text.create(name));
 	}
 
+	// BG-4.BT-34 Seller electronic address
+	// BG-7.BT-49 Buyer electronic address
 	@Override // 0..1 also genügt der erste
 	public Identifier getUriUniversalCommunication() {
 		List<UniversalCommunicationType> uriList = super.getURIUniversalCommunication();

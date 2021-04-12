@@ -50,7 +50,7 @@ public interface BG4_Seller {
 //	Code Codename 
 //	VA . Umsatzsteuernummer
 //	FC . Steuernummer 	
-
-	static final ReferenceCode FC = ReferenceCode.FiscalNumber;
+//
+//	static final ReferenceCode FC = ReferenceCode.FiscalNumber;
 		
 }

@@ -135,6 +135,105 @@ public class Party extends PartyType implements BusinessParty, BusinessPartyAddr
 		return Contact.create(contactName, contactTel, contactMail);
 	}
 
+	// (registration)Name
+	// BG-4.BT-27  1..1 Seller name
+	// BG-7.BT-44  1..1 Buyer name
+	// BG-10.BT-59 1..1 Payee name
+	// BG-11.BT-62 1..1 Seller tax representative name
+	// BG-13.BT-70 0..1 Deliver to party name
+	@Override
+	public String getRegistrationName() {
+		List<PartyLegalEntityType> partyLegalEntityList = getPartyLegalEntity();
+		if(partyLegalEntityList.isEmpty()) return null;
+		RegistrationNameType registrationName = partyLegalEntityList.get(0).getRegistrationName();
+		return registrationName==null ? null : registrationName.getValue();
+	}
+
+	private void setRegistrationName(String name) {
+		if(name==null) return;
+		RegistrationNameType registrationName = new RegistrationNameType();
+		registrationName.setValue(name);
+		partyLegalEntity.setRegistrationName(registrationName);
+		if(super.getPartyLegalEntity().isEmpty()) super.getPartyLegalEntity().add(partyLegalEntity);
+	}
+	
+	// businessName
+	// BG-4.BT-28  0..1 Seller trading name (also known as Business name)
+	// BG-7.BT-45  0..1  Buyer trading name
+	@Override
+	public String getBusinessName() {
+		List<PartyNameType> partyNameList = getPartyName();
+		return partyNameList.isEmpty() ? null : partyNameList.get(0).getName().getValue();
+	}
+
+	@Override
+	public void setBusinessName(String businessName) {
+		if(businessName==null) return;
+		NameType name = new NameType();
+		name.setValue(businessName);
+		PartyNameType partyName = new PartyNameType();
+		partyName.setName(name);
+		super.getPartyName().add(partyName);
+	}
+
+	// BG-4.BT-29  0..n Seller identifier / Kennung des Verkäufers
+	// BG-7.BT-46  0..1  Buyer identifier
+	// BG-10.BT-60 0..1  Payee identifier
+	@Override
+	public Identifier getIdentifier() {
+		List<PartyIdentificationType> partyIdentificationList = getPartyIdentification();
+		return partyIdentificationList.isEmpty() ? null 
+				: new ID(partyIdentificationList.get(0).getID().getValue(), partyIdentificationList.get(0).getID().getSchemeID());
+	}
+	@Override
+	public String getId() {
+		List<PartyIdentificationType> partyIdentificationList = super.getPartyIdentification();
+		return partyIdentificationList.isEmpty() ? null : partyIdentificationList.get(0).getID().getValue(); // ohne schema
+	}
+
+	@Override
+	public void addId(String name, String schemeID) {
+		if(name==null) return;
+		PartyIdentificationType partyIdentification = new PartyIdentificationType();
+		partyIdentification.setID(new ID(name, schemeID));
+		super.getPartyIdentification().add(partyIdentification);
+	}
+	@Override
+	public void setId(String name, String schemeID) {
+		addId(name, schemeID);
+	}
+
+	// BG-4.BT-30  0..1 Seller legal registration identifier 
+	// BG-7.BT-47  0..1  Buyer legal registration identifier
+	// BG-10.BT-61 0..1  Payee legal registration identifier
+	@Override
+	public String getCompanyId() {
+		Identifier id = getCompanyIdentifier();
+		return id==null? null : id.getContent();
+	}	
+	@Override
+	public Identifier getCompanyIdentifier() {
+		List<PartyLegalEntityType> partyLegalEntityList = getPartyLegalEntity();
+		if(partyLegalEntityList.isEmpty()) return null;
+		CompanyIDType companyID = partyLegalEntityList.get(0).getCompanyID();
+		return companyID==null ? null : new ID(companyID.getValue(), companyID.getSchemeID());
+	}
+
+	@Override
+	public void setCompanyId(String name, String schemeID) {
+		if(name==null) return;
+		CompanyIDType companyID = new CompanyIDType();
+		companyID.setValue(name);
+		companyID.setSchemeID(schemeID);
+		partyLegalEntity.setCompanyID(companyID);
+		if(super.getPartyLegalEntity().isEmpty()) super.getPartyLegalEntity().add(partyLegalEntity);
+	}
+
+	// BG-4.BT-31  0..1 Seller VAT identifier mit schemeID BT-31-0 "VA"/"VAT"
+	// BG-4.BT-32  0..1 Seller tax registration identifier mit schemeID BT-32-0 "FC"
+	// BG-7.BT-48  0..1  Buyer VAT identifier
+	// BG-11.BT-63 1..1 Seller tax representative VAT identifier
+	
 	// Die Umsatzsteuer-Identifikationsnummer des Verkäufers.
 	static final String DEFAULT_TAX_SCHEME = "VAT"; // ein möglicher BUG in UBL Spez!
 	static final String NO_CC = "??";
@@ -164,88 +263,6 @@ public class Party extends PartyType implements BusinessParty, BusinessPartyAddr
 		}
 	}
 
-	@Override
-	public String getRegistrationName() {
-		List<PartyLegalEntityType> partyLegalEntityList = getPartyLegalEntity();
-		if(partyLegalEntityList.isEmpty()) return null;
-		RegistrationNameType registrationName = partyLegalEntityList.get(0).getRegistrationName();
-		return registrationName==null ? null : registrationName.getValue();
-	}
-
-	private void setRegistrationName(String name) {
-		if(name==null) return;
-		RegistrationNameType registrationName = new RegistrationNameType();
-		registrationName.setValue(name);
-		partyLegalEntity.setRegistrationName(registrationName);
-		if(super.getPartyLegalEntity().isEmpty()) super.getPartyLegalEntity().add(partyLegalEntity);
-	}
-
-	@Override
-	public String getBusinessName() {
-		List<PartyNameType> partyNameList = getPartyName();
-		return partyNameList.isEmpty() ? null : partyNameList.get(0).getName().getValue();
-	}
-
-	@Override
-	public void setBusinessName(String businessName) {
-		if(businessName==null) return;
-		NameType name = new NameType();
-		name.setValue(businessName);
-		PartyNameType partyName = new PartyNameType();
-		partyName.setName(name);
-		super.getPartyName().add(partyName);
-	}
-
-	// BG-4.BT-29  0..n Seller identifier / Kennung des Verkäufers
-	// BG-7.BT-46  0..1  Buyer identifier
-	// BG-10.BT-60 0..1  Payee identifier
-	@Override
-	public String getId() {
-		List<PartyIdentificationType> partyIdentificationList = super.getPartyIdentification();
-		return partyIdentificationList.isEmpty() ? null : partyIdentificationList.get(0).getID().getValue(); // ohne schema
-	}
-	@Override
-	public Identifier getIdentifier() {
-		List<PartyIdentificationType> partyIdentificationList = getPartyIdentification();
-		return partyIdentificationList.isEmpty() ? null 
-				: new ID(partyIdentificationList.get(0).getID().getValue(), partyIdentificationList.get(0).getID().getSchemeID());
-	}
-
-	@Override
-	public void addId(String name, String schemeID) {
-		if(name==null) return;
-		PartyIdentificationType partyIdentification = new PartyIdentificationType();
-		partyIdentification.setID(new ID(name, schemeID));
-		super.getPartyIdentification().add(partyIdentification);
-	}
-	@Override
-	public void setId(String name, String schemeID) {
-		addId(name, schemeID);
-	}
-
-	@Override
-	public String getCompanyId() {
-		Identifier id = getCompanyIdentifier();
-		return id==null? null : id.getContent();
-	}
-	
-	@Override
-	public Identifier getCompanyIdentifier() {
-		List<PartyLegalEntityType> partyLegalEntityList = getPartyLegalEntity();
-		if(partyLegalEntityList.isEmpty()) return null;
-		CompanyIDType companyID = partyLegalEntityList.get(0).getCompanyID();
-		return companyID==null ? null : new ID(companyID.getValue(), companyID.getSchemeID());
-	}
-
-	@Override
-	public void setCompanyId(String name, String schemeID) {
-		if(name==null) return;
-		CompanyIDType companyID = new CompanyIDType();
-		companyID.setValue(name);
-		companyID.setSchemeID(schemeID);
-		partyLegalEntity.setCompanyID(companyID);
-		if(super.getPartyLegalEntity().isEmpty()) super.getPartyLegalEntity().add(partyLegalEntity);
-	}
 
 	@Override
 	public List<Identifier> getTaxRegistrationIdentifier() {
@@ -299,6 +316,7 @@ public class Party extends PartyType implements BusinessParty, BusinessPartyAddr
 		list.add(partyTaxScheme);
 	}
 
+	// BG-4.BT-33 0..1 Seller additional legal information
 	@Override
 	public String getCompanyLegalForm() {
 		List<PartyLegalEntityType> partyLegalEntityList = getPartyLegalEntity();
@@ -316,6 +334,8 @@ public class Party extends PartyType implements BusinessParty, BusinessPartyAddr
 		if(super.getPartyLegalEntity().isEmpty()) super.getPartyLegalEntity().add(partyLegalEntity);
 	}
 
+	// BG-4.BT-34 Seller electronic address
+	// BG-7.BT-49 Buyer electronic address
 	@Override
 	public Identifier getUriUniversalCommunication() {
 		EndpointIDType endpointID = super.getEndpointID();
