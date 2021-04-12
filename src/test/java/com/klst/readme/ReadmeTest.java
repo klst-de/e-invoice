@@ -164,6 +164,10 @@ public class ReadmeTest {
 		BusinessParty seller = invoice.createParty("[Seller name]", null, sellerAddress, sellerContact);
 		seller.setCompanyId("[HRA-Eintrag]");
 		seller.setCompanyLegalForm("123/456/7890, HRA-Eintrag in […]");
+		// mehrere BG-4.BT-29  0..n Seller identifier / https://github.com/klst-de/e-invoice/issues/27
+		// Bsp aus https://docs.peppol.eu/poacc/billing/3.0/syntax/ubl-invoice/cac-AccountingSupplierParty/cac-Party/cac-PartyIdentification/cbc-ID/
+		seller.addId("5060012349998", "0088");     // "0088" : EAN Location Code
+		seller.addId("12345 6789 RC0001", "0093"); // "0093" : Revenue Canada Business Number
 		invoice.setSeller(seller);
 		  
 		// BusinessParty Buyer aka Customer 

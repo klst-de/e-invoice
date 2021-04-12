@@ -8,8 +8,6 @@ import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 
-import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PartyType;
-
 /**
  * A common interface for
  * 
@@ -68,6 +66,23 @@ public interface BusinessParty extends BusinessPartyFactory {
 	// BG-4.BT-29  0..n Seller identifier
 	// BG-7.BT-46  0..1  Buyer identifier
 	// BG-10.BT-60 0..1  Payee identifier
+	/**
+	 * An identification of the Business Party with optional scheme identifier.
+	 * <p>
+	 * For many systems, this identifier is a key piece of information. 
+	 * Multiple Seller identifiers may be assigned or specified. 
+	 * They may be differentiated by using various identification schemes. 
+	 * If no scheme is specified, it should be known by Buyer and Seller, 
+	 * e.g. a previously exchanged Buyer assigned identifier of the Seller.
+	 * 
+	 * If used, the identification scheme shall be chosen from the entries of the 
+	 * list published by the ISO/IEC 6523 maintenance agency.
+	 * 
+	 * @return String or Identifier with scheme
+	 * 
+	 * @see https://en.wikipedia.org/wiki/ISO/IEC_6523
+	 * @see https://docs.peppol.eu/poacc/billing/3.0/codelist/ICD/
+	 */
 	public String getId(); // kleingeschrieben, nicht ID!
 	public Identifier getIdentifier();
 
@@ -83,6 +98,20 @@ public interface BusinessParty extends BusinessPartyFactory {
 	// BG-4.BT-30  0..1 Seller legal registration identifier 
 	// BG-7.BT-47  0..1  Buyer legal registration identifier
 	// BG-10.BT-61 0..1  Payee legal registration identifier
+	/**
+	 * An identifier issued by an official registrar that identifies the Business Party as a legal entity or person.
+	 * With optional scheme identifier.
+	 * <p>
+	 * If no identification scheme is specified, it should be known by Buyer and Seller.
+	 * 
+	 * If used, the identification scheme shall be chosen from the entries of the 
+	 * list published by the ISO/IEC 6523 maintenance agency.
+	 * 
+	 * @return String or Identifier with scheme
+	 * 
+	 * @see https://en.wikipedia.org/wiki/ISO/IEC_6523
+	 * @see https://docs.peppol.eu/poacc/billing/3.0/codelist/ICD/
+	 */
 	public String getCompanyId();
 	public Identifier getCompanyIdentifier();
 	
