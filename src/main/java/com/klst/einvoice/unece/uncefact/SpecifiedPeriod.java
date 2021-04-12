@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IPeriod;
-import com.klst.untdid.codelist.DateTimeFormats;
+import com.klst.edoc.untdid.DateTimeFormats;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;

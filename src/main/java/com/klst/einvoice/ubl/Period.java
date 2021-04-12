@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IPeriod;
-import com.klst.untdid.codelist.DateTimeFormats;
+import com.klst.edoc.untdid.DateTimeFormats;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PeriodType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EndDateType;

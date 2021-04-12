@@ -2,7 +2,7 @@ package com.klst.einvoice.unece.uncefact;
 
 import java.sql.Timestamp;
 
-import com.klst.untdid.codelist.DateTimeFormats;
+import com.klst.edoc.untdid.DateTimeFormats;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;

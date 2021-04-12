@@ -4,9 +4,9 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import com.klst.edoc.api.Reference;
+import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.PrecedingInvoice;
-import com.klst.untdid.codelist.DateTimeFormats;
 import com.klst.untdid.codelist.DocumentNameCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;

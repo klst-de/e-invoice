@@ -5,8 +5,8 @@ import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Reference;
+import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.einvoice.PrecedingInvoice;
-import com.klst.untdid.codelist.DateTimeFormats;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDateType;

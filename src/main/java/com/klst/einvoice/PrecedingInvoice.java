@@ -3,7 +3,7 @@ package com.klst.einvoice;
 import java.sql.Timestamp;
 
 import com.klst.edoc.api.Reference;
-import com.klst.untdid.codelist.DateTimeFormats;
+import com.klst.edoc.untdid.DateTimeFormats;
 
 /**
  * BG-3 PRECEDING INVOICE REFERENCE
