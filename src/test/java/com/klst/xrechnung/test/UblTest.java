@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
@@ -35,7 +36,6 @@ import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
-import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 

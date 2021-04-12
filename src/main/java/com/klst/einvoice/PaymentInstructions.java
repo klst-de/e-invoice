@@ -2,7 +2,7 @@ package com.klst.einvoice;
 
 import java.util.List;
 
-import com.klst.untdid.codelist.PaymentMeansEnum;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 
 /**
  * BG-16 0..1 PAYMENT INSTRUCTIONS

@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.IPeriod;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.CreditTransferFactory;
@@ -16,7 +17,6 @@ import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PaymentInstructionsFactory;
-import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CurrencyCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
@@ -375,7 +375,9 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 
 		// FinancialAccount implements CreditTransfer, DirectDebit
 		haderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans().forEach(pm -> {
-			PaymentMeansEnum code = PaymentMeansEnum.valueOf(pm.getTypeCode());
+			String value = pm.getTypeCode().getValue();
+			int intcode = Integer.parseInt(value);
+			PaymentMeansEnum code = PaymentMeansEnum.valueOf(intcode);
 			switch(code) {
 			case CreditTransfer:
 			case SEPACreditTransfer:

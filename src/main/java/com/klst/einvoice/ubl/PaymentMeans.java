@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.einvoice.DirectDebit;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DebitedAccountID;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PaymentInstructionsFactory;
-import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InstructionNoteType;
@@ -282,7 +282,8 @@ public class PaymentMeans extends PaymentMeansType implements PaymentInstruction
 	}
 	static PaymentMeansEnum getPaymentMeansEnum(PaymentMeansType pm) {
 		CodeType paymentMeansCode = pm.getPaymentMeansCode();
-		return paymentMeansCode==null ? null : PaymentMeansEnum.valueOf(paymentMeansCode);
+		String value = paymentMeansCode.getValue();
+		return paymentMeansCode==null ? null : PaymentMeansEnum.valueOf(Integer.parseInt(value));
 	}
 	
 	boolean isCreditTransfer() {

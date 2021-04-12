@@ -12,7 +12,7 @@ import com.klst.edoc.api.PostalAddressFactory;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
-import com.klst.untdid.codelist.PaymentMeansEnum;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 
 /*
 
