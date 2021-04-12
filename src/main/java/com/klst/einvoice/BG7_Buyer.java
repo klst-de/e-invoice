@@ -1,5 +1,6 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 
@@ -39,6 +40,9 @@ import com.klst.edoc.api.PostalAddress;
  * Das Element „Buyer post code“ (BT-53) muss übermittelt werden.
  */
 public interface BG7_Buyer {
+	
+	// BG-8 1..1 BUYER POSTAL ADDRESS
+	// BG-9 0..1 BUYER CONTACT
 	
 	public void setBuyer(String name, PostalAddress address, ContactInfo contact);
 	public void setBuyer(BusinessParty party);

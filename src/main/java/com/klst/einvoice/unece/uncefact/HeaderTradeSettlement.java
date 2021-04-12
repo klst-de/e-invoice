@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.IPeriod;
 import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.DirectDebit;

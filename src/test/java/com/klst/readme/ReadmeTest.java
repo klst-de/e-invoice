@@ -13,10 +13,10 @@ import java.util.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.PrecedingInvoice;

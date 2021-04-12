@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.klst.edoc.api.BusinessPartyFactory;
 import com.klst.edoc.api.ContactInfoFactory;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
