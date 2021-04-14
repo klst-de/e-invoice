@@ -4,18 +4,21 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="src" path="src/test/kositresources"/>
+	<classpathentry kind="src" path="e-doc-commons/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<accessrules>
 			<accessrule kind="discouraged" pattern="com/sun/xml/internal/bind/marshaller/NamespacePrefixMapper"/>
 		</accessrules>
 	</classpathentry>
-	<classpathentry kind="lib" path="/tools/lib/javax.inject-1.jar"/>
-	<classpathentry kind="lib" path="src/test/lib/assertj-core-3.8.0.jar"/>
-	<classpathentry kind="lib" path="src/test/lib/Saxon-HE-9.9.1-1.jar"/>
-	<classpathentry kind="lib" path="src/test/lib/validationtool-1.1.0-SNAPSHOT.jar" sourcepath="/kosit-validator/src/main/java"/>
-	<classpathentry kind="lib" path="src/test/lib/slf4j-api-1.7.25.jar"/>
-	<classpathentry kind="lib" path="src/test/lib/slf4j-simple-1.7.25.jar"/>
-	<classpathentry kind="lib" path="src/test/lib/commons-lang3-3.5.jar"/>
+	<classpathentry kind="lib" path="../../16-Factur-X/e-invoice/src/test/lib/assertj-core-3.8.0.jar"/>
+	<classpathentry kind="lib" path="../../16-Factur-X/e-invoice/src/test/lib/Saxon-HE-9.9.1-1.jar"/>
+	<classpathentry kind="lib" path="../../16-Factur-X/e-invoice/src/test/lib/validationtool-1.1.0.jar" sourcepath="/kosit-validator/src/main/java"/>
+	<classpathentry kind="lib" path="../../16-Factur-X/e-invoice/src/test/lib/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="lib" path="../../16-Factur-X/e-invoice/src/test/lib/slf4j-simple-1.7.25.jar"/>
+	<classpathentry kind="lib" path="../../16-Factur-X/e-invoice/src/test/lib/commons-lang3-3.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="/e-order/e-doc-commons/lib/javax.inject-1.jar"/>
+	<classpathentry kind="lib" path="/e-order-CIO/e-doc-commons/lib/istack-commons-runtime-3.0.11.jar"/>
+	<classpathentry kind="lib" path="/e-order-CIO/e-doc-commons/lib/jaxb-runtime-2.3.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
