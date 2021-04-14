@@ -7,12 +7,12 @@ import java.util.logging.Logger;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.einvoice.ITaxCategory;
 import com.klst.einvoice.ITaxCategoryFactory;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.VatBreakdownFactory;
-import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
@@ -295,7 +295,7 @@ keine Beispiele für Tests!
 	}
 	@Override
 	public TaxCategoryCode getTaxCategoryCode() {
-		return TaxCategoryCode.valueOf(super.getCategoryCode());
+		return super.getCategoryCode()==null ? null : TaxCategoryCode.getEnum(super.getCategoryCode().getValue());
 	}
 
 	/* BT-118 1..1 CategoryCode

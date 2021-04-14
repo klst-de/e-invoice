@@ -3,7 +3,7 @@ package com.klst.einvoice;
 import java.math.BigDecimal;
 
 import com.klst.edoc.api.IAmount;
-import com.klst.untdid.codelist.TaxCategoryCode;
+import com.klst.edoc.untdid.TaxCategoryCode;
 
 public interface VatBreakdownFactory {
 	

@@ -6,12 +6,12 @@ import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.einvoice.ITaxCategory;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.VatBreakdownFactory;
 import com.klst.einvoice.unece.uncefact.Amount;
-import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSubtotalType;
@@ -149,7 +149,9 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 	}
 	@Override
 	public TaxCategoryCode getTaxCategoryCode() {
-		return TaxCategoryCode.valueOf(super.getTaxCategory());
+		return TaxCategory.create(super.getTaxCategory()).getTaxCategoryCode();
+//		if(super.getTaxCategory()==null) return null;
+//		return super.getTaxCategory().getID()==null ? null : TaxCategoryCode.getEnum(getTaxCategory().getID().getValue());
 	}
 
 	// BG-23.BT-119

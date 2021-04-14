@@ -3,10 +3,10 @@ package com.klst.einvoice;
 import java.math.BigDecimal;
 
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
-import com.klst.untdid.codelist.TaxCategoryCode;
 
 /**
  * abstract-factory, aka Kit to create invoices

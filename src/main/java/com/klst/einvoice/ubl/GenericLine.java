@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import com.klst.edoc.api.IPeriod;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoiceLine;
@@ -17,7 +18,6 @@ import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
-import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AllowanceChargeType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CommodityClassificationType;
@@ -476,8 +476,10 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		} else {
 			ItemType item = cnLine.getItem();
 			taxCategory = item.getClassifiedTaxCategory().get(0); // wg. 1..1
-		}	
-		return TaxCategoryCode.valueOf(taxCategory); // S
+		}
+		return TaxCategory.create(taxCategory).getTaxCategoryCode();
+//		if(taxCategory==null) return null;
+//		return taxCategory.getID()==null ? null : TaxCategoryCode.getEnum(taxCategory.getID().getValue()); // S
 	}
 
 

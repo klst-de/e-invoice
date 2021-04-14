@@ -2,8 +2,8 @@ package com.klst.einvoice;
 
 import java.math.BigDecimal;
 
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
-import com.klst.untdid.codelist.TaxCategoryCode;
 
 public interface ITaxCategoryFactory {
 	
