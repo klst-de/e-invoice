@@ -162,7 +162,7 @@ PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B
 	HeaderTradeDeliveryType applicableHeaderTradeDelivery;
 //	ExchangedDocumentType exchangedDocument; // in super
 	
-	private CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
+	public CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
 		super();
 		if(doc!=null) {
 			SCopyCtor.getInstance().invokeCopy(this, doc);
