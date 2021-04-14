@@ -13,6 +13,7 @@ import com.klst.edoc.api.BusinessPartyContact;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.PaymentMeansEnum;
+import com.klst.edoc.untdid.ReferenceCode;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
@@ -28,7 +29,6 @@ import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 import com.klst.einvoice.unece.uncefact.TradeParty;
 import com.klst.marshaller.CiiTransformer;
-import com.klst.untdid.codelist.ReferenceCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 
