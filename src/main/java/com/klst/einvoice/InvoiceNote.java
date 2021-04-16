@@ -40,8 +40,8 @@ während in CII mehrere Objekte da sind, nur zwei werden genutzt:
  */
 public interface InvoiceNote extends InvoiceNoteFactory {
 	
-	@Override // factory method
-	public InvoiceNote createNote(String subjectCode, String content);
+//	@Override // factory method
+//	public InvoiceNote createNote(String subjectCode, String content);
 	
 // setter:
 //	void setCode(String code); // not public ==> use factory
