@@ -1,7 +1,5 @@
 package com.klst.marshaller;
 
-import java.io.InputStream;
-
 import javax.inject.Named;
 
 @Named
@@ -20,7 +18,7 @@ public class UblCreditNoteTransformer extends UblTransformer {
 	public static AbstactTransformer getInstance() {
 		return SINGLETON;
 	}
-	
+
 	private static final String UBL_CREDITNOTE_XSD_21 = "/ubl/maindoc/UBL-CreditNote-2.1.xsd";
 	private static final String CONTENT_PATH = "oasis.names.specification.ubl.schema.xsd.creditnote_2";
 	private static final String CONTENT_SUPERTYPE_NAME = CONTENT_PATH+".CreditNoteType"; 
@@ -35,23 +33,9 @@ public class UblCreditNoteTransformer extends UblTransformer {
 		return UBL_CREDITNOTE_XSD_21;
 	}
 
-	Class<?> loadClass() {
-		Class<?> type = null;
-		try {
-			// dynamisch die UBL Klasse laden 
-			type = Class.forName(CONTENT_SUPERTYPE_NAME);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return type;
-	}
-
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Object> T toModel(InputStream xmlInputStream) {
-		Class<?> type = loadClass();
-		Object result = this.toModel(xmlInputStream, type);
-		return (T) result;
+	protected String getSupertypeName() {
+		return CONTENT_SUPERTYPE_NAME;
 	}
 
 }

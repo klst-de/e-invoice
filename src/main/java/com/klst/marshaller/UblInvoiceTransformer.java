@@ -1,7 +1,5 @@
 package com.klst.marshaller;
 
-import java.io.InputStream;
-
 import javax.inject.Named;
 
 @Named
@@ -38,23 +36,9 @@ public class UblInvoiceTransformer extends UblTransformer {
 		return UBL_INVOICE_XSD_21;
 	}
 
-	Class<?> loadClass() {
-		Class<?> type = null;
-		try {
-			// dynamisch die UBL Klasse laden 
-			type = Class.forName(CONTENT_SUPERTYPE_NAME);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return type;
-	}
-
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Object> T toModel(InputStream xmlInputStream) {
-		Class<?> type = loadClass();
-		Object result = this.toModel(xmlInputStream, type);
-		return (T) result;
+	protected String getSupertypeName() {
+		return CONTENT_SUPERTYPE_NAME;
 	}
 
 }

@@ -7,8 +7,6 @@ import javax.inject.Named;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import com.klst.einvoice.ubl.GenericInvoice;
-
 /* in java 1.8 'NamespacePrefixMapper' is not in API (restriction on required library ... jdk1.8.0_241\jre\lib\rt.jar')
  * to compile in eclipse define access rule.
  * 
@@ -19,8 +17,6 @@ import com.klst.einvoice.ubl.GenericInvoice;
  */
 //import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-
-import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
 
 @Named
 /* Notice 
@@ -41,19 +37,28 @@ public abstract class UblTransformer extends AbstactTransformer {
 	@Override
 	abstract String getResource();
 
+	abstract protected String getSupertypeName();
+	
+	@Override
+	Class<?> loadClass() {
+		Class<?> type = null;
+		try {
+			type = Class.forName(getSupertypeName());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return type;
+	}
+
+	@SuppressWarnings("rawtypes")
 	@Override
 	public byte[] fromModel(Object document) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(16000);
-		Class<?> type = loadClass();
+//		Class<?> type = loadClass();
 		
 		try {
 			Marshaller marshaller = createMarshaller();
-
-			if(document instanceof GenericInvoice<?>) {
-				marshaller.marshal(((GenericInvoice)document).get(), outputStream);
-			} else if(document instanceof CrossIndustryInvoiceType) {
-				marshaller.marshal((CrossIndustryInvoiceType)document, outputStream);
-			}
+			marshaller.marshal(((com.klst.einvoice.ubl.GenericInvoice)document).get(), outputStream);
 		} catch (JAXBException ex) {
 			throw new TransformationException(TransformationException.MARSHALLING_ERROR, ex);
 		}
@@ -61,10 +66,14 @@ public abstract class UblTransformer extends AbstactTransformer {
 		return outputStream.toByteArray();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	abstract public <T> T toModel(InputStream xmlInputStream);
+	public <T extends Object> T toModel(InputStream xmlInputStream) {
+		Class<?> type = loadClass();
+		Object result = this.toModel(xmlInputStream, type);
+		return (T) result;
+	}
 
-	@SuppressWarnings("restriction")
 	@Override // implements abstract method
 	NamespacePrefixMapper getNamespacePrefixMapper() {
 		return new UblNamespacePrefixMapper();
