@@ -12,8 +12,8 @@ import java.util.Map;
  * @see https://jesperdj.com/2018/09/30/jaxb-on-java-9-10-11-and-beyond/
  * @see https://dzone.com/articles/jaxb-and-namespace-prefixes
  */
-//import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
+//import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 // @see https://www.intertech.com/Blog/jaxb-tutorial-customized-namespace-prefixes-example-using-namespaceprefixmapper/
 // @see http://hwellmann.blogspot.com/2011/03/jaxb-marshalling-with-custom-namespace.html
@@ -28,7 +28,15 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
  * 
  * @see CiiNamespacePrefixMapper
  */
-public class UblNamespacePrefixMapper extends NamespacePrefixMapper {
+public class UblNamespacePrefixMapper extends NamespacePrefixMapper implements NamespacePrefixMapperFactory {
+
+	@Override // implements Factory
+	public NamespacePrefixMapper createNamespacePrefixMapper() {
+		return getNamespacePrefixMapper();
+	}
+	static NamespacePrefixMapper getNamespacePrefixMapper() {
+		return new UblNamespacePrefixMapper();
+	}
 
 	private static final String INVOICE="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2";
 	private static final String CREDITNOTE="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2";
@@ -67,7 +75,7 @@ public class UblNamespacePrefixMapper extends NamespacePrefixMapper {
 	/**
 	 * Create mappings.
 	 */
-	public UblNamespacePrefixMapper() {
+	private UblNamespacePrefixMapper() {
 		namespaceMap.put(INVOICE, "ubl");
 		namespaceMap.put(CREDITNOTE, "ubl");
 		namespaceMap.put(CAC, "cac");

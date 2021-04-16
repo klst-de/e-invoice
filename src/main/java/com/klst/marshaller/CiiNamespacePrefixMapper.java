@@ -11,8 +11,8 @@ import java.util.Map;
  * 
  * @see https://jesperdj.com/2018/09/30/jaxb-on-java-9-10-11-and-beyond/
  */
-//import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
+//import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 //@see https://www.intertech.com/Blog/jaxb-tutorial-customized-namespace-prefixes-example-using-namespaceprefixmapper/
 //@see http://hwellmann.blogspot.com/2011/03/jaxb-marshalling-with-custom-namespace.html
@@ -27,7 +27,15 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 * 
 * @see UblNamespacePrefixMapper
 */
-public class CiiNamespacePrefixMapper extends NamespacePrefixMapper {
+public class CiiNamespacePrefixMapper extends NamespacePrefixMapper implements NamespacePrefixMapperFactory {
+
+	@Override // implements Factory
+	public NamespacePrefixMapper createNamespacePrefixMapper() {
+		return getNamespacePrefixMapper();
+	}
+	static NamespacePrefixMapper getNamespacePrefixMapper() {
+		return new CiiNamespacePrefixMapper();
+	}
 
 	/**
 	 * REQUIREMENTS SPECIFICATION MAPPING for Cross Industry Invoice (CII)
@@ -56,7 +64,7 @@ public class CiiNamespacePrefixMapper extends NamespacePrefixMapper {
 	/**
 	 * Create mappings.
 	 */
-	public CiiNamespacePrefixMapper() {
+	private CiiNamespacePrefixMapper() {
 		namespaceMap.put(RSM, "rsm");
 		namespaceMap.put(RAM, "ram");
 		namespaceMap.put(UDT, "udt");

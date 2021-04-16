@@ -18,7 +18,9 @@
 	<classpathentry kind="lib" path="../../16-Factur-X/e-invoice/src/test/lib/commons-lang3-3.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/e-order/e-doc-commons/lib/javax.inject-1.jar"/>
+<!--	
 	<classpathentry kind="lib" path="/e-order-CIO/e-doc-commons/lib/istack-commons-runtime-3.0.11.jar"/>
-	<classpathentry kind="lib" path="/e-order-CIO/e-doc-commons/lib/jaxb-runtime-2.3.3.jar"/>
+	<classpathentry kind="lib" path="/e-order-CIO/e-doc-commons/lib/jaxb-runtime-2.3.3.jar" sourcepath="C:/Users/homeb/Downloads/jaxb-runtime-2.3.3-sources.jar"/>
+	-->
 	<classpathentry kind="output" path="bin"/>
 </classpath>

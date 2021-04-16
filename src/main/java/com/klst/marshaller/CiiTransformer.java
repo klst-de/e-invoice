@@ -4,17 +4,6 @@ import java.io.InputStream;
 
 import javax.inject.Named;
 
-/* in java 1.8 'NamespacePrefixMapper' is not in API (restriction on required library ... jdk1.8.0_241\jre\lib\rt.jar')
- * to compile in eclipse define access rule.
- * 
- * Proposal JEP-320(http://openjdk.java.net/jeps/320) to remove the Java EE and CORBA modules from the JDK.
- * In Java SE 11, the module has been removed. To use JAX-WS and JAXB you need to add them to your project as separate libraries.
- * 
- * @see https://jesperdj.com/2018/09/30/jaxb-on-java-9-10-11-and-beyond/
- */
-//import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-
 @Named
 /* Notice 
  * that there are two @Singleton annotations, 
@@ -68,12 +57,6 @@ public class CiiTransformer extends AbstactTransformer {
 		Class<?> type = loadClass();
 		Object result = this.toModel(xmlInputStream, type);
 		return (T) result;
-	}
-
-	// implements com.klst.marshaller.AbstactTransformer.getNamespacePrefixMapper
-	@Override
-	NamespacePrefixMapper getNamespacePrefixMapper() {
-		return new CiiNamespacePrefixMapper();
 	}
 
 }

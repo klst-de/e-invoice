@@ -13,7 +13,6 @@ import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -22,16 +21,6 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.xml.sax.SAXException;
-
-/* in java 1.8 'NamespacePrefixMapper' is not in API (restriction on required library ... jdk1.8.0_241\jre\lib\rt.jar')
- * to compile in eclipse define access rule.
- * 
- * Proposal JEP-320(http://openjdk.java.net/jeps/320) to remove the Java EE and CORBA modules from the JDK.
- * In Java SE 11, the module has been removed. To use JAX-WS and JAXB you need to add them to your project as separate libraries.
- * 
- * @see https://jesperdj.com/2018/09/30/jaxb-on-java-9-10-11-and-beyond/
- */
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 @Named
 /* Notice 
@@ -42,7 +31,7 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
  * @see https://github.com/javax-inject/javax-inject
  */
 @javax.inject.Singleton
-public abstract class AbstactTransformer {
+public abstract class AbstactTransformer implements NamespacePrefixMapperFactory {
 
 	private static final Logger LOG = Logger.getLogger(AbstactTransformer.class.getName());
 	
@@ -58,7 +47,7 @@ public abstract class AbstactTransformer {
 	protected AbstactTransformer(String contentPath, AbstactTransformer instance) {
 		LOG.fine("contentPath:"+contentPath);
 		if(instance==null) try {
-			System.setProperty(JAXBContext.JAXB_CONTEXT_FACTORY, "com.sun.xml.bind.v2.ContextFactory");
+			System.setProperty(JAXBContext.JAXB_CONTEXT_FACTORY, "com.sun.xml.internal.bind.v2.ContextFactory");
 			this.jaxbContext = newInstance(contentPath);
 			LOG.finer("jaxbContext:\n"+jaxbContext.toString()); // displays path and Classes known to context
 			instance = this;
@@ -132,20 +121,6 @@ public abstract class AbstactTransformer {
 		return schema.newValidator();
 	}
 
-	/**
-	 * override the default namespace prefixes ns1, ns2, ... created by the Marshaller.
-	 * 
-	 * use own NamespacePrefixMapper
-	 * and set prop "com.sun.xml.bind.namespacePrefixMapper"
-	 * 
-	 * @see http://hwellmann.blogspot.com/2011/03/jaxb-marshalling-with-custom-namespace.html
-	 * and
-	 * 5.1. Changing prefixes in file:///C:/proj/jaxb-ri/docs/ch03.html#marshalling
-	 * 
-	 * @return own NamespacePrefixMapper
-	 */
-	abstract NamespacePrefixMapper getNamespacePrefixMapper();
-	
 	private Unmarshaller createUnmarshaller() throws JAXBException {
 		return jaxbContext.createUnmarshaller();
 	}
@@ -167,12 +142,7 @@ public abstract class AbstactTransformer {
 		Marshaller marshaller = jaxbContext.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formatXmlOutput());
 		
-        try {
-        	marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", getNamespacePrefixMapper());
-        } catch(PropertyException ex) {
-            // In case another JAXB implementation is used
-			throw new TransformationException(TransformationException.NAMESPACE_PREFIX_MAPPER_ERROR, ex);
-        }
+		registerNamespacePrefixMapper(marshaller);
 
 		return marshaller;
 	}
