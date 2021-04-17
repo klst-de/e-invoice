@@ -375,26 +375,16 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 	
 	void makeLineGroup(CoreInvoice ublDoc, CoreInvoice testDoc) {
 		List<CoreInvoiceLine> testLines = testDoc.getLines();
-		Object testDocObject = ((GenericInvoice)testDoc).get();
-		LOG.info("LineGroup started for "+testLines.size() + " lines. testDocObject ist "+testDocObject.getClass() +
+		LOG.info("LineGroup started for "+testLines.size() + " lines. testDocObject ist "+testDoc.getClass() +
 				" testDoc ist "+testDoc.getClass());
 		testLines.forEach(testLine -> {
 			CoreInvoiceLine targetLine;
-			if(testDocObject instanceof InvoiceType) {
-				targetLine = ublDoc.createInvoiceLine(testLine.getId(), 
-						testLine.getQuantity(),                                       // BT-129
-						testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), // BT-131 , BG-29.BT-146 
-						testLine.getItemName(),
-						testLine.getTaxCategory(), testLine.getTaxRate()
-						);
-			} else {
-				targetLine = GenericLine.createCreditNoteLine(testLine.getId(), 
-						testLine.getQuantity(), 
-						testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), 
-						testLine.getItemName(),
-						testLine.getTaxCategory(), testLine.getTaxRate()
-						);
-			}
+			targetLine = ublDoc.createInvoiceLine(testLine.getId(), 
+					testLine.getQuantity(),                                       // BT-129
+					testLine.getLineTotalAmount(), testLine.getUnitPriceAmount(), // BT-131 , BG-29.BT-146 
+					testLine.getItemName(),
+					testLine.getTaxCategory(), testLine.getTaxRate()
+					);
 			
 			// opt:
 			targetLine.setBuyerAccountingReference(testLine.getBuyerAccountingReference()); // BG-25.BT-133

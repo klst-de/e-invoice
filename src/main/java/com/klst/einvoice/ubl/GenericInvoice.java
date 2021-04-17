@@ -11,6 +11,7 @@ import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
+import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
@@ -105,12 +106,14 @@ public class GenericInvoice <T> implements CoreInvoice  {
 		return create(profile, processType, code);
 	}
 	@Override
-	public CoreInvoiceLine createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
+	public CoreInvoiceLine createInvoiceLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
-		if(isInvoiceType) {
-			return GenericLine.createInvoiceLine(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
-		}
-		return GenericLine.createCreditNoteLine(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+		return GenericLine.create(this, id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+//		if(isInvoiceType) {
+//			return GenericLine.createIL(id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+//		} else {
+//			return GenericLine.createCNL(id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+//		}
 	}
 
 	static CoreInvoice create(String profile, String processType, DocumentNameCode code) {

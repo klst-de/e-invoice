@@ -11,6 +11,7 @@ import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.ContactInfo;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
+import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.api.Reference;
@@ -79,9 +80,9 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		return new CrossIndustryInvoice(profile, processType, code);
 	}
 	@Override
-	public CoreInvoiceLine createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
+	public CoreInvoiceLine createInvoiceLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
-		return TradeLineItem.createInvoiceLine(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+		return TradeLineItem.create(id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 	}
 
 /*

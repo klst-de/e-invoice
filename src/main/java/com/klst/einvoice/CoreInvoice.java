@@ -39,7 +39,7 @@ public interface CoreInvoice extends CoreInvoiceFactory, BG1_InvoiceNote, BG2_Pr
 	BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentative, BG14_InvoicingPeriod, 
 	PaymentInstructionsFactory, CreditTransferFactory, PaymentCardFactory, DirectDebitFactory,
 	BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
-	BG22_DocumentTotals, BG23_VatBreakdown, 
+	BG22_DocumentTotals, BG23_VatBreakdown, BG25_InvoiceLine,
 	PostalAddressFactory, ContactInfoFactory, BusinessPartyFactory {
 
 	/**

@@ -21,7 +21,8 @@ import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> for EN_16931_1_2017 rule and request IDs
  */
-public interface CoreInvoiceLine extends BG26_InvoiceLinePeriod, BG27_LineLevelAllowences, BG28_LineLevelCharges, BG32_ItemAttributes {
+public interface CoreInvoiceLine extends CoreInvoiceLineFactory,
+	BG26_InvoiceLinePeriod, BG27_LineLevelAllowences, BG28_LineLevelCharges, BG32_ItemAttributes {
 
 	/**
 	 * Invoice line identifier

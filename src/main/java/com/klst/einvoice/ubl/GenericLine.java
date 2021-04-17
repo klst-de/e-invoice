@@ -7,12 +7,16 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IPeriod;
+import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.einvoice.AllowancesAndCharges;
+import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -50,29 +54,34 @@ import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.QuantityT
 
 public class GenericLine<T> implements CoreInvoiceLine {
 
+	@Override
+	public CoreInvoiceLine createInvoiceLine(String id, IQuantity quantity, IAmount lineTotalAmount,
+			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
+		return create(this.invoice, id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+	}
+	
 	private static final Logger LOG = Logger.getLogger(GenericLine.class.getName());
 	
+	private CoreInvoice invoice; // Invoice or CreditNote this line belongs to
 	T t;
 	boolean isInvoiceLineType = false;
 	InvoiceLineType iLine = null;
 	CreditNoteLineType cnLine = null;
 	
 	// factory
-	// TODO not public:
-	public static CoreInvoiceLine createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
+	static CoreInvoiceLine create(CoreInvoice invoice, String id, Quantity quantity, Amount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
-		InvoiceLineType il = new InvoiceLineType();
-		GenericLine<InvoiceLineType> gl = new GenericLine<InvoiceLineType>(il);
-		gl.init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
-		return gl;
-	}
-	// TODO not public:
-	public static CoreInvoiceLine createCreditNoteLine(String id, Quantity quantity, Amount lineTotalAmount, 
-			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
-		CreditNoteLineType cnl = new CreditNoteLineType();
-		GenericLine<CreditNoteLineType> gl = new GenericLine<CreditNoteLineType>(cnl);
-		gl.init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
-		return gl;
+		if(invoice.getTypeCode()==DocumentNameCode.CreditNote) {
+			CreditNoteLineType cnl = new CreditNoteLineType();
+			GenericLine<CreditNoteLineType> gl = new GenericLine<CreditNoteLineType>(cnl);
+			gl.init(invoice, id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+			return gl;
+		} else {
+			InvoiceLineType il = new InvoiceLineType();
+			GenericLine<InvoiceLineType> gl = new GenericLine<InvoiceLineType>(il);
+			gl.init(invoice, id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+			return gl;
+		}
 	}
 	
 	// ctor mit type parameter
@@ -84,7 +93,6 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		} else {
 			cnLine = (CreditNoteLineType)t;
 		}
-//		LOG.info("copy ctor isInvoiceLineType:"+isInvoiceLineType);
 		if(getId()!=null) LOG.config("copy ctor "+this);
 	}
 	
@@ -92,10 +100,10 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return this.t;
 	}
 
-	void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
-			, TaxCategoryCode codeEnum, BigDecimal taxRate) {
+	private void init(CoreInvoice invoice, String id, Quantity quantity, Amount lineTotalAmount, 
+			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal taxRate) {
+		this.invoice = invoice;
 		ItemType item = new ItemType();
-//		PriceType price = new PriceType();
 		if(isInvoiceLineType) {
 			iLine.setItem(item);
 		} else {
