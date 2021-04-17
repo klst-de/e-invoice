@@ -145,7 +145,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return id==null ? null : id.getValue();
 	}
 
-	// BT-127 ++ 0..1 Invoice line note
+	// BG-25.BT-127 0..1 Invoice line note
 	@Override
 	public void setNote(String text) {
 		if(text==null) return;
@@ -164,7 +164,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return noteList.isEmpty() ? null : noteList.get(0).getValue(); // wg. 0..1
 	}
 
-	// BT-128 ++ 0..1 Invoice line object identifier
+	// BG-25.BT-128 0..1 Invoice line object identifier
 	@Override
 	public void setLineObjectID(String id, String schemeID, String schemeCode) {
  		if(id==null) return;
@@ -198,8 +198,8 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return documentReference.isEmpty() ? null : new ID(documentReference.get(0).getID()); // get(0) wg. 0..1
 	}
 
-	// BT-129 ++ 1..1 Invoiced quantity
-	// BT-130 ++ 1..1 Invoiced quantity unit of measure code
+	// BG-25.BT-129 1..1 Invoiced quantity
+	// BG-25.BT-130 1..1 Invoiced quantity unit of measure code
  	/**
  	 * non public - use ctor
  	 * 
@@ -216,12 +216,12 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		}	
 	}
 	@Override
-	public Quantity getQuantity() {
+	public IQuantity getQuantity() {
 		QuantityType quantity = (QuantityType)(isInvoiceLineType ? iLine.getInvoicedQuantity() : cnLine.getCreditedQuantity());	
 		return new Quantity(quantity.getUnitCode(), quantity.getValue());
 	}
 
-	// BT-131 ++ 1..1 Invoice line net amount
+	// BG-25.BT-131 1..1 Invoice line net amount
  	/**
  	 * non public - use ctor
  	 * 
@@ -243,7 +243,14 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
 
-	// BT-132 ++ 0..1 Referenced purchase order line reference
+	/* BG-25.BT-132 0..1 Referenced purchase order line reference
+
+Bsp. UBL 01.01a :
+        <cac:OrderLineReference>
+            <cbc:LineID>6171175.1</cbc:LineID>
+        </cac:OrderLineReference>
+
+	 */
 	@Override
 	public void setOrderLineID(String lineReference) {
 		if(lineReference==null) return;
@@ -264,7 +271,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return list.isEmpty() ? null : list.get(0).getLineID().getValue(); // wg. 0..1
 	}
 
-	// BT-133 ++ 0..1 Invoice line Buyer accounting reference
+	// BG-25.BT-133 0..1 Invoice line Buyer accounting reference
 	@Override
 	public void setBuyerAccountingReference(String text) {
 		if(text==null) return;
@@ -318,7 +325,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		setStartDate(period.getStartDateAsTimestamp());
 		setEndDate(period.getEndDateAsTimestamp());
 	}
-	// BG-26.BT-134 +++ 0..1 Invoice line period start date / Das Datum, an dem der Rechnungszeitraum der betreffenden Rechnungsposition beginnt.
+	// BG-26.BT-134 0..1 Invoice line period start date / Das Datum, an dem der Rechnungszeitraum der betreffenden Rechnungsposition beginnt.
 	private void setStartDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		StartDateType date = new StartDateType();
@@ -368,7 +375,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return resList;
 	}
 
-	// BG-29 ++ 1..1 PRICE DETAILS
+	// BG-29        1..1 PRICE DETAILS
 	// BG-29.BT-146 1..1 Item net price
 	@Override
 	public UnitPriceAmount getUnitPriceAmount() {
@@ -376,7 +383,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return price.getUnitPriceAmount();
 	}
 	
-	// BG-29.BT-147 +++ 0..1 Item price discount
+	// BG-29.BT-147 0..1 Item price discount
 	@Override
 	public UnitPriceAmount getPriceDiscount() {
 		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
@@ -407,27 +414,12 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		}		
 	}
 	
+	// BG-29.BT-146 1..1 UnitPriceAmount
 	private void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
 		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
 		price.setUnitPriceAmount(unitPriceAmount);
 		setPrice(price);
 	}
-
-//	private void setPriceDiscount(UnitPriceAmount unitPriceAmount) { 
-//		if(unitPriceAmount!=null) {
-//			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
-//			price.setPriceDiscount(unitPriceAmount);
-//			setPrice(price);
-//		}
-//	}
-//
-//	private void setGrossPrice(UnitPriceAmount unitPriceAmount) { 
-//		if(unitPriceAmount!=null) {
-//			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
-//			price.setGrossPrice(unitPriceAmount);
-//			setPrice(price);
-//		}
-//	}
 
 	private void setUnitPriceQuantity(Quantity quantity) {
 		if(quantity!=null) {

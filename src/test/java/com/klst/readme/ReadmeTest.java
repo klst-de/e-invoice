@@ -78,8 +78,6 @@ public class ReadmeTest {
 		commercialInvoiceTest();
 	}
 
-	private static final BigDecimal ONE = new BigDecimal(1);
-	
 	CoreInvoiceLine line00() {
 		// mandatory:
 		CoreInvoiceLine line = invoice.createInvoiceLine("1"    // invoice line number

@@ -391,7 +391,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			targetLine.setLineDeliveryPeriod(testLine.getLineDeliveryPeriod());     // optional BG-26
 			
 			// BG-29:BT-149-0 0..1 , BT-150-0
-			Quantity baseQuantity = testLine.getBaseQuantity();
+			Quantity baseQuantity = testLine.getUnitPriceQuantity();
 			if(baseQuantity!=null) {
 				LOG.info("PRICE DETAILS BG-29.BT-149 + BT-150 baseQuantity "+baseQuantity);
 				// BG-29.BT-146 + BG-29:BT-149-0 0..1 , BT-150-0

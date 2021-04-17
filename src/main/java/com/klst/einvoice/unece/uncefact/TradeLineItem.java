@@ -128,7 +128,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		setTaxCategoryAndRate(taxCode, taxRate);
 	}
 	
-	// 1 .. 1 LineID BT-126
+	// BG-25.BT-126 1..1 line identifier
 	void setId(String id) {
 		associatedDocumentLineDocument.setLineID(new ID(id)); // No identification scheme is to be used.
 		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
@@ -139,7 +139,8 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return associatedDocumentLineDocument.getLineID().getValue();
 	}
 
-	@Override // Invoice line note BT-127 0..1 (optional)
+	// BG-25.BT-127 0..1 line note (optional)
+	@Override
 	public void setNote(String text) {
 		if(text==null) return;
 		Note note = Note.create(text);
@@ -158,7 +159,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return list.isEmpty() ? null : Note.getNote(list.get(0));
 	}
 
-	// 0..1 BT-128  IssuerAssignedID
+	// BG-25.BT-128 0..1 Invoice line object identifier aka IssuerAssignedID
 	@Override
 	public void setLineObjectID(String id, String schemeID, String schemeCode) {
 		if(id==null) return;
@@ -212,11 +213,11 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	@Override
-	public Quantity getQuantity() {
+	public IQuantity getQuantity() {
 		return new Quantity(specifiedLineTradeDelivery.getBilledQuantity().getUnitCode(), specifiedLineTradeDelivery.getBilledQuantity().getValue());
 	}
 
-	// BT-131
+	// BG-25.BT-131 1..1 Invoice line net amount
 	void setLineTotalAmount(Amount amount) {
 		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
 		AmountType lineTotalAmt = new AmountType();
@@ -232,19 +233,16 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
 
-	/*
+	/* BG-25.BT-132 0..1 Referenced purchase order line reference
+
 Bsp. CII 01.01a-INVOICE_uncefact.xml :
             <ram:SpecifiedLineTradeAgreement>
                 <ram:BuyerOrderReferencedDocument>
                     <ram:LineID>6171175.1</ram:LineID>
                 </ram:BuyerOrderReferencedDocument>
-     UBL
-        <cac:OrderLineReference>
-            <cbc:LineID>6171175.1</cbc:LineID>
-        </cac:OrderLineReference>
 
 	 */
-	@Override // BT-132 0..1
+	@Override
 	public void setOrderLineID(String id) {
 		if(id==null) return;
 		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
@@ -259,7 +257,8 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
 	}
 
-	@Override  // BT-133 0..1
+	// BG-25.BT-133 0..1 Invoice line Buyer accounting reference
+	@Override
 	public void setBuyerAccountingReference(String text) {
 		if(text==null) return;
 		TradeAccountingAccountType taa = new TradeAccountingAccountType();
@@ -340,8 +339,8 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	/*
 	 * BG-29 1..1 PRICE DETAILS
 	 * 
-	 * BT-146 +++ 1..1      Item net price   ==> NetPriceProductTradePrice
-	 * BT-149-0 + BT-150-0 UnitPriceQuantity ==> NetPriceProductTradePrice
+	 * BT-146              1..1 Item net price   ==> NetPriceProductTradePrice
+	 * BT-149-0 + BT-150-0     UnitPriceQuantity ==> NetPriceProductTradePrice
 	 */
 	// BG-29.BT-146 1..1 Item net price aka UnitPriceAmount
 	@Override
