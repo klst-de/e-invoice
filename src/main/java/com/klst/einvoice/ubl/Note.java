@@ -2,36 +2,39 @@ package com.klst.einvoice.ubl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.klst.einvoice.BG1_InvoiceNote;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.InvoiceNoteFactory;
 
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 
-/* implements UBL BG-1 INVOICE NOTE
- * to get all getInvoiceNotes use  CoreInvoice method 
- * public List<InvoiceNote> getInvoiceNotes()
+/** 
+ * implements UBL BG-1 INVOICE NOTE {@link InvoiceNote}
+ * <p>
+ * to get all InvoiceNotes use {@link BG1_InvoiceNote#getInvoiceNotes()} method 
+ * <p>
+ * also implements BG-25.BT-127 0..n IncludedNote.Content {@link com.klst.einvoice.CoreInvoiceLine#setNote(String)}
+ * 
+ * @see InvoiceNoteFactory
  */
+/*      subjectCode BT-21 gibt es in UBL nicht!
+Bsp 05:
+UBL:
+    <cbc:Note>ADU</cbc:Note>
+    <cbc:Note>Trainer: Herr […]</cbc:Note>
+
+wurde geändert zu:
+    <cbc:Note>#ADU#Trainer: Herr […]</cbc:Note>
+
+also ist in UBL effektiv nur ein String da, value - dieser wird per regex in subjectCode und content aufgeteilt
+ */
+
 public class Note extends NoteType implements InvoiceNote, InvoiceNoteFactory {
 
-//	static final String RESOURCE_PATH = "src/main/resources/";
-//	static LogManager logManager = LogManager.getLogManager(); // Singleton
-//	
-//	private static Logger LOG = null; // Logger.getLogger(Note.class.getName());
-//	static {
-//        URL url = Note.class.getClassLoader().getResource("testLogging.properties");
-//		try {
-//	        File file = new File(url.toURI());
-//			logManager.readConfiguration(new FileInputStream(file));
-//		} catch (IOException | URISyntaxException e) {
-//			LOG = Logger.getLogger(Note.class.getName());
-//			LOG.warning(e.getMessage());
-//		}
-//		LOG = Logger.getLogger(Note.class.getName());
-//	}
-	
 	@Override // implements NoteFactory
 	public InvoiceNote createNote(String subjectCode, String content) {
 		return create(subjectCode, content);
@@ -48,22 +51,8 @@ public class Note extends NoteType implements InvoiceNote, InvoiceNoteFactory {
 		return result;
 	}
 
-/*      subjectCode gibt es in super nicht!
-Bsp 05:
-CII:
-        <ram:IncludedNote>
-            <ram:Content>Trainer: Herr […]</ram:Content>
-            <ram:SubjectCode>ADU</ram:SubjectCode>
-        </ram:IncludedNote>
+	private static final Logger LOG = Logger.getLogger(Note.class.getName());
 
-UBL:
-    <cbc:Note>ADU</cbc:Note>
-    <cbc:Note>Trainer: Herr […]</cbc:Note>
-
-wurde geändert zu:
-    <cbc:Note>#ADU#Trainer: Herr […]</cbc:Note>
-    
- */
 	static final String FORMAT = "(#)([A-Z]{3})(#)(.*)";
 	static Pattern PATTERN = Pattern.compile(FORMAT);
 	static final int SUBJECT_CODE_GROUP = 2;
@@ -76,7 +65,7 @@ wurde geändert zu:
 //					+", CONTENT_GROUP="+matcher.group(CONTENT_GROUP) + "<<<<");
 			return matcher.group(group);
 		} else {
-//			LOG.config("no match in '"+content+"´");
+			LOG.fine("no match in '"+content+"´");
 			return group==SUBJECT_CODE_GROUP ? null : content;
 		}
 	}

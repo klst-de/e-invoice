@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.einvoice.BG1_InvoiceNote;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.InvoiceNoteFactory;
 
@@ -11,11 +12,30 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
-/* implements CII BG-1 INVOICE NOTE
- * to get all getInvoiceNotes use  CoreInvoice method 
- * public List<InvoiceNote> getInvoiceNotes()
+/** 
+ * implements CII BG-1 INVOICE NOTE {@link InvoiceNote}
+ * <p>
+ * to get all InvoiceNotes use {@link BG1_InvoiceNote#getInvoiceNotes()} method 
+ * <p>
+ * also implements BG-25.BT-127 0..n IncludedNote.Content {@link com.klst.einvoice.CoreInvoiceLine#setNote(String)}
  * 
- * also implements BG-25.BT-127 0..n IncludedNote.Content
+ * @see InvoiceNoteFactory
+ */
+/*
+Bsp 05:
+CII:
+        <ram:IncludedNote>
+            <ram:Content>Trainer: Herr […]</ram:Content>
+            <ram:SubjectCode>ADU</ram:SubjectCode>
+        </ram:IncludedNote>
+
+in super NoteType sind mehrere Objekte da, nur zwei werden genutzt:
+    protected TextType subject;
+    protected CodeType contentCode;
+    protected List<TextType> content;      <=========== BT-22 
+    protected CodeType subjectCode;        <=========== BT-21
+    protected IDType id; 
+
  */
 public class Note extends NoteType implements InvoiceNote, InvoiceNoteFactory {
 
