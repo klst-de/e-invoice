@@ -36,7 +36,7 @@ public interface NamespacePrefixMapperFactory {
 		NamespacePrefixMapper namespacePrefixMapper = createNamespacePrefixMapper();
 		if(namespacePrefixMapper==null) return;
         try {
-        	marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", namespacePrefixMapper);
+        	marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", namespacePrefixMapper);
         } catch(PropertyException ex) {
             // In case another JAXB implementation is used
 			throw new TransformationException(TransformationException.NAMESPACE_PREFIX_MAPPER_ERROR, ex);
