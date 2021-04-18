@@ -1,6 +1,7 @@
 package com.klst.ebXml.reflection;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -203,7 +204,43 @@ public class SCopyCtor {
 	    	field.set(obj, getter.invoke(doc));
 	    } catch (Exception e) {
 	        LOG.warning("List<?> "+field.getName()+" = "+getter.getName() + "Exception:"+e);
-	    }
+	    }	
+	}
 	
+    private static final String METHOD_GETVALUE = "getValue";
+    // == Getter.getValue(Object codeType, String clazz)
+	public Object invokeGetValue(Object codeType, String clazz) {
+		Class<?> type = null;
+		Object codeTypeClazz = null;
+		try {
+			// dynamisch die Klasse laden
+			type = Class.forName(clazz);
+			codeTypeClazz = type.cast(codeType); // == codeTypeClazz = ("clazz"type)codeType
+		} catch (ClassCastException e) {
+			LOG.fine(e.getMessage());
+			return null;
+		} catch (ClassNotFoundException e) {
+			LOG.warning(e.getMessage());
+			// kann in e-order passieren, siehe com.klst.edoc.untdid.DocumentNameCode#valueOf
+			return null;
+		}
+
+		if(type.isInstance(codeTypeClazz)) {
+			try {
+				Method getValue = type.getDeclaredMethod(METHOD_GETVALUE);
+				return getValue.invoke(codeTypeClazz);
+			} catch (NoSuchMethodException e) {
+				LOG.severe(METHOD_GETVALUE + "() not defined for " + codeType.getClass().getSimpleName());
+				e.printStackTrace(); // darf nicht passieren
+			} catch (IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+				LOG.severe(e.getMessage());
+				e.printStackTrace(); // darf nicht passieren
+			}					
+		} else {
+			LOG.info("Object "+codeType + " isInstance of "+codeType.getClass().getName() + " NOT "+clazz);
+		}
+
+		return null;
+		
 	}
 }
