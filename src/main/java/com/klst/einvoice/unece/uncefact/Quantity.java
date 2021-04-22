@@ -8,32 +8,36 @@ import com.klst.edoc.api.IQuantity;
 
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType;
 
-/* Mit diesem Datentyp wird die Mengenangabe zu einem Einzelposten abgebildet. 
+/* Quantity : „Core Data Types“ aus "ISO 15000-5" aka ebXML
  * 
- * Er basiert auf dem Typ „Quantity. Type“, wie in ISO 15000-5:2014 Anhang B definiert.
+ * A counted number of non-monetary units. 
+ * Quantities need to be specified with a unit of quantity.
  * 
- * Hinweis: Der Mengenangabe wird über ein eigenständiges Informationselement eine Maßeinheit zugeordnet.
+ * [Note: This Representation Term shall also be used 
+ * for counted coefficients (e.g. flowers/m²).]
  * 
+ * Quelle: https://www.oasis-open.org/events/symposium/2006/slides/CrawfordTutorial.pdf
+ * PS: Das Original (27Seiten kosten CHF138) : https://www.iso.org/standard/61433.html 
  */
 /**
  * Quantity contains unit of measure and quantity of items (goods or services)
  * <p>
- * This is a "decimal" type with 4 digits maximum after the decimal point, without a thousand separator, and with the ". " as a decimal separator. 
+ * This is a "decimal" type with 4 digits maximum after the decimal point, without a thousand separator, and with the "." as a decimal separator. 
  * Example 10000.3454
  * 
- * <br>The unit of measure that applies to the invoiced quantity.
- * The quantity of items (goods or services) that is charged in the Invoice line.
+ * <br>The unit of measure that applies to the ordered or invoiced quantity.
+ * The quantity of items (goods or services) that is charged in the Order/Invoice line.
  * 
  */
 public class Quantity extends QuantityType implements IQuantity {
 
 	@Override
-	public IQuantity createQuantity(String unitCode, BigDecimal quantity) {
-		return create(unitCode, quantity);
+	public IQuantity createQuantity(String unitCode, BigDecimal value) {
+		return create(unitCode, value);
 	}
 
-	static Quantity create(String unitCode, BigDecimal quantity) {
-		return new Quantity(unitCode, quantity);
+	static Quantity create(String unitCode, BigDecimal value) {
+		return new Quantity(unitCode, value);
 	}
 
 	// in EN 16931-1:2017/A1:2019 + AC:2020 entfällt die Einschränkung:
@@ -45,6 +49,7 @@ public class Quantity extends QuantityType implements IQuantity {
 	}
 	// copy factory
 	static Quantity create(QuantityType object) {
+		if(object==null) return null;
 		if(object instanceof QuantityType && object.getClass()!=QuantityType.class) {
 			// object is instance of a subclass of QuantityType, but not QuantityType itself
 			return (Quantity)object;
@@ -61,10 +66,15 @@ public class Quantity extends QuantityType implements IQuantity {
 		}
 	}
 
-	public Quantity(String unitCode, BigDecimal quantity) {
+	public Quantity(String unitCode, BigDecimal value) {
 		super();
 		super.setUnitCode(unitCode);
-		super.setValue(quantity.setScale(SCALE, RoundingMode.HALF_UP));
+		setvalue(value); // nicht super.setValue!
+	}
+
+	private void setvalue(BigDecimal value) {
+		if(value==null) return;
+		super.setValue(value.setScale(SCALE, RoundingMode.HALF_UP));
 	}
 
 	void copyTo(un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType quantity) {
@@ -79,7 +89,8 @@ public class Quantity extends QuantityType implements IQuantity {
 	
 	@Override
 	public String toString() {
-		return getValue(RoundingMode.HALF_UP) + (getUnitCode()==null ? "" : getUnitCode());
+		return getValue()==null ? "" : getValue(RoundingMode.HALF_UP) 
+				+ (getUnitCode()==null ? "" : getUnitCode());
 	}
 
 }
