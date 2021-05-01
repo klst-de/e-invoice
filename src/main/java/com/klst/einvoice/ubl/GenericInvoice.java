@@ -544,28 +544,19 @@ UBL:
 	@Override
 	public void setTenderOrLotReference(String docRefId) {
 		if(docRefId==null) return;
-//		AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(docRefId, DocumentNameCode.ValidatedPricedTender.getValueAsString(), null);
-		AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(docRefId, (String)null, null);
-		addOriginatorDocumentReference(asd);
+		addOriginatorDocumentReference(DocumentReference.create(docRefId, (String)null, null));
 	}
 	@Override
 	public String getTenderOrLotReference() {
 		List<DocumentReferenceType> additionalDocumentReferenceList;
 		if(isInvoiceType) {
 			additionalDocumentReferenceList = invoice.getOriginatorDocumentReference();
-//			additionalDocumentReferenceList = invoice.getAdditionalDocumentReference();
 		} else {
 			additionalDocumentReferenceList = creditNote.getOriginatorDocumentReference();
-//			additionalDocumentReferenceList = creditNote.getAdditionalDocumentReference();
 		}
-		List<AdditionalSupportingDocument> resList = new ArrayList<AdditionalSupportingDocument>(additionalDocumentReferenceList.size());
+		List<DocumentReference> resList = new ArrayList<DocumentReference>(additionalDocumentReferenceList.size());
 		additionalDocumentReferenceList.forEach(doc -> {
-			AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(doc);
-//			if(asd.isValidatedPricedTender()) {
-//				// das sind BT-17 docs
-//				resList.add(asd);
-//			}
-			resList.add(asd);
+			resList.add(DocumentReference.create(doc));
 		});
 		return resList.isEmpty() ? null : resList.get(0).getDocumentReference().getContent();	
 	}
@@ -583,8 +574,8 @@ UBL:
 	@Override
 	public void setInvoicedObject(String name, String schemeID) {
 		if(name==null) return;
-		AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(name, DocumentNameCode.InvoicingDataSheet.getValueAsString(), schemeID);
-		addSupportigDocument(asd);
+		DocumentReference docRef = DocumentReference.create(name, DocumentNameCode.InvoicingDataSheet.getValueAsString(), schemeID);
+		addSupportigDocument(docRef);
 	}
 	@Override
 	public String getInvoicedObject() {
@@ -599,12 +590,12 @@ UBL:
 		} else {
 			additionalDocumentReferenceList = creditNote.getAdditionalDocumentReference();
 		}
-		List<AdditionalSupportingDocument> resList = new ArrayList<AdditionalSupportingDocument>(additionalDocumentReferenceList.size());
+		List<DocumentReference> resList = new ArrayList<DocumentReference>(additionalDocumentReferenceList.size());
 		additionalDocumentReferenceList.forEach(doc -> {
-			AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(doc);
-			if(asd.isInvoicingDataSheet()) {
+			DocumentReference docRef = DocumentReference.create(doc);
+			if(docRef.isInvoicingDataSheet()) {
 				// das sind BT-18 docs
-				resList.add(asd);
+				resList.add(docRef);
 			}
 		});
 		return resList.isEmpty() ? null : resList.get(0).getDocumentReference();
@@ -727,27 +718,27 @@ ubl-tc434-example2.xml :
 	// BG-3.BT-25 1..1 Preceding Invoice reference
 	// BG-3.BT-26 0..1 Preceding Invoice issue date
 	
-	// BG-3 0..n PRECEDING INVOICE REFERENCE / implements BG3_PrecedingInvoiceReference factory
+	// implements BG3_PrecedingInvoiceReference factory
 	@Override
 	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
-		return AdditionalSupportingDocument.create(docRefId, ts);
+		return DocumentReference.create(docRefId, ts);
 	}
-	@Override // implements BG3_PrecedingInvoiceReference
+	@Override // add aka set
 	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice) {
 		if(precedingInvoice==null) return;
-		DocumentReferenceType docRef = (AdditionalSupportingDocument)precedingInvoice;
+		DocumentReferenceType docRef = (DocumentReference)precedingInvoice;
 		BillingReferenceType billingReference = new BillingReferenceType();
 		billingReference.setInvoiceDocumentReference(docRef);
 		List<BillingReferenceType> billingReferenceList = isInvoiceType ? invoice.getBillingReference() : creditNote.getBillingReference();
 		billingReferenceList.add(billingReference);
 	}
-	@Override // implements BG3_PrecedingInvoiceReference
+	@Override // get
 	public List<PrecedingInvoice> getPrecedingInvoices() {
 		List<BillingReferenceType> billingReferenceList = isInvoiceType ? invoice.getBillingReference() : creditNote.getBillingReference();
 		List<PrecedingInvoice> docRefList = new ArrayList<PrecedingInvoice>();
 		billingReferenceList.forEach(billingRef -> {
 			DocumentReferenceType docRef = billingRef.getInvoiceDocumentReference();
-			docRefList.add(AdditionalSupportingDocument.create(docRef));
+			docRefList.add(DocumentReference.create(docRef));
 		});
 		return docRefList;
 	}
@@ -1439,41 +1430,26 @@ ubl-tc434-example2.xml :
 	// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	@Override
 	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts, String uri) {
-		AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(docRefId, lineId, description);
-//		AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(docRefId, (Reference)null, description);
-		asd.setExternalDocumentLocation(uri);
-		return asd;
+		DocumentReference doc = DocumentReference.create(docRefId, lineId, description);
+		doc.setExternalDocumentLocation(uri);
+		return doc;
 	}
 	@Override
 	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts
 			, byte[] content, String mimeCode, String filename) {
-		AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(docRefId, lineId, description);
-//		AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(docRefId, (Reference)null, description);
-		asd.setAttachedDocument(content, mimeCode, filename);
-		return asd;
+		DocumentReference doc = DocumentReference.create(docRefId, lineId, description);
+		doc.setAttachedDocument(content, mimeCode, filename);
+		return doc;
 	}
-//	@Override
-//	public void addSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts, String uri) {
-////	public void addSupportigDocument(String docRefId, String description, String url) {
-//		if(docRefId!=null && description==null && uri==null) {
-//			AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(docRefId, lineId, description);
-//			//asd.setExternalDocumentLocation(uri); // uri==null
-//			addOriginatorDocumentReference(asd);
-//		} else {
-//			AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(docRefId, lineId, description);
-//			asd.setExternalDocumentLocation(uri);
-//			addSupportigDocument(asd);
-//		}
-//	}
 	@Override
 	public void addSupportigDocument(SupportingDocument asDoc) {
 		if(isInvoiceType) {
-			invoice.getAdditionalDocumentReference().add((AdditionalSupportingDocument)asDoc);
+			invoice.getAdditionalDocumentReference().add((DocumentReference)asDoc);
 		} else {
-			creditNote.getAdditionalDocumentReference().add((AdditionalSupportingDocument)asDoc);
+			creditNote.getAdditionalDocumentReference().add((DocumentReference)asDoc);
 		}
 	}
-	private void addOriginatorDocumentReference(AdditionalSupportingDocument asDoc) {
+	private void addOriginatorDocumentReference(DocumentReference asDoc) {
 		if(isInvoiceType) {
 			invoice.getOriginatorDocumentReference().add(asDoc);
 		} else {
@@ -1491,15 +1467,16 @@ ubl-tc434-example2.xml :
 		}
 		List<SupportingDocument> resList = new ArrayList<SupportingDocument>(additionalDocumentReferenceList.size());
 		additionalDocumentReferenceList.forEach(doc -> {
-			AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(doc);
-			if(asd.isValidatedPricedTender()) {
+			DocumentReference dr = DocumentReference.create(doc);
+			if(dr.isValidatedPricedTender()) {
 				// das sind BT-17 docs
-			} else if(asd.isInvoicingDataSheet()) {
+			} else if(dr.isInvoicingDataSheet()) {
 				// das sind BT-18 docs
+			} else if(dr.isRelatedDocument()) {
+				resList.add(dr);
 			} else {
-				resList.add(asd);
+				resList.add(dr);
 			}
-//			if(asd.isRelatedDocument()) resList.add(asd);
 		});
 		return resList;
 	}

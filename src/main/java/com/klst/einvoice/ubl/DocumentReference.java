@@ -45,33 +45,33 @@ expl 01.15a-INVOICE_ubl.xml:
     </cac:AdditionalDocumentReference>
 
  */
-public class AdditionalSupportingDocument extends DocumentReferenceType 
+public class DocumentReference extends DocumentReferenceType 
 	implements SupportingDocument, PrecedingInvoice {
 
 	// factory for BG-3 PRECEDING INVOICE REFERENCE
 	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
 		return create(docRefId, ts);
 	}
-	static AdditionalSupportingDocument create(String docRefId, Timestamp ts) {
-		return new AdditionalSupportingDocument(docRefId, null, null, ts);
+	static DocumentReference create(String docRefId, Timestamp ts) {
+		return new DocumentReference(docRefId, null, null, ts);
 	}
 
 	// factory for BG-24 ADDITIONAL SUPPORTING DOCUMENTS
 	@Override
 	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts, String uri) {
-		AdditionalSupportingDocument rd = create(docRefId, lineId, description);
+		DocumentReference rd = create(docRefId, lineId, description);
 		rd.setExternalDocumentLocation(uri);
 		return rd;
 	}
 	@Override
 	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts
 			, byte[] content, String mimeCode, String filename) {
-		AdditionalSupportingDocument rd = create(docRefId, lineId, description);
+		DocumentReference rd = create(docRefId, lineId, description);
 		rd.setAttachedDocument(content, mimeCode, filename);
 		return rd;
 	}
-	static AdditionalSupportingDocument create(String docRefId, Reference lineId, String description) {
-		AdditionalSupportingDocument rd = new AdditionalSupportingDocument(docRefId, lineId, description, null);
+	static DocumentReference create(String docRefId, Reference lineId, String description) {
+		DocumentReference rd = new DocumentReference(docRefId, lineId, description, null);
 		return rd;
 	}
 
@@ -79,33 +79,33 @@ public class AdditionalSupportingDocument extends DocumentReferenceType
 	// BT-17 0..1 Tender or lot reference
 	// BT-18 0..1 (OBJECT IDENTIFIER FOR INVOICE)
 	// BG-25.BT-128 : To be used for line object identifier (TypeCode value = 130)
-	static AdditionalSupportingDocument create(String docRefId, String code, String referenceTypeCode) {
-		return new AdditionalSupportingDocument(docRefId, code, referenceTypeCode);
+	static DocumentReference create(String docRefId, String code, String referenceTypeCode) {
+		return new DocumentReference(docRefId, code, referenceTypeCode);
 	}
 
 	// create a factory
-	static AdditionalSupportingDocument create() {
-		return new AdditionalSupportingDocument(null); 
+	static DocumentReference create() {
+		return new DocumentReference(null); 
 	}
 	// copy factory
-	static AdditionalSupportingDocument create(DocumentReferenceType object) {
+	static DocumentReference create(DocumentReferenceType object) {
 		// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
 		if(object instanceof DocumentReferenceType && object.getClass()!=DocumentReferenceType.class) {
 			// object is instance of a subclass of DocumentReferenceType, but not DocumentReferenceType itself
-			return (AdditionalSupportingDocument)object;
+			return (DocumentReference)object;
 		} else {
-			return new AdditionalSupportingDocument(object); 
+			return new DocumentReference(object); 
 		}
 	}
 
 	// copy ctor
-	private AdditionalSupportingDocument(DocumentReferenceType doc) {
+	private DocumentReference(DocumentReferenceType doc) {
 		if(doc!=null) {
 			SCopyCtor.getInstance().invokeCopy(this, doc);
 		}
 	}
 
-	private AdditionalSupportingDocument(String docRefId, Reference lineId, String description, Timestamp ts) {
+	private DocumentReference(String docRefId, Reference lineId, String description, Timestamp ts) {
 //		setDocumentCode(DocumentNameCode.RelatedDocument.getValueAsString());
 		setDocumentReference(new ID(docRefId));
 		setLineReference(lineId);
@@ -113,7 +113,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType
 		setDate(ts);
 	}
 	
-	private AdditionalSupportingDocument(String docRefId, String code, String referenceTypeCode) {
+	private DocumentReference(String docRefId, String code, String referenceTypeCode) {
 		setDocumentReference(new ID(docRefId));
 		setDocumentCode(code);
 		setReferenceCode(referenceTypeCode); // TODO BT-18-0:
