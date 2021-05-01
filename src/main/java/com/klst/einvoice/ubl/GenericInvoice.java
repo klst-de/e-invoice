@@ -723,19 +723,19 @@ ubl-tc434-example2.xml :
 		return profileID==null ? null : profileID.getValue();
 	}
 
-	// BG-3 + 0..n PRECEDING INVOICE REFERENCE
-	// BG-3.BT-25 ++ 1..1 Preceding Invoice reference
-	// BG-3.BT-26 ++ 0..1 Preceding Invoice issue date
+	// BG-3 0..n PRECEDING INVOICE REFERENCE
+	// BG-3.BT-25 1..1 Preceding Invoice reference
+	// BG-3.BT-26 0..1 Preceding Invoice issue date
 	
-	// BG-3 + 0..n PRECEDING INVOICE REFERENCE / implements BG3_PrecedingInvoiceReference factory
+	// BG-3 0..n PRECEDING INVOICE REFERENCE / implements BG3_PrecedingInvoiceReference factory
 	@Override
 	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
-		return DocumentReference.create(docRefId, ts);
+		return AdditionalSupportingDocument.create(docRefId, ts);
 	}
 	@Override // implements BG3_PrecedingInvoiceReference
 	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice) {
 		if(precedingInvoice==null) return;
-		DocumentReferenceType docRef = (DocumentReference)precedingInvoice;
+		DocumentReferenceType docRef = (AdditionalSupportingDocument)precedingInvoice;
 		BillingReferenceType billingReference = new BillingReferenceType();
 		billingReference.setInvoiceDocumentReference(docRef);
 		List<BillingReferenceType> billingReferenceList = isInvoiceType ? invoice.getBillingReference() : creditNote.getBillingReference();
@@ -747,7 +747,7 @@ ubl-tc434-example2.xml :
 		List<PrecedingInvoice> docRefList = new ArrayList<PrecedingInvoice>();
 		billingReferenceList.forEach(billingRef -> {
 			DocumentReferenceType docRef = billingRef.getInvoiceDocumentReference();
-			docRefList.add(DocumentReference.create(docRef));
+			docRefList.add(AdditionalSupportingDocument.create(docRef));
 		});
 		return docRefList;
 	}

@@ -4,7 +4,9 @@ import java.sql.Timestamp;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Reference;
+import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.einvoice.PrecedingInvoice;
 import com.klst.einvoice.SupportingDocument;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AttachmentType;
@@ -13,11 +15,12 @@ import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.Exte
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentDescriptionType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.DocumentTypeCodeType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EmbeddedDocumentBinaryObjectType;
+import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.URIType;
 
 /*
  * used at document level 
- * <br>in BG-3  0..n PRECEDING INVOICE REFERENCE     typeCode==null TODO
+ * <br>in BG-3  0..n PRECEDING INVOICE REFERENCE     typeCode==null
  * <br>in BT-17 0..1 Tender or lot reference         typeCode==50
  * <br>in BT-18 0..1 Invoiced object identifier      typeCode==130
  * <br>in BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS typeCode==916 or null
@@ -42,9 +45,18 @@ expl 01.15a-INVOICE_ubl.xml:
     </cac:AdditionalDocumentReference>
 
  */
-public class AdditionalSupportingDocument extends DocumentReferenceType implements SupportingDocument {
+public class AdditionalSupportingDocument extends DocumentReferenceType 
+	implements SupportingDocument, PrecedingInvoice {
 
-	// factory for BG.24
+	// factory for BG-3 PRECEDING INVOICE REFERENCE
+	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
+		return create(docRefId, ts);
+	}
+	static AdditionalSupportingDocument create(String docRefId, Timestamp ts) {
+		return new AdditionalSupportingDocument(docRefId, null, null, ts);
+	}
+
+	// factory for BG-24 ADDITIONAL SUPPORTING DOCUMENTS
 	@Override
 	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts, String uri) {
 		AdditionalSupportingDocument rd = create(docRefId, lineId, description);
@@ -58,16 +70,15 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		rd.setAttachedDocument(content, mimeCode, filename);
 		return rd;
 	}
-
 	static AdditionalSupportingDocument create(String docRefId, Reference lineId, String description) {
-		AdditionalSupportingDocument rd = new AdditionalSupportingDocument(docRefId, lineId, description);
+		AdditionalSupportingDocument rd = new AdditionalSupportingDocument(docRefId, lineId, description, null);
 		return rd;
 	}
 
 	// factory for
 	// BT-17 0..1 Tender or lot reference
 	// BT-18 0..1 (OBJECT IDENTIFIER FOR INVOICE)
-	// BG.25.BT-128 : To be used for line object identifier (TypeCode value = 130)
+	// BG-25.BT-128 : To be used for line object identifier (TypeCode value = 130)
 	static AdditionalSupportingDocument create(String docRefId, String code, String referenceTypeCode) {
 		return new AdditionalSupportingDocument(docRefId, code, referenceTypeCode);
 	}
@@ -94,11 +105,12 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		}
 	}
 
-	private AdditionalSupportingDocument(String docRefId, Reference lineId, String description) {
+	private AdditionalSupportingDocument(String docRefId, Reference lineId, String description, Timestamp ts) {
 //		setDocumentCode(DocumentNameCode.RelatedDocument.getValueAsString());
 		setDocumentReference(new ID(docRefId));
 		setLineReference(lineId);
 		setSupportingDocumentDescription(description);
+		setDate(ts);
 	}
 	
 	private AdditionalSupportingDocument(String docRefId, String code, String referenceTypeCode) {
@@ -125,6 +137,7 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 		return stringBuilder.toString();
 	}
 
+	//  BG-3.BT-25  1..1 Preceding Invoice reference
 	// BG-24.BT-122 1..1 Supporting document reference
 	@Override
 	public void setDocumentReference(Reference documentReference) {
@@ -298,16 +311,20 @@ Bsp.: ubl-tc434-example2.xml :
 		return null;
 	}
 
+	// BG-3.BT-26 0..1 Preceding Invoice issue date
 	@Override
 	public void setDate(Timestamp ts) {
-		// TODO Auto-generated method stub
-		
+		if(ts!=null) {
+			IssueDateType date = new IssueDateType();
+			date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
+			super.setIssueDate(date);
+		}
 	}
 
 	@Override
 	public Timestamp getDateAsTimestamp() {
-		// TODO Auto-generated method stub
-		return null;
+		if(super.getIssueDate()==null) return null;
+		return DateTimeFormats.xmlGregorianCalendarToTs(getIssueDate().getValue());
 	}
 
 }
