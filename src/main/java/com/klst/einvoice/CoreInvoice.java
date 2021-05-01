@@ -39,7 +39,7 @@ public interface CoreInvoice extends CoreInvoiceFactory, BG1_InvoiceNote, BG2_Pr
 	BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentative, BG14_InvoicingPeriod, 
 	PaymentInstructionsFactory, CreditTransferFactory, PaymentCardFactory, DirectDebitFactory,
 	BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
-	BG22_DocumentTotals, BG23_VatBreakdown, BG25_InvoiceLine,
+	BG22_DocumentTotals, BG23_VatBreakdown, BG24_AdditionalSupportingDocs, BG25_InvoiceLine,
 	PostalAddressFactory, ContactInfoFactory, BusinessPartyFactory {
 
 	/**
@@ -478,7 +478,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * <br>Rule ID: 	 
 	 * <br>Request ID: 	R7, R4
 	 * 
-	 * @param Document reference
+	 * @param docRefId - document reference id
 	 */
 	public void setTenderOrLotReference(String docRefId);
 	public String getTenderOrLotReference();
@@ -615,37 +615,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 //	public void addVATBreakDown(VatBreakdown vatBreakdown);
 //	public List<VatBreakdown> getVATBreakDowns();
 	
-	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
-	// BG-24.BT-122 ++ 1..1 Supporting document reference
-	// BG-24.BT-122-0  1..1 TypeCode
-	// BG-24.BT-123 ++ 0..1 Supporting document description
-	// BG-24.BT-124 ++ 0..1 External document location
-	// BG-24.BT-125 ++ 0..1 Attached document
-	/**
-	 * use this to add an attached document
-	 * 
-	 * @param docRefId - BG-24.BT-122 Supporting document reference
-//	 * @param code - BG-24.BT-122-0 TypeCode (CII only)
-	 * @param description/name - BG-24.BT-123 Supporting document description
-	 * @param content - BG-24.BT-125 Attached document content
-	 * @param mimeCode
-	 * @param filename
-	 */
-//	public void addSupportigDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename);
-	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename);
-	
-	/**
-	 * use this to add an External document
-	 * 
-	 * @param docRefId - BG-24.BT-122 Supporting document reference
-//	 * @param code - BG-24.BT-122-0 TypeCode (CII only)
-	 * @param description/name - BG-24.BT-123 Supporting document description
-	 * @param uri locationUri
-	 */
-//	public void addSupportigDocument(String docRefId, String code, String description, String uri);
-	public void addSupportigDocument(String docRefId, String description, String uri);
-	
-	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments();
+	// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	
 	// INVOICE LINE  BG-25 1..* (mandatory)
 	public void addLine(CoreInvoiceLine line);

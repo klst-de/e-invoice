@@ -8,6 +8,7 @@ import com.klst.edoc.untdid.DateTimeFormats;
  * BG-3 Factory for PRECEDING INVOICE REFERENCE
  * 
  * @see PrecedingInvoice
+ * @see BG3_PrecedingInvoiceReference
  */
 public interface PrecedingInvoiceFactory {
 	

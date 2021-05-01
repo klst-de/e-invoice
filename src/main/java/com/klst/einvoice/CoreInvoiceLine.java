@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.api.IQuantity;
+import com.klst.edoc.untdid.DocumentNameCode;
 
 /**
  * INVOICE LINE
@@ -78,15 +79,22 @@ public interface CoreInvoiceLine extends CoreInvoiceLineFactory, BG26_InvoiceLin
 	 * <br>Request ID: 	R33
 	 * 
 	 * @param id
-	 * @param schemeID (optional) if it may be not clear for the receiver what scheme is used for the identifier, 
+	 * @param typeCode (optional) if it may be not clear for the receiver what scheme is used for the identifier, 
 	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.
 	 * @param schemeCode example AAC :  Documentary credit identifier
 	 */
-	public void setLineObjectID(String id, String schemeID, String schemeCode);
-	public void setLineObjectID(String id);
-	public void setLineObjectID(String id, String schemeID);
-	public void setLineObjectIdentifier(GlobalIdentifier id);
-	public GlobalIdentifier getLineObjectIdentifier();
+	public void setLineObjectID(String id, String typeCode, String schemeCode);
+	default void setLineObjectID(String id) {
+		setLineObjectID(id, DocumentNameCode.InvoicingDataSheet.getValueAsString(), null);
+	}
+	default void setLineObjectID(String id, String schemeCode) {
+		setLineObjectID(id, DocumentNameCode.InvoicingDataSheet.getValueAsString(), schemeCode);
+	}
+	default void setLineObjectIdentifier(GlobalIdentifier id) {
+		if(id==null) return;
+		setLineObjectID(id.getContent(), DocumentNameCode.InvoicingDataSheet.getValueAsString(), id.getSchemeIdentifier());
+	}
+	public GlobalIdentifier getLineObjectIdentifier(); // Identifier.Content == id , .SchemeIdentifier == schemeCode
 
 	/**
 	 * Get billed quantity and UoM of items (goods or services) that is charged in the Invoice line.

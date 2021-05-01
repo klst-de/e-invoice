@@ -19,7 +19,7 @@ import com.klst.edoc.untdid.DateTimeFormats;
  * <br>Rule ID: 	
  * <br>Request ID: 	R11, R12
  */
-public interface PrecedingInvoice extends PrecedingInvoiceFactory{
+public interface PrecedingInvoice extends PrecedingInvoiceFactory {
 	
 	/**
 	 * Preceding Invoice reference
