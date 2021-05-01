@@ -24,6 +24,7 @@ import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PrecedingInvoice;
+import com.klst.einvoice.SupportingDocument;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.ubl.GenericLine;
@@ -224,6 +225,8 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		
 		ublInvoice.setReceiptReference(testDoc.getReceiptReference()); // BT-15 + 0..1
 		ublInvoice.setDespatchAdviceReference(testDoc.getDespatchAdviceReference()); // BT-16 + 0..1
+		String _BT17_tenderOrLotReference = testDoc.getTenderOrLotReference();
+		LOG.info("_BT17_tenderOrLotReference="+_BT17_tenderOrLotReference);
 		ublInvoice.setTenderOrLotReference(testDoc.getTenderOrLotReference()); // BT-17 + 0..1
 		// BT-18 + 0..1
 		// Testfälle 01.15a , 02.01a:
@@ -275,7 +278,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 		ublInvoice.setDeliveryPeriod(testDoc.getDeliveryPeriod());
 		ublInvoice.setDelivery(testDoc.getDelivery());
 		
-		List<BG24_AdditionalSupportingDocs> asDocList = testDoc.getAdditionalSupportingDocuments();
+		List<SupportingDocument> asDocList = testDoc.getAdditionalSupportingDocuments();
 		asDocList.forEach(asDoc -> {
 			String documentReference = asDoc.getDocumentReference().getName();
 			LOG.info("SupportingDocumentReference:"+documentReference + " MimeCode:"+asDoc.getAttachedDocumentMimeCode());

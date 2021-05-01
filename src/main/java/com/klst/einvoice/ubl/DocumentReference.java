@@ -11,6 +11,8 @@ import com.klst.einvoice.PrecedingInvoice;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IssueDateType;
 
+// TODO merge DocumentReference (BG3) + AdditionalSupportingDocument
+//public class AdditionalSupportingDocument extends DocumentReferenceType implements SupportingDocument {
 public class DocumentReference extends DocumentReferenceType implements PrecedingInvoice {
 
 	// factory
@@ -61,7 +63,7 @@ public class DocumentReference extends DocumentReferenceType implements Precedin
 		return stringBuilder.toString();
 	}
 
-	// BG-2.BT-25 ++ 1..1 Preceding Invoice reference
+	// BG-3.BT-25 ++ 1..1 Preceding Invoice reference
 	@Override
 	public Reference getDocumentReference() {
 		return super.getID()==null ? null : new ID(getID());
@@ -74,7 +76,7 @@ public class DocumentReference extends DocumentReferenceType implements Precedin
 		super.setID((ID)docRefId);
 	}
 
-	// BG-2.BT-26 ++ 0..1 Preceding Invoice issue date
+	// BG-3.BT-26 ++ 0..1 Preceding Invoice issue date
 	@Override
 	public Timestamp getDateAsTimestamp() {
 		if(super.getIssueDate()==null) return null;

@@ -166,15 +166,15 @@ public class GenericLine<T> implements CoreInvoiceLine {
 
 	// BG-25.BT-128 0..1 Invoice line object identifier
 	@Override
-	public void setLineObjectID(String id, String schemeID, String schemeCode) {
+	public void setLineObjectID(String id, String typeCode, String schemeCode) {
  		if(id==null) return;
- 		DocumentReferenceType note = new DocumentReferenceType();
- 		note.setID(new ID(id, schemeID, schemeCode));
+ 		DocumentReferenceType docRef = new DocumentReferenceType();
+ 		docRef.setID(new ID(id, typeCode, schemeCode));
 		
 		if(isInvoiceLineType) {
-			iLine.getDocumentReference().add(note);
+			iLine.getDocumentReference().add(docRef);
 		} else {
-			cnLine.getDocumentReference().add(note);
+			cnLine.getDocumentReference().add(docRef);
 		}	
 	}
 

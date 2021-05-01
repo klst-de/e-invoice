@@ -1,9 +1,11 @@
 package com.klst.einvoice.ubl;
 
+import java.sql.Timestamp;
+
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DocumentNameCode;
-import com.klst.einvoice.BG24_AdditionalSupportingDocs;
+import com.klst.einvoice.SupportingDocument;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AttachmentType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;
@@ -13,36 +15,66 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.Document
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.EmbeddedDocumentBinaryObjectType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.URIType;
 
-/* ADDITIONAL SUPPORTING DOCUMENTS             BG-24                       0..*  
- * 
- * Eine Gruppe von Informationselementen mit Informationen über rechnungsbegründende Unterlagen, 
- * die Belege für die in der Rechnung gestellten Ansprüche enthalten.
- * 
- * Anmerkung: Die Gruppe kann verwendet werden, um auf eine dem Erwerber bekannte Dokumentennummer 
- * oder ein externes Dokument (referenziert über eine URL als separat herunterladbare Ressource) 
- * oder ein eingebettetes Dokument (wie z. B. ein Leistungsnachweis als pdf) zu referenzieren. 
- * Von der Möglichkeit der Trennung von Rechnung und rechnungsbegründenden Unterlagen
- * kann insbesondere im Fall großer Anlagen oder sensibler Daten Gebrauch gemacht werden.
- * 
- * Supporting document reference               BT-122   Document Reference 1
- * Supporting document description             BT-123                 Text 0..1
- * External document location                  BT-124                 Text 0..1
- * Attached document                           BT-125        Binary Object 0..1
- * Attached document/Attached document Mime code                           1
- * Attached document/Attached document Filename                            1
- * 
- * BT-18 : wenn isInvoicingDataSheet()
- */
-public class AdditionalSupportingDocument extends DocumentReferenceType implements BG24_AdditionalSupportingDocs {
+/*
+ * used at document level 
+ * <br>in BG-3  0..n PRECEDING INVOICE REFERENCE     typeCode==null TODO
+ * <br>in BT-17 0..1 Tender or lot reference         typeCode==50
+ * <br>in BT-18 0..1 Invoiced object identifier      typeCode==130
+ * <br>in BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS typeCode==916 or null
+ * <p>
+ * at document line level:
+ * <br>in BG.25.BT-128 0..1 line object identifier
 
-	// AdditionalSupportingDocument für BT-18, vll auch für BT-17
-	// für BT-18 DocumentNameCode.InvoicingDataSheet
-	static AdditionalSupportingDocument create(DocumentNameCode code, String docRefId, String schemeID) {
-		return new AdditionalSupportingDocument(code, docRefId, schemeID);
+expl 01.15a-INVOICE_ubl.xml:
+
+	<cac:AdditionalDocumentReference>
+		<cbc:ID>OBJ999</cbc:ID>
+		<cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>  <!-- BT-18-0 -->
+	</cac:AdditionalDocumentReference>
+
+    <cac:AdditionalDocumentReference>
+        <cbc:ID>01_15_Anhang_01.pdf</cbc:ID>
+        <cbc:DocumentTypeCode>916</cbc:DocumentTypeCode>  <!-- BG-24-0 -->
+        <cbc:DocumentDescription>Aufschlüsselung der einzelnen Leistungspositionen</cbc:DocumentDescription>
+        <cac:Attachment>
+            <cbc:EmbeddedDocumentBinaryObject mimeCode="application/pdf" filename="01_15_Anhang_01.pdf"> ... </cbc:EmbeddedDocumentBinaryObject>
+        </cac:Attachment>
+    </cac:AdditionalDocumentReference>
+
+ */
+public class AdditionalSupportingDocument extends DocumentReferenceType implements SupportingDocument {
+
+	// factory for BG.24
+	@Override
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts, String uri) {
+		AdditionalSupportingDocument rd = create(docRefId, lineId, description);
+		rd.setExternalDocumentLocation(uri);
+		return rd;
 	}
-	
+	@Override
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts
+			, byte[] content, String mimeCode, String filename) {
+		AdditionalSupportingDocument rd = create(docRefId, lineId, description);
+		rd.setAttachedDocument(content, mimeCode, filename);
+		return rd;
+	}
+
+	static AdditionalSupportingDocument create(String docRefId, Reference lineId, String description) {
+		AdditionalSupportingDocument rd = new AdditionalSupportingDocument(docRefId, lineId, description);
+		return rd;
+	}
+
+	// factory for
+	// BT-17 0..1 Tender or lot reference
+	// BT-18 0..1 (OBJECT IDENTIFIER FOR INVOICE)
+	// BG.25.BT-128 : To be used for line object identifier (TypeCode value = 130)
+	static AdditionalSupportingDocument create(String docRefId, String code, String referenceTypeCode) {
+		return new AdditionalSupportingDocument(docRefId, code, referenceTypeCode);
+	}
+
+	// create a factory
 	static AdditionalSupportingDocument create() {
-		return create((DocumentReferenceType)null);
+		return new AdditionalSupportingDocument(null); 
 	}
 	// copy factory
 	static AdditionalSupportingDocument create(DocumentReferenceType object) {
@@ -57,95 +89,51 @@ public class AdditionalSupportingDocument extends DocumentReferenceType implemen
 
 	// copy ctor
 	private AdditionalSupportingDocument(DocumentReferenceType doc) {
-		super();
 		if(doc!=null) {
 			SCopyCtor.getInstance().invokeCopy(this, doc);
 		}
 	}
 
-	private AdditionalSupportingDocument(DocumentNameCode code, String docRefId, String schemeID) {
-		super();
-		setDocumentCode(code);
-		setID(new ID(docRefId, schemeID));
-	}
-	
-	AdditionalSupportingDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
-		super();
-		init(docRefId, description, null);
-		setAttachedDocument(content, mimeCode, filename);
-	}
-	
-	/**
-	 * 
-	 * @param Supporting document reference id, madatory
-	 * @param description, optional
-	 * @param url, optional
-	 */
-	AdditionalSupportingDocument(String docRefId, String description, String url) {
-		super();
-		init(docRefId, description, url);
-	}
-	
-	private void init(String docRefId, String description, String url) {
-		super.setID(new ID(docRefId));
+	private AdditionalSupportingDocument(String docRefId, Reference lineId, String description) {
+//		setDocumentCode(DocumentNameCode.RelatedDocument.getValueAsString());
+		setDocumentReference(new ID(docRefId));
+		setLineReference(lineId);
 		setSupportingDocumentDescription(description);
-		setExternalDocumentLocation(url);
-	}
-
-	// code ==  50 : isValidatedPricedTender() ==> BT-17
-	// code == 130 : isInvoicingDataSheet()    ==> BT-18	
-	private void setDocumentCode(DocumentNameCode code) {
-		if(code==null) return;
-		DocumentTypeCodeType documentTypeCode = new DocumentTypeCodeType();
-		documentTypeCode.setValue(code.getValueAsString());
-		super.setDocumentTypeCode(documentTypeCode);
-	}
-	private DocumentNameCode getDocumentCode() {
-		return super.getDocumentTypeCode()==null ? null : DocumentNameCode.valueOf(getDocumentTypeCode());
-	}
-/* 01.15a:
-	<cac:AdditionalDocumentReference>
-		<cbc:ID>OBJ999</cbc:ID>
-		<cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>  <!-- BT-18-0 -->
-	</cac:AdditionalDocumentReference>
- */
-	boolean isInvoicingDataSheet() {
-		if(getDocumentCode()==null) return false;
-		return getDocumentCode()==DocumentNameCode.InvoicingDataSheet;
-	}
-	boolean isValidatedPricedTender() {
-		if(getDocumentCode()==null) return false;
-		return getDocumentCode()==DocumentNameCode.ValidatedPricedTender;
-	}
-
-	// BG.24.BT-122
-	public void setDocumentReference(Reference docRefId) {
-		super.setID((ID)docRefId);
-	}
-	public Reference getDocumentReference() {
-		return new ID(getId(this));
 	}
 	
-	private static String getId(DocumentReferenceType documentReference) {
-		return documentReference.getID().getValue();
+	private AdditionalSupportingDocument(String docRefId, String code, String referenceTypeCode) {
+		setDocumentReference(new ID(docRefId));
+		setDocumentCode(code);
+		setReferenceCode(referenceTypeCode); // TODO BT-18-0:
+		// in BG-25.BT-128 steht: 
+		//super.setID(new ID(docRefId, null, referenceTypeCode));
+		// etwa so
+		ID id = new ID(docRefId);
+		id.setSchemeID(referenceTypeCode);
+		super.setID(id);
+	}
+	
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("[DocumentCode:");
+		stringBuilder.append(getDocumentCode()==null ? "null" : getDocumentCode());
+		stringBuilder.append(", DocumentReference:");
+		stringBuilder.append(getDocumentReference()==null ? "null" : getDocumentReference().getContent());
+		stringBuilder.append(", SupportingDocumentDescription:");
+		stringBuilder.append(getSupportingDocumentDescription()==null ? "null" : getSupportingDocumentDescription());
+		stringBuilder.append("]");
+		return stringBuilder.toString();
 	}
 
-	// BG.24.BT-123 ++ 0..1 Supporting document description
+	// BG-24.BT-122 1..1 Supporting document reference
 	@Override
-	public void setSupportingDocumentDescription(String text) {
-		if(text!=null) {
-			DocumentDescriptionType documentDescription = new DocumentDescriptionType();
-			documentDescription.setValue(text);
-			super.getDocumentDescription().add(documentDescription);
-		}
+	public void setDocumentReference(Reference documentReference) {
+		// Reference extends Identifier
+		if(documentReference!=null) super.setID((ID)documentReference);
 	}
-
 	@Override
-	public String getSupportingDocumentDescription() {
-		return getSupportingDocumentDescription(this);
-	}
-	static String getSupportingDocumentDescription(DocumentReferenceType documentReference) {
-		return documentReference.getDocumentDescription().isEmpty() ? null : documentReference.getDocumentDescription().get(0).getValue();
+	public Reference getDocumentReference() {
+		return super.getID()==null ? null : new ID(super.getID());
 	}
 
 	/*
@@ -184,10 +172,7 @@ Bsp.: ubl-tc434-example2.xml :
 	
 	@Override
 	public String getExternalDocumentLocation() {
-		return getExternalDocumentLocation(this);
-	}
-	static String getExternalDocumentLocation(DocumentReferenceType documentReference) {
-		AttachmentType attachment = documentReference.getAttachment();
+		AttachmentType attachment = super.getAttachment();
 		if(attachment==null) return null;
 		
 		ExternalReferenceType externalReference = attachment.getExternalReference();
@@ -199,7 +184,74 @@ Bsp.: ubl-tc434-example2.xml :
 		return uri.getValue();
 	}
 
-	// BT-125 ++ 0..1 Attached document
+	// document line reference
+	@Override
+	public void setLineReference(Reference lineReference) {
+		// TODO
+	}
+	@Override
+	public Reference getLineReference() {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public String getDocumentCode() {
+		DocumentTypeCodeType documentCode = super.getDocumentTypeCode();
+		if(documentCode==null) {
+			// ===> isPrecedingInvoice ???
+			return null;
+		}
+		return documentCode.getValue();
+	}
+	// code == 916 :"ADDITIONAL SUPPORTING DOCUMENTS" ==> BG-24
+	// code ==  50 : isValidatedPricedTender() ==> BT-17
+	// code == 130 : isInvoicingDataSheet()    ==> BT-18
+	@Override
+	public void setDocumentCode(String code) {
+		if(code==null) return;
+		DocumentTypeCodeType documentTypeCode = new DocumentTypeCodeType();
+		documentTypeCode.setValue(code);
+		super.setDocumentTypeCode(documentTypeCode);
+	}
+	boolean isRelatedDocument() {
+		String typeCode = getDocumentCode();
+		if(typeCode==null) return false;
+		return typeCode.equals(DocumentNameCode.RelatedDocument.getValueAsString());
+	}
+	boolean isValidatedPricedTender() {
+		String typeCode = getDocumentCode();
+		if(typeCode==null) return false;
+		return typeCode.equals(DocumentNameCode.ValidatedPricedTender.getValueAsString());
+	}
+/* 01.15a:
+	<cac:AdditionalDocumentReference>
+		<cbc:ID>OBJ999</cbc:ID>
+		<cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>  <!-- BT-18-0 -->
+	</cac:AdditionalDocumentReference>
+ */
+	boolean isInvoicingDataSheet() {
+		String typeCode = getDocumentCode();
+		if(typeCode==null) return false;
+		return typeCode.equals(DocumentNameCode.InvoicingDataSheet.getValueAsString());
+	}
+
+	// BG-24.BT-123 0..1 Supporting document description
+	@Override
+	public void setSupportingDocumentDescription(String text) {
+		if(text!=null) {
+			DocumentDescriptionType documentDescription = new DocumentDescriptionType();
+			documentDescription.setValue(text);
+			super.getDocumentDescription().add(documentDescription);
+		}
+	}
+	@Override
+	public String getSupportingDocumentDescription() {
+		DocumentDescriptionType dd = super.getDocumentDescription().isEmpty() ? null : getDocumentDescription().get(0);	
+		return dd==null ? null : dd.getValue();
+	}
+
+	// BG-24.BT-125 0..1 Attached document
 	@Override
 	public void setAttachedDocument(byte[] content, String mimeCode, String filename) {
 		EmbeddedDocumentBinaryObjectType embeddedDocumentBinaryObject = new EmbeddedDocumentBinaryObjectType();
@@ -227,14 +279,35 @@ Bsp.: ubl-tc434-example2.xml :
 		return embeddedDocumentBinaryObject==null ? null : embeddedDocumentBinaryObject.getFilename();
 	}
 	
-	EmbeddedDocumentBinaryObjectType getEmbeddedDocumentBinaryObject() {
-		return getEmbeddedDocumentBinaryObject(this);
+	private EmbeddedDocumentBinaryObjectType getEmbeddedDocumentBinaryObject() {
+		AttachmentType attachment = super.getAttachment();
+		return attachment==null ? null : attachment.getEmbeddedDocumentBinaryObject();
 	}
-	static EmbeddedDocumentBinaryObjectType getEmbeddedDocumentBinaryObject(DocumentReferenceType documentReference) {
-		AttachmentType attachment = documentReference.getAttachment();
-		if(attachment==null) return null;
 
-		return attachment.getEmbeddedDocumentBinaryObject();
+	// ReferenceTypeCode, Kennung des Schemas BT-18-1
+	/*
+	 * To be used for Object identifier (TypeCode value = 130)
+	 * If it may be not clear for the receiver what scheme is used for the identifier,
+	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.
+	 */
+	private void setReferenceCode(String code) {
+		if(code==null) return;
+//		TODO
+	}
+	public String getReferenceCode() {
+		return null;
+	}
+
+	@Override
+	public void setDate(Timestamp ts) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getDateAsTimestamp() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
