@@ -15,12 +15,11 @@ import com.klst.edoc.api.Identifier;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.einvoice.AllowancesAndCharges;
+import com.klst.einvoice.BG29_PriceDetails;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.GlobalIdentifier;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CountryIDType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.ReferenceCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentLineDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeDeliveryType;
@@ -163,45 +162,23 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override
 	public void setLineObjectID(String id, String schemeID, String schemeCode) {
 		if(id==null) return;
-		ReferencedDocumentType rd = new ReferencedDocumentType();
-		rd.setIssuerAssignedID(new ID(id));
-		if(schemeID!=null) {
-			DocumentCodeType documentCode = new DocumentCodeType();
-			documentCode.setValue(schemeID);
-			rd.setTypeCode(documentCode);
-		}
-		if(schemeCode!=null) {
-			ReferenceCodeType referenceCode = new ReferenceCodeType();
-			referenceCode.setValue(schemeCode);
-			rd.setReferenceTypeCode(referenceCode);
-		}
+		ReferencedDocument rd = ReferencedDocument.create(id, schemeID, schemeCode);
 		specifiedLineTradeSettlement.getAdditionalReferencedDocument().add(rd);
 		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
 	}
-
-	@Override
-	public void setLineObjectID(String id) {
-		setLineObjectID(id, null, null);
-	}
-
-	@Override
-	public void setLineObjectID(String id, String schemeID) {
-		setLineObjectID(id, schemeID, null);
-	}
-
-	@Override
-	public void setLineObjectIdentifier(GlobalIdentifier id) {
-		if(id==null) return;
-		setLineObjectID(id.getContent(), id.getSchemeIdentifier(), id.getSchemeVersion());
-	}
-
 	@Override
 	public GlobalIdentifier getLineObjectIdentifier() {
 		List<ReferencedDocumentType> rds = specifiedLineTradeSettlement.getAdditionalReferencedDocument();
-		if(rds.isEmpty()) return null;
-		ReferencedDocumentType rd = rds.get(0);
-		return new ID(rd.getIssuerAssignedID().getValue(), rd.getTypeCode()==null ? null : rd.getTypeCode().getValue()
-				, rd.getReferenceTypeCode()==null ? null : rd.getReferenceTypeCode().getValue());
+		if(rds==null || rds.isEmpty()) return null;
+		// A Line MUST NOT HAVE more than 1 Object Identifier BT-128
+		ReferencedDocument rd = ReferencedDocument.create(rds.get(0));
+		return new ID(rd.getIssuerAssignedID().getValue(), rd.getReferenceCode());
+//
+//		List<ReferencedDocumentType> rds = specifiedLineTradeSettlement.getAdditionalReferencedDocument();
+//		if(rds.isEmpty()) return null;
+//		ReferencedDocumentType rd = rds.get(0);
+//		return new ID(rd.getIssuerAssignedID().getValue(), rd.getTypeCode()==null ? null : rd.getTypeCode().getValue()
+//				, rd.getReferenceTypeCode()==null ? null : rd.getReferenceTypeCode().getValue());
 	}
 
 	// BT-129+BT-130

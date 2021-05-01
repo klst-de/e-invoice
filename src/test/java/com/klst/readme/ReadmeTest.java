@@ -4,13 +4,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.klst.edoc.api.BusinessParty;
@@ -23,6 +30,7 @@ import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.PrecedingInvoice;
+import com.klst.einvoice.SupportingDocument;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -32,12 +40,25 @@ import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CiiTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
+import com.klst.xrechnung.test.UblTest;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 
 public class ReadmeTest {
 
-	private static final Logger LOG = Logger.getLogger(ReadmeTest.class.getName());
+	private static LogManager logManager = LogManager.getLogManager(); // Singleton
+	private static Logger LOG = null;
+	private static void initLogger() {
+        URL url = UblTest.class.getClassLoader().getResource("testLogging.properties");
+		try {
+	        File file = new File(url.toURI());
+			logManager.readConfiguration(new FileInputStream(file));
+		} catch (IOException | URISyntaxException e) {
+			LOG = Logger.getLogger(ReadmeTest.class.getName());
+			LOG.warning(e.getMessage());
+		}
+		LOG = Logger.getLogger(UblTest.class.getName());
+	}
 	
 	static final String PROFILE_XRECHNUNG = CoreInvoice.PROFILE_XRECHNUNG;
 	static final DocumentNameCode CommercialInvoice = DocumentNameCode.CommercialInvoice;
@@ -57,6 +78,11 @@ public class ReadmeTest {
 	
 	CoreInvoice invoice;
 	
+    @BeforeClass
+    public static void staticSetup() {
+    	initLogger();
+    }
+    
 	@Before 
     public void setup() {
 		ciiTransformer = CiiTransformer.getInstance();  // for UN/CEFACT Cross Industry Invoice XML
@@ -180,18 +206,18 @@ public class ReadmeTest {
 		BigDecimal ermUSt = new BigDecimal(16); // 16%
 		VatBreakdown vb = invoice.createVATBreakDown(
 				new Amount(EUR, new BigDecimal(99.79)) // Amount taxableAmount
-			, 	new Amount(EUR, new BigDecimal(9.79)) //Amount taxAmount
+			, 	new Amount(EUR, new BigDecimal(9.79))  // Amount taxAmount
 			, 	TaxCategoryCode.StandardRate // code
 			, 	ermUSt // BigDecimal percent
 			);
-		LOG.info(">>>>>>>>>>>> tax type VAT? : "+vb.getTaxType() + " , Standard:"+vb.getTaxCategoryCode() + vb.getTaxPercentage());
+		LOG.info("VatBreakdown tax type : "+vb.getTaxType() + " , Standard:"+vb.getTaxCategoryCode() + vb.getTaxPercentage());
 		assertEquals(TaxTypeCode.VAT, vb.getTaxType());
 		assertEquals(TaxCategoryCode.StandardRate, vb.getTaxCategoryCode());
 		assertEquals(ermUSt, vb.getTaxPercentage());
 		
 		String TobaccoTax = "AAD";
 		vb.setTaxType(TobaccoTax);
-		LOG.info(">>>>>>>>>>>> tax type AAD? : "+vb.getTaxType());
+		LOG.info("TobaccoTax   tax type : "+vb.getTaxType());
 		assertEquals(TobaccoTax, vb.getTaxType());
 		
 		// BG-3 + 0..n REFERENZ AUF DIE VORAUSGEGANGENE RECHNUNG
@@ -221,6 +247,17 @@ public class ReadmeTest {
 		allowance.setTaxCategoryCode(TaxCategoryCode.StandardRate);
 		allowance.setTaxPercentage(new BigDecimal(20));
 		invoice.addAllowanceCharge(allowance);
+		
+		// BT-18 0..1 Invoiced object identifier
+		invoice.setInvoicedObject("BT-18 Invoiced object identifier name", "schemeID");
+		
+		// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
+		SupportingDocument sd = invoice.createSupportigDocument("docRefId", "description", "uri");
+		// explizit 916 setzen:
+		sd.setDocumentCode(DocumentNameCode.RelatedDocument.getValueAsString());
+		invoice.addSupportigDocument(sd);
+		// default ohne DocumentCode in UBL:
+		invoice.addSupportigDocument("docRefId", "description", "uri");
 		
 		assertEquals(CoreInvoice.PROFILE_XRECHNUNG, invoice.getCustomization());
 		assertThat(invoice.getProcessType()).isNull();

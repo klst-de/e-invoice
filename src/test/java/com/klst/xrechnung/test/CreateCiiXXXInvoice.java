@@ -16,7 +16,6 @@ import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.edoc.untdid.ReferenceCode;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
@@ -24,6 +23,7 @@ import com.klst.einvoice.DirectDebit;
 import com.klst.einvoice.GlobalIdentifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentInstructions;
+import com.klst.einvoice.SupportingDocument;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
@@ -143,23 +143,20 @@ public class CreateCiiXXXInvoice extends InvoiceFactory {
 		cii.setBuyer(buyerParty);
 
 		// Cardinality: 0..n EN16931-ID: BG-24
-		List<BG24_AdditionalSupportingDocs> additionalSupportingDocs = testDoc.getAdditionalSupportingDocuments();
+		List<SupportingDocument> additionalSupportingDocs = testDoc.getAdditionalSupportingDocuments();
 		additionalSupportingDocs.forEach(additionalSupportingDoc -> {
-//			cii.addSupportigDocument((ReferencedDocument)additionalSupportingDoc); // TODO methode in CoreInvoice
-//			((CrossIndustryInvoice)cii).addSupportigDocument((ReferencedDocument)additionalSupportingDoc);
-			
 			byte[] byteDoc = additionalSupportingDoc.getAttachedDocument();
 			String documentReference = additionalSupportingDoc.getDocumentReference().getName();
 			if(byteDoc==null) {
-				cii.addSupportigDocument(documentReference
-						, additionalSupportingDoc.getSupportingDocumentDescription()
-						, additionalSupportingDoc.getExternalDocumentLocation());
+				cii.addSupportigDocument(documentReference,
+					additionalSupportingDoc.getSupportingDocumentDescription(),
+					additionalSupportingDoc.getExternalDocumentLocation());
 			} else {
-				cii.addSupportigDocument(documentReference
-						, additionalSupportingDoc.getSupportingDocumentDescription()
-						, byteDoc
-						, additionalSupportingDoc.getAttachedDocumentMimeCode()
-						, additionalSupportingDoc.getAttachedDocumentFilename());
+				cii.addSupportigDocument(documentReference,
+					additionalSupportingDoc.getSupportingDocumentDescription(),
+					byteDoc,
+					additionalSupportingDoc.getAttachedDocumentMimeCode(),
+					additionalSupportingDoc.getAttachedDocumentFilename());
 			}
 		});
 		
