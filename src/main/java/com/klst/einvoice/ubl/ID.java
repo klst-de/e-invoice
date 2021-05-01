@@ -26,6 +26,12 @@ public class ID extends IDType implements Identifier, Reference, GlobalIdentifie
 		this(id.getValue(), id.getSchemeID(), id.getSchemeVersionID());
 	}
 	
+	public String toString() {
+		return "["+(super.getSchemeID()==null? "":"SchemeID="+getSchemeID())
+			+(super.getSchemeVersionID()==null? "":", SchemeVersionID="+getSchemeVersionID())
+			+" \""+super.getValue()+"\"]";
+	}
+
 	@Override
 	public void setContent(String content) {
 		super.setValue(content);

@@ -544,12 +544,14 @@ UBL:
 	public Identifier getInvoicedObjectIdentifier() {
 		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
 		List<ReferencedDocumentType> list = headerTradeAgreement.getAdditionalReferencedDocument();
-		List<SupportingDocument> res = new ArrayList<SupportingDocument>(list.size());
+		List<ReferencedDocument> res = new ArrayList<ReferencedDocument>(list.size());
 		list.forEach(rd -> {
-			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
-			if(referencedDocument.isInvoicingDataSheet()) res.add(referencedDocument);
+			ReferencedDocument refDoc = ReferencedDocument.create(rd);
+			if(refDoc.isInvoicingDataSheet()) res.add(refDoc);
 		});
-		return res.isEmpty() ? null : res.get(0).getDocumentReference();
+		if(res.isEmpty()) return null;
+		ReferencedDocument sd = res.get(0);
+		return new ID(sd.getDocumentReference().getName(), sd.getReferenceCode());
 	}
 	@Override
 	public String getInvoicedObject() {
@@ -660,6 +662,9 @@ UBL:
 	 * ist 0..1 spezifiziert - das ist möglicherweise ein Fehler, denn es steht dort auch
 	 * "Eine Gruppe ..., die Informationen über eine oder mehrere vorausgegangene Rechnungen enthält"
 	 * Ich implementiere wie spezifiziert.
+	 * Siehe https://github.com/klst-de/e-invoice/issues/19
+	 *   und https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/207#issuecomment-612128643
+	 * in CII D19B soll es behoben sein, wir nutzen D16B
 	 */
 	@Override
 	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice) {
@@ -1163,92 +1168,6 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		return res;
 
 	}
-
-//	/**
-//	 * add Additional Referenced Document 0..n(optional) BG-24
-//	 * 
-//	 * @param docRefId    BG-24.BT-122 ++ 1..1 Supporting document reference
-//	 * @param description BG-24.BT-123 ++ 0..1 Supporting document description
-//	 * @param uri         BG-24.BT-124 ++ 0..1 External document location uri
-//	 */
-//	@Override
-//	public void addSupportigDocument(String docRefId, String description, String uri) {
-//		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId);
-//		referencedDocument.setSupportingDocumentDescription(description);
-//		referencedDocument.setExternalDocumentLocation(uri);
-//		
-//		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
-//		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
-//	}
-//	
-//	public void addSupportigDocument(ReferencedDocument doc) {
-//		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
-//		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(doc);
-//	}
-//
-//	@Override
-//	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments() {
-//		List<ReferencedDocument> referencedDocuments = getReferencedDocuments(this);
-//		List<BG24_AdditionalSupportingDocs> result = new ArrayList<BG24_AdditionalSupportingDocs>();
-////		if(referencedDocuments.isEmpty()) return result;
-//		referencedDocuments.forEach(refDoc -> {
-//			if(refDoc.isRelatedDocument()) {
-//				result.add(refDoc);
-//			}
-//		});
-//		return result;
-//	}
-	// BT-17 BT-18 BG-24.BT-122
-	// BT-17 BT-18 haben IssuerAssignedID und (optional) BT-17-0, BT-18-0 TypeCode , BT-18-1 ReferenceTypeCode
-/*
-
-TypeCode Typ des referenzierten Dokuments
-. Datentyp: qdt:DocumentCodeType
-Hinweis: 
-Der Code 916 "Referenzpapier" wird benutzt, um die Kennung der rechnungsbegründenden Unterlage zu referenzieren. (BT-122)
-Der Code  50 "Price/sales catalogue response" wird benutzt, um die Ausschreibung oder das Los zu referenzieren. (BT-17)
-Der Code 130 "Rechnungsdatenblatt" wird benutzt, um eine vom Verkäufer angegebene Kennung für ein Objekt zu referenzieren. (BT-18)
-
-Codeliste: UNTDID 1001 Untermenge
-Code Codename
-.  50 . Validated priced tender
-. 130 . Invoicing data sheet / Rechnungsdatenblatt
-. 916 . Related document / Referenzpapier
-
- */
-//	static List<ReferencedDocument> getReferencedDocuments(CrossIndustryInvoiceType doc) {
-//		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-//		List<ReferencedDocumentType> referencedDocuments = headerTradeAgreement.getAdditionalReferencedDocument();
-//		List<ReferencedDocument> result = new ArrayList<ReferencedDocument>();
-//		if(referencedDocuments.isEmpty()) {
-//			return result;
-//		}
-//		referencedDocuments.forEach(refDoc -> {
-//			IDType issuerAssignedID = refDoc.getIssuerAssignedID();
-//			DocumentCodeType documentCode = refDoc.getTypeCode(); 
-//			// documentCode.getValue() == 916 ==> BT-122
-//			// sonst ist es BT-17 oder BT-18
-//			LOG.fine("referencedDocument DocumentCode="+documentCode.getValue()+" IssuerAssignedID="+issuerAssignedID.getValue());
-//			ReferencedDocument rd = new ReferencedDocument(issuerAssignedID.getValue(), documentCode.getValue(), null);
-//			
-//			List<TextType> texts = refDoc.getName();
-//			texts.forEach(text -> {
-//				rd.getName().add(text);
-//			});
-//			
-//			List<BinaryObjectType> binaryObjects = refDoc.getAttachmentBinaryObject();
-//			binaryObjects.forEach(bo -> {
-//				BinaryObjectType bot = new BinaryObjectType();
-//				bot.setValue(bo.getValue());
-//				bot.setMimeCode(bo.getMimeCode());
-//				bot.setFilename(bo.getFilename());
-//				rd.getAttachmentBinaryObject().add(bot);
-//			});
-//			
-//			result.add(rd);
-//		});
-//		return result;
-//	}
 
 	/* INVOICE LINE                                BG-25                       1..* (mandatory)
 	 * Eine Gruppe von Informationselementen, die Informationen über einzelne Rechnungspositionen liefern.

@@ -168,8 +168,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 	@Override
 	public void setLineObjectID(String id, String typeCode, String schemeCode) {
  		if(id==null) return;
- 		DocumentReferenceType docRef = new DocumentReferenceType();
- 		docRef.setID(new ID(id, typeCode, schemeCode));
+ 		DocumentReference docRef = DocumentReference.create(id, schemeCode, typeCode);
 		
 		if(isInvoiceLineType) {
 			iLine.getDocumentReference().add(docRef);

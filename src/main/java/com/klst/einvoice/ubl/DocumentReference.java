@@ -106,6 +106,7 @@ public class DocumentReference extends DocumentReferenceType
 	}
 
 	private DocumentReference(String docRefId, Reference lineId, String description, Timestamp ts) {
+//	per default ohne "916"
 //		setDocumentCode(DocumentNameCode.RelatedDocument.getValueAsString());
 		setDocumentReference(new ID(docRefId));
 		setLineReference(lineId);
@@ -116,7 +117,7 @@ public class DocumentReference extends DocumentReferenceType
 	private DocumentReference(String docRefId, String code, String referenceTypeCode) {
 		setDocumentReference(new ID(docRefId));
 		setDocumentCode(code);
-		setReferenceCode(referenceTypeCode); // TODO BT-18-0:
+		setReferenceCode(referenceTypeCode); // wg. BT-18-0:
 		// in BG-25.BT-128 steht: 
 		//super.setID(new ID(docRefId, null, referenceTypeCode));
 		// etwa so

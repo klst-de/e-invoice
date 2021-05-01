@@ -220,7 +220,7 @@ public class ReadmeTest {
 		LOG.info("TobaccoTax   tax type : "+vb.getTaxType());
 		assertEquals(TobaccoTax, vb.getTaxType());
 		
-		// BG-3 + 0..n REFERENZ AUF DIE VORAUSGEGANGENE RECHNUNG
+		// BG-3 0..n REFERENZ AUF DIE VORAUSGEGANGENE RECHNUNG
 		// Zu verwenden, falls:
 //		— eine vorausgegangene Rechnung korrigiert wird;
 //		— aus einer Schlussrechnung auf vorausgegangene Teilrechnungen Bezug genommen wird;
@@ -249,7 +249,8 @@ public class ReadmeTest {
 		invoice.addAllowanceCharge(allowance);
 		
 		// BT-18 0..1 Invoiced object identifier
-		invoice.setInvoicedObject("BT-18 Invoiced object identifier name", "schemeID");
+		String BT_18_1_schemeID  = "AAB"; // Proforma invoice document identifier
+		invoice.setInvoicedObject("BT-18 Invoiced object identifier name", BT_18_1_schemeID);
 		
 		// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
 		SupportingDocument sd = invoice.createSupportigDocument("docRefId", "description", "uri");
@@ -284,6 +285,18 @@ public class ReadmeTest {
 		assertEquals(12, tsTaxPointDate.toLocalDateTime().getMonthValue());
 		assertEquals(31, tsTaxPointDate.toLocalDateTime().getDayOfMonth());
 
+		// BT-18 0..1 Invoiced object identifier Asserts
+		LOG.info("getInvoicedObjectIdentifier:"+invoice.getInvoicedObjectIdentifier());
+		assertEquals(BT_18_1_schemeID, invoice.getInvoicedObjectIdentifier().getSchemeIdentifier());
+		// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS Asserts
+		List<SupportingDocument> asdList = invoice.getAdditionalSupportingDocuments();
+		assertEquals(2, asdList.size());
+		asdList.forEach(asd -> {
+			LOG.info("SUPPORTING DOCUMENT:"+asd);
+			String asdCode = asd.getDocumentCode();
+			if(asdCode!=null) assertEquals("916", asdCode);
+		});
+		
 		List<CoreInvoiceLine> lines = invoice.getLines();
 		assertEquals(2, lines.size());
 		assertLine01(lines.get(1));

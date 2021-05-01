@@ -501,8 +501,8 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * <br>Rule ID: 	 
 	 * <br>Request ID: 	R33
 	 * 
-	 * @param the identifier name BT-18
-	 * @param scheme identifier BT-18-1
+	 * @param name - BT-18 the identifier name 
+	 * @param schemeID - BT-18-1 identifier. 
 	 * The identification scheme identifier of the Invoiced object identifier.
 	 * If it may be not clear for the receiver what scheme is used for the identifier, 
 	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.

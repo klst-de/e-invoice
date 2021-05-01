@@ -37,9 +37,9 @@ public class ID extends IDType implements Identifier, Reference, GlobalIdentifie
 	}
 	
 	public String toString() {
-		return "["+(super.getSchemeID()==null? "":",SchemeID="+getSchemeID())
-			+(super.getSchemeVersionID()==null? "":",SchemeVersionID="+getSchemeVersionID())
-			+"\""+super.getValue()+"\"]";
+		return "["+(super.getSchemeID()==null? "":"SchemeID="+getSchemeID())
+			+(super.getSchemeVersionID()==null? "":", SchemeVersionID="+getSchemeVersionID())
+			+" \""+super.getValue()+"\"]";
 	}
 
 	@Override
