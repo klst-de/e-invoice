@@ -456,11 +456,9 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		return specifiedTradeProduct.getDescription()==null ? null : specifiedTradeProduct.getDescription().getValue();
 	}
 
-	@Override // 0 .. 1 BT-155 Bsp: <ram:SellerAssignedID>246</ram:SellerAssignedID>
+	@Override // 0..1 BT-155 Bsp: <ram:SellerAssignedID>246</ram:SellerAssignedID>
 	public void setSellerAssignedID(String id) {
-		if(id==null) return;
-		specifiedTradeProduct.setSellerAssignedID(new ID(id)); // No identification scheme is to be used.
-		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+		SCopyCtor.getInstance().set(specifiedTradeProduct, "sellerAssignedID", id);
 	}
 
 	@Override
@@ -559,13 +557,12 @@ Bsp.
 		return result;
 	}
 
-	// BG-31.BT-159 +++ 0..1 Item country of origin
+	// BG-31.BT-159 0..1 Item country of origin
 	@Override
 	public void setCountryOfOrigin(String code) {
 		SCopyCtor.getInstance().newFieldInstance(specifiedTradeProduct, "originTradeCountry", code);
 		SCopyCtor.getInstance().set(specifiedTradeProduct.getOriginTradeCountry(), "id", code);
 	}
-
 	@Override
 	public String getCountryOfOrigin() {
 		TradeCountryType tradeCountry = specifiedTradeProduct.getOriginTradeCountry()==null ? null : specifiedTradeProduct.getOriginTradeCountry();
