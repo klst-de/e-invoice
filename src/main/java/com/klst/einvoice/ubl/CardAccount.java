@@ -1,7 +1,7 @@
 package com.klst.einvoice.ubl;
 
-import com.klst.einvoice.PaymentCard;
-import com.klst.einvoice.PaymentCardFactory;
+import com.klst.einvoice.api.PaymentCard;
+import com.klst.einvoice.api.PaymentCardFactory;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CardAccountType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.HolderNameType;

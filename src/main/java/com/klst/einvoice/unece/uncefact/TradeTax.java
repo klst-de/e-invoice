@@ -9,10 +9,10 @@ import com.klst.edoc.api.IAmount;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
-import com.klst.einvoice.ITaxCategory;
-import com.klst.einvoice.ITaxCategoryFactory;
-import com.klst.einvoice.VatBreakdown;
-import com.klst.einvoice.VatBreakdownFactory;
+import com.klst.einvoice.api.ITaxCategory;
+import com.klst.einvoice.api.ITaxCategoryFactory;
+import com.klst.einvoice.api.VatBreakdown;
+import com.klst.einvoice.api.VatBreakdownFactory;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
@@ -334,7 +334,7 @@ keine Beispiele für Tests!
 	/**
 	 * VAT exemption reason text (BT-120) and code (BT-121)
 	 *
-	 * @see com.klst.einvoice.VatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
+	 * @see com.klst.einvoice.api.VatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void setTaxExemption(String text, String codeId) {

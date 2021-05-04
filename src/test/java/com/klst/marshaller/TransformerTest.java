@@ -28,7 +28,7 @@ import org.junit.runners.MethodSorters;
 import org.xml.sax.SAXException;
 
 import com.klst.edoc.untdid.DocumentNameCode;
-import com.klst.einvoice.CoreInvoice;
+import com.klst.einvoice.api.CoreInvoice;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransformerTest {

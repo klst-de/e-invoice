@@ -1,4 +1,4 @@
-package com.klst.einvoice;
+package com.klst.einvoice.api;
 
 /**
  * BG-2 PROCESS CONTROL

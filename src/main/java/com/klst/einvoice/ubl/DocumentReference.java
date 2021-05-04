@@ -6,8 +6,8 @@ import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.Reference;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
-import com.klst.einvoice.PrecedingInvoice;
-import com.klst.einvoice.SupportingDocument;
+import com.klst.einvoice.api.PrecedingInvoice;
+import com.klst.einvoice.api.SupportingDocument;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AttachmentType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DocumentReferenceType;

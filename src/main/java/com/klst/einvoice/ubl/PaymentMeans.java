@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.klst.einvoice.DirectDebit;
 import com.klst.edoc.untdid.PaymentMeansEnum;
-import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.DebitedAccountID;
-import com.klst.einvoice.PaymentCard;
-import com.klst.einvoice.PaymentInstructions;
-import com.klst.einvoice.PaymentInstructionsFactory;
+import com.klst.einvoice.api.CreditTransfer;
+import com.klst.einvoice.api.DebitedAccountID;
+import com.klst.einvoice.api.DirectDebit;
+import com.klst.einvoice.api.PaymentCard;
+import com.klst.einvoice.api.PaymentInstructions;
+import com.klst.einvoice.api.PaymentInstructionsFactory;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.PaymentMeansType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.InstructionNoteType;

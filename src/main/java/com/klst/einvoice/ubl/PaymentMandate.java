@@ -1,8 +1,8 @@
 package com.klst.einvoice.ubl;
 
 import com.klst.ebXml.reflection.SCopyCtor;
-import com.klst.einvoice.DirectDebit;
-import com.klst.einvoice.DirectDebitFactory;
+import com.klst.einvoice.api.DirectDebit;
+import com.klst.einvoice.api.DirectDebitFactory;
 import com.klst.einvoice.unece.uncefact.IBANId;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.FinancialAccountType;

@@ -1,4 +1,4 @@
-package com.klst.einvoice;
+package com.klst.einvoice.api;
 
 /*
 Tax TypeCode : Code der Umsatzsteuerkategorie

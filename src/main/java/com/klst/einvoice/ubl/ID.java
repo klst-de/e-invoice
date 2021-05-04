@@ -2,7 +2,7 @@ package com.klst.einvoice.ubl;
 
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.api.Reference;
-import com.klst.einvoice.GlobalIdentifier;
+import com.klst.einvoice.api.GlobalIdentifier;
 
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 

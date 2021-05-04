@@ -2,7 +2,7 @@ package com.klst.xrechnung.test;
 
 import java.util.logging.Logger;
 
-import com.klst.einvoice.CoreInvoice;
+import com.klst.einvoice.api.CoreInvoice;
 import com.klst.marshaller.AbstactTransformer;
 
 public abstract class InvoiceFactory {

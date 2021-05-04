@@ -14,10 +14,10 @@ import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
-import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.BG29_PriceDetails;
-import com.klst.einvoice.CoreInvoiceLine;
-import com.klst.einvoice.GlobalIdentifier;
+import com.klst.einvoice.api.AllowancesAndCharges;
+import com.klst.einvoice.api.BG29_PriceDetails;
+import com.klst.einvoice.api.CoreInvoiceLine;
+import com.klst.einvoice.api.GlobalIdentifier;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentLineDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeAgreementType;
@@ -260,7 +260,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * @param end - The date is the last day of the period.
 	 * @return IPeriod - aka delivery period
 	 * 
-	 * @see com.klst.einvoice.BG26_InvoiceLinePeriod
+	 * @see com.klst.einvoice.api.BG26_InvoiceLinePeriod
 	 * @see com.klst.edoc.api.IPeriod
 	 */
 	public IPeriod createPeriod(Timestamp start, Timestamp end) {

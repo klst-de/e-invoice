@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.untdid.TaxCategoryCode;
-import com.klst.einvoice.AllowancesAndCharges;
+import com.klst.einvoice.api.AllowancesAndCharges;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;

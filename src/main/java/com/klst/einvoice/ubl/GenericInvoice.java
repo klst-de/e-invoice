@@ -19,18 +19,18 @@ import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.edoc.untdid.TaxCategoryCode;
-import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.CoreInvoice;
-import com.klst.einvoice.CoreInvoiceLine;
-import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.DirectDebit;
-import com.klst.einvoice.InvoiceNote;
-import com.klst.einvoice.PaymentCard;
-import com.klst.einvoice.PaymentInstructions;
-import com.klst.einvoice.PrecedingInvoice;
-import com.klst.einvoice.SupportingDocument;
-import com.klst.einvoice.VatBreakdown;
+import com.klst.einvoice.api.AllowancesAndCharges;
+import com.klst.einvoice.api.BG13_DeliveryInformation;
+import com.klst.einvoice.api.CoreInvoice;
+import com.klst.einvoice.api.CoreInvoiceLine;
+import com.klst.einvoice.api.CreditTransfer;
+import com.klst.einvoice.api.DirectDebit;
+import com.klst.einvoice.api.InvoiceNote;
+import com.klst.einvoice.api.PaymentCard;
+import com.klst.einvoice.api.PaymentInstructions;
+import com.klst.einvoice.api.PrecedingInvoice;
+import com.klst.einvoice.api.SupportingDocument;
+import com.klst.einvoice.api.VatBreakdown;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
@@ -880,7 +880,7 @@ ubl-tc434-example2.xml :
 	 * @param end - The date on which the delivery of goods or services was completed.
 	 * @return IPeriod - aka delivery period
 	 * 
-	 * @see com.klst.einvoice.BG14_InvoicingPeriod
+	 * @see com.klst.einvoice.api.BG14_InvoicingPeriod
 	 * @see com.klst.edoc.api.IPeriod
 	 */
 	public IPeriod createPeriod(Timestamp start, Timestamp end) {

@@ -1,4 +1,4 @@
-package com.klst.einvoice;
+package com.klst.einvoice.api;
 
 /**
  * BG-28 0..n INVOICE LINE CHARGES / ZUSCHLÄGE

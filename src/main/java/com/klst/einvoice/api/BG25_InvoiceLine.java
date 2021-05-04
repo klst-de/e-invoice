@@ -1,4 +1,4 @@
-package com.klst.einvoice;
+package com.klst.einvoice.api;
 
 import java.math.BigDecimal;
 import java.util.List;

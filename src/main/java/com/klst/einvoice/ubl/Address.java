@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.PostalAddress;
-import com.klst.einvoice.PostalAddressExt;
+import com.klst.einvoice.api.PostalAddressExt;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;

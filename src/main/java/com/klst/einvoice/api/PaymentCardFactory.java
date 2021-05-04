@@ -1,4 +1,4 @@
-package com.klst.einvoice;
+package com.klst.einvoice.api;
 
 /**
  * abstract-factory, aka Kit for BG-18 PAYMENT CARD INFORMATION

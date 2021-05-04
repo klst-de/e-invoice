@@ -1,4 +1,4 @@
-package com.klst.einvoice;
+package com.klst.einvoice.api;
 
 /**
  * abstract-factory, aka Kit for BG-1 INVOICE NOTE

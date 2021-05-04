@@ -1,7 +1,7 @@
 package com.klst.einvoice.ubl;
 
-import com.klst.einvoice.ITaxType;
-import com.klst.einvoice.ITaxTypeFactory;
+import com.klst.einvoice.api.ITaxType;
+import com.klst.einvoice.api.ITaxTypeFactory;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSchemeType;
 

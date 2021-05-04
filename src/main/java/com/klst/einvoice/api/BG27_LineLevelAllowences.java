@@ -1,4 +1,4 @@
-package com.klst.einvoice;
+package com.klst.einvoice.api;
 
 /**
  * BG-27 0..n INVOICE LINE ALLOWANCES / ABSCHLÄGE

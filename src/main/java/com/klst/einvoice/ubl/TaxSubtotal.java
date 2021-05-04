@@ -8,9 +8,9 @@ import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
-import com.klst.einvoice.ITaxCategory;
-import com.klst.einvoice.VatBreakdown;
-import com.klst.einvoice.VatBreakdownFactory;
+import com.klst.einvoice.api.ITaxCategory;
+import com.klst.einvoice.api.VatBreakdown;
+import com.klst.einvoice.api.VatBreakdownFactory;
 import com.klst.einvoice.unece.uncefact.Amount;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
@@ -170,7 +170,7 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 	/**
 	 * VAT exemption reason text and code
 	 * 
-	 * @see com.klst.einvoice.VatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
+	 * @see com.klst.einvoice.api.VatBreakdown#setTaxExemption(java.lang.String, java.lang.String)
 	 */
  	@Override
 	public void setTaxExemption(String text, String code) {

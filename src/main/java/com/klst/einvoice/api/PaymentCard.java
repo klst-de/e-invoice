@@ -1,4 +1,4 @@
-package com.klst.einvoice;
+package com.klst.einvoice.api;
 
 /**
  * BG-18 ++ 0..1 PAYMENT CARD INFORMATION

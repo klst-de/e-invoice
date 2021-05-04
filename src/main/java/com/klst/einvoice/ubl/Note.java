@@ -6,9 +6,9 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.klst.einvoice.BG1_InvoiceNote;
-import com.klst.einvoice.InvoiceNote;
-import com.klst.einvoice.InvoiceNoteFactory;
+import com.klst.einvoice.api.BG1_InvoiceNote;
+import com.klst.einvoice.api.InvoiceNote;
+import com.klst.einvoice.api.InvoiceNoteFactory;
 
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType;
 
@@ -17,7 +17,7 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType
  * <p>
  * to get all InvoiceNotes use {@link BG1_InvoiceNote#getInvoiceNotes()} method 
  * <p>
- * also implements BG-25.BT-127 0..n IncludedNote.Content {@link com.klst.einvoice.CoreInvoiceLine#setNote(String)}
+ * also implements BG-25.BT-127 0..n IncludedNote.Content {@link com.klst.einvoice.api.CoreInvoiceLine#setNote(String)}
  * 
  * @see InvoiceNoteFactory
  */

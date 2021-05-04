@@ -24,11 +24,11 @@ import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.edoc.untdid.DocumentNameCode;
 import com.klst.edoc.untdid.PaymentMeansEnum;
-import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.BG2_ProcessControl;
-import com.klst.einvoice.CoreInvoice;
-import com.klst.einvoice.InvoiceNote;
-import com.klst.einvoice.PaymentInstructions;
+import com.klst.einvoice.api.BG13_DeliveryInformation;
+import com.klst.einvoice.api.BG2_ProcessControl;
+import com.klst.einvoice.api.CoreInvoice;
+import com.klst.einvoice.api.InvoiceNote;
+import com.klst.einvoice.api.PaymentInstructions;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
