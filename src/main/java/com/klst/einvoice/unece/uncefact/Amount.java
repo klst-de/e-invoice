@@ -3,7 +3,8 @@ package com.klst.einvoice.unece.uncefact;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import com.klst.einvoice.Rounding;
+import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.IAmount;
 
 import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.AmountType;
 
@@ -29,31 +30,59 @@ import un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.Amo
  * Type is floating up to two fraction digits.
  *
  */
-public class Amount extends AmountType implements Rounding {
+public class Amount extends AmountType implements IAmount {
+
+	@Override
+	public IAmount createAmount(String currencyID, BigDecimal amount) {
+		return create(currencyID, amount);
+	}
+	static Amount create(String currencyID, BigDecimal amount) {
+		return new Amount(currencyID, amount);
+	}
+	static Amount create(un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType amount) {
+		return new Amount(amount.getCurrencyID(), amount.getValue());
+	}
+	public static Amount create(oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.AmountType amount) {
+		return new Amount(amount.getCurrencyID(), amount.getValue());
+	}
 
 	// Der Betrag wird mit zwei Nachkommastellen angegeben. ==> setScale(2, RoundingMode.HALF_UP)
 	public static final int SCALE = 2;
+	private int scale = SCALE;
 
-	Amount() {
+	static Amount create() {
+		return new Amount((AmountType)null); 
+	}
+	// copy factory
+	static Amount create(AmountType object) {
+		if(object instanceof AmountType && object.getClass()!=AmountType.class) {
+			// object is instance of a subclass of AmountType, but not AmountType itself
+			return (Amount)object;
+		} else {
+			return new Amount(object); 
+		}
+	}
+
+	// copy ctor
+	private Amount(AmountType object) {
 		super();
+		if(object!=null) {
+			SCopyCtor.getInstance().invokeCopy(this, object);
+		}
 	}
 
 	public Amount(BigDecimal amount) {
-		this(null, amount);
+		this((String)null, amount);
 	}
-	
 	public Amount(String currencyID, BigDecimal amount) {
-		this();
+		this(currencyID, SCALE, RoundingMode.HALF_UP, amount);
+	}
+
+	Amount(String currencyID, int scale, RoundingMode roundingMode, BigDecimal amount) {
+		super();
 		super.setCurrencyID(currencyID);
-		super.setValue(amount);
-	}
-
-	public Amount(oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.AmountType amount) {
-		this(amount.getCurrencyID(), amount.getValue());
-	}
-
-	public Amount(un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType amount) {
-		this(amount.getCurrencyID(), amount.getValue());
+		this.scale = scale;
+		super.setValue(amount.setScale(this.scale, IAmount.roundingMode));
 	}
 
 	void copyTo(un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType amount) {
@@ -66,17 +95,14 @@ public class Amount extends AmountType implements Rounding {
 		amount.setValue(this.getValue(RoundingMode.HALF_UP));
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see com.klst.cius.Rounding#getValue(java.math.RoundingMode)
-	 */
 	@Override
 	public BigDecimal getValue(RoundingMode roundingMode) {
-		return getValue().setScale(SCALE, roundingMode);
+		return super.getValue().setScale(scale, roundingMode);
 	}
 	
 	@Override
 	public String toString() {
-		return getCurrencyID()==null ? ""+getValue(RoundingMode.HALF_UP) : getCurrencyID() + getValue(RoundingMode.HALF_UP);
+		return getCurrencyID()==null ? ""+getValue(roundingMode) : getCurrencyID() + getValue(roundingMode);
 	}
+
 }

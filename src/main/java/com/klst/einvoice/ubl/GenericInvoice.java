@@ -7,32 +7,35 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.ContactInfo;
+import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IPeriod;
+import com.klst.edoc.api.IQuantity;
+import com.klst.edoc.api.Identifier;
+import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.api.Reference;
+import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.PaymentMeansEnum;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.BG24_AdditionalSupportingDocs;
-import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
-import com.klst.einvoice.IContact;
-import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
-import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.PrecedingInvoice;
-import com.klst.einvoice.Reference;
+import com.klst.einvoice.SupportingDocument;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
-import com.klst.untdid.codelist.DateTimeFormats;
-import com.klst.untdid.codelist.DocumentNameCode;
-import com.klst.untdid.codelist.PaymentMeansEnum;
-import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AllowanceChargeType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.BillingReferenceType;
@@ -81,7 +84,6 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxInclu
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxPointDateType;
 import oasis.names.specification.ubl.schema.xsd.creditnote_2.CreditNoteType;
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
-import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.DateType;
 
 public class GenericInvoice <T> implements CoreInvoice  {
 
@@ -104,12 +106,14 @@ public class GenericInvoice <T> implements CoreInvoice  {
 		return create(profile, processType, code);
 	}
 	@Override
-	public CoreInvoiceLine createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
+	public CoreInvoiceLine createInvoiceLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
-		if(isInvoiceType) {
-			return GenericLine.createInvoiceLine(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
-		}
-		return GenericLine.createCreditNoteLine(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+		return GenericLine.create(this, id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+//		if(isInvoiceType) {
+//			return GenericLine.createIL(id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+//		} else {
+//			return GenericLine.createCNL(id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+//		}
 	}
 
 	static CoreInvoice create(String profile, String processType, DocumentNameCode code) {
@@ -209,7 +213,8 @@ public class GenericInvoice <T> implements CoreInvoice  {
 	
 	@Override
 	public DocumentNameCode getTypeCode() {
-		return isInvoiceType ? DocumentNameCode.valueOf(invoice.getInvoiceTypeCode()) : DocumentNameCode.valueOf(creditNote.getCreditNoteTypeCode());
+		return isInvoiceType ? DocumentNameCode.valueOf(invoice.getInvoiceTypeCode())
+				             : DocumentNameCode.valueOf(creditNote.getCreditNoteTypeCode());
 	}
 
 	// BT-4 ist nicht definiert
@@ -539,58 +544,38 @@ UBL:
 	@Override
 	public void setTenderOrLotReference(String docRefId) {
 		if(docRefId==null) return;
-		addSupportigDocument(AdditionalSupportingDocument.create(DocumentNameCode.ValidatedPricedTender, docRefId, null));
+		addOriginatorDocumentReference(DocumentReference.create(docRefId, (String)null, null));
 	}
 	@Override
 	public String getTenderOrLotReference() {
 		List<DocumentReferenceType> additionalDocumentReferenceList;
 		if(isInvoiceType) {
-			additionalDocumentReferenceList = invoice.getAdditionalDocumentReference();
+			additionalDocumentReferenceList = invoice.getOriginatorDocumentReference();
 		} else {
-			additionalDocumentReferenceList = creditNote.getAdditionalDocumentReference();
+			additionalDocumentReferenceList = creditNote.getOriginatorDocumentReference();
 		}
-		List<BG24_AdditionalSupportingDocs> resList = new ArrayList<BG24_AdditionalSupportingDocs>(additionalDocumentReferenceList.size());
+		List<DocumentReference> resList = new ArrayList<DocumentReference>(additionalDocumentReferenceList.size());
 		additionalDocumentReferenceList.forEach(doc -> {
-			AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(doc);
-			if(asd.isValidatedPricedTender()) {
-				// das sind BT-17 docs
-				resList.add(asd);
-			}
+			resList.add(DocumentReference.create(doc));
 		});
-		return resList.isEmpty() ? null : resList.get(0).getDocumentReference().getContent();
-		
+		return resList.isEmpty() ? null : resList.get(0).getDocumentReference().getContent();	
 	}
-	// alternative implementierung:
-//	@Override
-//	public void setTenderOrLotReference(String docRefId) {
-//		if(docRefId==null) return; // optional
-//		DocumentReferenceType documentReference = new DocumentReferenceType();
-//		documentReference.setID(new ID(docRefId));
-//		List<DocumentReferenceType> documentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
-//		documentReferenceList.add(documentReference);
-//	}
-//
-//	@Override
-//	public String getTenderOrLotReference() {
-//		List<DocumentReferenceType> documentReferenceList = isInvoiceType ? invoice.getOriginatorDocumentReference() : creditNote.getOriginatorDocumentReference();
-//		if(documentReferenceList.isEmpty()) return null;
-//		return documentReferenceList.get(0).getID().getValue();
-//	}
 	
 	// BT-18 0..1 Invoiced object identifier
 	@Override
-	public void setInvoicedObject(String name, String schemeID) {
-		if(name==null) return;
-		addSupportigDocument(AdditionalSupportingDocument.create(DocumentNameCode.InvoicingDataSheet, name, schemeID));
-	}
-	@Override
 	public void setInvoicedObjectIdentifier(Identifier id) {
-		if(id==null) return;
+		if(id==null) return; // optional
 		setInvoicedObject(id.getContent(), id.getSchemeIdentifier());
 	}
 	@Override
 	public void setInvoicedObject(String name) {
 		setInvoicedObject(name, null);
+	}
+	@Override
+	public void setInvoicedObject(String name, String schemeID) {
+		if(name==null) return;
+		DocumentReference docRef = DocumentReference.create(name, DocumentNameCode.InvoicingDataSheet.getValueAsString(), schemeID);
+		addSupportigDocument(docRef);
 	}
 	@Override
 	public String getInvoicedObject() {
@@ -605,12 +590,12 @@ UBL:
 		} else {
 			additionalDocumentReferenceList = creditNote.getAdditionalDocumentReference();
 		}
-		List<BG24_AdditionalSupportingDocs> resList = new ArrayList<BG24_AdditionalSupportingDocs>(additionalDocumentReferenceList.size());
+		List<DocumentReference> resList = new ArrayList<DocumentReference>(additionalDocumentReferenceList.size());
 		additionalDocumentReferenceList.forEach(doc -> {
-			AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(doc);
-			if(asd.isInvoicingDataSheet()) {
+			DocumentReference docRef = DocumentReference.create(doc);
+			if(docRef.isInvoicingDataSheet()) {
 				// das sind BT-18 docs
-				resList.add(asd);
+				resList.add(docRef);
 			}
 		});
 		return resList.isEmpty() ? null : resList.get(0).getDocumentReference();
@@ -729,16 +714,16 @@ ubl-tc434-example2.xml :
 		return profileID==null ? null : profileID.getValue();
 	}
 
-	// BG-3 + 0..n PRECEDING INVOICE REFERENCE
-	// BG-3.BT-25 ++ 1..1 Preceding Invoice reference
-	// BG-3.BT-26 ++ 0..1 Preceding Invoice issue date
+	// BG-3 0..n PRECEDING INVOICE REFERENCE
+	// BG-3.BT-25 1..1 Preceding Invoice reference
+	// BG-3.BT-26 0..1 Preceding Invoice issue date
 	
-	// BG-3 + 0..n PRECEDING INVOICE REFERENCE / implements BG3_PrecedingInvoiceReference factory
+	// implements BG3_PrecedingInvoiceReference factory
 	@Override
 	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
 		return DocumentReference.create(docRefId, ts);
 	}
-	@Override // implements BG3_PrecedingInvoiceReference
+	@Override // add aka set
 	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice) {
 		if(precedingInvoice==null) return;
 		DocumentReferenceType docRef = (DocumentReference)precedingInvoice;
@@ -747,7 +732,7 @@ ubl-tc434-example2.xml :
 		List<BillingReferenceType> billingReferenceList = isInvoiceType ? invoice.getBillingReference() : creditNote.getBillingReference();
 		billingReferenceList.add(billingReference);
 	}
-	@Override // implements BG3_PrecedingInvoiceReference
+	@Override // get
 	public List<PrecedingInvoice> getPrecedingInvoices() {
 		List<BillingReferenceType> billingReferenceList = isInvoiceType ? invoice.getBillingReference() : creditNote.getBillingReference();
 		List<PrecedingInvoice> docRefList = new ArrayList<PrecedingInvoice>();
@@ -761,7 +746,7 @@ ubl-tc434-example2.xml :
 	
 	// BG-4 + 1..1 SELLER
 	@Override
-	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm) {
 		BusinessParty party = createParty(name, address, contact); 
 		party.setCompanyId(companyId);
 		party.setCompanyLegalForm(companyLegalForm);
@@ -786,7 +771,7 @@ ubl-tc434-example2.xml :
 	
 	// BG-7 + 1..1 BUYER
 	@Override
-	public void setBuyer(String name, PostalAddress address, IContact contact) {
+	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = createParty(name, address, contact); 
 		setBuyer(party);
 	}
@@ -886,8 +871,22 @@ ubl-tc434-example2.xml :
 		return Delivery.create(deliveryList.get(0));
 	}
 
-	// BG-14 ++ 0..1 INVOICING PERIOD
-	List<PeriodType> periodList = null;
+	// BG-14 0..1 INVOICING PERIOD
+//	@Override // comment to show the java-doc
+	/**
+	 * factory method to create BG-14 INVOICING PERIOD
+	 * 
+	 * @param start - The initial date of delivery of goods or services.
+	 * @param end - The date on which the delivery of goods or services was completed.
+	 * @return IPeriod - aka delivery period
+	 * 
+	 * @see com.klst.einvoice.BG14_InvoicingPeriod
+	 * @see com.klst.edoc.api.IPeriod
+	 */
+	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		return Period.create(start, end);
+	}
+	private List<PeriodType> periodList = null;
 	private PeriodType getPeriod0() {
 		if(periodList==null) {
 			periodList = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
@@ -899,9 +898,17 @@ ubl-tc434-example2.xml :
 		} 
 		return periodList.get(0);
 	}
-	// BG-14.BT-73 +++ 0..1 Invoicing period start date
 	@Override
-	public void setStartDate(Timestamp ts) {
+	public IPeriod getDeliveryPeriod() {
+		return Period.create(getPeriod0());
+	}
+	@Override
+	public void setDeliveryPeriod(IPeriod period) {
+		setStartDate(period.getStartDateAsTimestamp());
+		setEndDate(period.getEndDateAsTimestamp());
+	}
+	// BG-14.BT-73 0..1 Invoicing period start date
+	private void setStartDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		StartDateType date = new StartDateType();
 		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
@@ -909,32 +916,13 @@ ubl-tc434-example2.xml :
 		period.setStartDate(date);
 	}
 	
-	@Override
-	public Timestamp getStartDateAsTimestamp() {
-		List<PeriodType> list = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
-		if(list.isEmpty()) return null;
-		DateType date = (DateType)list.get(0).getStartDate();
-		if(date==null) return null;
-		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
-	}
-	
-	// BG-14.BT-74 +++ 0..1 Invoicing period end date
-	@Override
-	public void setEndDate(Timestamp ts) {
+	// BG-14.BT-74 0..1 Invoicing period end date
+	private void setEndDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		EndDateType date = new EndDateType();
 		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
 		PeriodType period = getPeriod0();
 		period.setEndDate(date);
-	}
-	
-	@Override
-	public Timestamp getEndDateAsTimestamp() {
-		List<PeriodType> list = isInvoiceType ? invoice.getInvoicePeriod() : creditNote.getInvoicePeriod();
-		if(list.isEmpty()) return null;
-		DateType date = (DateType)list.get(0).getEndDate();
-		if(date==null) return null;
-		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
 	}
 	
 	// BG-16 + 0..1 PAYMENT INSTRUCTIONS / Zahlungsanweisungen
@@ -1412,7 +1400,7 @@ ubl-tc434-example2.xml :
 	}
 	
 	@Override
-	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode code, BigDecimal percent) {
+	public VatBreakdown createVATBreakDown(IAmount taxableAmount, IAmount taxAmount, TaxCategoryCode code, BigDecimal percent) {
 		return TaxSubtotal.create(taxableAmount, taxAmount, code, percent);
 	}
 
@@ -1439,27 +1427,29 @@ ubl-tc434-example2.xml :
 		return result;
 	}
 
-	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
+	// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	@Override
-	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
-		addSupportigDocument(new AdditionalSupportingDocument(docRefId, description, content, mimeCode, filename));
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts, String uri) {
+		DocumentReference doc = DocumentReference.create(docRefId, lineId, description);
+		doc.setExternalDocumentLocation(uri);
+		return doc;
 	}
 	@Override
-	public void addSupportigDocument(String docRefId, String description, String url) {
-		if(docRefId!=null && description==null && url==null) {
-			addOriginatorDocumentReference(new AdditionalSupportingDocument(docRefId, description, url));
-		} else {
-			addSupportigDocument(new AdditionalSupportingDocument(docRefId, description, url));
-		}
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts
+			, byte[] content, String mimeCode, String filename) {
+		DocumentReference doc = DocumentReference.create(docRefId, lineId, description);
+		doc.setAttachedDocument(content, mimeCode, filename);
+		return doc;
 	}
-	void addSupportigDocument(AdditionalSupportingDocument asDoc) {
+	@Override
+	public void addSupportigDocument(SupportingDocument asDoc) {
 		if(isInvoiceType) {
-			invoice.getAdditionalDocumentReference().add(asDoc);
+			invoice.getAdditionalDocumentReference().add((DocumentReference)asDoc);
 		} else {
-			creditNote.getAdditionalDocumentReference().add(asDoc);
+			creditNote.getAdditionalDocumentReference().add((DocumentReference)asDoc);
 		}
 	}
-	void addOriginatorDocumentReference(AdditionalSupportingDocument asDoc) {
+	private void addOriginatorDocumentReference(DocumentReference asDoc) {
 		if(isInvoiceType) {
 			invoice.getOriginatorDocumentReference().add(asDoc);
 		} else {
@@ -1468,22 +1458,24 @@ ubl-tc434-example2.xml :
 	}
 
 	@Override
-	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments() {
+	public List<SupportingDocument> getAdditionalSupportingDocuments() {
 		List<DocumentReferenceType> additionalDocumentReferenceList;
 		if(isInvoiceType) {
 			additionalDocumentReferenceList = invoice.getAdditionalDocumentReference();
 		} else {
 			additionalDocumentReferenceList = creditNote.getAdditionalDocumentReference();
 		}
-		List<BG24_AdditionalSupportingDocs> resList = new ArrayList<BG24_AdditionalSupportingDocs>(additionalDocumentReferenceList.size());
+		List<SupportingDocument> resList = new ArrayList<SupportingDocument>(additionalDocumentReferenceList.size());
 		additionalDocumentReferenceList.forEach(doc -> {
-			AdditionalSupportingDocument asd = AdditionalSupportingDocument.create(doc);
-			if(asd.isValidatedPricedTender()) {
+			DocumentReference dr = DocumentReference.create(doc);
+			if(dr.isValidatedPricedTender()) {
 				// das sind BT-17 docs
-			} else if(asd.isInvoicingDataSheet()) {
+			} else if(dr.isInvoicingDataSheet()) {
 				// das sind BT-18 docs
+			} else if(dr.isRelatedDocument()) {
+				resList.add(dr);
 			} else {
-				resList.add(asd);
+				resList.add(dr);
 			}
 		});
 		return resList;
@@ -1535,14 +1527,14 @@ ubl-tc434-example2.xml :
 
 	// BG-6 , BG-9 CONTACT
 	@Override
-	public IContact createContact(String contactName, String contactTel, String contactMail) {
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
 		Party factory = Party.create();
-		return factory.createContact(contactName, contactTel, contactMail);
+		return factory.createContactInfo(contactName, contactTel, contactMail);
 	}
 
 	// BG-4 , BG-7 , BG-10 , BG-11 , BG-13 : SELLER, BUYER, ...
 	@Override
-	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		Party factory = Party.create();
 		return factory.createParty(name, tradingName, address, contact);
 	}

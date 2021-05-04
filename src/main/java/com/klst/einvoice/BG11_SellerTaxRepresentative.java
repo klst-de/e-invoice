@@ -1,5 +1,8 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.PostalAddress;
+
 /**
  * BG-11 + 0..1 SELLER TAX REPRESENTATIVE PARTY
  * <p>
@@ -43,9 +46,9 @@ package com.klst.einvoice;
  */
 public interface BG11_SellerTaxRepresentative {
 	
-	// BT-62 ++ 1..1 Seller tax representative name	
-	// BG-12 ++ 1..1 SELLER TAX REPRESENTATIVE POSTAL ADDRESS	
-	// BT-63 ++ 1..1 Seller tax representative VAT identifier
+	// BG-11.BT-62 1..1 Seller tax representative name	
+	// BG-11.BT-63 1..1 Seller tax representative VAT identifier
+	// BG-12 1..1 SELLER TAX REPRESENTATIVE POSTAL ADDRESS	
 	
 	public void setTaxRepresentative(String registrationName, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID);
 	public void setTaxRepresentative(BusinessParty party);

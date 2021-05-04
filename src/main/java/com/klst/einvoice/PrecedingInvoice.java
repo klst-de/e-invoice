@@ -2,7 +2,8 @@ package com.klst.einvoice;
 
 import java.sql.Timestamp;
 
-import com.klst.untdid.codelist.DateTimeFormats;
+import com.klst.edoc.api.Reference;
+import com.klst.edoc.untdid.DateTimeFormats;
 
 /**
  * BG-3 PRECEDING INVOICE REFERENCE
@@ -18,7 +19,7 @@ import com.klst.untdid.codelist.DateTimeFormats;
  * <br>Rule ID: 	
  * <br>Request ID: 	R11, R12
  */
-public interface PrecedingInvoice extends PrecedingInvoiceFactory{
+public interface PrecedingInvoice extends PrecedingInvoiceFactory {
 	
 	/**
 	 * Preceding Invoice reference

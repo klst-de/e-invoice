@@ -1,8 +1,8 @@
 package com.klst.einvoice.ubl;
 
+import com.klst.edoc.api.Identifier;
+import com.klst.edoc.api.Reference;
 import com.klst.einvoice.GlobalIdentifier;
-import com.klst.einvoice.Identifier;
-import com.klst.einvoice.Reference;
 
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.IDType;
 
@@ -26,6 +26,12 @@ public class ID extends IDType implements Identifier, Reference, GlobalIdentifie
 		this(id.getValue(), id.getSchemeID(), id.getSchemeVersionID());
 	}
 	
+	public String toString() {
+		return "["+(super.getSchemeID()==null? "":"SchemeID="+getSchemeID())
+			+(super.getSchemeVersionID()==null? "":", SchemeVersionID="+getSchemeVersionID())
+			+" \""+super.getValue()+"\"]";
+	}
+
 	@Override
 	public void setContent(String content) {
 		super.setValue(content);

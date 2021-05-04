@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.IAmount;
+import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.einvoice.ITaxCategory;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.VatBreakdownFactory;
 import com.klst.einvoice.unece.uncefact.Amount;
-import com.klst.untdid.codelist.TaxCategoryCode;
-import com.klst.untdid.codelist.TaxTypeCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxSubtotalType;
@@ -26,11 +27,11 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 	 */
 	// implements VatBreakdownFactory
 	@Override
-	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
+	public VatBreakdown createVATBreakDown(IAmount taxableAmount, IAmount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return create(taxableAmount, taxAmount, taxCode, taxRate);
 	}
 	// factory for VatBreakdown
-	static VatBreakdown create(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
+	static VatBreakdown create(IAmount taxableAmount, IAmount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return new TaxSubtotal(taxableAmount, taxAmount, taxCode, taxRate);
 	}
 
@@ -55,7 +56,7 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 		}
 	}
 
-	private TaxSubtotal(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal taxRate) {
+	private TaxSubtotal(IAmount taxableAmount, IAmount taxAmount, TaxCategoryCode codeEnum, BigDecimal taxRate) {
 		super();
 		setTaxBaseAmount(taxableAmount);
 		setCalculatedTaxAmount(taxAmount);
@@ -77,29 +78,29 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 	
 	// BG-23.BT-116 taxBaseAmount aka taxableAmount aka basisAmount
 	@Override
-	public void setTaxBaseAmount(Amount taxBaseAmount) {
+	public void setTaxBaseAmount(IAmount taxBaseAmount) {
 		TaxableAmountType amount = new TaxableAmountType();
-		taxBaseAmount.copyTo(amount);
+		((Amount)taxBaseAmount).copyTo(amount);
 		super.setTaxableAmount(amount);
 	}
 	@Override
-	public Amount getTaxBaseAmount() {
+	public IAmount getTaxBaseAmount() {
 		if(super.getTaxableAmount()==null) return null;
-		return new Amount(super.getTaxableAmount().getCurrencyID(), super.getTaxableAmount().getValue());
+		return Amount.create(super.getTaxableAmount());
 	}
 	
 	// BG-23.BT-117 calculatedTaxAmount aka taxAmount
 	@Override
-	public void setCalculatedTaxAmount(Amount taxAmount) {
+	public void setCalculatedTaxAmount(IAmount taxAmount) {
 		TaxAmountType amount = new TaxAmountType();
-		taxAmount.copyTo(amount);
+		((Amount)taxAmount).copyTo(amount);
 		super.setTaxAmount(amount);
 	}
 
 	@Override
-	public Amount getCalculatedTaxAmount() {
+	public IAmount getCalculatedTaxAmount() {
 		if(super.getTaxAmount()==null) return null;
-		return new Amount(super.getTaxAmount().getCurrencyID(), super.getTaxAmount().getValue());
+		return Amount.create(super.getTaxAmount());
 	}
 
 	private ITaxCategory getITaxCategory() {
@@ -148,7 +149,9 @@ public class TaxSubtotal extends TaxSubtotalType implements VatBreakdown, VatBre
 	}
 	@Override
 	public TaxCategoryCode getTaxCategoryCode() {
-		return TaxCategoryCode.valueOf(super.getTaxCategory());
+		return TaxCategory.create(super.getTaxCategory()).getTaxCategoryCode();
+//		if(super.getTaxCategory()==null) return null;
+//		return super.getTaxCategory().getID()==null ? null : TaxCategoryCode.getEnum(getTaxCategory().getID().getValue());
 	}
 
 	// BG-23.BT-119

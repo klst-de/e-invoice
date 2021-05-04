@@ -2,7 +2,7 @@ package com.klst.einvoice;
 
 import java.math.BigDecimal;
 
-import com.klst.untdid.codelist.TaxCategoryCode;
+import com.klst.edoc.untdid.TaxCategoryCode;
 
 /**
  * TaxCategory contains a category code and a rate

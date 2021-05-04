@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.unece.uncefact.Amount;
-import com.klst.untdid.codelist.TaxCategoryCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AllowanceChargeType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;

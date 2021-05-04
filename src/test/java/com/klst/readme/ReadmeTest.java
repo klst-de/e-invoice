@@ -3,25 +3,34 @@ package com.klst.readme;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.ContactInfo;
+import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.BusinessPartyAddress;
-import com.klst.einvoice.BusinessPartyContact;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
-import com.klst.einvoice.IContact;
-import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.PrecedingInvoice;
+import com.klst.einvoice.SupportingDocument;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -31,15 +40,25 @@ import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.CiiTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
-import com.klst.untdid.codelist.DocumentNameCode;
-import com.klst.untdid.codelist.TaxCategoryCode;
-import com.klst.untdid.codelist.TaxTypeCode;
+import com.klst.xrechnung.test.UblTest;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 
 public class ReadmeTest {
 
-	private static final Logger LOG = Logger.getLogger(ReadmeTest.class.getName());
+	private static LogManager logManager = LogManager.getLogManager(); // Singleton
+	private static Logger LOG = null;
+	private static void initLogger() {
+        URL url = UblTest.class.getClassLoader().getResource("testLogging.properties");
+		try {
+	        File file = new File(url.toURI());
+			logManager.readConfiguration(new FileInputStream(file));
+		} catch (IOException | URISyntaxException e) {
+			LOG = Logger.getLogger(ReadmeTest.class.getName());
+			LOG.warning(e.getMessage());
+		}
+		LOG = Logger.getLogger(UblTest.class.getName());
+	}
 	
 	static final String PROFILE_XRECHNUNG = CoreInvoice.PROFILE_XRECHNUNG;
 	static final DocumentNameCode CommercialInvoice = DocumentNameCode.CommercialInvoice;
@@ -59,6 +78,11 @@ public class ReadmeTest {
 	
 	CoreInvoice invoice;
 	
+    @BeforeClass
+    public static void staticSetup() {
+    	initLogger();
+    }
+    
 	@Before 
     public void setup() {
 		ciiTransformer = CiiTransformer.getInstance();  // for UN/CEFACT Cross Industry Invoice XML
@@ -80,8 +104,6 @@ public class ReadmeTest {
 		commercialInvoiceTest();
 	}
 
-	private static final BigDecimal ONE = new BigDecimal(1);
-	
 	CoreInvoiceLine line00() {
 		// mandatory:
 		CoreInvoiceLine line = invoice.createInvoiceLine("1"    // invoice line number
@@ -93,7 +115,7 @@ public class ReadmeTest {
 		
 		// optional ...
 		line.setNote("Die letzte Abonnementslieferung");        // BT-127 note
-		line.setPeriod("2016-01-01", "2016-12-31");             // BG-26  line delivery period.
+		line.setLineDeliveryPeriod("2016-01-01", "2016-12-31"); // BG-26  line delivery period.
 		line.setOrderLineID("6171175.1");                       // BT-132 Referenced purchase order line
 		line.setUnitPriceAllowance(new UnitPriceAmount(EUR, new BigDecimal(21.21)) // priceDiscount
 				                  ,new UnitPriceAmount(EUR, new BigDecimal(310))); // grossPrice
@@ -159,13 +181,22 @@ public class ReadmeTest {
 		String contactName = "nicht vorhanden";
 		String contactTel  = "+49 1234-5678";
 		String contactMail = "seller@email.de";
-		IContact sellerContact = invoice.createContact(contactName, contactTel, contactMail);
-		invoice.setSeller("[Seller name]", sellerAddress, sellerContact, 
-				"[HRA-Eintrag]", "123/456/7890, HRA-Eintrag in […]");
+		ContactInfo sellerContact = invoice.createContactInfo(contactName, contactTel, contactMail);
+//		invoice.setSeller("[Seller name]", sellerAddress, sellerContact, 
+//				"[HRA-Eintrag]", "123/456/7890, HRA-Eintrag in […]");
+		// alternativ:
+		BusinessParty seller = invoice.createParty("[Seller name]", null, sellerAddress, sellerContact);
+		seller.setCompanyId("[HRA-Eintrag]");
+		seller.setCompanyLegalForm("123/456/7890, HRA-Eintrag in […]");
+		// mehrere BG-4.BT-29  0..n Seller identifier / https://github.com/klst-de/e-invoice/issues/27
+		// Bsp aus https://docs.peppol.eu/poacc/billing/3.0/syntax/ubl-invoice/cac-AccountingSupplierParty/cac-Party/cac-PartyIdentification/cbc-ID/
+		seller.addId("5060012349998", "0088");     // "0088" : EAN Location Code
+		seller.addId("12345 6789 RC0001", "0093"); // "0093" : Revenue Canada Business Number
+		invoice.setSeller(seller);
 		  
 		// BusinessParty Buyer aka Customer 
 		PostalAddress buyerAddress = invoice.createAddress(DE, "12345", "[Buyer city]");
-		IContact buyerContact = null;                           // (optional)
+		ContactInfo buyerContact = null;                           // (optional)
 		invoice.setBuyer("[Buyer name]", buyerAddress, buyerContact);
 		
 		String taxPointDate = "2016-12-31";
@@ -175,21 +206,21 @@ public class ReadmeTest {
 		BigDecimal ermUSt = new BigDecimal(16); // 16%
 		VatBreakdown vb = invoice.createVATBreakDown(
 				new Amount(EUR, new BigDecimal(99.79)) // Amount taxableAmount
-			, 	new Amount(EUR, new BigDecimal(9.79)) //Amount taxAmount
+			, 	new Amount(EUR, new BigDecimal(9.79))  // Amount taxAmount
 			, 	TaxCategoryCode.StandardRate // code
 			, 	ermUSt // BigDecimal percent
 			);
-		LOG.info(">>>>>>>>>>>> tax type VAT? : "+vb.getTaxType() + " , Standard:"+vb.getTaxCategoryCode() + vb.getTaxPercentage());
+		LOG.info("VatBreakdown tax type : "+vb.getTaxType() + " , Standard:"+vb.getTaxCategoryCode() + vb.getTaxPercentage());
 		assertEquals(TaxTypeCode.VAT, vb.getTaxType());
 		assertEquals(TaxCategoryCode.StandardRate, vb.getTaxCategoryCode());
 		assertEquals(ermUSt, vb.getTaxPercentage());
 		
 		String TobaccoTax = "AAD";
 		vb.setTaxType(TobaccoTax);
-		LOG.info(">>>>>>>>>>>> tax type AAD? : "+vb.getTaxType());
+		LOG.info("TobaccoTax   tax type : "+vb.getTaxType());
 		assertEquals(TobaccoTax, vb.getTaxType());
 		
-		// BG-3 + 0..n REFERENZ AUF DIE VORAUSGEGANGENE RECHNUNG
+		// BG-3 0..n REFERENZ AUF DIE VORAUSGEGANGENE RECHNUNG
 		// Zu verwenden, falls:
 //		— eine vorausgegangene Rechnung korrigiert wird;
 //		— aus einer Schlussrechnung auf vorausgegangene Teilrechnungen Bezug genommen wird;
@@ -217,6 +248,18 @@ public class ReadmeTest {
 		allowance.setTaxPercentage(new BigDecimal(20));
 		invoice.addAllowanceCharge(allowance);
 		
+		// BT-18 0..1 Invoiced object identifier
+		String BT_18_1_schemeID  = "AAB"; // Proforma invoice document identifier
+		invoice.setInvoicedObject("BT-18 Invoiced object identifier name", BT_18_1_schemeID);
+		
+		// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
+		SupportingDocument sd = invoice.createSupportigDocument("docRefId", "description", "uri");
+		// explizit 916 setzen:
+		sd.setDocumentCode(DocumentNameCode.RelatedDocument.getValueAsString());
+		invoice.addSupportigDocument(sd);
+		// default ohne DocumentCode in UBL:
+		invoice.addSupportigDocument("docRefId", "description", "uri");
+		
 		assertEquals(CoreInvoice.PROFILE_XRECHNUNG, invoice.getCustomization());
 		assertThat(invoice.getProcessType()).isNull();
 		assertEquals(DocumentNameCode.CommercialInvoice, invoice.getTypeCode());
@@ -242,6 +285,18 @@ public class ReadmeTest {
 		assertEquals(12, tsTaxPointDate.toLocalDateTime().getMonthValue());
 		assertEquals(31, tsTaxPointDate.toLocalDateTime().getDayOfMonth());
 
+		// BT-18 0..1 Invoiced object identifier Asserts
+		LOG.info("getInvoicedObjectIdentifier:"+invoice.getInvoicedObjectIdentifier());
+		assertEquals(BT_18_1_schemeID, invoice.getInvoicedObjectIdentifier().getSchemeIdentifier());
+		// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS Asserts
+		List<SupportingDocument> asdList = invoice.getAdditionalSupportingDocuments();
+		assertEquals(2, asdList.size());
+		asdList.forEach(asd -> {
+			LOG.info("SUPPORTING DOCUMENT:"+asd);
+			String asdCode = asd.getDocumentCode();
+			if(asdCode!=null) assertEquals("916", asdCode);
+		});
+		
 		List<CoreInvoiceLine> lines = invoice.getLines();
 		assertEquals(2, lines.size());
 		assertLine01(lines.get(1));

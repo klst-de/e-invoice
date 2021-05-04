@@ -1,11 +1,6 @@
 package com.klst.marshaller;
 
-import java.io.InputStream;
-
 import javax.inject.Named;
-import javax.inject.Singleton;
-
-import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
 @Named
 /* Notice 
@@ -28,6 +23,8 @@ public class UblInvoiceTransformer extends UblTransformer {
 
 	private static final String UBL_INVOICE_XSD_21 = "/ubl/maindoc/UBL-Invoice-2.1.xsd";
 	private static final String CONTENT_PATH = "oasis.names.specification.ubl.schema.xsd.invoice_2";
+	private static final String CONTENT_SUPERTYPE_NAME = CONTENT_PATH+".InvoiceType"; 
+	public static final String CONTENT_TYPE_NAME = "com.klst.einvoice.ubl.GenericInvoice"; 
 	
 	private UblInvoiceTransformer() {
 		super(CONTENT_PATH, SINGLETON);
@@ -40,8 +37,8 @@ public class UblInvoiceTransformer extends UblTransformer {
 	}
 
 	@Override
-	public <T extends Object> T toModel(InputStream xmlInputStream) {
-		return (T) this.toModel(xmlInputStream, InvoiceType.class);
+	protected String getSupertypeName() {
+		return CONTENT_SUPERTYPE_NAME;
 	}
 
 }

@@ -7,49 +7,47 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.ContactInfo;
+import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IPeriod;
+import com.klst.edoc.api.IQuantity;
+import com.klst.edoc.api.Identifier;
+import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.api.Reference;
+import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.PaymentMeansEnum;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.BG24_AdditionalSupportingDocs;
-import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DirectDebit;
-import com.klst.einvoice.IContact;
-import com.klst.einvoice.Identifier;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
-import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.PrecedingInvoice;
-import com.klst.einvoice.Reference;
+import com.klst.einvoice.SupportingDocument;
 import com.klst.einvoice.VatBreakdown;
-import com.klst.untdid.codelist.DateTimeFormats;
-import com.klst.untdid.codelist.DocumentNameCode;
-import com.klst.untdid.codelist.PaymentMeansEnum;
-import com.klst.untdid.codelist.TaxCategoryCode;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.ReferenceCodeType;
+import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentContextParameterType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProcuringProjectType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.BinaryObjectType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 // @see https://www.unece.org/fileadmin/DAM/cefact/rsm/RSM_CrossIndustryInvoice_v2.0.pdf
@@ -59,6 +57,10 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 
 	private static final Logger LOG = Logger.getLogger(CrossIndustryInvoice.class.getName());
 	
+	// wg. Mapper:
+	private static final String FIELD_typeCode = "typeCode";
+	private static final String FIELD_issuerAssignedID = "issuerAssignedID";
+
 	// factory
 	public static CoreInvoice getFactory() {
 		return new CrossIndustryInvoice(null);
@@ -78,9 +80,9 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 		return new CrossIndustryInvoice(profile, processType, code);
 	}
 	@Override
-	public CoreInvoiceLine createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
+	public CoreInvoiceLine createInvoiceLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
-		return TradeLineItem.createInvoiceLine(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+		return TradeLineItem.create(id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 	}
 
 /*
@@ -156,12 +158,12 @@ PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B
     CIO basiert auf eine neuere Version von SCRDM 103
     
  */
-	
+	// applicableHeaderTradeAgreement TODO
 	HeaderTradeSettlement applicableHeaderTradeSettlement;
 	HeaderTradeDeliveryType applicableHeaderTradeDelivery;
 //	ExchangedDocumentType exchangedDocument; // in super
 	
-	private CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
+	public CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
 		super();
 		if(doc!=null) {
 			SCopyCtor.getInstance().invokeCopy(this, doc);
@@ -183,11 +185,8 @@ PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B
 		this(null);
 		setProcessControl(customization, processType);
 		
-		exchangedDocument = new ExchangedDocumentType();
-		DocumentCodeType documentCode = new DocumentCodeType();
-		documentCode.setValue(documentNameCode.getValueAsString());
-		exchangedDocument.setTypeCode(documentCode);
-		super.setExchangedDocument(exchangedDocument);
+		SCopyCtor.getInstance().newFieldInstance(this, "exchangedDocument", documentNameCode.getValueAsString());
+		SCopyCtor.getInstance().set(getExchangedDocument(), FIELD_typeCode, documentNameCode.getValueAsString());
 	}
 
 	/* Invoice number                              BT-1  Identifier            1 (mandatory) 
@@ -236,9 +235,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 
 	@Override
 	public void setTypeCode(DocumentNameCode code) {
-		DocumentCodeType documentCode = new DocumentCodeType();
-		documentCode.setValue(code.getValueAsString());
-		exchangedDocument.setTypeCode(documentCode);
+		SCopyCtor.getInstance().set(exchangedDocument, FIELD_typeCode, code.getValueAsString());
 	}
 
 	@Override
@@ -345,17 +342,13 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	/* EN16931-ID: 	BT-10 (optional), but mandatory in CIUS rule BR-DE-15
 	 * (non-Javadoc)
 	 * @see com.klst.cius.CoreInvoice#setBuyerReference(java.lang.String)
+	 * TODO hier Leitweg-ID
 	 */
 	@Override
 	public void setBuyerReference(String reference) {
-		if(reference==null) return;
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setBuyerReference(Text.create(reference));
-		// TODO hier Leitweg-ID
-		
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+		SCopyCtor.getInstance().newFieldInstance(getSupplyChainTradeTransaction(), "applicableHeaderTradeAgreement", reference);
+//		getApplicableHeaderTradeAgreement() ist private!!!
+		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement(), "buyerReference", reference);
 	}
 
 	@Override
@@ -377,17 +370,9 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	}
 	@Override
 	public void setProjectReference(String docRefId, String name) {
-		if(docRefId==null) return; // optional
-		ProcuringProjectType procuringProject = new ProcuringProjectType();
-		procuringProject.setID(new ID(docRefId));
-		procuringProject.setName(Text.create(name));
-		
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setSpecifiedProcuringProject(procuringProject);
-		
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+		SCopyCtor.getInstance().newFieldInstance(getApplicableHeaderTradeAgreement(), "specifiedProcuringProject", docRefId);
+		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getSpecifiedProcuringProject(), "id", docRefId);
+		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getSpecifiedProcuringProject(), "name", Text.create(name));
 	}
 
 	@Override
@@ -414,12 +399,9 @@ UBL:
     </cac:ContractDocumentReference>
  */
 	@Override
-	public void setContractReference(String id) {
-		if(id==null) return; // optional
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new ID(id)); // No identification scheme
-		headerTradeAgreement.setContractReferencedDocument(referencedDocument);
+	public void setContractReference(String docRefId) {
+		SCopyCtor.getInstance().newFieldInstance(getApplicableHeaderTradeAgreement(), "contractReferencedDocument", docRefId);
+		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getContractReferencedDocument(), FIELD_issuerAssignedID, docRefId);
 	}
 
 	@Override
@@ -432,16 +414,8 @@ UBL:
 	// BT-13 + 0..1 Purchase order reference
 	@Override
 	public void setPurchaseOrderReference(String docRefId) {
-		if(docRefId==null) return; // optional
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
-		
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument);
-
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+		SCopyCtor.getInstance().newFieldInstance(getApplicableHeaderTradeAgreement(), "buyerOrderReferencedDocument", docRefId);
+		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getBuyerOrderReferencedDocument(), FIELD_issuerAssignedID, docRefId);
 	}
 
 	@Override
@@ -454,16 +428,8 @@ UBL:
 	// BT-14 + 0..1 Sales order reference
 	@Override
 	public void setOrderReference(String docRefId) {
-		if(docRefId==null) return; // optional
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
-		
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setSellerOrderReferencedDocument(referencedDocument);
-
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+		SCopyCtor.getInstance().newFieldInstance(getApplicableHeaderTradeAgreement(), "sellerOrderReferencedDocument", docRefId);
+		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getSellerOrderReferencedDocument(), FIELD_issuerAssignedID, docRefId);
 	}
 	@Override
 	public String getOrderReference() {
@@ -475,11 +441,7 @@ UBL:
 	// BT-15 + 0..1 Receiving advice reference / Referenz auf die Wareneingangsmeldung
 	@Override
 	public void setReceiptReference(String docRefId) {
-		if(docRefId==null) return; // optional
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
-		
-		applicableHeaderTradeDelivery.setReceivingAdviceReferencedDocument(referencedDocument);
+		SCopyCtor.getInstance().set(applicableHeaderTradeDelivery.getReceivingAdviceReferencedDocument(), FIELD_issuerAssignedID, docRefId);
 	}
 	@Override
 	public String getReceiptReference() {
@@ -491,11 +453,7 @@ UBL:
 	// BT-16 + 0..1 Despatch advice reference / Lieferavisreferenz
 	@Override
 	public void setDespatchAdviceReference(String docRefId) {
-		if(docRefId==null) return; // optional
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
-		
-		applicableHeaderTradeDelivery.setDespatchAdviceReferencedDocument(referencedDocument);
+		SCopyCtor.getInstance().set(applicableHeaderTradeDelivery.getDespatchAdviceReferencedDocument(), FIELD_issuerAssignedID, docRefId);
 	}
 	@Override
 	public String getDespatchAdviceReference() {
@@ -504,28 +462,27 @@ UBL:
 		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
 	}
 
-	// BT-17 Tender or lot reference
+	// BT-17 0..1 Tender or lot reference
 	@Override
 	public void setTenderOrLotReference(String docRefId) {
 		if(docRefId==null) return; // optional
-		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId, DocumentNameCode.ValidatedPricedTender);
-		addSupportigDocument(referencedDocument);
+		ReferencedDocument rd = ReferencedDocument.create(docRefId, 
+			DocumentNameCode.ValidatedPricedTender.getValueAsString(), (String)null);
+		addSupportigDocument(rd);
 	}
 	@Override
 	public String getTenderOrLotReference() {
-		List<ReferencedDocument> referencedDocuments = getReferencedDocuments(this);
-		if(referencedDocuments.isEmpty()) return null;
-		String result = null;
-		for(int i=0; i<referencedDocuments.size(); i++) {
-			ReferencedDocument refDoc = referencedDocuments.get(i);
-			if(refDoc.isValidatedPricedTender()) {
-				result = refDoc.getIssuerAssignedID().getValue();
-			}
-		}
-		return result;
+		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		List<ReferencedDocumentType> list = headerTradeAgreement.getAdditionalReferencedDocument();
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>(list.size());
+		list.forEach(rd -> {
+			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
+			if(referencedDocument.isValidatedPricedTender()) res.add(referencedDocument);
+		});
+		return res.isEmpty() ? null : res.get(0).getDocumentReference().getName();
 	}
 
-	// BT-18 Invoiced object identifier
+	// BT-18 0..1 Invoiced object identifier
 	@Override
 	public void setInvoicedObjectIdentifier(Identifier id) {
 		if(id==null) return; // optional
@@ -536,27 +493,23 @@ UBL:
 		setInvoicedObject(name, null);
 	}
 	@Override
-	public void setInvoicedObject(String name, String code) {
+	public void setInvoicedObject(String name, String schemeID) {
 		if(name==null) return; // optional
-		ReferencedDocument referencedDocument = new ReferencedDocument(name, DocumentNameCode.InvoicingDataSheet, code);
-		addSupportigDocument(referencedDocument);
+		ReferencedDocument rd = ReferencedDocument.create(name, DocumentNameCode.InvoicingDataSheet.getValueAsString(), schemeID);
+		addSupportigDocument(rd);
 	}
 	@Override
 	public Identifier getInvoicedObjectIdentifier() {
-		List<ReferencedDocument> referencedDocuments = getReferencedDocuments(this);
-		if(referencedDocuments.isEmpty()) return null;
-		Identifier result = null;
-		for(int i=0; i<referencedDocuments.size(); i++) {
-			ReferencedDocument refDoc = referencedDocuments.get(i);
-			if(refDoc.isInvoicingDataSheet()) {
-				// IssuerAssignedID
-				// TypeCode 130
-				// 0..1 ReferenceTypeCode
-				ReferenceCodeType referenceCode = refDoc.getReferenceTypeCode();
-				result = new ID(refDoc.getIssuerAssignedID().getValue(), referenceCode==null? null : referenceCode.getValue());
-			}
-		}
-		return result;
+		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		List<ReferencedDocumentType> list = headerTradeAgreement.getAdditionalReferencedDocument();
+		List<ReferencedDocument> res = new ArrayList<ReferencedDocument>(list.size());
+		list.forEach(rd -> {
+			ReferencedDocument refDoc = ReferencedDocument.create(rd);
+			if(refDoc.isInvoicingDataSheet()) res.add(refDoc);
+		});
+		if(res.isEmpty()) return null;
+		ReferencedDocument sd = res.get(0);
+		return new ID(sd.getDocumentReference().getName(), sd.getReferenceCode());
 	}
 	@Override
 	public String getInvoicedObject() {
@@ -662,7 +615,16 @@ UBL:
 	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
 		return ReferencedDocument.create(docRefId, ts);
 	}
-	@Override // implements BG3_PrecedingInvoiceReference
+	/* implements BG3_PrecedingInvoiceReference
+	 * in Dokumentation/ZUGFeRD-2.1.1%20-%20Spezifikation_TA.pdf
+	 * ist 0..1 spezifiziert - das ist möglicherweise ein Fehler, denn es steht dort auch
+	 * "Eine Gruppe ..., die Informationen über eine oder mehrere vorausgegangene Rechnungen enthält"
+	 * Ich implementiere wie spezifiziert.
+	 * Siehe https://github.com/klst-de/e-invoice/issues/19
+	 *   und https://github.com/ConnectingEurope/eInvoicing-EN16931/issues/207#issuecomment-612128643
+	 * in CII D19B soll es behoben sein, wir nutzen D16B
+	 */
+	@Override
 	public void addPrecedingInvoice(PrecedingInvoice precedingInvoice) {
 		if(getPrecedingInvoices().isEmpty()) {
 			applicableHeaderTradeSettlement.setInvoiceReferencedDocument((ReferencedDocument)precedingInvoice);
@@ -673,9 +635,13 @@ UBL:
 	@Override // implements BG3_PrecedingInvoiceReference
 	public List<PrecedingInvoice> getPrecedingInvoices() {
 		ReferencedDocumentType referencedDocument = applicableHeaderTradeSettlement.getInvoiceReferencedDocument();
+		// es kann nur ein referencedDocument geben, oder null ===> also 0..1
 		List<PrecedingInvoice> docRefList = new ArrayList<PrecedingInvoice>();
 		if(referencedDocument!=null) {
-			docRefList.add(new ReferencedDocument(referencedDocument.getIssuerAssignedID(), referencedDocument.getFormattedIssueDateTime()));
+			Reference docRef = referencedDocument.getIssuerAssignedID()==null ? null : new ID(referencedDocument.getIssuerAssignedID());
+			FormattedDateTimeType.DateTimeString dt = referencedDocument.getFormattedIssueDateTime()==null ? null : referencedDocument.getFormattedIssueDateTime().getDateTimeString();
+			PrecedingInvoice precedingInvoice = ReferencedDocument.create(docRef==null ? null : docRef.getName(), dt==null ? null : DateTimeFormats.ymdToTs(dt.getValue()));
+			docRefList.add(precedingInvoice);
 		}
 		return docRefList;
 	}
@@ -695,7 +661,7 @@ UBL:
 	 * @param companyId optional / Seller legal registration identifier, BT-30/R52
 	 * @param companyLegalForm optional / Seller additional legal information, BT-33/R47
 	 */
-	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm) {
+	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm) {
 		                               // BT-27 , BG-5   , BG-6          , BT-30    , BT-33
 		BusinessParty party = createParty(name, address, contact); //, companyId, companyLegalForm);
 		party.setCompanyId(companyId);
@@ -721,7 +687,7 @@ UBL:
 	/* BUYER                                       BG-7                        1 (mandatory) 
 	 * Eine Gruppe von Informationselementen, die Informationen über den Erwerber liefern.
 	 */
-	public void setBuyer(String name, PostalAddress address, IContact contact) {
+	public void setBuyer(String name, PostalAddress address, ContactInfo contact) {
 		BusinessParty party = createParty(name, address, contact); // BT-44, BG-8, BG-9
 		setBuyer(party);
 	}
@@ -836,37 +802,33 @@ UBL:
 		return HeaderTradeDelivery.create(headerTradeDelivery);
 	}
 
-	// BG-14.BT-73 +++ 0..1 Invoicing period start date
+	// BG-14 0..1 Invoicing period
+//	@Override // comment to show the java-doc
+	/**
+	 * factory method to create BG-14 INVOICING PERIOD
+	 * 
+	 * @param start - The initial date of delivery of goods or services.
+	 * @param end - The date on which the delivery of goods or services was completed.
+	 * @return IPeriod - aka delivery period
+	 * 
+	 * @see com.klst.einvoice.BG14_InvoicingPeriod
+	 * @see com.klst.edoc.api.IPeriod
+	 */
+	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		return SpecifiedPeriod.create(start, end);
+	}
 	@Override
-	public void setStartDate(Timestamp ts) {
-		if(ts==null) return;
-		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		applicableHeaderTradeSettlement.getBillingSpecifiedPeriod().setStartDateTime(dateTime);
+	public void setDeliveryPeriod(IPeriod period) {
+		// delegieren:
+		applicableHeaderTradeSettlement.setDeliveryPeriod(period);
+	}
+	@Override
+	public IPeriod getDeliveryPeriod() {
+		return applicableHeaderTradeSettlement.getDeliveryPeriod();
 	}
 
-	@Override
-	public Timestamp getStartDateAsTimestamp() {
-		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
-		if(specifiedPeriod==null) return null;
-		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
-		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
-	}
-	
-	// BG-14.BT-74 +++ 0..1 Invoicing period end date
-	@Override
-	public void setEndDate(Timestamp ts) {
-		if(ts==null) return;
-		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		applicableHeaderTradeSettlement.getBillingSpecifiedPeriod().setEndDateTime(dateTime);
-	}
-
-	@Override
-	public Timestamp getEndDateAsTimestamp() {
-		SpecifiedPeriodType specifiedPeriod = applicableHeaderTradeSettlement.getBillingSpecifiedPeriod();
-		if(specifiedPeriod==null) return null;
-		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
-		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
-	}
+	// BG-14.BT-73 0..1 Invoicing period start date
+	// BG-14.BT-74 0..1 Invoicing period end date
 
 /*
 
@@ -1103,7 +1065,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 
 	 */
 	@Override
-	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode codeEnum, BigDecimal taxRate) {
+	public VatBreakdown createVATBreakDown(IAmount taxableAmount, IAmount taxAmount, TaxCategoryCode codeEnum, BigDecimal taxRate) {
 		return TradeTax.create(taxableAmount, taxAmount, codeEnum, taxRate);
 	}
 	
@@ -1131,131 +1093,38 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		return result;
 	}
 	
-	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
-	// 0 .. n AdditionalReferencedDocument Rechnungsbegründende Unterlagen BG-24
-	// BG-24.BT-122 ++ 1..1 Supporting document reference
-	// BG-24.BT-123 ++ 0..1 Supporting document description
-	// BG-24.BT-124 ++ 0..1 External document location
-	// BG-24.BT-125 ++ 0..1 Attached document
-//	An attached document embedded as binary object or sent together with the invoice.
-//	Attached document is used when 	documentation shall be stored with the 	Invoice for future reference or audit 	purposes.
-//	R35 Binary object
-	//                 1..1 Attached document
-	//                      Mime code / The mime code of the attached document.
-	//                      Allowed mime codes:
-	//	- application/pdf
-	// 	- image/png
-	// 	- image/jpeg
-	// 	- text/csv
-	// 	- application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet
-	// 	- application/vnd.oasis.opendocument.spreadsheet
-	//                 1..1 Attached document Filename / The file name of the attached document
-/* test daten
-
-        <ram:ApplicableHeaderTradeAgreement>
-        ...
-            <ram:AdditionalReferencedDocument>
-                <ram:IssuerAssignedID>01_15_Anhang_01.pdf</ram:IssuerAssignedID>
-                <ram:TypeCode>916</ram:TypeCode>
-                <ram:Name>Aufschlüsselung der einzelnen Leistungspositionen</ram:Name>
-                <ram:AttachmentBinaryObject mimeCode="application/pdf" filename="01_15_Anhang_01.pdf">... binary data ...</ram:AttachmentBinaryObject>
-            </ram:AdditionalReferencedDocument>
-
- */
+	// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	@Override
-	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename) {
-		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId);
-		referencedDocument.setSupportingDocumentDescription(description);
-		referencedDocument.setAttachedDocument(content, mimeCode, filename);
-		
-		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
-		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts, String uri) {
+		// delegieren
+		ReferencedDocument rd = ReferencedDocument.create(docRefId, lineId, description);
+		rd.setExternalDocumentLocation(uri);
+		return rd;
 	}
-
-	/**
-	 * add Additional Referenced Document 0..n(optional) BG-24
-	 * 
-	 * @param docRefId    BG-24.BT-122 ++ 1..1 Supporting document reference
-	 * @param description BG-24.BT-123 ++ 0..1 Supporting document description
-	 * @param uri         BG-24.BT-124 ++ 0..1 External document location uri
-	 */
 	@Override
-	public void addSupportigDocument(String docRefId, String description, String uri) {
-		ReferencedDocument referencedDocument = new ReferencedDocument(docRefId);
-		referencedDocument.setSupportingDocumentDescription(description);
-		referencedDocument.setExternalDocumentLocation(uri);
-		
-		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
-		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(referencedDocument);
+	public SupportingDocument createSupportigDocument(String docRefId, Reference lineId, String description, Timestamp ts
+			, byte[] content, String mimeCode, String filename) {
+		// delegieren
+		ReferencedDocument rd = ReferencedDocument.create(docRefId, lineId, description);
+		rd.setAttachedDocument(content, mimeCode, filename);
+		return rd;
 	}
-	
-	public void addSupportigDocument(ReferencedDocument doc) {
-		HeaderTradeAgreementType applicableHeaderTradeAgreement = getApplicableHeaderTradeAgreement();
-		applicableHeaderTradeAgreement.getAdditionalReferencedDocument().add(doc);
-	}
-
 	@Override
-	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments() {
-		List<ReferencedDocument> referencedDocuments = getReferencedDocuments(this);
-		List<BG24_AdditionalSupportingDocs> result = new ArrayList<BG24_AdditionalSupportingDocs>();
-//		if(referencedDocuments.isEmpty()) return result;
-		referencedDocuments.forEach(refDoc -> {
-			if(refDoc.isRelatedDocument()) {
-				result.add(refDoc);
-			}
+	public void addSupportigDocument(SupportingDocument supportigDocument) {
+		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
+		headerTradeAgreement.getAdditionalReferencedDocument().add((ReferencedDocument)supportigDocument);
+	}
+	@Override
+	public List<SupportingDocument> getAdditionalSupportingDocuments() {
+		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
+		List<ReferencedDocumentType> list = headerTradeAgreement.getAdditionalReferencedDocument();
+		List<SupportingDocument> res = new ArrayList<SupportingDocument>(list.size());
+		list.forEach(rd -> {
+			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
+			if(referencedDocument.isRelatedDocument()) res.add(referencedDocument);
 		});
-		return result;
-	}
-	// BT-17 BT-18 BG-24.BT-122
-	// BT-17 BT-18 haben IssuerAssignedID und (optional) BT-17-0, BT-18-0 TypeCode , BT-18-1 ReferenceTypeCode
-/*
+		return res;
 
-TypeCode Typ des referenzierten Dokuments
-. Datentyp: qdt:DocumentCodeType
-Hinweis: 
-Der Code 916 "Referenzpapier" wird benutzt, um die Kennung der rechnungsbegründenden Unterlage zu referenzieren. (BT-122)
-Der Code  50 "Price/sales catalogue response" wird benutzt, um die Ausschreibung oder das Los zu referenzieren. (BT-17)
-Der Code 130 "Rechnungsdatenblatt" wird benutzt, um eine vom Verkäufer angegebene Kennung für ein Objekt zu referenzieren. (BT-18)
-
-Codeliste: UNTDID 1001 Untermenge
-Code Codename
-.  50 . Validated priced tender
-. 130 . Invoicing data sheet / Rechnungsdatenblatt
-. 916 . Related document / Referenzpapier
-
- */
-	static List<ReferencedDocument> getReferencedDocuments(CrossIndustryInvoiceType doc) {
-		HeaderTradeAgreementType headerTradeAgreement = doc.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		List<ReferencedDocumentType> referencedDocuments = headerTradeAgreement.getAdditionalReferencedDocument();
-		List<ReferencedDocument> result = new ArrayList<ReferencedDocument>();
-		if(referencedDocuments.isEmpty()) {
-			return result;
-		}
-		referencedDocuments.forEach(refDoc -> {
-			IDType issuerAssignedID = refDoc.getIssuerAssignedID();
-			DocumentCodeType documentCode = refDoc.getTypeCode(); 
-			// documentCode.getValue() == 916 ==> BT-122
-			// sonst ist es BT-17 oder BT-18
-			LOG.fine("referencedDocument DocumentCode="+documentCode.getValue()+" IssuerAssignedID="+issuerAssignedID.getValue());
-			ReferencedDocument rd = new ReferencedDocument(issuerAssignedID.getValue(), documentCode.getValue(), null);
-			
-			List<TextType> texts = refDoc.getName();
-			texts.forEach(text -> {
-				rd.getName().add(text);
-			});
-			
-			List<BinaryObjectType> binaryObjects = refDoc.getAttachmentBinaryObject();
-			binaryObjects.forEach(bo -> {
-				BinaryObjectType bot = new BinaryObjectType();
-				bot.setValue(bo.getValue());
-				bot.setMimeCode(bo.getMimeCode());
-				bot.setFilename(bo.getFilename());
-				rd.getAttachmentBinaryObject().add(bot);
-			});
-			
-			result.add(rd);
-		});
-		return result;
 	}
 
 	/* INVOICE LINE                                BG-25                       1..* (mandatory)
@@ -1319,7 +1188,7 @@ Code Codename
 
 	// ----------------- factories to delegate
 	@Override
-	public BusinessParty createParty(String name, String tradingName, PostalAddress address, IContact contact) {
+	public BusinessParty createParty(String name, String tradingName, PostalAddress address, ContactInfo contact) {
 		TradeParty factory = TradeParty.create();
 		return factory.createParty(name, tradingName, address, contact); 
 	}
@@ -1331,9 +1200,9 @@ Code Codename
 	}
 
 	@Override
-	public IContact createContact(String contactName, String contactTel, String contactMail) {
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
 		TradeParty factory = TradeParty.create();
-		return factory.createContact(contactName, contactTel, contactMail);
+		return factory.createContactInfo(contactName, contactTel, contactMail);
 	}
 
 }

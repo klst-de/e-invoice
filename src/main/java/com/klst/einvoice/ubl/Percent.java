@@ -3,7 +3,7 @@ package com.klst.einvoice.ubl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import com.klst.einvoice.Rounding;
+import com.klst.edoc.api.Rounding;
 
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PercentType;
 

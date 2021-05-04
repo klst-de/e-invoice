@@ -4,9 +4,15 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.klst.untdid.codelist.DateTimeFormats;
-import com.klst.untdid.codelist.DocumentNameCode;
-import com.klst.untdid.codelist.PaymentMeansEnum;
+import com.klst.edoc.api.BusinessPartyFactory;
+import com.klst.edoc.api.ContactInfoFactory;
+import com.klst.edoc.api.Identifier;
+import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.api.PostalAddressFactory;
+import com.klst.edoc.api.Reference;
+import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 
 /*
 
@@ -33,8 +39,8 @@ public interface CoreInvoice extends CoreInvoiceFactory, BG1_InvoiceNote, BG2_Pr
 	BG4_Seller, BG7_Buyer, BG10_Payee, BG11_SellerTaxRepresentative, BG14_InvoicingPeriod, 
 	PaymentInstructionsFactory, CreditTransferFactory, PaymentCardFactory, DirectDebitFactory,
 	BG20_DocumentLevelAllowences, BG21_DocumentLevelCharges,
-	BG22_DocumentTotals, BG23_VatBreakdown, 
-	PostalAddressFactory, IContactFactory, BusinessPartyFactory {
+	BG22_DocumentTotals, BG23_VatBreakdown, BG24_AdditionalSupportingDocs, BG25_InvoiceLine,
+	PostalAddressFactory, ContactInfoFactory, BusinessPartyFactory {
 
 	/**
 	 * Invoice number   - A unique identification of the Invoice.
@@ -472,7 +478,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * <br>Rule ID: 	 
 	 * <br>Request ID: 	R7, R4
 	 * 
-	 * @param Document reference
+	 * @param docRefId - document reference id
 	 */
 	public void setTenderOrLotReference(String docRefId);
 	public String getTenderOrLotReference();
@@ -495,8 +501,8 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * <br>Rule ID: 	 
 	 * <br>Request ID: 	R33
 	 * 
-	 * @param the identifier name BT-18
-	 * @param scheme identifier BT-18-1
+	 * @param name - BT-18 the identifier name 
+	 * @param schemeID - BT-18-1 identifier. 
 	 * The identification scheme identifier of the Invoiced object identifier.
 	 * If it may be not clear for the receiver what scheme is used for the identifier, 
 	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.
@@ -609,37 +615,7 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 //	public void addVATBreakDown(VatBreakdown vatBreakdown);
 //	public List<VatBreakdown> getVATBreakDowns();
 	
-	// BG-24 + 0..n ADDITIONAL SUPPORTING DOCUMENTS
-	// BG-24.BT-122 ++ 1..1 Supporting document reference
-	// BG-24.BT-122-0  1..1 TypeCode
-	// BG-24.BT-123 ++ 0..1 Supporting document description
-	// BG-24.BT-124 ++ 0..1 External document location
-	// BG-24.BT-125 ++ 0..1 Attached document
-	/**
-	 * use this to add an attached document
-	 * 
-	 * @param docRefId - BG-24.BT-122 Supporting document reference
-//	 * @param code - BG-24.BT-122-0 TypeCode (CII only)
-	 * @param description/name - BG-24.BT-123 Supporting document description
-	 * @param content - BG-24.BT-125 Attached document content
-	 * @param mimeCode
-	 * @param filename
-	 */
-//	public void addSupportigDocument(String docRefId, String code, String description, byte[] content, String mimeCode, String filename);
-	public void addSupportigDocument(String docRefId, String description, byte[] content, String mimeCode, String filename);
-	
-	/**
-	 * use this to add an External document
-	 * 
-	 * @param docRefId - BG-24.BT-122 Supporting document reference
-//	 * @param code - BG-24.BT-122-0 TypeCode (CII only)
-	 * @param description/name - BG-24.BT-123 Supporting document description
-	 * @param uri locationUri
-	 */
-//	public void addSupportigDocument(String docRefId, String code, String description, String uri);
-	public void addSupportigDocument(String docRefId, String description, String uri);
-	
-	public List<BG24_AdditionalSupportingDocs> getAdditionalSupportingDocuments();
+	// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	
 	// INVOICE LINE  BG-25 1..* (mandatory)
 	public void addLine(CoreInvoiceLine line);

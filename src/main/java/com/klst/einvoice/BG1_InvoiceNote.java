@@ -14,39 +14,26 @@ import java.util.List;
  * <br>Request ID: 	R56
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
- */
-
-/* Bsp 05:
-CII:
-        <ram:IncludedNote>
-            <ram:Content>Trainer: Herr […]</ram:Content>
-            <ram:SubjectCode>ADU</ram:SubjectCode>
-        </ram:IncludedNote>
-
-UBL:
-    <cbc:Note>ADU</cbc:Note>
-    <cbc:Note>Trainer: Herr […]</cbc:Note>
-
-wurde geändert zu:
-    <cbc:Note>#ADU#Trainer: Herr […]</cbc:Note>
-
+ * @see InvoiceNoteFactory
  */
 public interface BG1_InvoiceNote extends InvoiceNoteFactory {
 	
-	// getter
-	public List<InvoiceNote> getInvoiceNotes();
-
-	// factory methods
 	/**
-	 * {@inheritDoc}
+	 * A shortcut to create an InvoiceNote without optional subjectCode
+	 * @param content
+	 * @return INVOICE NOTE Object
+	 * 
+	 * @see InvoiceNoteFactory#createNote(String, String)
 	 */
-	@Override
-	public InvoiceNote createNote(String subjectCode, String content);
 	default InvoiceNote createNote(String content) {
 		return createNote((String)null, content);
 	}
 
-	// setter
+	/**
+	 * Add BG-1 INVOICE NOTE <code>note</code> to the invoice
+	 * 
+	 * @param note
+	 */
 	public void addNote(InvoiceNote note);
 	default void addNote(String subjectCode, String content) {
 		addNote(createNote(subjectCode, content));
@@ -55,4 +42,11 @@ public interface BG1_InvoiceNote extends InvoiceNoteFactory {
 		addNote((String)null, content);
 	}
 	
+	/**
+	 * Get all BG-1 INVOICE NOTEs related to the invoice. The cardinality is 0..n
+	 * 
+	 * @return List of InvoiceNotes
+	 */
+	public List<InvoiceNote> getInvoiceNotes();
+
 }

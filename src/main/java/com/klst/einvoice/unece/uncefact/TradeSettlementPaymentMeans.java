@@ -3,10 +3,10 @@ package com.klst.einvoice.unece.uncefact;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.DebitedAccountID;
 import com.klst.einvoice.PaymentCard;
-import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.CreditorFinancialAccountType;
@@ -137,10 +137,21 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 		super.setTypeCode(pmc);
 	}
 	
-	PaymentMeansEnum getPaymentMeansEnum() {
+	private String getPaymentMeansString() {
 		PaymentMeansCodeType pmc = super.getTypeCode();
 		if(pmc==null) return null;
-		return PaymentMeansEnum.valueOf(pmc);
+		return pmc.getValue()==null ? null : pmc.getValue();
+	}
+	PaymentMeansEnum getPaymentMeansEnum() {
+		String value = getPaymentMeansString();
+		if(value==null) return null;
+		try {
+			int code = Integer.parseInt(value);
+			return PaymentMeansEnum.valueOf(code);
+		} catch (NumberFormatException e) {
+			LOG.warning(e.getMessage());
+		}
+		return null;
 	}
 	
 	boolean isCreditTransfer() {
@@ -175,7 +186,7 @@ public class TradeSettlementPaymentMeans extends TradeSettlementPaymentMeansType
 
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder().append("[");
-		stringBuilder.append(this.getPaymentMeansEnum());
+		stringBuilder.append(this.getPaymentMeansString());
 		if(isCreditTransfer()) {
 			stringBuilder.append(", CREDIT TRANSFER PaymentAccountID:"); // BG-17.BT-84
 			stringBuilder.append(getPaymentAccountID()==null ? "null" : getPaymentAccountID());

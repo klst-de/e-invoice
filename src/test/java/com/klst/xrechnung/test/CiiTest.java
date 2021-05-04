@@ -20,16 +20,16 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG2_ProcessControl;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.PaymentInstructions;
-import com.klst.einvoice.PostalAddress;
 import com.klst.einvoice.unece.uncefact.CrossIndustryInvoice;
-import com.klst.untdid.codelist.DateTimeFormats;
-import com.klst.untdid.codelist.DocumentNameCode;
-import com.klst.untdid.codelist.PaymentMeansEnum;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CiiTest {
@@ -192,8 +192,8 @@ java.lang.ArrayIndexOutOfBoundsException: 5
     	assertEquals("[DE (Bayern), 98765, [Deliver to city]]", delivery.getAddress().toString());
     	assertEquals("[Deliver to party name]", delivery.getName()); 
     	
-    	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), cii.getStartDateAsTimestamp()); 
-    	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), cii.getEndDateAsTimestamp()); 
+    	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), cii.getDeliveryPeriod().getStartDateAsTimestamp()); 
+    	assertEquals(Timestamp.valueOf("2018-04-13 00:00:00"), cii.getDeliveryDateAsTimestamp()); 
     	
     	LOG.info("------------------------------------------- toCii:");
     	byte[] bytes = factory.toCii(); // the xml

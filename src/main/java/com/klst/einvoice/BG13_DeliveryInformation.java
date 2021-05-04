@@ -2,7 +2,7 @@ package com.klst.einvoice;
 
 import java.sql.Timestamp;
 
-import com.klst.untdid.codelist.DateTimeFormats;
+import com.klst.edoc.untdid.DateTimeFormats;
 
 /**
  * BG-13 + 0..1 DELIVERY INFORMATION

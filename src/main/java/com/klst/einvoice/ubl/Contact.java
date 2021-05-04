@@ -1,7 +1,7 @@
 package com.klst.einvoice.ubl;
 
 import com.klst.ebXml.reflection.SCopyCtor;
-import com.klst.einvoice.IContact;
+import com.klst.edoc.api.ContactInfo;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.ContactType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ElectronicMailType;
@@ -29,10 +29,10 @@ Seller contact telephone number             BT-42 Text                  1
 Seller contact email address                BT-43 Text                  1
 
 */
-public class Contact extends ContactType implements IContact {
+public class Contact extends ContactType implements ContactInfo {
 
-	@Override // implements IContactFactory
-	public IContact createContact(String contactName, String contactTel, String contactMail) {
+	@Override // Factory
+	public ContactInfo createContactInfo(String contactName, String contactTel, String contactMail) {
 		return create(contactName, contactTel, contactMail);
 	}
 	
@@ -44,7 +44,7 @@ public class Contact extends ContactType implements IContact {
 		return create((ContactType)null);
 	}
 	// copy factory
-	public static IContact createIContact(ContactType object) {
+	public static ContactInfo createIContact(ContactType object) {
 		return create(object);
 	}
 	static Contact create(ContactType object) {
@@ -89,7 +89,7 @@ public class Contact extends ContactType implements IContact {
 		setContactEmail(contactMail);
 	}
 
-	Contact(IContact contact) {
+	Contact(ContactInfo contact) {
 		this(contact.getContactPoint(), contact.getContactTelephone(), contact.getContactEmail());
 	}
 

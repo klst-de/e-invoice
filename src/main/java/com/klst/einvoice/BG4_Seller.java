@@ -1,6 +1,8 @@
 package com.klst.einvoice;
 
-import com.klst.untdid.codelist.ReferenceCode;
+import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.ContactInfo;
+import com.klst.edoc.api.PostalAddress;
 
 /**
  * BG-4 + 1..1 SELLER 
@@ -37,11 +39,9 @@ import com.klst.untdid.codelist.ReferenceCode;
  */
 public interface BG4_Seller {
 	
-	public void setSeller(String name, PostalAddress address, IContact contact, String companyId, String companyLegalForm);
-	public void setSeller(BusinessParty party);
-	public BusinessParty getSeller();
-
-	// BT-31 ++ 0..1 Seller VAT identifier z.B. DE 123456789 / <ram:SpecifiedTaxRegistration><ram:ID> / <cac:PartyTaxScheme><cbc:CompanyID>
+	// BG-4.BT-27 1..1 Seller name
+	// ...
+	// BG-4.BT-31 0..1 Seller VAT identifier z.B. DE 123456789 / <ram:SpecifiedTaxRegistration><ram:ID> / <cac:PartyTaxScheme><cbc:CompanyID>
 //	Umsatzsteueridentnummer des Verkäufers BT-31
 //	Steuernummer des Verkäufers            BT-32
 //	Die betriebswirtschaftlichen Begriffe werden über einen Scheme identifier unterschieden. 
@@ -49,6 +49,12 @@ public interface BG4_Seller {
 //	VA . Umsatzsteuernummer
 //	FC . Steuernummer 	
 
-	static final ReferenceCode FC = ReferenceCode.FiscalNumber;
+	// BG-5 1..1 SELLER POSTAL ADDRESS
+	// BG-6 0..1 SELLER CONTACT
+	
+	public void setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm);
+	public void setSeller(BusinessParty party);
+	public BusinessParty getSeller();
+
 		
 }

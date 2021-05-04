@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,19 +26,20 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.einvoice.AllowancesAndCharges;
 import com.klst.einvoice.BG13_DeliveryInformation;
 import com.klst.einvoice.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.PaymentInstructions;
+import com.klst.einvoice.SupportingDocument;
 import com.klst.einvoice.ubl.GenericInvoice;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
 import com.klst.marshaller.AbstactTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
-import com.klst.untdid.codelist.DocumentNameCode;
-import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import oasis.names.specification.ubl.schema.xsd.invoice_2.InvoiceType;
 
@@ -208,12 +212,50 @@ public class UblTest {
     	assertEquals("[DE (Bayern), 98765, [Deliver to city]]", delivery.getAddress().toString());
     	assertEquals("[Deliver to party name]", delivery.getName()); 
     	
-    	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getStartDateAsTimestamp()); 
-    	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getEndDateAsTimestamp()); 
+    	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getDeliveryPeriod().getStartDateAsTimestamp()); 
+    	assertEquals(Timestamp.valueOf("2018-04-13 01:00:00"), ublInvoice.getDeliveryDateAsTimestamp()); 
 	}
 
 	@Test
-    public void ubl0201_AdditionalDocs() { // auch möglich mit 01.15a
+    public void ubl0115_AdditionalDocs() {
+	   	InvoiceFactory factory = new CreateUblXXXInvoice("01.15a-INVOICE_ubl.xml");
+    	Object o = factory.makeInvoice();
+    	GenericInvoice<InvoiceType> ublTest = (GenericInvoice<InvoiceType>)o;
+    	GenericInvoice<InvoiceType> ublInvoice = new GenericInvoice<InvoiceType>(ublTest.get());
+    	// BT-18:
+    	assertEquals("OBJ999", ublInvoice.getInvoicedObject());
+    	// BG-24:
+    	List<SupportingDocument> sdList = ublInvoice.getAdditionalSupportingDocuments();
+    	assertEquals(1, sdList.size());
+    	SupportingDocument sDoc = sdList.get(0);
+    	assertEquals("01_15_Anhang_01.pdf", sDoc.getDocumentReference().getName());
+/*
+DocumentCode "916" wird in UBL nicht gesetzt! null!
+ */
+    	LOG.info("sDoc:"+sDoc);
+//    	assertEquals("916", asDoc.getDocumentCode());
+    	assertEquals("Aufschlüsselung der einzelnen Leistungspositionen", sDoc.getSupportingDocumentDescription());
+    	assertEquals("application/pdf", sDoc.getAttachedDocumentMimeCode());
+    	assertEquals("01_15_Anhang_01.pdf", sDoc.getAttachedDocumentFilename());
+    	byte[] content = getBytesFromTestFile(PDF);
+    	assertTrue(Arrays.equals(content, sDoc.getAttachedDocument()));
+    	assertNull(sDoc.getExternalDocumentLocation());
+ 	}
+	static final String PDF = "01_15_Anhang_01.pdf";
+	private byte[] getBytesFromTestFile(String fileName) {
+		Path path = Paths.get(TESTDIR+fileName);
+		byte[] data = null;
+		try {
+			data = Files.readAllBytes(path);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return data;
+	}
+
+	@Test
+    public void ubl0201_AdditionalDocs() {
     	InvoiceFactory factory = new CreateUblXXXInvoice("02.01a-INVOICE_ubl.xml");
     	Object o = factory.makeInvoice();
     	GenericInvoice<InvoiceType> ublTest = (GenericInvoice<InvoiceType>)o;
@@ -236,9 +278,9 @@ public class UblTest {
 //    	assertNotNull(tenderOrLotReference);
 //    	assertEquals("ANG987654321", tenderOrLotReference); 
    	
-    	List<BG24_AdditionalSupportingDocs> asdList = ublInvoice.getAdditionalSupportingDocuments();
+    	List<SupportingDocument> asdList = ublInvoice.getAdditionalSupportingDocuments();
     	assertEquals(1, asdList.size());
-    	BG24_AdditionalSupportingDocs asDoc = asdList.get(0);
+    	SupportingDocument asDoc = asdList.get(0);
     	assertEquals("01_15_Anhang_01.pdf", asDoc.getDocumentReference().getName());
     	assertEquals("Aufschlüsselung der einzelnen Leistungspositionen", asDoc.getSupportingDocumentDescription());
     	assertEquals("application/pdf", asDoc.getAttachedDocumentMimeCode());

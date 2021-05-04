@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.einvoice.ITaxCategory;
 import com.klst.einvoice.ITaxCategoryFactory;
-import com.klst.untdid.codelist.TaxCategoryCode;
-import com.klst.untdid.codelist.TaxTypeCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;
@@ -106,7 +106,7 @@ public class TaxCategory extends TaxCategoryType implements ITaxCategory, ITaxCa
 	 */
 	@Override
 	public TaxCategoryCode getTaxCategoryCode() {
-		return TaxCategoryCode.valueOf(this);
+		return super.getID()==null ? null : TaxCategoryCode.getEnum(getID().getValue());
 	}
 	
 	// BT-96, BT-103 0..1 Document level allowance/charge tax/VAT rate

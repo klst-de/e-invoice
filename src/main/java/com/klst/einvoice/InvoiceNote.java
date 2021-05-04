@@ -13,35 +13,10 @@ package com.klst.einvoice;
  * 
  * @see <a href="https://standards.cen.eu">standards.cen.eu</a> (en)EN_16931_1_2017 for rule and request IDs
  */
-
-/*      subjectCode BT-21 gibt es in UBL nicht!
-Bsp 05:
-CII:
-        <ram:IncludedNote>
-            <ram:Content>Trainer: Herr […]</ram:Content>
-            <ram:SubjectCode>ADU</ram:SubjectCode>
-        </ram:IncludedNote>
-
-UBL:
-    <cbc:Note>ADU</cbc:Note>
-    <cbc:Note>Trainer: Herr […]</cbc:Note>
-
-wurde geändert zu:
-    <cbc:Note>#ADU#Trainer: Herr […]</cbc:Note>
-
-also ist in UBL effektiv nur ein String da, value - dieser wird per regex in subjectCode und content aufgeteilt
-während in CII mehrere Objekte da sind, nur zwei werden genutzt:
-    protected TextType subject;
-    protected CodeType contentCode;
-    protected List<TextType> content;      <=========== BT-22 
-    protected CodeType subjectCode;        <=========== BT-21
-    protected IDType id; 
-
- */
 public interface InvoiceNote extends InvoiceNoteFactory {
 	
-	@Override // factory method
-	public InvoiceNote createNote(String subjectCode, String content);
+//	factory method:
+//	public InvoiceNote createNote(String subjectCode, String content);
 	
 // setter:
 //	void setCode(String code); // not public ==> use factory

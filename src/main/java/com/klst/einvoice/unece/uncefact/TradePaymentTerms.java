@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
-import com.klst.untdid.codelist.DateTimeFormats;
+import com.klst.edoc.untdid.DateTimeFormats;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;

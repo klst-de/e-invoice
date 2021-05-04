@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.IPeriod;
+import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.einvoice.BusinessParty;
 import com.klst.einvoice.CreditTransfer;
 import com.klst.einvoice.CreditTransferFactory;
 import com.klst.einvoice.DirectDebit;
@@ -15,11 +17,9 @@ import com.klst.einvoice.DirectDebitFactory;
 import com.klst.einvoice.PaymentCard;
 import com.klst.einvoice.PaymentInstructions;
 import com.klst.einvoice.PaymentInstructionsFactory;
-import com.klst.untdid.codelist.PaymentMeansEnum;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.CurrencyCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeSettlementType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePaymentTermsType;
@@ -168,7 +168,7 @@ public class HeaderTradeSettlement extends HeaderTradeSettlementType
 		}
 	}
 	
-	SpecifiedPeriodType billingSpecifiedPeriod = null; // BG-14 ++ 0..1 INVOICING PERIOD
+//	SpecifiedPeriod billingSpecifiedPeriod = null; // BG-14 0..1 INVOICING PERIOD
 	
 	// das erste element der Liste specifiedTradePaymentTerms aus super, die anderen werden nicht genutzt
 	TradePaymentTerms tradePaymentTerms = null;
@@ -233,9 +233,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 
 	// BT-5 + 1..1 Invoice currency code
 	void setDocumentCurrency(String isoCurrencyCode) {
-		CurrencyCodeType currencyCode = new CurrencyCodeType();
-		currencyCode.setValue(isoCurrencyCode);
-		super.setInvoiceCurrencyCode(currencyCode);		
+		SCopyCtor.getInstance().set(this, "invoiceCurrencyCode", isoCurrencyCode);
 	}
 	String getDocumentCurrency() {
 		if(super.getInvoiceCurrencyCode()==null) {
@@ -247,10 +245,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	
 	// BT-6 + 0..1 VAT accounting currency code
 	void setTaxCurrency(String isoCurrencyCode) {
-		if(isoCurrencyCode==null) return;  // optional
-		CurrencyCodeType currencyCode = new CurrencyCodeType();
-		currencyCode.setValue(isoCurrencyCode);
-		super.setTaxCurrencyCode(currencyCode);
+		SCopyCtor.getInstance().set(this, "taxCurrencyCode", isoCurrencyCode);
 	}
 	public String getTaxCurrency() {
 		CurrencyCodeType currencyCode = super.getTaxCurrencyCode();
@@ -375,7 +370,9 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 
 		// FinancialAccount implements CreditTransfer, DirectDebit
 		haderTradeSettlement.getSpecifiedTradeSettlementPaymentMeans().forEach(pm -> {
-			PaymentMeansEnum code = PaymentMeansEnum.valueOf(pm.getTypeCode());
+			String value = pm.getTypeCode().getValue();
+			int intcode = Integer.parseInt(value);
+			PaymentMeansEnum code = PaymentMeansEnum.valueOf(intcode);
 			switch(code) {
 			case CreditTransfer:
 			case SEPACreditTransfer:
@@ -731,16 +728,14 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 		return party==null ? null : TradeParty.create(party);
 	}
 	
-	// BG-14 ++ 0..1 INVOICING PERIOD
-	public SpecifiedPeriodType getBillingSpecifiedPeriod() {
-		if(billingSpecifiedPeriod==null) {
-			billingSpecifiedPeriod = super.getBillingSpecifiedPeriod();
-			if(billingSpecifiedPeriod==null) {
-				billingSpecifiedPeriod = new SpecifiedPeriodType();
-				super.setBillingSpecifiedPeriod(billingSpecifiedPeriod);
-			}
-		}
-		return billingSpecifiedPeriod;
+	// BG-14 0..1 INVOICING PERIOD
+	void setDeliveryPeriod(IPeriod period) {
+		if(period==null) return;
+		super.setBillingSpecifiedPeriod((SpecifiedPeriod)period);
+	}
+	IPeriod getDeliveryPeriod() {
+		if(super.getBillingSpecifiedPeriod()==null) return null;
+		return SpecifiedPeriod.create(super.getBillingSpecifiedPeriod());
 	}
 
 }

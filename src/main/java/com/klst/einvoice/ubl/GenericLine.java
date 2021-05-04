@@ -7,16 +7,21 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IPeriod;
+import com.klst.edoc.api.IQuantity;
+import com.klst.edoc.api.Identifier;
+import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.DocumentNameCode;
+import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.einvoice.AllowancesAndCharges;
+import com.klst.einvoice.CoreInvoice;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.GlobalIdentifier;
-import com.klst.einvoice.Identifier;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
-import com.klst.untdid.codelist.DateTimeFormats;
-import com.klst.untdid.codelist.TaxCategoryCode;
-import com.klst.untdid.codelist.TaxTypeCode;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AllowanceChargeType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.CommodityClassificationType;
@@ -45,34 +50,38 @@ import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NoteType
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.PercentType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.StartDateType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ValueType;
-import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.DateType;
 import oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.QuantityType;
 
 public class GenericLine<T> implements CoreInvoiceLine {
 
+	@Override
+	public CoreInvoiceLine createInvoiceLine(String id, IQuantity quantity, IAmount lineTotalAmount,
+			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
+		return create(this.invoice, id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+	}
+	
 	private static final Logger LOG = Logger.getLogger(GenericLine.class.getName());
 	
+	private CoreInvoice invoice; // Invoice or CreditNote this line belongs to
 	T t;
 	boolean isInvoiceLineType = false;
 	InvoiceLineType iLine = null;
 	CreditNoteLineType cnLine = null;
 	
 	// factory
-	// TODO not public:
-	public static CoreInvoiceLine createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
+	static CoreInvoiceLine create(CoreInvoice invoice, String id, Quantity quantity, Amount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
-		InvoiceLineType il = new InvoiceLineType();
-		GenericLine<InvoiceLineType> gl = new GenericLine<InvoiceLineType>(il);
-		gl.init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
-		return gl;
-	}
-	// TODO not public:
-	public static CoreInvoiceLine createCreditNoteLine(String id, Quantity quantity, Amount lineTotalAmount, 
-			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
-		CreditNoteLineType cnl = new CreditNoteLineType();
-		GenericLine<CreditNoteLineType> gl = new GenericLine<CreditNoteLineType>(cnl);
-		gl.init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
-		return gl;
+		if(invoice.getTypeCode()==DocumentNameCode.CreditNote) {
+			CreditNoteLineType cnl = new CreditNoteLineType();
+			GenericLine<CreditNoteLineType> gl = new GenericLine<CreditNoteLineType>(cnl);
+			gl.init(invoice, id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+			return gl;
+		} else {
+			InvoiceLineType il = new InvoiceLineType();
+			GenericLine<InvoiceLineType> gl = new GenericLine<InvoiceLineType>(il);
+			gl.init(invoice, id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+			return gl;
+		}
 	}
 	
 	// ctor mit type parameter
@@ -84,7 +93,6 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		} else {
 			cnLine = (CreditNoteLineType)t;
 		}
-//		LOG.info("copy ctor isInvoiceLineType:"+isInvoiceLineType);
 		if(getId()!=null) LOG.config("copy ctor "+this);
 	}
 	
@@ -92,10 +100,10 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return this.t;
 	}
 
-	void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
-			, TaxCategoryCode codeEnum, BigDecimal taxRate) {
+	private void init(CoreInvoice invoice, String id, Quantity quantity, Amount lineTotalAmount, 
+			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal taxRate) {
+		this.invoice = invoice;
 		ItemType item = new ItemType();
-//		PriceType price = new PriceType();
 		if(isInvoiceLineType) {
 			iLine.setItem(item);
 		} else {
@@ -137,7 +145,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return id==null ? null : id.getValue();
 	}
 
-	// BT-127 ++ 0..1 Invoice line note
+	// BG-25.BT-127 0..1 Invoice line note
 	@Override
 	public void setNote(String text) {
 		if(text==null) return;
@@ -156,17 +164,16 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return noteList.isEmpty() ? null : noteList.get(0).getValue(); // wg. 0..1
 	}
 
-	// BT-128 ++ 0..1 Invoice line object identifier
+	// BG-25.BT-128 0..1 Invoice line object identifier
 	@Override
-	public void setLineObjectID(String id, String schemeID, String schemeCode) {
+	public void setLineObjectID(String id, String typeCode, String schemeCode) {
  		if(id==null) return;
- 		DocumentReferenceType note = new DocumentReferenceType();
- 		note.setID(new ID(id, schemeID, schemeCode));
+ 		DocumentReference docRef = DocumentReference.create(id, schemeCode, typeCode);
 		
 		if(isInvoiceLineType) {
-			iLine.getDocumentReference().add(note);
+			iLine.getDocumentReference().add(docRef);
 		} else {
-			cnLine.getDocumentReference().add(note);
+			cnLine.getDocumentReference().add(docRef);
 		}	
 	}
 
@@ -190,8 +197,8 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return documentReference.isEmpty() ? null : new ID(documentReference.get(0).getID()); // get(0) wg. 0..1
 	}
 
-	// BT-129 ++ 1..1 Invoiced quantity
-	// BT-130 ++ 1..1 Invoiced quantity unit of measure code
+	// BG-25.BT-129 1..1 Invoiced quantity
+	// BG-25.BT-130 1..1 Invoiced quantity unit of measure code
  	/**
  	 * non public - use ctor
  	 * 
@@ -208,12 +215,12 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		}	
 	}
 	@Override
-	public Quantity getQuantity() {
+	public IQuantity getQuantity() {
 		QuantityType quantity = (QuantityType)(isInvoiceLineType ? iLine.getInvoicedQuantity() : cnLine.getCreditedQuantity());	
 		return new Quantity(quantity.getUnitCode(), quantity.getValue());
 	}
 
-	// BT-131 ++ 1..1 Invoice line net amount
+	// BG-25.BT-131 1..1 Invoice line net amount
  	/**
  	 * non public - use ctor
  	 * 
@@ -235,7 +242,14 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
 
-	// BT-132 ++ 0..1 Referenced purchase order line reference
+	/* BG-25.BT-132 0..1 Referenced purchase order line reference
+
+Bsp. UBL 01.01a :
+        <cac:OrderLineReference>
+            <cbc:LineID>6171175.1</cbc:LineID>
+        </cac:OrderLineReference>
+
+	 */
 	@Override
 	public void setOrderLineID(String lineReference) {
 		if(lineReference==null) return;
@@ -256,7 +270,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return list.isEmpty() ? null : list.get(0).getLineID().getValue(); // wg. 0..1
 	}
 
-	// BT-133 ++ 0..1 Invoice line Buyer accounting reference
+	// BG-25.BT-133 0..1 Invoice line Buyer accounting reference
 	@Override
 	public void setBuyerAccountingReference(String text) {
 		if(text==null) return;
@@ -274,8 +288,21 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return accountingCost==null ? null : accountingCost.getValue();
 	}
 
-	// BG-26 ++ 0..1 INVOICE LINE PERIOD
-	// BG-26.BT-134 +++ 0..1 Invoice line period start date / Das Datum, an dem der Rechnungszeitraum der betreffenden Rechnungsposition beginnt.
+	// BG-26 0..1 INVOICE LINE PERIOD
+//	@Override // comment to show the java-doc
+	/**
+	 * factory method to create BG-26 INVOICE LINE PERIOD 
+	 * 
+	 * @param start - The date is the first day of the period.
+	 * @param end - The date is the last day of the period.
+	 * @return IPeriod - aka delivery period
+	 * 
+	 * @see com.klst.einvoice.BG26_InvoiceLinePeriod
+	 * @see com.klst.edoc.api.IPeriod
+	 */
+	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		return Period.create(start, end);
+	}
 	List<PeriodType> periodList = null;
 	PeriodType getPeriod0() {
 		if(periodList==null) {
@@ -289,7 +316,16 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return periodList.get(0);
 	}
 	@Override
-	public void setStartDate(Timestamp ts) {
+	public IPeriod getLineDeliveryPeriod() {
+		return Period.create(getPeriod0());
+	}
+	@Override
+	public void setLineDeliveryPeriod(IPeriod period) {
+		setStartDate(period.getStartDateAsTimestamp());
+		setEndDate(period.getEndDateAsTimestamp());
+	}
+	// BG-26.BT-134 0..1 Invoice line period start date / Das Datum, an dem der Rechnungszeitraum der betreffenden Rechnungsposition beginnt.
+	private void setStartDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		StartDateType date = new StartDateType();
 		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
@@ -297,33 +333,15 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		period.setStartDate(date);
 	}
 	
-	@Override
-	public Timestamp getStartDateAsTimestamp() {
-		List<PeriodType> list = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
-		if(list.isEmpty()) return null;
-		DateType date = (DateType)list.get(0).getStartDate();
-		if(date==null) return null;
-		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
-	}
-	
-	// BG-26.BT-135 +++ 0..1 Invoice line period end date
-	@Override
-	public void setEndDate(Timestamp ts) {
+	// BG-26.BT-135 0..1 Invoice line period end date
+	private void setEndDate(Timestamp ts) {
 		if(ts==null) return; // optional
 		EndDateType date = new EndDateType();
 		date.setValue(DateTimeFormats.tsToXMLGregorianCalendar(ts));
 		PeriodType period = getPeriod0();
 		period.setEndDate(date);
 	}
-	
-	@Override
-	public Timestamp getEndDateAsTimestamp() {
-		List<PeriodType> list = isInvoiceLineType ? iLine.getInvoicePeriod() : cnLine.getInvoicePeriod();
-		if(list.isEmpty()) return null;
-		DateType date = (DateType)list.get(0).getEndDate();
-		return DateTimeFormats.xmlGregorianCalendarToTs(date.getValue());
-	}
-	
+
 	/*
 	 * BG-27 0..n INVOICE LINE ALLOWANCES
 	 * BG-28 0..n INVOICE LINE CHARGES
@@ -356,7 +374,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return resList;
 	}
 
-	// BG-29 ++ 1..1 PRICE DETAILS
+	// BG-29        1..1 PRICE DETAILS
 	// BG-29.BT-146 1..1 Item net price
 	@Override
 	public UnitPriceAmount getUnitPriceAmount() {
@@ -364,7 +382,7 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		return price.getUnitPriceAmount();
 	}
 	
-	// BG-29.BT-147 +++ 0..1 Item price discount
+	// BG-29.BT-147 0..1 Item price discount
 	@Override
 	public UnitPriceAmount getPriceDiscount() {
 		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
@@ -395,27 +413,12 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		}		
 	}
 	
+	// BG-29.BT-146 1..1 UnitPriceAmount
 	private void setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
 		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
 		price.setUnitPriceAmount(unitPriceAmount);
 		setPrice(price);
 	}
-
-//	private void setPriceDiscount(UnitPriceAmount unitPriceAmount) { 
-//		if(unitPriceAmount!=null) {
-//			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
-//			price.setPriceDiscount(unitPriceAmount);
-//			setPrice(price);
-//		}
-//	}
-//
-//	private void setGrossPrice(UnitPriceAmount unitPriceAmount) { 
-//		if(unitPriceAmount!=null) {
-//			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
-//			price.setGrossPrice(unitPriceAmount);
-//			setPrice(price);
-//		}
-//	}
 
 	private void setUnitPriceQuantity(Quantity quantity) {
 		if(quantity!=null) {
@@ -472,8 +475,10 @@ public class GenericLine<T> implements CoreInvoiceLine {
 		} else {
 			ItemType item = cnLine.getItem();
 			taxCategory = item.getClassifiedTaxCategory().get(0); // wg. 1..1
-		}	
-		return TaxCategoryCode.valueOf(taxCategory); // S
+		}
+		return TaxCategory.create(taxCategory).getTaxCategoryCode();
+//		if(taxCategory==null) return null;
+//		return taxCategory.getID()==null ? null : TaxCategoryCode.getEnum(taxCategory.getID().getValue()); // S
 	}
 
 

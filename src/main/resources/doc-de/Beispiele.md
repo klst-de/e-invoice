@@ -44,15 +44,27 @@ Das folgende Beispiel definiert den Verkäufer und den Käufer und damit erfüll
 	// BusinessParty Seller aka Supplier
 	PostalAddress sellerAddress = invoice.createAddress(DE, "12345", "[Seller city]");
 	sellerAddress.setAddressLine1("[Seller address line 1]");
-	IContact sellerContact = null;                           // (optional)
+	ContactInfo sellerContact = null;                       // (optional)
 	invoice.setSeller("[Seller name]", sellerAddress, sellerContact, 
 		"[HRA-Eintrag]", "123/456/7890, HRA-Eintrag in […]");
 		  
 	// BusinessParty Buyer aka Customer 
 	PostalAddress buyerAddress = invoice.createAddress(DE, "12345", "[Buyer city]");
-	IContact buyerContact = null;                           // (optional)
+	ContactInfo buyerContact = null;                        // (optional)
 	invoice.setBuyer("[Buyer name]", buyerAddress, buyerContact);
 ...
+```
+
+Die Methode `setSeller(String name, PostalAddress address, ContactInfo contact, String companyId, String companyLegalForm)` ist eine Kurzschreibweise für `setSeller(BusinessParty party)`:
+
+```java
+   // alternativ:
+   String sellerName = "[Seller name]";  // BT-27 formelle Name des Verkäufers
+   String tradingName = null;            // BT-28 Handelsname des Verkäufers
+   BusinessParty seller = invoice.createParty(sellerName, tradingName, sellerAddress, sellerContact);
+   seller.setCompanyId("[HRA-Eintrag]"); // BT-29 Kennung des Verkäufers
+   seller.setCompanyLegalForm("123/456/7890, HRA-Eintrag in […]"); // BT-30 rechtliche Registrierung
+   invoice.setSeller(seller);
 ```
 
 Die Adresse der Käufers ist einfach zu vervollständigen: `setAddressLine1(...)`. Auch die optionalen Kontaktdaten lassen sich einfach ergänzen:
@@ -62,7 +74,7 @@ Die Adresse der Käufers ist einfach zu vervollständigen: `setAddressLine1(...)
 	String contactName = "nicht vorhanden";
 	String contactTel  = "+49 1234-5678";
 	String contactMail = "seller@email.de";
-	IContact sellerContact = invoice.createContact(contactName, contactTel, contactMail);
+	ContactInfo sellerContact = invoice.createContact(contactName, contactTel, contactMail);
 ...
 ```
 

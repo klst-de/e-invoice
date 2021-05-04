@@ -2,8 +2,8 @@ package com.klst.einvoice;
 
 import java.math.BigDecimal;
 
-import com.klst.einvoice.unece.uncefact.Amount;
-import com.klst.untdid.codelist.TaxCategoryCode;
+import com.klst.edoc.api.IAmount;
+import com.klst.edoc.untdid.TaxCategoryCode;
 
 public interface VatBreakdownFactory {
 	
@@ -17,6 +17,6 @@ public interface VatBreakdownFactory {
 	 * 
 	 * @return VATBreakdown object
 	 */
-	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode code, BigDecimal taxRate);
+	public VatBreakdown createVATBreakDown(IAmount taxableAmount, IAmount taxAmount, TaxCategoryCode code, BigDecimal taxRate);
 
 }

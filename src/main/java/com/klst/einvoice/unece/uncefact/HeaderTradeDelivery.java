@@ -4,10 +4,10 @@ import java.sql.Timestamp;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.PostalAddress;
+import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.einvoice.BG13_DeliveryInformation;
-import com.klst.einvoice.BusinessParty;
-import com.klst.einvoice.PostalAddress;
-import com.klst.untdid.codelist.DateTimeFormats;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainEventType;
@@ -122,10 +122,7 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements BG13
 	@Override
 	public void setActualDate(Timestamp ts) {
 		if(ts==null) return;
-		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		SupplyChainEventType supplyChainEvent = new SupplyChainEventType();
-		supplyChainEvent.setOccurrenceDateTime(dateTime);
-		super.setActualDeliverySupplyChainEvent(supplyChainEvent);
+		SCopyCtor.getInstance().set(this, "actualDeliverySupplyChainEvent", DateTimeFormatStrings.toDateTime(ts));
 	}
 
 	@Override

@@ -1,5 +1,9 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.BusinessParty;
+import com.klst.edoc.api.ContactInfo;
+import com.klst.edoc.api.PostalAddress;
+
 /**
  * BG-7 + 1..1 BUYER
  * <p>
@@ -37,7 +41,10 @@ package com.klst.einvoice;
  */
 public interface BG7_Buyer {
 	
-	public void setBuyer(String name, PostalAddress address, IContact contact);
+	// BG-8 1..1 BUYER POSTAL ADDRESS
+	// BG-9 0..1 BUYER CONTACT
+	
+	public void setBuyer(String name, PostalAddress address, ContactInfo contact);
 	public void setBuyer(BusinessParty party);
 	public BusinessParty getBuyer();
 

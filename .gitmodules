@@ -1,0 +1,3 @@
+[submodule "e-doc-commons"]
+	path = e-doc-commons
+	url = git@github.com:klst-de/e-doc-commons.git

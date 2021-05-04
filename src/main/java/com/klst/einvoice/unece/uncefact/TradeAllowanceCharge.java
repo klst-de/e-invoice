@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.einvoice.AllowancesAndCharges;
-import com.klst.untdid.codelist.TaxCategoryCode;
 
-import un.unece.uncefact.data.standard.qualifieddatatype._100.AllowanceChargeReasonCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAllowanceChargeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
@@ -136,9 +135,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	@Override
 	public void setChargeIndicator(boolean value) {
-		IndicatorType indicator = new IndicatorType();
-		indicator.setIndicator(value);
-		super.setChargeIndicator(indicator);
+		SCopyCtor.getInstance().set(this, "chargeIndicator", value);
 	}
 	
 	@Override
@@ -173,10 +170,12 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	// BT-93, BT100 (optional) Document level allowance/charge base amount
 	@Override
 	public void setAssessmentBase(Amount amount) {
-		if(amount==null) return;
-		AmountType baseAmt = new AmountType();
-		amount.copyTo(baseAmt);
-		super.setBasisAmount(baseAmt);
+		SCopyCtor.getInstance().set(this, "basisAmount", amount);
+//		
+//		if(amount==null) return;
+//		AmountType baseAmt = new AmountType();
+//		amount.copyTo(baseAmt);
+//		super.setBasisAmount(baseAmt);
 	}
 
 	@Override
@@ -277,9 +276,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	// BT-97, BT-104 0..1 Document level allowance/charge reason
 	@Override
 	public void setReasonText(String text) {
-		if(text==null) return;		
-		Text allowanceChargeReasonCode = Text.create(text);
-		super.setReason(allowanceChargeReasonCode);
+		SCopyCtor.getInstance().set(this, "reason", text);
 	}
 
 	@Override
@@ -290,10 +287,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	// BT-98, BT-103 0..1 Document level allowance/charge reason code
 	@Override
 	public void setReasoncode(String code) {
-		if(code==null) return; 
-		AllowanceChargeReasonCodeType allowanceChargeReasonCode = new AllowanceChargeReasonCodeType();
-		allowanceChargeReasonCode.setValue(code);
-		super.setReasonCode(allowanceChargeReasonCode);
+		SCopyCtor.getInstance().set(this, "reasonCode", code);
 	}
 
 	@Override

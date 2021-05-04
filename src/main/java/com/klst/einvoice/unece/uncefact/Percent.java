@@ -3,7 +3,7 @@ package com.klst.einvoice.unece.uncefact;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import com.klst.einvoice.Rounding;
+import com.klst.edoc.api.Rounding;
 
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 

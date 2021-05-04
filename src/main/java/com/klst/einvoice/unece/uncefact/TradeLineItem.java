@@ -8,17 +8,17 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IPeriod;
+import com.klst.edoc.api.IQuantity;
+import com.klst.edoc.api.Identifier;
+import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.einvoice.AllowancesAndCharges;
+import com.klst.einvoice.BG29_PriceDetails;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.GlobalIdentifier;
-import com.klst.einvoice.Identifier;
-import com.klst.untdid.codelist.DateTimeFormats;
-import com.klst.untdid.codelist.TaxCategoryCode;
-import com.klst.untdid.codelist.TaxTypeCode;
 
-import un.unece.uncefact.data.standard.qualifieddatatype._100.CountryIDType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.ReferenceCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentLineDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeDeliveryType;
@@ -27,7 +27,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductCharacteristicType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProductClassificationType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SpecifiedPeriodType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAllowanceChargeType;
@@ -37,7 +36,6 @@ import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentit
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeSettlementLineMonetarySummationType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
 
 /**
@@ -55,7 +53,13 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType;
  */
 public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreInvoiceLine {
 
-	static CoreInvoiceLine createInvoiceLine(String id, Quantity quantity, Amount lineTotalAmount, 
+	@Override
+	public CoreInvoiceLine createInvoiceLine(String id, IQuantity quantity, IAmount lineTotalAmount,
+			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
+		return create(id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+	}
+
+	static CoreInvoiceLine create(String id, Quantity quantity, Amount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
 		return new TradeLineItem(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 	}
@@ -122,7 +126,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		setTaxCategoryAndRate(taxCode, taxRate);
 	}
 	
-	// 1 .. 1 LineID BT-126
+	// BG-25.BT-126 1..1 line identifier
 	void setId(String id) {
 		associatedDocumentLineDocument.setLineID(new ID(id)); // No identification scheme is to be used.
 		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
@@ -133,7 +137,8 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return associatedDocumentLineDocument.getLineID().getValue();
 	}
 
-	@Override // Invoice line note BT-127 0..1 (optional)
+	// BG-25.BT-127 0..1 line note (optional)
+	@Override
 	public void setNote(String text) {
 		if(text==null) return;
 		Note note = Note.create(text);
@@ -152,65 +157,46 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return list.isEmpty() ? null : Note.getNote(list.get(0));
 	}
 
-	// 0..1 BT-128  IssuerAssignedID
+	// BG-25.BT-128 0..1 Invoice line object identifier aka IssuerAssignedID
 	@Override
 	public void setLineObjectID(String id, String schemeID, String schemeCode) {
 		if(id==null) return;
-		ReferencedDocumentType rd = new ReferencedDocumentType();
-		rd.setIssuerAssignedID(new ID(id));
-		if(schemeID!=null) {
-			DocumentCodeType documentCode = new DocumentCodeType();
-			documentCode.setValue(schemeID);
-			rd.setTypeCode(documentCode);
-		}
-		if(schemeCode!=null) {
-			ReferenceCodeType referenceCode = new ReferenceCodeType();
-			referenceCode.setValue(schemeCode);
-			rd.setReferenceTypeCode(referenceCode);
-		}
+		ReferencedDocument rd = ReferencedDocument.create(id, schemeID, schemeCode);
 		specifiedLineTradeSettlement.getAdditionalReferencedDocument().add(rd);
 		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
 	}
-
-	@Override
-	public void setLineObjectID(String id) {
-		setLineObjectID(id, null, null);
-	}
-
-	@Override
-	public void setLineObjectID(String id, String schemeID) {
-		setLineObjectID(id, schemeID, null);
-	}
-
-	@Override
-	public void setLineObjectIdentifier(GlobalIdentifier id) {
-		if(id==null) return;
-		setLineObjectID(id.getContent(), id.getSchemeIdentifier(), id.getSchemeVersion());
-	}
-
 	@Override
 	public GlobalIdentifier getLineObjectIdentifier() {
 		List<ReferencedDocumentType> rds = specifiedLineTradeSettlement.getAdditionalReferencedDocument();
-		if(rds.isEmpty()) return null;
-		ReferencedDocumentType rd = rds.get(0);
-		return new ID(rd.getIssuerAssignedID().getValue(), rd.getTypeCode()==null ? null : rd.getTypeCode().getValue()
-				, rd.getReferenceTypeCode()==null ? null : rd.getReferenceTypeCode().getValue());
+		if(rds==null || rds.isEmpty()) return null;
+		// A Line MUST NOT HAVE more than 1 Object Identifier BT-128
+		ReferencedDocument rd = ReferencedDocument.create(rds.get(0));
+		return new ID(rd.getIssuerAssignedID().getValue(), rd.getReferenceCode());
+//
+//		List<ReferencedDocumentType> rds = specifiedLineTradeSettlement.getAdditionalReferencedDocument();
+//		if(rds.isEmpty()) return null;
+//		ReferencedDocumentType rd = rds.get(0);
+//		return new ID(rd.getIssuerAssignedID().getValue(), rd.getTypeCode()==null ? null : rd.getTypeCode().getValue()
+//				, rd.getReferenceTypeCode()==null ? null : rd.getReferenceTypeCode().getValue());
 	}
 
 	// BT-129+BT-130
 	void setQuantity(Quantity quantity) { 
-		QuantityType qt = new QuantityType();
-		quantity.copyTo(qt);
-		specifiedLineTradeDelivery.setBilledQuantity(qt);
-		super.setSpecifiedLineTradeDelivery(specifiedLineTradeDelivery);
+		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeDelivery", quantity);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "billedQuantity", quantity);
+// TODO		
+//		QuantityType qt = new QuantityType();
+//		quantity.copyTo(qt);
+//		specifiedLineTradeDelivery.setBilledQuantity(qt);
+//		super.setSpecifiedLineTradeDelivery(specifiedLineTradeDelivery);
 	}
 
 	@Override
-	public Quantity getQuantity() {
+	public IQuantity getQuantity() {
 		return new Quantity(specifiedLineTradeDelivery.getBilledQuantity().getUnitCode(), specifiedLineTradeDelivery.getBilledQuantity().getValue());
 	}
 
-	// BT-131
+	// BG-25.BT-131 1..1 Invoice line net amount
 	void setLineTotalAmount(Amount amount) {
 		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
 		AmountType lineTotalAmt = new AmountType();
@@ -226,25 +212,19 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
 
-	/*
+	/* BG-25.BT-132 0..1 Referenced purchase order line reference
+
 Bsp. CII 01.01a-INVOICE_uncefact.xml :
             <ram:SpecifiedLineTradeAgreement>
                 <ram:BuyerOrderReferencedDocument>
                     <ram:LineID>6171175.1</ram:LineID>
                 </ram:BuyerOrderReferencedDocument>
-     UBL
-        <cac:OrderLineReference>
-            <cbc:LineID>6171175.1</cbc:LineID>
-        </cac:OrderLineReference>
 
 	 */
-	@Override // BT-132 0..1
+	@Override
 	public void setOrderLineID(String id) {
-		if(id==null) return;
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setLineID(new ID(id)); // No identification scheme is to be used.
-		specifiedLineTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument);
-		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
+		SCopyCtor.getInstance().newFieldInstance(specifiedLineTradeAgreement, "buyerOrderReferencedDocument", id);
+		SCopyCtor.getInstance().set(specifiedLineTradeAgreement.getBuyerOrderReferencedDocument(), "lineID", id);
 	}
 
 	@Override
@@ -253,7 +233,8 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		return referencedDocument==null ? null : referencedDocument.getLineID().getValue();
 	}
 
-	@Override  // BT-133 0..1
+	// BG-25.BT-133 0..1 Invoice line Buyer accounting reference
+	@Override
 	public void setBuyerAccountingReference(String text) {
 		if(text==null) return;
 		TradeAccountingAccountType taa = new TradeAccountingAccountType();
@@ -270,49 +251,34 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		return rds.get(0).getID().getValue();
 	}
 
-	// BT-134 +++ 0..1 Invoice line period start date
-	@Override
-	public void setStartDate(Timestamp ts) {
-		if(ts==null) return;
-		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		if(specifiedLineTradeSettlement.getBillingSpecifiedPeriod()==null) {
-//			LOG.info("creating SpecifiedPeriodType and setBillingSpecifiedPeriod");
-			SpecifiedPeriodType sp = new SpecifiedPeriodType();
-			sp.setStartDateTime(dateTime);
-			specifiedLineTradeSettlement.setBillingSpecifiedPeriod(sp);
-		} else {
-			specifiedLineTradeSettlement.getBillingSpecifiedPeriod().setStartDateTime(dateTime);
-		}
+	// BG-26 0..1 INVOICE LINE PERIOD 
+//	@Override // comment to show the java-doc
+	/**
+	 * factory method to create BG-26 INVOICE LINE PERIOD 
+	 * 
+	 * @param start - The date is the first day of the period.
+	 * @param end - The date is the last day of the period.
+	 * @return IPeriod - aka delivery period
+	 * 
+	 * @see com.klst.einvoice.BG26_InvoiceLinePeriod
+	 * @see com.klst.edoc.api.IPeriod
+	 */
+	public IPeriod createPeriod(Timestamp start, Timestamp end) {
+		return SpecifiedPeriod.create(start, end);
 	}
-
 	@Override
-	public Timestamp getStartDateAsTimestamp() {
-		SpecifiedPeriodType specifiedPeriod = specifiedLineTradeSettlement.getBillingSpecifiedPeriod();
-		if(specifiedPeriod==null) return null;
-		DateTimeType dateTime = specifiedPeriod.getStartDateTime();
-		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());		
+	public void setLineDeliveryPeriod(IPeriod period) {
+		if(period==null) return;
+		specifiedLineTradeSettlement.setBillingSpecifiedPeriod((SpecifiedPeriod)period);
 	}
-
 	@Override
-	public void setEndDate(Timestamp ts) {
-		if(ts==null) return;
-		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		if(specifiedLineTradeSettlement.getBillingSpecifiedPeriod()==null) {
-			SpecifiedPeriodType sp = new SpecifiedPeriodType();
-			sp.setStartDateTime(dateTime);
-			specifiedLineTradeSettlement.setBillingSpecifiedPeriod(sp);			
-		} else {
-			specifiedLineTradeSettlement.getBillingSpecifiedPeriod().setEndDateTime(dateTime);
-		}
+	public IPeriod getLineDeliveryPeriod() {
+		if(specifiedLineTradeSettlement.getBillingSpecifiedPeriod()==null) return null;
+		return SpecifiedPeriod.create(specifiedLineTradeSettlement.getBillingSpecifiedPeriod());
 	}
-
-	@Override
-	public Timestamp getEndDateAsTimestamp() {
-		SpecifiedPeriodType specifiedPeriod = specifiedLineTradeSettlement.getBillingSpecifiedPeriod();
-		if(specifiedPeriod==null) return null;
-		DateTimeType dateTime = specifiedPeriod.getEndDateTime();
-		return dateTime==null ? null : DateTimeFormats.ymdToTs(dateTime.getDateTimeString().getValue());
-	}
+	
+	// BG-26.BT-134 0..1 Invoice line period start date
+	// BG-26.BT-135 0..1 Invoice line period end date
 
 	/*
 	 * BG-27 0..n INVOICE LINE ALLOWANCES
@@ -349,8 +315,8 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	/*
 	 * BG-29 1..1 PRICE DETAILS
 	 * 
-	 * BT-146 +++ 1..1      Item net price   ==> NetPriceProductTradePrice
-	 * BT-149-0 + BT-150-0 UnitPriceQuantity ==> NetPriceProductTradePrice
+	 * BT-146              1..1 Item net price   ==> NetPriceProductTradePrice
+	 * BT-149-0 + BT-150-0     UnitPriceQuantity ==> NetPriceProductTradePrice
 	 */
 	// BG-29.BT-146 1..1 Item net price aka UnitPriceAmount
 	@Override
@@ -608,13 +574,8 @@ Bsp.
 	// BG-31.BT-159 +++ 0..1 Item country of origin
 	@Override
 	public void setCountryOfOrigin(String code) {
-		if(code==null) return;
-		CountryIDType countryID = new CountryIDType();
-		countryID.setValue(code);
-		TradeCountryType tradeCountry = new TradeCountryType();
-		tradeCountry.setID(countryID);
-		specifiedTradeProduct.setOriginTradeCountry(tradeCountry);
-		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+		SCopyCtor.getInstance().newFieldInstance(specifiedTradeProduct, "originTradeCountry", code);
+		SCopyCtor.getInstance().set(specifiedTradeProduct.getOriginTradeCountry(), "id", code);
 	}
 
 	@Override

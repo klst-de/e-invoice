@@ -5,13 +5,14 @@ import java.sql.Timestamp;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.IAmount;
+import com.klst.edoc.untdid.DateTimeFormats;
+import com.klst.edoc.untdid.TaxCategoryCode;
+import com.klst.edoc.untdid.TaxTypeCode;
 import com.klst.einvoice.ITaxCategory;
 import com.klst.einvoice.ITaxCategoryFactory;
 import com.klst.einvoice.VatBreakdown;
 import com.klst.einvoice.VatBreakdownFactory;
-import com.klst.untdid.codelist.DateTimeFormats;
-import com.klst.untdid.codelist.TaxCategoryCode;
-import com.klst.untdid.codelist.TaxTypeCode;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxCategoryCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.TaxTypeCodeType;
@@ -122,10 +123,10 @@ public class TradeTax extends TradeTaxType
 	 */
 	// implements VatBreakdownFactory
 	@Override
-	public VatBreakdown createVATBreakDown(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
+	public VatBreakdown createVATBreakDown(IAmount taxableAmount, IAmount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return create(taxableAmount, taxAmount, taxCode, taxRate);
 	}
-	static TradeTax create(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
+	static TradeTax create(IAmount taxableAmount, IAmount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		return new TradeTax(taxableAmount, taxAmount, taxCode, taxRate);
 	}
 
@@ -157,7 +158,7 @@ public class TradeTax extends TradeTaxType
 
 	private static final Logger LOG = Logger.getLogger(TradeTax.class.getName());
 
-	private TradeTax(Amount taxableAmount, Amount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
+	private TradeTax(IAmount taxableAmount, IAmount taxAmount, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		setTaxBaseAmount(taxableAmount);
 		setCalculatedTaxAmount(taxAmount);
 		setTaxCategoryCodeAndRate(taxCode, taxRate);
@@ -246,27 +247,28 @@ keine Beispiele für Tests!
 	
 	// BT-116 1..1 BasisAmount Steuerbasisbetrag
 	@Override
-	public void setTaxBaseAmount(Amount taxBaseAmount) {
+	public void setTaxBaseAmount(IAmount amount) {
+		if(amount==null) return; // defensiv
 		AmountType basisAmount = new AmountType();
-		taxBaseAmount.copyTo(basisAmount);
+		((Amount)amount).copyTo(basisAmount);
 		super.getBasisAmount().add(basisAmount);
 	}
 	@Override
-	public Amount getTaxBaseAmount() {
-		return super.getBasisAmount().isEmpty() ? null : new Amount(super.getBasisAmount().get(0).getValue());
+	public IAmount getTaxBaseAmount() {
+		return super.getBasisAmount().isEmpty() ? null : Amount.create(getBasisAmount().get(0));
 	}
 
 	// BT-117 1..1 CalculatedAmount Kategoriespezifischer Steuerbetrag
 	@Override
-	public void setCalculatedTaxAmount(Amount taxAmount) {
+	public void setCalculatedTaxAmount(IAmount taxAmount) {
 		AmountType calculatedAmount = new AmountType();
-		taxAmount.copyTo(calculatedAmount);
+		((Amount)taxAmount).copyTo(calculatedAmount);
 		super.getCalculatedAmount().add(calculatedAmount);		
 	}
 
 	@Override
-	public Amount getCalculatedTaxAmount() {
-		return super.getCalculatedAmount().isEmpty() ? null : new Amount(super.getCalculatedAmount().get(0).getValue());
+	public IAmount getCalculatedTaxAmount() {
+		return super.getCalculatedAmount().isEmpty() ? null : Amount.create(super.getCalculatedAmount().get(0));
 	}
 
 	// ALLOWANCES (BG-20.BT-95-0) and CHARGES (BG-21.BT-102-0)
@@ -293,7 +295,7 @@ keine Beispiele für Tests!
 	}
 	@Override
 	public TaxCategoryCode getTaxCategoryCode() {
-		return TaxCategoryCode.valueOf(super.getCategoryCode());
+		return super.getCategoryCode()==null ? null : TaxCategoryCode.getEnum(super.getCategoryCode().getValue());
 	}
 
 	/* BT-118 1..1 CategoryCode

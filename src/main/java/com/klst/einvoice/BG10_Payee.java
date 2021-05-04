@@ -1,5 +1,7 @@
 package com.klst.einvoice;
 
+import com.klst.edoc.api.BusinessParty;
+
 /**
  * BG-10 + 0..1 PAYEE 
  * <p>

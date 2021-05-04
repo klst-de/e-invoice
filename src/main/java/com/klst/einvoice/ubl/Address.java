@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
-import com.klst.einvoice.PostalAddress;
+import com.klst.edoc.api.PostalAddress;
+import com.klst.einvoice.PostalAddressExt;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressLineType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
@@ -43,7 +44,7 @@ Ein Code, mit dem das Land bezeichnet wird.
 Anmerkung: Die Liste der zulässigen Länder ist bei der ISO 3166-1 „Codes for the representation of names of countries and their subdivisions“ erhältlich.
 
  */
-public class Address extends AddressType implements PostalAddress {
+public class Address extends AddressType implements PostalAddressExt {
 
 	@Override // implements PostalAddressFactory
 	public PostalAddress createAddress(String countryCode, String postalCode, String city) {

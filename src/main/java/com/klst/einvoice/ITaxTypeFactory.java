@@ -1,6 +1,6 @@
 package com.klst.einvoice;
 
-import com.klst.untdid.codelist.TaxTypeCode;
+import com.klst.edoc.untdid.TaxTypeCode;
 
 public interface ITaxTypeFactory {
 
