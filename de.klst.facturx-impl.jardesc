@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="e-invoice/de.klst.facturx-impl-4.0.0.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/e-invoice/de.klst.facturx-impl.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="true">
+            <packagesToSeal>
+                <package handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.einvoice.api"/>
+                <package handleIdentifier="=e-invoice/e-doc-commons\/src\/main\/java&lt;com.klst.edoc.api"/>
+            </packagesToSeal>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;un.unece.uncefact.data.standard.qualifieddatatype._100"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;org.etsi.uri._01903.v1_4"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;oasis.names.specification.ubl.schema.xsd.commonextensioncomponents_2"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;org.w3._2000._09.xmldsig_"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;un.unece.uncefact.data.standard.unqualifieddatatype._100"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/resources&lt;cii.maindoc"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.einvoice.ubl"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;oasis.names.specification.ubl.schema.xsd.creditnote_2"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2"/>
+        <javaElement handleIdentifier="=e-invoice/e-doc-commons\/src\/main\/java&lt;com.klst.edoc.untdid"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.einvoice.unece.uncefact"/>
+        <file path="/e-invoice/LICENSE"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.marshaller"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;oasis.names.specification.ubl.schema.xsd.signatureaggregatecomponents_2"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;un.unece.uncefact.data.standard.crossindustryinvoice._100"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/resources&lt;ubl.maindoc"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;oasis.names.specification.ubl.schema.xsd.commonsignaturecomponents_2"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;oasis.names.specification.ubl.schema.xsd.invoice_2"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;oasis.names.specification.ubl.schema.xsd.signaturebasiccomponents_2"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.ebXml.reflection"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/resources&lt;ubl.common"/>
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;org.etsi.uri._01903.v1_3"/>
+    </selectedElements>
+</jardesc>
