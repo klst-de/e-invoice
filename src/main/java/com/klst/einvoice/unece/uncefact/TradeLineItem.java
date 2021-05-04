@@ -93,8 +93,19 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	// BG-30 ++ 1..1 UMSATZSTEUERINFORMATIONEN AUF DER EBENE DER RECHNUNGSPOSITION
 	TradeTax tradeTax = null;
 
+	/**
+	 * mandatory elements of INVOICE LINE
+	 * 
+	 * @param id              - BT-126 : a unique identifier for the individual line within the Invoice.
+	 * @param quantity        - BT-129+BT-130 : UoM and quantity of items (goods or services) that is charged in the line.
+	 * @param lineTotalAmount - BT-131 : the total amount of the line.
+	 * @param priceAmount     - BT-146 : item net price (mandatory part in {@link BG29_PriceDetails})
+	 * @param itemName        - BT-153 : a name for an item (mandatory part in {@link BG31_ItemInformation})
+	 * @param taxCode         - BG-30.BT-151 mandatory VAT category code
+	 * @param percent         - BG-30.BT-152 VAT rate, optional (can be null)
+	 */
 	private TradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
-			, TaxCategoryCode codeEnum, BigDecimal percent) {
+			, TaxCategoryCode taxCode, BigDecimal percent) {
 		super();
 		associatedDocumentLineDocument = new DocumentLineDocumentType();
 		specifiedTradeProduct = new TradeProductType();
@@ -102,28 +113,12 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		specifiedLineTradeDelivery = new LineTradeDeliveryType(); // 0..1, aber BT-129 ist mandatory 
 		specifiedLineTradeSettlement = new LineTradeSettlementType();
 		
-		init(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
-	}
-	
-	/**
-	 * mandatory elements of INVOICE LINE
-	 * 
-	 * @param BT-126 identifier : a unique identifier for the individual line within the Invoice.
-	 * @param BT-129+BT-130 quantity : UoM and quantity of items (goods or services) that is charged in the Invoice line.
-	 * @param BT-131 lineTotalAmount : the total amount of the Invoice line.
-	 * @param BT-146 priceAmt : item net price (mandatory part in PRICE DETAILS)
-	 * @param BT-153 itemName : a name for an item (mandatory part in ITEM INFORMATION)
-	 * @param BG-30.BT-151 taxCode 1..1 VAT category code
-	 * @param BG-30.BT-152 percent  0..1 VAT rate
-	 */
-	private void init(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
-			, TaxCategoryCode taxCode, BigDecimal taxRate) {
 		setId(id);
 		setQuantity(quantity);
 		setLineTotalAmount(lineTotalAmount);
 		setUnitPriceAmount(priceAmount);
 		setItemName(itemName);
-		setTaxCategoryAndRate(taxCode, taxRate);
+		setTaxCategoryAndRate(taxCode, percent);
 	}
 	
 	// BG-25.BT-126 1..1 line identifier
@@ -131,7 +126,6 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		associatedDocumentLineDocument.setLineID(new ID(id)); // No identification scheme is to be used.
 		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
 	}
-
 	@Override
 	public String getId() {
 		return associatedDocumentLineDocument.getLineID().getValue();
@@ -149,7 +143,6 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 		}
 		super.setAssociatedDocumentLineDocument(associatedDocumentLineDocument);
 	}
-
 	@Override 
 	public String getNote() {
 		if(associatedDocumentLineDocument.getIncludedNote().isEmpty()) return null;
@@ -181,14 +174,9 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	// BT-129+BT-130
-	void setQuantity(Quantity quantity) { 
+	private void setQuantity(Quantity quantity) { 
 		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeDelivery", quantity);
 		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "billedQuantity", quantity);
-// TODO		
-//		QuantityType qt = new QuantityType();
-//		quantity.copyTo(qt);
-//		specifiedLineTradeDelivery.setBilledQuantity(qt);
-//		super.setSpecifiedLineTradeDelivery(specifiedLineTradeDelivery);
 	}
 
 	@Override
@@ -295,10 +283,6 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	@Override
 	public void addAllowanceCharge(AllowancesAndCharges allowanceOrCharge) {
 		if(allowanceOrCharge==null) return; // optional
-		// The method add(TradeAllowanceChargeType) in the type List<TradeAllowanceChargeType> 
-		// is not applicable for the arguments (AllowancesAndCharges)
-		// specifiedLineTradeSettlement.getSpecifiedTradeAllowanceCharge().add(allowanceOrCharge);
-		// TradeAllowanceCharge extends TradeAllowanceChargeType implements AllowancesAndCharges !!!
 		specifiedLineTradeSettlement.getSpecifiedTradeAllowanceCharge().add((TradeAllowanceCharge)allowanceOrCharge);
 	}
 
@@ -329,14 +313,12 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	@Override
 	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
 		TradePriceType tradePrice = setUnitPriceAmount(unitPriceAmount);
-		if(quantity!=null) {
-			QuantityType qt = new QuantityType();
-			quantity.copyTo(qt);
-			tradePrice.setBasisQuantity(qt); 
-		}
 		specifiedLineTradeAgreement.setNetPriceProductTradePrice(tradePrice);
 		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
+		
+		setUnitPriceQuantity(quantity);
 	}	
+	
 	private TradePriceType setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
 		AmountType chargeAmount = new AmountType();
 		unitPriceAmount.copyTo(chargeAmount);
@@ -346,6 +328,12 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		specifiedLineTradeAgreement.setNetPriceProductTradePrice(tradePrice);
 		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
 		return tradePrice;
+	}
+
+	private void setUnitPriceQuantity(Quantity quantity) {
+		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeAgreement", quantity);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", quantity);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "basisQuantity", quantity);
 	}
 	
 	// BG-29.BT-147 0..1 Item price discount  ==>  GrossPriceProductTradePrice 

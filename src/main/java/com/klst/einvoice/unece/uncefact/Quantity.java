@@ -77,10 +77,10 @@ public class Quantity extends QuantityType implements IQuantity {
 		super.setValue(value.setScale(SCALE, RoundingMode.HALF_UP));
 	}
 
-	void copyTo(un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType quantity) {
-		quantity.setUnitCode(this.getUnitCode());
-		quantity.setValue(this.getValue(RoundingMode.HALF_UP));
-	}
+//	void copyTo(un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType quantity) {
+//		quantity.setUnitCode(this.getUnitCode());
+//		quantity.setValue(this.getValue(RoundingMode.HALF_UP));
+//	}
 
 	@Override
 	public BigDecimal getValue(RoundingMode roundingMode) {
