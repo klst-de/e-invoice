@@ -33,11 +33,9 @@ import com.klst.einvoice.SupportingDocument;
 import com.klst.einvoice.VatBreakdown;
 
 import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryInvoiceType;
-import un.unece.uncefact.data.standard.qualifieddatatype._100.DocumentCodeType;
 import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentContextParameterType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
@@ -59,6 +57,10 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 
 	private static final Logger LOG = Logger.getLogger(CrossIndustryInvoice.class.getName());
 	
+	// wg. Mapper:
+	private static final String FIELD_typeCode = "typeCode";
+	private static final String FIELD_issuerAssignedID = "issuerAssignedID";
+
 	// factory
 	public static CoreInvoice getFactory() {
 		return new CrossIndustryInvoice(null);
@@ -156,7 +158,7 @@ PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B
     CIO basiert auf eine neuere Version von SCRDM 103
     
  */
-	
+	// applicableHeaderTradeAgreement TODO
 	HeaderTradeSettlement applicableHeaderTradeSettlement;
 	HeaderTradeDeliveryType applicableHeaderTradeDelivery;
 //	ExchangedDocumentType exchangedDocument; // in super
@@ -183,11 +185,8 @@ PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B
 		this(null);
 		setProcessControl(customization, processType);
 		
-		exchangedDocument = new ExchangedDocumentType();
-		DocumentCodeType documentCode = new DocumentCodeType();
-		documentCode.setValue(documentNameCode.getValueAsString());
-		exchangedDocument.setTypeCode(documentCode);
-		super.setExchangedDocument(exchangedDocument);
+		SCopyCtor.getInstance().newFieldInstance(this, "exchangedDocument", documentNameCode.getValueAsString());
+		SCopyCtor.getInstance().set(getExchangedDocument(), FIELD_typeCode, documentNameCode.getValueAsString());
 	}
 
 	/* Invoice number                              BT-1  Identifier            1 (mandatory) 
@@ -236,9 +235,7 @@ Geschäftsregel: BR-1 Prozesssteuerung Eine Rechnung muss eine Spezifikationsken
 
 	@Override
 	public void setTypeCode(DocumentNameCode code) {
-		DocumentCodeType documentCode = new DocumentCodeType();
-		documentCode.setValue(code.getValueAsString());
-		exchangedDocument.setTypeCode(documentCode);
+		SCopyCtor.getInstance().set(exchangedDocument, FIELD_typeCode, code.getValueAsString());
 	}
 
 	@Override
@@ -345,17 +342,13 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	/* EN16931-ID: 	BT-10 (optional), but mandatory in CIUS rule BR-DE-15
 	 * (non-Javadoc)
 	 * @see com.klst.cius.CoreInvoice#setBuyerReference(java.lang.String)
+	 * TODO hier Leitweg-ID
 	 */
 	@Override
 	public void setBuyerReference(String reference) {
-		if(reference==null) return;
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setBuyerReference(Text.create(reference));
-		// TODO hier Leitweg-ID
-		
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+		SCopyCtor.getInstance().newFieldInstance(getSupplyChainTradeTransaction(), "applicableHeaderTradeAgreement", reference);
+//		getApplicableHeaderTradeAgreement() ist private!!!
+		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement(), "buyerReference", reference);
 	}
 
 	@Override
@@ -377,17 +370,9 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	}
 	@Override
 	public void setProjectReference(String docRefId, String name) {
-		if(docRefId==null) return; // optional
-		ProcuringProjectType procuringProject = new ProcuringProjectType();
-		procuringProject.setID(new ID(docRefId));
-		procuringProject.setName(Text.create(name));
-		
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setSpecifiedProcuringProject(procuringProject);
-		
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+		SCopyCtor.getInstance().newFieldInstance(getApplicableHeaderTradeAgreement(), "specifiedProcuringProject", docRefId);
+		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getSpecifiedProcuringProject(), "id", docRefId);
+		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getSpecifiedProcuringProject(), "name", Text.create(name));
 	}
 
 	@Override
@@ -414,12 +399,9 @@ UBL:
     </cac:ContractDocumentReference>
  */
 	@Override
-	public void setContractReference(String id) {
-		if(id==null) return; // optional
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new ID(id)); // No identification scheme
-		headerTradeAgreement.setContractReferencedDocument(referencedDocument);
+	public void setContractReference(String docRefId) {
+		SCopyCtor.getInstance().newFieldInstance(getApplicableHeaderTradeAgreement(), "contractReferencedDocument", docRefId);
+		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getContractReferencedDocument(), FIELD_issuerAssignedID, docRefId);
 	}
 
 	@Override
@@ -432,16 +414,8 @@ UBL:
 	// BT-13 + 0..1 Purchase order reference
 	@Override
 	public void setPurchaseOrderReference(String docRefId) {
-		if(docRefId==null) return; // optional
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
-		
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument);
-
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+		SCopyCtor.getInstance().newFieldInstance(getApplicableHeaderTradeAgreement(), "buyerOrderReferencedDocument", docRefId);
+		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getBuyerOrderReferencedDocument(), FIELD_issuerAssignedID, docRefId);
 	}
 
 	@Override
@@ -454,16 +428,8 @@ UBL:
 	// BT-14 + 0..1 Sales order reference
 	@Override
 	public void setOrderReference(String docRefId) {
-		if(docRefId==null) return; // optional
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
-		
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setSellerOrderReferencedDocument(referencedDocument);
-
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+		SCopyCtor.getInstance().newFieldInstance(getApplicableHeaderTradeAgreement(), "sellerOrderReferencedDocument", docRefId);
+		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getSellerOrderReferencedDocument(), FIELD_issuerAssignedID, docRefId);
 	}
 	@Override
 	public String getOrderReference() {
@@ -475,11 +441,7 @@ UBL:
 	// BT-15 + 0..1 Receiving advice reference / Referenz auf die Wareneingangsmeldung
 	@Override
 	public void setReceiptReference(String docRefId) {
-		if(docRefId==null) return; // optional
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
-		
-		applicableHeaderTradeDelivery.setReceivingAdviceReferencedDocument(referencedDocument);
+		SCopyCtor.getInstance().set(applicableHeaderTradeDelivery.getReceivingAdviceReferencedDocument(), FIELD_issuerAssignedID, docRefId);
 	}
 	@Override
 	public String getReceiptReference() {
@@ -491,11 +453,7 @@ UBL:
 	// BT-16 + 0..1 Despatch advice reference / Lieferavisreferenz
 	@Override
 	public void setDespatchAdviceReference(String docRefId) {
-		if(docRefId==null) return; // optional
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setIssuerAssignedID(new ID(docRefId)); // No identification scheme
-		
-		applicableHeaderTradeDelivery.setDespatchAdviceReferencedDocument(referencedDocument);
+		SCopyCtor.getInstance().set(applicableHeaderTradeDelivery.getDespatchAdviceReferencedDocument(), FIELD_issuerAssignedID, docRefId);
 	}
 	@Override
 	public String getDespatchAdviceReference() {

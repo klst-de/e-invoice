@@ -4,7 +4,6 @@ import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.ContactInfo;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeContactType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.UniversalCommunicationType;
 
 public class TradeContact extends TradeContactType implements ContactInfo {
 
@@ -57,15 +56,13 @@ public class TradeContact extends TradeContactType implements ContactInfo {
 	}
 
 	private void setContactTelephone(String contactTel) {
-		UniversalCommunicationType telephone = new UniversalCommunicationType();
-		telephone.setCompleteNumber(Text.create(contactTel));
-		super.setTelephoneUniversalCommunication(telephone);
+		SCopyCtor.getInstance().newFieldInstance(this, "telephoneUniversalCommunication", contactTel);
+		SCopyCtor.getInstance().set(getTelephoneUniversalCommunication(), "completeNumber", contactTel);
 	}
 
 	public void setContactEmail(String contactMail) {
-		UniversalCommunicationType electronicMail = new UniversalCommunicationType();
-		electronicMail.setURIID(new ID(contactMail));
-		super.setEmailURIUniversalCommunication(electronicMail);
+		SCopyCtor.getInstance().newFieldInstance(this, "emailURIUniversalCommunication", contactMail);
+		SCopyCtor.getInstance().set(getEmailURIUniversalCommunication(), "uriid", contactMail);
 	}
 	
 	@Override

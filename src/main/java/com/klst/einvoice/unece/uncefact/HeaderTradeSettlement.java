@@ -233,9 +233,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 
 	// BT-5 + 1..1 Invoice currency code
 	void setDocumentCurrency(String isoCurrencyCode) {
-		CurrencyCodeType currencyCode = new CurrencyCodeType();
-		currencyCode.setValue(isoCurrencyCode);
-		super.setInvoiceCurrencyCode(currencyCode);		
+		SCopyCtor.getInstance().set(this, "invoiceCurrencyCode", isoCurrencyCode);
 	}
 	String getDocumentCurrency() {
 		if(super.getInvoiceCurrencyCode()==null) {
@@ -247,10 +245,7 @@ in super gibt es 0..n <ram:SpecifiedTradeSettlementPaymentMeans> - Objekte
 	
 	// BT-6 + 0..1 VAT accounting currency code
 	void setTaxCurrency(String isoCurrencyCode) {
-		if(isoCurrencyCode==null) return;  // optional
-		CurrencyCodeType currencyCode = new CurrencyCodeType();
-		currencyCode.setValue(isoCurrencyCode);
-		super.setTaxCurrencyCode(currencyCode);
+		SCopyCtor.getInstance().set(this, "taxCurrencyCode", isoCurrencyCode);
 	}
 	public String getTaxCurrency() {
 		CurrencyCodeType currencyCode = super.getTaxCurrencyCode();

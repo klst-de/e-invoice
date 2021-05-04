@@ -19,7 +19,6 @@ import com.klst.einvoice.BG29_PriceDetails;
 import com.klst.einvoice.CoreInvoiceLine;
 import com.klst.einvoice.GlobalIdentifier;
 
-import un.unece.uncefact.data.standard.qualifieddatatype._100.CountryIDType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentLineDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.LineTradeDeliveryType;
@@ -183,10 +182,13 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 	// BT-129+BT-130
 	void setQuantity(Quantity quantity) { 
-		QuantityType qt = new QuantityType();
-		quantity.copyTo(qt);
-		specifiedLineTradeDelivery.setBilledQuantity(qt);
-		super.setSpecifiedLineTradeDelivery(specifiedLineTradeDelivery);
+		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeDelivery", quantity);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "billedQuantity", quantity);
+// TODO		
+//		QuantityType qt = new QuantityType();
+//		quantity.copyTo(qt);
+//		specifiedLineTradeDelivery.setBilledQuantity(qt);
+//		super.setSpecifiedLineTradeDelivery(specifiedLineTradeDelivery);
 	}
 
 	@Override
@@ -221,11 +223,8 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 */
 	@Override
 	public void setOrderLineID(String id) {
-		if(id==null) return;
-		ReferencedDocumentType referencedDocument = new ReferencedDocumentType();
-		referencedDocument.setLineID(new ID(id)); // No identification scheme is to be used.
-		specifiedLineTradeAgreement.setBuyerOrderReferencedDocument(referencedDocument);
-		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
+		SCopyCtor.getInstance().newFieldInstance(specifiedLineTradeAgreement, "buyerOrderReferencedDocument", id);
+		SCopyCtor.getInstance().set(specifiedLineTradeAgreement.getBuyerOrderReferencedDocument(), "lineID", id);
 	}
 
 	@Override
@@ -575,13 +574,8 @@ Bsp.
 	// BG-31.BT-159 +++ 0..1 Item country of origin
 	@Override
 	public void setCountryOfOrigin(String code) {
-		if(code==null) return;
-		CountryIDType countryID = new CountryIDType();
-		countryID.setValue(code);
-		TradeCountryType tradeCountry = new TradeCountryType();
-		tradeCountry.setID(countryID);
-		specifiedTradeProduct.setOriginTradeCountry(tradeCountry);
-		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+		SCopyCtor.getInstance().newFieldInstance(specifiedTradeProduct, "originTradeCountry", code);
+		SCopyCtor.getInstance().set(specifiedTradeProduct.getOriginTradeCountry(), "id", code);
 	}
 
 	@Override

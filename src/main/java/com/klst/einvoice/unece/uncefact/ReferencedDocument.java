@@ -211,11 +211,11 @@ public class ReferencedDocument extends ReferencedDocumentType
 	// code == 130 : isInvoicingDataSheet()    ==> BT-18
 	@Override
 	public void setDocumentCode(String code) {
-//		Mapper.set(this, "typeCode", code);   // TODO mapper!!!!
-		if(code==null) return;
-		DocumentCodeType documentCode = new DocumentCodeType();
-		documentCode.setValue(code);
-		super.setTypeCode(documentCode);
+		SCopyCtor.getInstance().set(this, "typeCode", code);
+//		if(code==null) return;
+//		DocumentCodeType documentCode = new DocumentCodeType();
+//		documentCode.setValue(code);
+//		super.setTypeCode(documentCode);
 	}
 //	Der Code 916 "Referenzpapier" wird benutzt, um die Kennung der rechnungsbegründenden Unterlage zu referenzieren. (BT-122)
 //	. 916 . Related document / Referenzpapier
@@ -242,7 +242,7 @@ public class ReferencedDocument extends ReferencedDocumentType
 	// BG-24.BT-123 0..1 Supporting document description
 	@Override
 	public void setSupportingDocumentDescription(String text) {
-//		Mapper.set(this, "name", text);
+//		Mapper.set(this, "name", text); // das kann der Mapper noch nicht
 		if(text==null) return;
 		if(super.getName().isEmpty()) {
 			super.getName().add(Text.create(text));

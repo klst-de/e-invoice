@@ -122,10 +122,7 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements BG13
 	@Override
 	public void setActualDate(Timestamp ts) {
 		if(ts==null) return;
-		DateTimeType dateTime = DateTimeFormatStrings.toDateTime(ts);
-		SupplyChainEventType supplyChainEvent = new SupplyChainEventType();
-		supplyChainEvent.setOccurrenceDateTime(dateTime);
-		super.setActualDeliverySupplyChainEvent(supplyChainEvent);
+		SCopyCtor.getInstance().set(this, "actualDeliverySupplyChainEvent", DateTimeFormatStrings.toDateTime(ts));
 	}
 
 	@Override

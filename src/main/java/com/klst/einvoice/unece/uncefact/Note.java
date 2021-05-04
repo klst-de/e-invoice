@@ -9,7 +9,6 @@ import com.klst.einvoice.InvoiceNote;
 import com.klst.einvoice.InvoiceNoteFactory;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 /** 
@@ -88,10 +87,7 @@ public class Note extends NoteType implements InvoiceNote, InvoiceNoteFactory {
 	}
 
 	void setCode(String code) {
-		if(code==null) return; 
-		CodeType subjectCode = new CodeType();
-		subjectCode.setValue(code);
-		super.setSubjectCode(subjectCode);
+		SCopyCtor.getInstance().set(this, "subjectCode", code);
 	}
 
 	// BG-1 .BT-22  1..1 Invoice note

@@ -5,9 +5,7 @@ import java.util.List;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.PostalAddress;
 
-import un.unece.uncefact.data.standard.qualifieddatatype._100.CountryIDType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAddressType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.CodeType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 public class TradeAddress extends TradeAddressType implements PostalAddress {
@@ -99,9 +97,7 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 	}
 
 	private void setPostCode(String postCode) {
-		CodeType postcode = new CodeType();
-		postcode.setValue(postCode);
-		this.setPostcodeCode(postcode);
+		SCopyCtor.getInstance().set(this, "postcodeCode", postCode);
 	}
 
 	@Override
@@ -111,11 +107,9 @@ public class TradeAddress extends TradeAddressType implements PostalAddress {
 		this.getCountrySubDivisionName().add(region);
 	}
 
+	// countryCode check in qualifieddatatype._103
 	private void setCountryCode(String countryCode) {
-		CountryIDType countryID = new CountryIDType();
-		countryID.setValue(countryCode);
-//		countryID.setSchemeID("ISO 3166-1"); // countryCode mit ISO check in qualifieddatatype._103
-		this.setCountryID(countryID);
+		SCopyCtor.getInstance().set(this, "countryID", countryCode);
 	}
 
 	@Override
