@@ -444,11 +444,9 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		return specifiedTradeProduct.getName().get(0).getValue();
 	}
 
-	@Override // 0 .. 1 SpecifiedTradeProduct.Description BT-154 Bsp: <ram:Description>Zeitschrift Inland</ram:Description>
+	@Override // BT-154 0..1 SpecifiedTradeProduct.Description Bsp: <ram:Description>Zeitschrift Inland</ram:Description>
 	public void setDescription(String text) {
-		if(text==null) return;
-		specifiedTradeProduct.setDescription(Text.create(text));
-		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+		SCopyCtor.getInstance().set(specifiedTradeProduct, "description", text);
 	}
 
 	@Override

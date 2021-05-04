@@ -23,7 +23,7 @@ import javax.inject.Singleton;
  * @see https://github.com/javax-inject/javax-inject
  */
 @Singleton
-// TODO rename, der Name ist historisch bedingt, neu: Macro , Util , ...
+// TODO rename, der Name ist historisch bedingt, neu: Mapper, Macro , Util , ...
 public class SCopyCtor {
 
 	private static final Logger LOG = Logger.getLogger(SCopyCtor.class.getName());

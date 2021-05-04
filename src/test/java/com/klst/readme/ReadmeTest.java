@@ -126,6 +126,7 @@ public class ReadmeTest {
 	Amount amount01 = new Amount(EUR, new BigDecimal(26.07));
 	UnitPriceAmount price01 = new UnitPriceAmount(EUR, new BigDecimal(26.07));
 	BigDecimal rate7 = new BigDecimal(7);
+	String lineDescription = "line dscription";
 	
 	CoreInvoiceLine line01() {
 		CoreInvoiceLine line = invoice.createInvoiceLine("2"    // invoice line number
@@ -135,6 +136,7 @@ public class ReadmeTest {
 		  , "Porto + Versandkosten"								// itemName
 		  , TaxCategoryCode.StandardRate, new BigDecimal(7));	// VAT category code, rate 7%
 		
+		line.setDescription(lineDescription);
 		// BG-27 0..n LINE ALLOWANCES:
 		BigDecimal tenPerCent = new BigDecimal(10);
 		line.addAllowance(new Amount(new BigDecimal(6.00)), new Amount(new BigDecimal(60.00)), tenPerCent);
@@ -157,6 +159,7 @@ public class ReadmeTest {
 		assertEquals(EUR, line.getUnitPriceAmount().getCurrencyID());
 		assertEquals(price01.toString(), line.getUnitPriceAmount().toString());
 		assertEquals("Porto + Versandkosten", line.getItemName());
+		assertEquals(lineDescription, line.getDescription());
 		assertEquals(TaxCategoryCode.StandardRate, line.getTaxCategory());
 		assertEquals(rate7, line.getTaxRate());
 	}
