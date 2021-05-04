@@ -4,9 +4,9 @@ import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.untdid.PaymentMeansEnum;
-import com.klst.einvoice.CreditTransfer;
-import com.klst.einvoice.DebitedAccountID;
-import com.klst.einvoice.PaymentCard;
+import com.klst.einvoice.api.CreditTransfer;
+import com.klst.einvoice.api.DebitedAccountID;
+import com.klst.einvoice.api.PaymentCard;
 
 import un.unece.uncefact.data.standard.qualifieddatatype._100.PaymentMeansCodeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.CreditorFinancialAccountType;

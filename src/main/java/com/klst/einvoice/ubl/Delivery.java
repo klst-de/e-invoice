@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.PostalAddress;
 import com.klst.edoc.untdid.DateTimeFormats;
-import com.klst.einvoice.BG13_DeliveryInformation;
+import com.klst.einvoice.api.BG13_DeliveryInformation;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.AddressType;
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.DeliveryType;

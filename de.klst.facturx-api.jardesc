@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="e-invoice/de.klst.facturx-api-4.0.0.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/e-invoice/de.klst.facturx-api.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal>
+                <package handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.einvoice.api"/>
+                <package handleIdentifier="=e-invoice/e-doc-commons\/src\/main\/java&lt;com.klst.edoc.api"/>
+            </packagesToSeal>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=e-invoice/src\/main\/java&lt;com.klst.einvoice.api"/>
+        <file path="/e-invoice/README.md"/>
+        <file path="/e-invoice/LICENSE"/>
+        <javaElement handleIdentifier="=e-invoice/e-doc-commons\/src\/main\/java&lt;com.klst.edoc.api"/>
+    </selectedElements>
+</jardesc>

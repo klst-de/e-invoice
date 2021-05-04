@@ -9,8 +9,8 @@ import java.util.logging.Logger;
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.edoc.untdid.TaxTypeCode;
-import com.klst.einvoice.ITaxCategory;
-import com.klst.einvoice.ITaxCategoryFactory;
+import com.klst.einvoice.api.ITaxCategory;
+import com.klst.einvoice.api.ITaxCategoryFactory;
 
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.TaxCategoryType;
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.TaxExemptionReasonCodeType;

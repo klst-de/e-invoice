@@ -2,7 +2,7 @@ package com.klst.einvoice.ubl;
 
 import java.util.logging.Logger;
 
-import com.klst.einvoice.CreditTransfer;
+import com.klst.einvoice.api.CreditTransfer;
 import com.klst.einvoice.unece.uncefact.BICId;
 import com.klst.einvoice.unece.uncefact.IBANId;
 

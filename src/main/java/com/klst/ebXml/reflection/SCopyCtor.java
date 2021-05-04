@@ -296,10 +296,10 @@ public class SCopyCtor {
     private static final String METHOD_GETUNITCODE = "getUnitCode"; // wg. Quantity
 
     private Class<?> typeUDT_ID = un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType.class;
-    private Package packageUDT = typeUDT_ID.getPackage();
-    private Class<?> typeUDT_Quantity = un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType.class;
+//    private Package packageUDT = typeUDT_ID.getPackage();
+//    private Class<?> typeUDT_Quantity = un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType.class;
     private Class<?> type_Quantity = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType.class;
-    private Class<?> typeUDT_Amount = un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType.class;
+//    private Class<?> typeUDT_Amount = un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType.class;
     private Class<?> type_Amount = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.AmountType.class;
     
 	private void set(Field field, Object obj, String fieldName, Object value) {
@@ -368,11 +368,6 @@ public class SCopyCtor {
 		}
 		
 		LOG.warning("NO METHOD found for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
-//		if(type_Quantity.isInstance(value) && value.getClass()!=type_Quantity) {
-//			// value is instance of a subclass of QuantityType, but not QuantityType itself
-//			// mögliche Methoden: setRequestedQuantity / setAgreedQuantity / setBasisQuantity
-//			if (set("setBilledQuantity", obj, field, value, typeUDT_Quantity)) return;
-//		}
 
 	}
 

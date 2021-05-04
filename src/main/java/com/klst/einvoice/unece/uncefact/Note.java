@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.klst.ebXml.reflection.SCopyCtor;
-import com.klst.einvoice.BG1_InvoiceNote;
-import com.klst.einvoice.InvoiceNote;
-import com.klst.einvoice.InvoiceNoteFactory;
+import com.klst.einvoice.api.BG1_InvoiceNote;
+import com.klst.einvoice.api.InvoiceNote;
+import com.klst.einvoice.api.InvoiceNoteFactory;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
@@ -16,7 +16,7 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
  * <p>
  * to get all InvoiceNotes use {@link BG1_InvoiceNote#getInvoiceNotes()} method 
  * <p>
- * also implements BG-25.BT-127 0..n IncludedNote.Content {@link com.klst.einvoice.CoreInvoiceLine#setNote(String)}
+ * also implements BG-25.BT-127 0..n IncludedNote.Content {@link com.klst.einvoice.api.CoreInvoiceLine#setNote(String)}
  * 
  * @see InvoiceNoteFactory
  */
