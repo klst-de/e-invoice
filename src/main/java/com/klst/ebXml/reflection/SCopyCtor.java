@@ -414,11 +414,11 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt):
 
 			 */
 
-			LOG.info("value:"+value 
-					+ "\n\t   Package:"+ valueSuperType.getPackage().getName()
-					+ "\n\t     Class:"+ value.getClass().getCanonicalName()
-					+ "\n\tSuperClass:"+ value.getClass().getSuperclass().getCanonicalName()
-				);
+//			LOG.info("value:"+value 
+//					+ "\n\t   Package:"+ valueSuperType.getPackage().getName()
+//					+ "\n\t     Class:"+ value.getClass().getCanonicalName()
+//					+ "\n\tSuperClass:"+ value.getClass().getSuperclass().getCanonicalName()
+//				);
 			if(type_Amount==valueSuperType) {
 				Method setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
 				Method setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETCURRENCY, String.class);
@@ -433,7 +433,7 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt):
 			}
 			
 			setter.invoke(obj, fo);
-			LOG.info(">>>>>>>>>> "+methodName + " with "+value);
+			LOG.info(methodName + " with "+value);
 			return true;
 		} catch (NoSuchMethodException e) {
 			LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
