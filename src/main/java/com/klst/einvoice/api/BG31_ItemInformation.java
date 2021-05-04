@@ -98,14 +98,19 @@ public interface BG31_ItemInformation {
 	 * <br>Rule ID: 	BR-64
 	 * <br>Request ID: 	R23, R56
 	 * 
-	 * @param Identifier
-	 * @param schemeID, The identification scheme shall be identified from the entries of the list published by the ISO/IEC 6523 maintenance agency.
+	 * @param globalID - The global Identifier
+	 * @param schemeID - The identification scheme shall be identified from the entries of the list published by the ISO/IEC 6523 maintenance agency.
 	 */
 	public void setStandardID(String globalID, String schemeID);
-	public void setStandardID(String globalID);
+	default void setStandardID(String globalID) {
+		setStandardID(globalID, null);
+	}
 	public void setStandardIdentifier(Identifier id);
 	public Identifier getStandardIdentifier();
-	public String getStandardID();
+	default String getStandardID() {
+		Identifier identifier = getStandardIdentifier();
+		return identifier==null ? null : identifier.getContent();
+	}
 
 	/**
 	 * Item classification identifier

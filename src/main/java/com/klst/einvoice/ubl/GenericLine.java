@@ -599,15 +599,11 @@ Bsp. UBL 01.01a :
 		return itemIdentification.getID()==null ? null : itemIdentification.getID().getValue();
 	}
 
-	// BG-31.BT-157 +++ 0..1 Item standard identifier
+	// BG-31.BT-157 0..1 Item standard identifier
 	@Override
 	public void setStandardIdentifier(Identifier id) {
  		if(id==null) return;
  		setStandardID(id.getContent(), id.getSchemeIdentifier());
-	}
-	@Override
-	public void setStandardID(String id) {
- 		setStandardID(id, null);
 	}
 	@Override
 	public void setStandardID(String id, String schemeID) {
@@ -632,11 +628,6 @@ Bsp. UBL 01.01a :
 		ItemIdentificationType itemIdentification = item.getStandardItemIdentification();
 		if(itemIdentification==null) return null;
 		return itemIdentification.getID()==null ? null : new ID(itemIdentification.getID().getValue(), itemIdentification.getID().getSchemeID());
-	}
-	@Override
-	public String getStandardID() {
-		Identifier id = getStandardIdentifier();
-		return id==null ? null : id.getContent();
 	}
 	
 	// BG-31.BT-158 +++ 0..n Item classification identifier

@@ -444,7 +444,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		return specifiedTradeProduct.getName().get(0).getValue();
 	}
 
-	@Override // BT-154 0..1 SpecifiedTradeProduct.Description Bsp: <ram:Description>Zeitschrift Inland</ram:Description>
+	@Override // 0..1 BG-31.BT-154 Product Description Bsp: <ram:Description>Zeitschrift Inland</ram:Description>
 	public void setDescription(String text) {
 		SCopyCtor.getInstance().set(specifiedTradeProduct, "description", text);
 	}
@@ -454,7 +454,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		return specifiedTradeProduct.getDescription()==null ? null : specifiedTradeProduct.getDescription().getValue();
 	}
 
-	@Override // 0..1 BT-155 Bsp: <ram:SellerAssignedID>246</ram:SellerAssignedID>
+	@Override // 0..1 BG-31.BT-155 Bsp: <ram:SellerAssignedID>246</ram:SellerAssignedID>
 	public void setSellerAssignedID(String id) {
 		SCopyCtor.getInstance().set(specifiedTradeProduct, "sellerAssignedID", id);
 	}
@@ -464,11 +464,9 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		return specifiedTradeProduct.getSellerAssignedID()==null ? null : specifiedTradeProduct.getSellerAssignedID().getValue();
 	}
 
-	@Override // 0 .. 1 BT-156
+	@Override // 0..1 BG-31.BT-156 Item Buyer's identifier
 	public void setBuyerAssignedID(String id) {
-		if(id==null) return;
-		specifiedTradeProduct.setBuyerAssignedID(new ID(id)); // No identification scheme is to be used.
-		super.setSpecifiedTradeProduct(specifiedTradeProduct);
+		SCopyCtor.getInstance().set(specifiedTradeProduct, "buyerAssignedID", id);
 	}
 
 	@Override
@@ -488,14 +486,10 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * 0060 : DUNS 
 	 * 0177 : ODETTE 
 	 */
-	@Override // 0 .. 1 BT-157
+	@Override // 0..1 BG-31.BT-157
 	public void setStandardIdentifier(Identifier id) {
 		if(id==null) return;
 		setStandardID(id.getContent(), id.getSchemeIdentifier());
-	}
-	@Override
-	public void setStandardID(String id) {
-		setStandardID(id, null);
 	}
 	@Override
 	public void setStandardID(String id, String schemeID) {
@@ -507,10 +501,6 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	@Override
 	public Identifier getStandardIdentifier() {
 		return specifiedTradeProduct.getGlobalID()==null ? null : new ID(specifiedTradeProduct.getGlobalID().getValue(), specifiedTradeProduct.getGlobalID().getSchemeID());
-	}
-	@Override
-	public String getStandardID() {
-		return specifiedTradeProduct.getGlobalID()==null ? null : specifiedTradeProduct.getGlobalID().getValue();
 	}
 
 /*
