@@ -2,14 +2,11 @@ package com.klst.einvoice.api;
 
 import java.math.BigDecimal;
 
-import com.klst.einvoice.unece.uncefact.Amount;
+import com.klst.edoc.api.IAmount;
 
 public interface AllowancesOrChargesFactory {
 
-	public AllowancesAndCharges createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage);
-	public AllowancesAndCharges createCharge(Amount amount, Amount baseAmount, BigDecimal percentage);
-	// demnächst:
-//	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage);
-//	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage);
+	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage);
+	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage);
 
 }

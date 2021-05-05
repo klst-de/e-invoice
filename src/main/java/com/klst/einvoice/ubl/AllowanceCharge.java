@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.IAmount;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.einvoice.api.AllowancesAndCharges;
 import com.klst.einvoice.unece.uncefact.Amount;
@@ -74,11 +75,11 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 
 	// factory:
 	@Override
-	public AllowancesAndCharges createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
 	}
 	@Override
-	public AllowancesAndCharges createCharge(Amount amount, Amount baseAmount, BigDecimal percentage) {
+	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
 	}
 
@@ -86,7 +87,7 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 	 * used in (Line)Price
 	 * @see Price#setPriceDiscount
 	 */
-	static AllowanceCharge create(boolean chargeIndicator, Amount amount, Amount baseAmount, BigDecimal percentage) {
+	static AllowanceCharge create(boolean chargeIndicator, IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return new AllowanceCharge(chargeIndicator, amount, baseAmount, percentage);
 	}
 	static AllowanceCharge create() {
@@ -107,7 +108,7 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 	// das erste element der Liste taxCategory aus super, die anderen werden nicht genutzt
 	TaxCategory taxCategory = null;
 	
-	private AllowanceCharge(boolean chargeIndicator, Amount amount, Amount baseAmount, BigDecimal percentage) {
+	private AllowanceCharge(boolean chargeIndicator, IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		super();
 		setChargeIndicator(chargeIndicator);
 		setAmountWithoutTax(amount);
@@ -169,28 +170,28 @@ public class AllowanceCharge extends AllowanceChargeType implements AllowancesAn
 	}
 
 	@Override
-	public void setAmountWithoutTax(Amount amount) {
+	public void setAmountWithoutTax(IAmount amount) {
 		AmountType amt = new AmountType();
-		amount.copyTo(amt);
+		((Amount)amount).copyTo(amt);
 		super.setAmount(amt);
 	}
 
 	@Override
-	public Amount getAmountWithoutTax() {
+	public IAmount getAmountWithoutTax() {
 		AmountType amount = super.getAmount();
 		return amount==null? null : new Amount(amount.getCurrencyID(), amount.getValue());	
 	}
 
 	@Override
-	public void setAssessmentBase(Amount amount) {
+	public void setAssessmentBase(IAmount amount) {
 		if(amount==null) return;
 		BaseAmountType baseAmount = new BaseAmountType();
-		amount.copyTo(baseAmount);
+		((Amount)amount).copyTo(baseAmount);
 		super.setBaseAmount(baseAmount);
 	}
 
 	@Override
-	public Amount getAssessmentBase() {
+	public IAmount getAssessmentBase() {
 		BaseAmountType amount = super.getBaseAmount();
 		return amount==null? null : new Amount(amount.getCurrencyID(), amount.getValue());	
 	}

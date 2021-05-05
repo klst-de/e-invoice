@@ -3,7 +3,7 @@ package com.klst.einvoice.api;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.klst.einvoice.unece.uncefact.Amount;
+import com.klst.edoc.api.IAmount;
 
 /**
  * Common Interface for optional DOCUMENT LEVEL ALLOWANCES (BG-20) and CHARGES (BG-21) and
@@ -37,11 +37,11 @@ public interface BG20_DocumentLevelAllowences extends AllowancesOrChargesFactory
 	
 	public List<AllowancesAndCharges> getAllowancesAndCharges();
 
-	default void addAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+	default void addAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		addAllowanceCharge(createAllowance(amount, baseAmount, percentage));
 	}
 	
-	default void addCharge(Amount amount, Amount baseAmount, BigDecimal percentage) {
+	default void addCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		addAllowanceCharge(createCharge(amount, baseAmount, percentage));
 	}
 	

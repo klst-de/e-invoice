@@ -3,6 +3,7 @@ package com.klst.einvoice.ubl;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.IAmount;
 import com.klst.einvoice.api.AllowancesAndCharges;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
@@ -116,12 +117,12 @@ public class Price extends PriceType {
 //			super.getAllowanceCharge().set(0, ac);
 //		}
 //	}
-	public Amount getPriceDiscount() {
+	public IAmount getPriceDiscount() {
 		if(super.getAllowanceCharge().isEmpty()) return null;
 		AllowanceCharge allowance = AllowanceCharge.create(getAllowanceCharge().get(0));
 		return allowance.getAmountWithoutTax();
 	}
-	public Amount getGrossPrice() {
+	public IAmount getGrossPrice() {
 		if(super.getAllowanceCharge().isEmpty()) return null;
 		AllowanceCharge allowance = AllowanceCharge.create(getAllowanceCharge().get(0));
 		return allowance.getAssessmentBase();

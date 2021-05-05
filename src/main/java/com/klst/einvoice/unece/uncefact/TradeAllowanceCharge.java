@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
+import com.klst.edoc.api.IAmount;
 import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.einvoice.api.AllowancesAndCharges;
 
@@ -15,8 +16,8 @@ import un.unece.uncefact.data.standard.unqualifieddatatype._100.IndicatorType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.PercentType;
 
 /*
-
-CII: ApplicableHeaderTradeSettlement ...
+Bsp 02.01:
+   ApplicableHeaderTradeSettlement ...
             <ram:SpecifiedTradeAllowanceCharge>
                 <ram:ChargeIndicator>
                     <udt:Indicator>true</udt:Indicator>
@@ -48,6 +49,24 @@ CII: ApplicableHeaderTradeSettlement ...
                 </ram:CategoryTradeTax>
             </ram:SpecifiedTradeAllowanceCharge>
 
+0 .. n SpecifiedTradeAllowanceCharge Zu- und Abschläge auf Dokumentenebene           BG-20, BG-21
+ 1 .. 1 ChargeIndicator Schalter für Zu-/Abschlag                                     BG-20-0 , BG-21-0  xs:choice
+  1 .. 1 Indicator Schalter für Zu-/Abschlag, Wert                                     BG-20-00, BG-21-00
+ 0 .. 1 SequenceNumeric Berechnungsreihenfolge
+ 0 .. 1 CalculationPercent Prozentualer Zu- oder Abschlag auf Dokumentenebene         BT-94, BT-101
+ 0 .. 1 BasisAmount Grundbetrag des Zu- oder Abschlags auf Dokumentenebene            BT-93, BT-100
+ 0 .. 1 BasisQuantity Basismenge des Rabatts required unitCode Einheit der Preisbasismenge
+ 1 .. 1 ActualAmount Betrag des Zu- oder Abschlags auf Dokumentenebene                BT-92, BT-99
+ 0 .. 1 ReasonCode Code für den Grund für den Zu- oder Abschlag auf Dokumentenebene   BT-98, BT-105
+ 0 .. 1 Reason Grund für den Zu- oder Abschlag auf Dokumentenebene                    BT-97, BT-104
+ 1 .. 1 CategoryTradeTax Detailinformationen zu Steuerangaben                                       xs:sequence
+  1 .. 1 TypeCode Code für die Umsatzsteuerkategorie 
+          des Zu- oder Abschlages auf Dokumentenebene                                  BT-95-0, BT-102-0
+  1 .. 1 CategoryCode Code für die Umsatzsteuerkategorie 
+          des Zu- oder Abschlages auf Dokumentenebene                                  BT-95  , BT-102
+  0 .. 1 RateApplicablePercent Umsatzsteuersatz 
+          für den Zu- oder Abschlag auf Dokumentenebene                                BT-96  , BT-103
+
  */
 public class TradeAllowanceCharge extends TradeAllowanceChargeType implements AllowancesAndCharges {
 
@@ -57,11 +76,11 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	// factory:
 	@Override
-	public AllowancesAndCharges createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
 	}
 	@Override
-	public AllowancesAndCharges createCharge(Amount amount, Amount baseAmount, BigDecimal percentage) {
+	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
 	}
 
@@ -69,7 +88,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 	 * used in TradeLineItem
 	 * @see TradeLineItem#setUnitPriceAllowance
 	 */
-	static TradeAllowanceCharge create(boolean chargeIndicator, Amount amount, Amount baseAmount, BigDecimal percentage) {
+	static TradeAllowanceCharge create(boolean chargeIndicator, IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return new TradeAllowanceCharge(chargeIndicator, amount, baseAmount, percentage);
 	}
 	static TradeAllowanceCharge create() {
@@ -86,7 +105,7 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 		}
 	}
 
-	private TradeAllowanceCharge(boolean chargeIndicator, Amount amount, Amount baseAmount, BigDecimal percentage) {
+	private TradeAllowanceCharge(boolean chargeIndicator, IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		super();
 		setChargeIndicator(chargeIndicator);
 		setAmountWithoutTax(amount);
@@ -152,14 +171,14 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	// BT-92, BT-99 (mandatory) Document level allowance/charge amount
 	@Override
-	public void setAmountWithoutTax(Amount amount) {
+	public void setAmountWithoutTax(IAmount amount) {
 		AmountType actualAmt = new AmountType();
-		amount.copyTo(actualAmt);
+		((Amount)amount).copyTo(actualAmt);
 		super.getActualAmount().add(actualAmt);
 	}
 
 	@Override
-	public Amount getAmountWithoutTax() {
+	public IAmount getAmountWithoutTax() {
 		List<AmountType> list = super.getActualAmount();
 		if(list.isEmpty()) return null; // sollte nicht vorkommen, da mandatory
 		// nur das erste Element holen und kopieren:
@@ -169,17 +188,12 @@ public class TradeAllowanceCharge extends TradeAllowanceChargeType implements Al
 
 	// BT-93, BT100 (optional) Document level allowance/charge base amount
 	@Override
-	public void setAssessmentBase(Amount amount) {
-		SCopyCtor.getInstance().set(this, "basisAmount", amount);
-//		
-//		if(amount==null) return;
-//		AmountType baseAmt = new AmountType();
-//		amount.copyTo(baseAmt);
-//		super.setBasisAmount(baseAmt);
+	public void setAssessmentBase(IAmount amount) {
+		SCopyCtor.getInstance().set(this, "basisAmount", (Amount)amount);
 	}
 
 	@Override
-	public Amount getAssessmentBase() {
+	public IAmount getAssessmentBase() {
 		AmountType amount = super.getBasisAmount();
 		return amount==null? null : new Amount(amount.getCurrencyID(), amount.getValue());
 	}

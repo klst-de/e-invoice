@@ -347,11 +347,11 @@ Bsp. UBL 01.01a :
 	 * BG-28 0..n INVOICE LINE CHARGES
 	 */
 	@Override
-	public AllowancesAndCharges createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return AllowanceCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
 	}
 	@Override
-	public AllowancesAndCharges createCharge(Amount amount, Amount baseAmount, BigDecimal percentage) {
+	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return AllowanceCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
 	}
 	@Override
@@ -386,7 +386,7 @@ Bsp. UBL 01.01a :
 	@Override
 	public UnitPriceAmount getPriceDiscount() {
 		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
-		Amount amount = price.getPriceDiscount();
+		IAmount amount = price.getPriceDiscount();
 		return amount==null ? null : new UnitPriceAmount(amount.getCurrencyID(), amount.getValue());		
 	}
 	
@@ -394,7 +394,7 @@ Bsp. UBL 01.01a :
 	@Override
 	public UnitPriceAmount getGrossPrice() {
 		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
-		Amount amount = price.getGrossPrice();
+		IAmount amount = price.getGrossPrice();
 		return amount==null ? null : new UnitPriceAmount(amount.getCurrencyID(), amount.getValue());		
 	}
 	

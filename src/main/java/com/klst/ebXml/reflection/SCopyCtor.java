@@ -239,8 +239,8 @@ public class SCopyCtor {
 	
 	private Object invokeGetXX(String method, Class<?> type, Object object) {
 		try {
-			Method getValue = type.getDeclaredMethod(method);
-			return getValue.invoke(object);
+			Method getter = type.getDeclaredMethod(method);
+			return getter.invoke(object);
 		} catch (NoSuchMethodException e) {
 			LOG.severe(method + "() not defined for " + type.getSimpleName());
 			e.printStackTrace(); // darf nicht passieren
@@ -264,6 +264,9 @@ public class SCopyCtor {
 	 */
 	public Field newFieldInstance(Object obj, String fieldName, Object value) {
 		if(value==null) return null;
+		return newFieldInstance(obj, fieldName);
+	}
+	private Field newFieldInstance(Object obj, String fieldName) {
 		Field field = null; // declared field in obj super
 		Class<?> fieldType = null;
 		try {
@@ -277,7 +280,13 @@ public class SCopyCtor {
 			if(field.get(obj)==null) {
 				fieldType = field.getType();
 				field.set(obj, fieldType.newInstance());
-				LOG.config(fieldName);
+//				LOG.info("field ist null fieldType="+fieldType.getSimpleName());
+//				if(fieldType==List.class) {
+//					field.set(obj, ArrayList.class.newInstance());
+//				} else {
+//					field.set(obj, fieldType.newInstance());
+//				}
+				LOG.config(fieldType.getSimpleName()+" "+fieldName);
 			}
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | InstantiationException e) {
 			LOG.warning(obj.getClass().getSimpleName() +"."+fieldName + ": Exception:"+e);
@@ -296,7 +305,7 @@ public class SCopyCtor {
     private static final String METHOD_GETUNITCODE = "getUnitCode"; // wg. Quantity
 
     private Class<?> typeUDT_ID = un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType.class;
-//    private Package packageUDT = typeUDT_ID.getPackage();
+    private Package packageUDT = typeUDT_ID.getPackage();
 //    private Class<?> typeUDT_Quantity = un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType.class;
     private Class<?> type_Quantity = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType.class;
 //    private Class<?> typeUDT_Amount = un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType.class;
@@ -371,6 +380,33 @@ public class SCopyCtor {
 
 	}
 
+	private Method getSetterGetter(String setget, Object obj, Field field) {
+		String fieldName = field.getName();
+		String methodName = setget + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
+		try {
+			Object fo = field.get(obj);
+			if(setget==set) {
+				Class<? extends Object> para = fo.getClass();
+				if(obj.getClass().getSimpleName().endsWith("Type")) {
+					return obj.getClass().getDeclaredMethod(methodName, para);
+				}
+				return obj.getClass().getSuperclass().getDeclaredMethod(methodName, para);
+			} else {
+				return obj.getClass().getDeclaredMethod(methodName);
+			}
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+//			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	private boolean set(Object obj, Field field, Object value) {
 		Class<?> valueSuperType = value.getClass().getSuperclass();
 //		while(valueSuperType.getPackage()!=packageUDT) {
@@ -378,12 +414,27 @@ public class SCopyCtor {
 //			valueSuperType = valueSuperType.getSuperclass();
 //		}
 		String fieldName = field.getName();
-		String methodName = set + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
+		String methodName = set+get;
+//		String methodName = set + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
 
 		try {
 			Object fo = field.get(obj);
 			// exception, wenn es set methodName nicht gibt (in CII sind es oft Listen)
-			Method setter = obj.getClass().getDeclaredMethod(methodName, fo.getClass());
+//			Method setter = obj.getClass().getDeclaredMethod(methodName, fo.getClass());
+			Method setter = getSetterGetter(set, obj, field);
+			Method getter = null; 
+			if(setter!=null) {
+				methodName = setter.getName();
+//				LOG.info("setter gefunden????????????:"+methodName);
+			} else {
+				LOG.warning("setter für "+field.getName()+" nicht gefunden. para="+obj.getClass().getCanonicalName());
+				Method[] ms = obj.getClass().getSuperclass().getDeclaredMethods();
+				LOG.info("getter suchen:"+fo);
+				getter = getSetterGetter(get, obj, field);
+				// TODO getter==null
+				LOG.info("getter gefunden????????????:"+getter);
+				methodName = getter.getName();
+			}
 			
 			/* setter methodName mit passender Signatur existiert:
 Amount:
@@ -419,6 +470,9 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt):
 //					+ "\n\t     Class:"+ value.getClass().getCanonicalName()
 //					+ "\n\tSuperClass:"+ value.getClass().getSuperclass().getCanonicalName()
 //				);
+			// TODO bei Listen ist es nicht field object
+			// sondern es muss ein dummy Object vom Typ typeUDT_Amount erstellt werden
+			// und dass fo.add(dummy)
 			if(type_Amount==valueSuperType) {
 				Method setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
 				Method setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETCURRENCY, String.class);
@@ -432,8 +486,16 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt):
 				setUnitCode.invoke(fo, invokeGetXX(METHOD_GETUNITCODE, valueSuperType, value));
 			}
 			
-			setter.invoke(obj, fo);
-			LOG.info(methodName + " with "+value);
+//			setter.invoke(obj, fo);
+			if(setter!=null) {
+				setter.invoke(obj, fo);
+				LOG.info(methodName + " with "+value);
+			}
+			if(getter!=null) { // List
+				// invoke add
+				getter.invoke(obj, fo);
+				LOG.info(methodName + " add "+value);
+			}
 			return true;
 		} catch (NoSuchMethodException e) {
 			LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
@@ -454,7 +516,8 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt):
 	 
 	 */
 	public void set(Object obj, String fieldName, Object value) {
-		Field field = newFieldInstance(obj, fieldName, value);
+		if(value==null) return;
+		Field field = newFieldInstance(obj, fieldName); // == DocumentCodeType documentCode = new DocumentCodeType()
 		set(field, obj, fieldName, value);
 	}
 

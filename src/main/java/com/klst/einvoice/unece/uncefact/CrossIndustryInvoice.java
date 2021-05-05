@@ -82,7 +82,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 	@Override
 	public CoreInvoiceLine createInvoiceLine(String id, IQuantity quantity, IAmount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
-		return TradeLineItem.create(id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+		return TradeLineItem.create(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 	}
 
 /*
@@ -902,11 +902,11 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 
 	// BG-20 + BG-21- 0..n
 	@Override
-	public AllowancesAndCharges createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return TradeAllowanceCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
 	}
 	@Override
-	public AllowancesAndCharges createCharge(Amount amount, Amount baseAmount, BigDecimal percentage) {
+	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return TradeAllowanceCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
 	}
 	@Override

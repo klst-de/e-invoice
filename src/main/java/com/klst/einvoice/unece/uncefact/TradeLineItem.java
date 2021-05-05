@@ -56,10 +56,10 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	@Override
 	public CoreInvoiceLine createInvoiceLine(String id, IQuantity quantity, IAmount lineTotalAmount,
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
-		return create(id, (Quantity)quantity, (Amount)lineTotalAmount, priceAmount, itemName, codeEnum, percent);
+		return create(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 	}
 
-	static CoreInvoiceLine create(String id, Quantity quantity, Amount lineTotalAmount, 
+	static CoreInvoiceLine create(String id, IQuantity quantity, IAmount lineTotalAmount, 
 			UnitPriceAmount priceAmount, String itemName, TaxCategoryCode codeEnum, BigDecimal percent) {
 		return new TradeLineItem(id, quantity, lineTotalAmount, priceAmount, itemName, codeEnum, percent);
 	}
@@ -104,7 +104,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	 * @param taxCode         - BG-30.BT-151 mandatory VAT category code
 	 * @param percent         - BG-30.BT-152 VAT rate, optional (can be null)
 	 */
-	private TradeLineItem(String id, Quantity quantity, Amount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
+	private TradeLineItem(String id, IQuantity quantity, IAmount lineTotalAmount, UnitPriceAmount priceAmount, String itemName
 			, TaxCategoryCode taxCode, BigDecimal percent) {
 		super();
 		associatedDocumentLineDocument = new DocumentLineDocumentType();
@@ -174,9 +174,9 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	// BT-129+BT-130
-	private void setQuantity(Quantity quantity) { 
-		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeDelivery", quantity);
-		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "billedQuantity", quantity);
+	private void setQuantity(IQuantity quantity) { 
+		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeDelivery", (Quantity)quantity);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeDelivery(), "billedQuantity", (Quantity)quantity);
 	}
 
 	@Override
@@ -185,10 +185,15 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	// BG-25.BT-131 1..1 Invoice line net amount
-	void setLineTotalAmount(Amount amount) {
+	private void setLineTotalAmount(IAmount amount) {
+		// TODO Baustelle
+//		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeSettlement", amount);
+//		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", amount);
+//		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", amount);
+
 		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
 		AmountType lineTotalAmt = new AmountType();
-		amount.copyTo(lineTotalAmt);
+		((Amount)amount).copyTo(lineTotalAmt);
 		tradeSettlementLineMonetarySummation.getLineTotalAmount().add(lineTotalAmt);
 		specifiedLineTradeSettlement.setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
 		super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);
@@ -273,11 +278,11 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	 * BG-28 0..n INVOICE LINE CHARGES
 	 */
 	@Override
-	public AllowancesAndCharges createAllowance(Amount amount, Amount baseAmount, BigDecimal percentage) {
+	public AllowancesAndCharges createAllowance(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return TradeAllowanceCharge.create(AllowancesAndCharges.ALLOWANCE, amount, baseAmount, percentage);
 	}
 	@Override
-	public AllowancesAndCharges createCharge(Amount amount, Amount baseAmount, BigDecimal percentage) {
+	public AllowancesAndCharges createCharge(IAmount amount, IAmount baseAmount, BigDecimal percentage) {
 		return TradeAllowanceCharge.create(AllowancesAndCharges.CHARGE, amount, baseAmount, percentage);
 	}
 	@Override
@@ -343,7 +348,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		List<TradeAllowanceChargeType> list = specifiedLineTradeAgreement.getGrossPriceProductTradePrice().getAppliedTradeAllowanceCharge();
 		if(list.isEmpty()) return null;
 		TradeAllowanceCharge allowance = TradeAllowanceCharge.create(list.get(0));
-		Amount amount = allowance.getAmountWithoutTax();
+		IAmount amount = allowance.getAmountWithoutTax();
 		return amount==null ? null : new UnitPriceAmount(amount.getCurrencyID(), amount.getValue());
 	}
 	
