@@ -186,10 +186,10 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 	// BG-25.BT-131 1..1 Invoice line net amount
 	private void setLineTotalAmount(IAmount amount) {
-		// TODO Baustelle
-//		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeSettlement", amount);
-//		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", amount);
-//		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", amount);
+//		// TODO Baustelle
+//		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeSettlement", (Amount)amount);
+//		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", (Amount)amount);
+//		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", (Amount)amount);
 
 		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
 		AmountType lineTotalAmt = new AmountType();
@@ -200,7 +200,7 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 	}
 
 	@Override
-	public Amount getLineTotalAmount() {
+	public IAmount getLineTotalAmount() {
 		AmountType amount = specifiedLineTradeSettlement.getSpecifiedTradeSettlementLineMonetarySummation().getLineTotalAmount().get(0);
 		return new Amount(amount.getCurrencyID(), amount.getValue());
 	}
@@ -316,7 +316,7 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 
 	// 1..1 Item net price + UnitPriceQuantity BT-149+BT-149-0 + BT-150-0 optional
 	@Override
-	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
+	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, IQuantity quantity) {
 		TradePriceType tradePrice = setUnitPriceAmount(unitPriceAmount);
 		specifiedLineTradeAgreement.setNetPriceProductTradePrice(tradePrice);
 		super.setSpecifiedLineTradeAgreement(specifiedLineTradeAgreement);
@@ -335,10 +335,10 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 		return tradePrice;
 	}
 
-	private void setUnitPriceQuantity(Quantity quantity) {
-		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeAgreement", quantity);
-		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", quantity);
-		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "basisQuantity", quantity);
+	private void setUnitPriceQuantity(IQuantity quantity) {
+		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeAgreement", (Quantity)quantity);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", (Quantity)quantity);
+		SCopyCtor.getInstance().set(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "basisQuantity", (Quantity)quantity);
 	}
 	
 	// BG-29.BT-147 0..1 Item price discount  ==>  GrossPriceProductTradePrice 

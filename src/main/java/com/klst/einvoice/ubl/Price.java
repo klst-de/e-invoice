@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import com.klst.ebXml.reflection.SCopyCtor;
 import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IQuantity;
 import com.klst.einvoice.api.AllowancesAndCharges;
 import com.klst.einvoice.unece.uncefact.Amount;
 import com.klst.einvoice.unece.uncefact.Quantity;
@@ -135,7 +136,7 @@ public class Price extends PriceType {
 	 * Bsp.: <cbc:BaseQuantity unitCode="EA">1</cbc:BaseQuantity>
 	 * 
 	 */
-	public void setUnitPriceQuantity(Quantity quantity) {
+	public void setUnitPriceQuantity(IQuantity quantity) {
 		if(quantity!=null) {
 			BaseQuantityType baseQuantity = new BaseQuantityType();
 			baseQuantity.setUnitCode(quantity.getUnitCode());
@@ -143,7 +144,7 @@ public class Price extends PriceType {
 			super.setBaseQuantity(baseQuantity);
 		}	
 	}
-	public Quantity getUnitPriceQuantity() {
+	public IQuantity getUnitPriceQuantity() {
 		if(super.getBaseQuantity()==null) return null;
 		String unit = getBaseQuantity().getUnitCode();
 		return new Quantity(unit, getBaseQuantity().getValue());

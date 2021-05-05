@@ -1,6 +1,10 @@
 package com.klst.einvoice.api;
 
-import com.klst.einvoice.unece.uncefact.Quantity;
+import java.math.BigDecimal;
+
+import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IQuantity;
+import com.klst.edoc.untdid.TaxCategoryCode;
 import com.klst.einvoice.unece.uncefact.UnitPriceAmount;
 
 /**
@@ -34,7 +38,7 @@ public interface BG29_PriceDetails {
 	public UnitPriceAmount getUnitPriceAmount();
 
 	// BG-29.BT-146 1..1 UnitPriceAmount , UnitPriceQuantity BT-149-0 + BT-150-0 optional
-	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity);
+	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, IQuantity quantity);
 
 	/**
 	 * Item price discount
@@ -88,8 +92,8 @@ public interface BG29_PriceDetails {
 	 * <br>Request ID: 	R14
 	 * 
 	 * @return UnitPriceQuantity
-	 * @see #getQuantity
+	 * @see CoreInvoiceLine#getQuantity()
 	 */
-	public Quantity getUnitPriceQuantity();
+	public IQuantity getUnitPriceQuantity();
 
 }

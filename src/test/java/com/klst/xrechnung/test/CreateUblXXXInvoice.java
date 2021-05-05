@@ -12,10 +12,10 @@ import com.klst.edoc.api.BusinessParty;
 import com.klst.edoc.api.BusinessPartyAddress;
 import com.klst.edoc.api.BusinessPartyContact;
 import com.klst.edoc.api.IAmount;
+import com.klst.edoc.api.IQuantity;
 import com.klst.edoc.api.Identifier;
 import com.klst.edoc.untdid.PaymentMeansEnum;
 import com.klst.einvoice.api.AllowancesAndCharges;
-import com.klst.einvoice.api.BG24_AdditionalSupportingDocs;
 import com.klst.einvoice.api.CoreInvoice;
 import com.klst.einvoice.api.CoreInvoiceLine;
 import com.klst.einvoice.api.CreditTransfer;
@@ -27,9 +27,7 @@ import com.klst.einvoice.api.PrecedingInvoice;
 import com.klst.einvoice.api.SupportingDocument;
 import com.klst.einvoice.api.VatBreakdown;
 import com.klst.einvoice.ubl.GenericInvoice;
-import com.klst.einvoice.ubl.GenericLine;
 import com.klst.einvoice.unece.uncefact.Amount;
-import com.klst.einvoice.unece.uncefact.Quantity;
 import com.klst.marshaller.UblCreditNoteTransformer;
 import com.klst.marshaller.UblInvoiceTransformer;
 
@@ -394,7 +392,7 @@ public class CreateUblXXXInvoice extends InvoiceFactory {
 			targetLine.setLineDeliveryPeriod(testLine.getLineDeliveryPeriod());     // optional BG-26
 			
 			// BG-29:BT-149-0 0..1 , BT-150-0
-			Quantity baseQuantity = testLine.getUnitPriceQuantity();
+			IQuantity baseQuantity = testLine.getUnitPriceQuantity();
 			if(baseQuantity!=null) {
 				LOG.info("PRICE DETAILS BG-29.BT-149 + BT-150 baseQuantity "+baseQuantity);
 				// BG-29.BT-146 + BG-29:BT-149-0 0..1 , BT-150-0

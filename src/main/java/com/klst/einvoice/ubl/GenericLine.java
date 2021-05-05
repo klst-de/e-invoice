@@ -400,7 +400,7 @@ Bsp. UBL 01.01a :
 	
 	// optional UnitPriceQuantity : BT-149-0 QuantityUnit 0..1 + BT-150-0 Quantity required
 	@Override
-	public Quantity getUnitPriceQuantity() {
+	public IQuantity getUnitPriceQuantity() {
 		Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice());
 		return price.getUnitPriceQuantity();
 	}
@@ -420,7 +420,7 @@ Bsp. UBL 01.01a :
 		setPrice(price);
 	}
 
-	private void setUnitPriceQuantity(Quantity quantity) {
+	private void setUnitPriceQuantity(IQuantity quantity) {
 		if(quantity!=null) {
 			Price price = Price.create( isInvoiceLineType ? iLine.getPrice() : cnLine.getPrice() );
 			price.setUnitPriceQuantity(quantity);
@@ -429,7 +429,7 @@ Bsp. UBL 01.01a :
 	}
 	
 	@Override
-	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, Quantity quantity) {
+	public void setUnitPriceAmountAndQuantity(UnitPriceAmount unitPriceAmount, IQuantity quantity) {
 		setUnitPriceAmount(unitPriceAmount);
 		setUnitPriceQuantity(quantity);
 	}
