@@ -380,11 +380,15 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * <br>Rule ID: 	
 	 * <br>Request ID: 	R44
 	 * 
-	 * @param Document reference
+	 * @param ref Document reference
 	 */
-	public void setProjectReference(String id);
+	default void setProjectReference(Reference ref) {
+		setProjectReference(ref.getID(), ref.getName());
+	}
+	default void setProjectReference(String id) {
+		setProjectReference(id, null);
+	}
 	public void setProjectReference(String id, String name); // name nur in CII Beispielen 05 13 15
-	public void setProjectReference(Reference ref);
 	public Reference getProjectReference();
 	
 	/**
@@ -508,8 +512,12 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * a conditional scheme identifier should be used that shall be chosen from the UNTDID 1153 code list entries.
 	 */
 	public void setInvoicedObject(String name, String schemeID);
-	public void setInvoicedObjectIdentifier(Identifier id);
-	public void setInvoicedObject(String name);
+	default void setInvoicedObject(String name) {
+		setInvoicedObject(name, null);
+	}
+	default void setInvoicedObjectIdentifier(Identifier id) {
+		if(id!=null) setInvoicedObject(id.getContent(), id.getSchemeIdentifier());
+	}
 	public String getInvoicedObject();
 	public Identifier getInvoicedObjectIdentifier();
 	
