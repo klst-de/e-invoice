@@ -377,10 +377,6 @@ UBL:
 		setProjectReference(ref.getID(), ref.getName());
 	}
 	@Override
-	public void setProjectReference(String id) {
-		setProjectReference(id, null);
-	}
-	@Override
 	public void setProjectReference(String id, String name) { // Name wird nicht genutzt
 		if(id==null) return; // optional
 		ProjectReferenceType projectReference = new ProjectReferenceType();
@@ -562,15 +558,6 @@ UBL:
 	}
 	
 	// BT-18 0..1 Invoiced object identifier
-	@Override
-	public void setInvoicedObjectIdentifier(Identifier id) {
-		if(id==null) return; // optional
-		setInvoicedObject(id.getContent(), id.getSchemeIdentifier());
-	}
-	@Override
-	public void setInvoicedObject(String name) {
-		setInvoicedObject(name, null);
-	}
 	@Override
 	public void setInvoicedObject(String name, String schemeID) {
 		if(name==null) return;
