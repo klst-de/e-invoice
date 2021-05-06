@@ -186,17 +186,17 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 	// BG-25.BT-131 1..1 Invoice line net amount
 	private void setLineTotalAmount(IAmount amount) {
-//		// TODO Baustelle
-//		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeSettlement", (Amount)amount);
-//		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", (Amount)amount);
-//		SCopyCtor.getInstance().set(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", (Amount)amount);
+		// TODO Baustelle
+		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeSettlement", (Amount)amount);
+		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", (Amount)amount);
+		SCopyCtor.getInstance().add(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", (Amount)amount);
 
-		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
-		AmountType lineTotalAmt = new AmountType();
-		((Amount)amount).copyTo(lineTotalAmt);
-		tradeSettlementLineMonetarySummation.getLineTotalAmount().add(lineTotalAmt);
-		specifiedLineTradeSettlement.setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
-		super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);
+//		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
+//		AmountType lineTotalAmt = new AmountType();
+//		((Amount)amount).copyTo(lineTotalAmt);
+//		tradeSettlementLineMonetarySummation.getLineTotalAmount().add(lineTotalAmt);
+//		specifiedLineTradeSettlement.setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
+//		super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);
 	}
 
 	@Override

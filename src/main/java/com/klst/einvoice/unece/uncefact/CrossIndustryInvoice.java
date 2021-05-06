@@ -36,19 +36,14 @@ import un.unece.uncefact.data.standard.crossindustryinvoice._100.CrossIndustryIn
 import un.unece.uncefact.data.standard.qualifieddatatype._100.FormattedDateTimeType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.DocumentContextParameterType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ExchangedDocumentContextType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeAgreementType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.NoteType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ProcuringProjectType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeLineItemType;
-import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainTradeTransactionType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeAccountingAccountType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradeTaxType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
-import un.unece.uncefact.data.standard.unqualifieddatatype._100.TextType;
 
 // @see https://www.unece.org/fileadmin/DAM/cefact/rsm/RSM_CrossIndustryInvoice_v2.0.pdf
 //      https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=2ahUKEwijlav-gPjhAhUGU1AKHSv2CIoQFjAAegQIARAC&url=https%3A%2F%2Fwww.unece.org%2Ffileadmin%2FDAM%2Fcefact%2Frsm%2FRSM_CrossIndustryInvoice_v2.0.pdf&usg=AOvVaw0yPVFpbRqJ50xaDMUaYm62
@@ -59,7 +54,7 @@ public class CrossIndustryInvoice extends CrossIndustryInvoiceType implements Co
 	
 	// wg. Mapper:
 	private static final String FIELD_typeCode = "typeCode";
-	private static final String FIELD_issuerAssignedID = "issuerAssignedID";
+//	private static final String FIELD_issuerAssignedID = "issuerAssignedID";
 
 	// factory
 	public static CoreInvoice getFactory() {
@@ -158,10 +153,12 @@ PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B
     CIO basiert auf eine neuere Version von SCRDM 103
     
  */
-	// applicableHeaderTradeAgreement TODO
+//	ExchangedDocumentType exchangedDocument; // required in super
+	SupplyChainTradeTransaction supplyChainTradeTransaction; // required in super
+	// required in SupplyChainTradeTransaction:
+	HeaderTradeAgreement applicableHeaderTradeAgreement;
+	HeaderTradeDelivery applicableHeaderTradeDelivery;
 	HeaderTradeSettlement applicableHeaderTradeSettlement;
-	HeaderTradeDeliveryType applicableHeaderTradeDelivery;
-//	ExchangedDocumentType exchangedDocument; // in super
 	
 	public CrossIndustryInvoice(CrossIndustryInvoiceType doc) {
 		super();
@@ -169,16 +166,16 @@ PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B
 			SCopyCtor.getInstance().invokeCopy(this, doc);
 			LOG.config("copy ctor:"+this);
 		}
+		supplyChainTradeTransaction = SupplyChainTradeTransaction.create(super.getSupplyChainTradeTransaction(), this);
+		applicableHeaderTradeAgreement = supplyChainTradeTransaction.createtHeaderTradeAgreement();
+		applicableHeaderTradeDelivery = supplyChainTradeTransaction.createtHeaderTradeDelivery();
+		applicableHeaderTradeSettlement = supplyChainTradeTransaction.createtHeaderTradeSettlement();
 		if(super.getSupplyChainTradeTransaction()==null) {
-			applicableHeaderTradeSettlement = HeaderTradeSettlement.create();
-			applicableHeaderTradeDelivery = HeaderTradeDelivery.create();
-			super.setSupplyChainTradeTransaction(new SupplyChainTradeTransactionType());
-		} else {
-			applicableHeaderTradeSettlement = HeaderTradeSettlement.create(getSupplyChainTradeTransaction().getApplicableHeaderTradeSettlement());
-			applicableHeaderTradeDelivery = HeaderTradeDelivery.create(getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery());
+			super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
+			supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(applicableHeaderTradeAgreement);
+			supplyChainTradeTransaction.setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
+			supplyChainTradeTransaction.setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
 		}
-		getSupplyChainTradeTransaction().setApplicableHeaderTradeSettlement(applicableHeaderTradeSettlement);
-		getSupplyChainTradeTransaction().setApplicableHeaderTradeDelivery(applicableHeaderTradeDelivery);
 	}
 
 	private CrossIndustryInvoice(String customization, String processType, DocumentNameCode documentNameCode) {
@@ -346,45 +343,26 @@ Statt dessen ist das Liefer- und Leistungsdatum anzugeben.
 	 */
 	@Override
 	public void setBuyerReference(String reference) {
-		SCopyCtor.getInstance().newFieldInstance(getSupplyChainTradeTransaction(), "applicableHeaderTradeAgreement", reference);
-//		getApplicableHeaderTradeAgreement() ist private!!!
-		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement(), "buyerReference", reference);
+		applicableHeaderTradeAgreement.setBuyerReference(reference);
 	}
 
 	@Override
 	public String getBuyerReferenceValue() {
-		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		TextType text = headerTradeAgreement.getBuyerReference();
-		return text==null ? null : text.getValue();
+		return applicableHeaderTradeAgreement.getBuyerReferenceValue();
 	}
 	
-	// BT-11 + 0..1 Project reference
-	@Override
-	public void setProjectReference(Reference ref) {
-		if(ref==null) return; // optional
-		setProjectReference(ref.getID(), ref.getName());
-	}
-	@Override
-	public void setProjectReference(String docRefId) {
-		setProjectReference(docRefId, null);
-	}
+	// BT-11 0..1 Project reference
 	@Override
 	public void setProjectReference(String docRefId, String name) {
-		SCopyCtor.getInstance().newFieldInstance(getApplicableHeaderTradeAgreement(), "specifiedProcuringProject", docRefId);
-		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getSpecifiedProcuringProject(), "id", docRefId);
-		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getSpecifiedProcuringProject(), "name", Text.create(name));
+		applicableHeaderTradeAgreement.setProjectReference(docRefId, name);
 	}
 
 	@Override
 	public Reference getProjectReference() {
-		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		ProcuringProjectType referencedDocument = headerTradeAgreement.getSpecifiedProcuringProject();
-		if(referencedDocument==null) return null;
-		return new ID(referencedDocument.getName()==null ? "" : referencedDocument.getName().getValue()
-				, referencedDocument.getID()==null ? null : referencedDocument.getID().getValue());	
+		return applicableHeaderTradeAgreement.getProjectReference();
 	}
 
-	// BT-12 + 0..1 Contract reference
+	// BT-12 0..1 Contract reference
 /*
 test daten in 03 06 08 15
 CII: 01.03a-INVOICE_uncefact.xml :
@@ -400,116 +378,73 @@ UBL:
  */
 	@Override
 	public void setContractReference(String docRefId) {
-		SCopyCtor.getInstance().newFieldInstance(getApplicableHeaderTradeAgreement(), "contractReferencedDocument", docRefId);
-		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getContractReferencedDocument(), FIELD_issuerAssignedID, docRefId);
+		applicableHeaderTradeAgreement.setContractReference(docRefId);	
 	}
 
 	@Override
 	public String getContractReference() {
-		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		ReferencedDocumentType referencedDocument = headerTradeAgreement.getContractReferencedDocument();
-		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();
+		return applicableHeaderTradeAgreement.getContractReference();	
 	}
 
-	// BT-13 + 0..1 Purchase order reference
+	// BT-13 0..1 Purchase order reference
 	@Override
 	public void setPurchaseOrderReference(String docRefId) {
-		SCopyCtor.getInstance().newFieldInstance(getApplicableHeaderTradeAgreement(), "buyerOrderReferencedDocument", docRefId);
-		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getBuyerOrderReferencedDocument(), FIELD_issuerAssignedID, docRefId);
+		applicableHeaderTradeAgreement.setPurchaseOrderReference(docRefId);	
 	}
 
 	@Override
 	public String getPurchaseOrderReference() {
-		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		ReferencedDocumentType referencedDocument = headerTradeAgreement.getBuyerOrderReferencedDocument();
-		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
+		return applicableHeaderTradeAgreement.getPurchaseOrderReference();	
 	}
 
-	// BT-14 + 0..1 Sales order reference
+	// BT-14 0..1 Sales order reference
 	@Override
 	public void setOrderReference(String docRefId) {
-		SCopyCtor.getInstance().newFieldInstance(getApplicableHeaderTradeAgreement(), "sellerOrderReferencedDocument", docRefId);
-		SCopyCtor.getInstance().set(getApplicableHeaderTradeAgreement().getSellerOrderReferencedDocument(), FIELD_issuerAssignedID, docRefId);
+		applicableHeaderTradeAgreement.setOrderReference(docRefId);
 	}
 	@Override
 	public String getOrderReference() {
-		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		ReferencedDocumentType referencedDocument = headerTradeAgreement.getSellerOrderReferencedDocument();
-		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
+		return applicableHeaderTradeAgreement.getOrderReference();
 	}
 	
-	// BT-15 + 0..1 Receiving advice reference / Referenz auf die Wareneingangsmeldung
+	// BT-15 0..1 Receiving advice reference / Referenz auf die Wareneingangsmeldung
 	@Override
 	public void setReceiptReference(String docRefId) {
-		SCopyCtor.getInstance().set(applicableHeaderTradeDelivery.getReceivingAdviceReferencedDocument(), FIELD_issuerAssignedID, docRefId);
+		applicableHeaderTradeDelivery.setReceiptReference(docRefId);
 	}
 	@Override
 	public String getReceiptReference() {
-		HeaderTradeDeliveryType headerTradeDelivery = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
-		ReferencedDocumentType referencedDocument = headerTradeDelivery.getReceivingAdviceReferencedDocument();
-		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
+		return applicableHeaderTradeDelivery.getReceiptReference();
 	}
 
-	// BT-16 + 0..1 Despatch advice reference / Lieferavisreferenz
+	// BT-16 0..1 Despatch advice reference / Lieferavisreferenz
 	@Override
 	public void setDespatchAdviceReference(String docRefId) {
-		SCopyCtor.getInstance().set(applicableHeaderTradeDelivery.getDespatchAdviceReferencedDocument(), FIELD_issuerAssignedID, docRefId);
+		applicableHeaderTradeDelivery.setDespatchAdviceReference(docRefId);
 	}
 	@Override
 	public String getDespatchAdviceReference() {
-		HeaderTradeDeliveryType headerTradeDelivery = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeDelivery();
-		ReferencedDocumentType referencedDocument = headerTradeDelivery.getDespatchAdviceReferencedDocument();
-		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
+		return applicableHeaderTradeDelivery.getDespatchAdviceReference();
 	}
 
 	// BT-17 0..1 Tender or lot reference
 	@Override
 	public void setTenderOrLotReference(String docRefId) {
-		if(docRefId==null) return; // optional
-		ReferencedDocument rd = ReferencedDocument.create(docRefId, 
-			DocumentNameCode.ValidatedPricedTender.getValueAsString(), (String)null);
-		addSupportigDocument(rd);
+		applicableHeaderTradeAgreement.setTenderOrLotReference(docRefId);
 	}
 	@Override
 	public String getTenderOrLotReference() {
-		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		List<ReferencedDocumentType> list = headerTradeAgreement.getAdditionalReferencedDocument();
-		List<SupportingDocument> res = new ArrayList<SupportingDocument>(list.size());
-		list.forEach(rd -> {
-			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
-			if(referencedDocument.isValidatedPricedTender()) res.add(referencedDocument);
-		});
-		return res.isEmpty() ? null : res.get(0).getDocumentReference().getName();
+		return applicableHeaderTradeAgreement.getTenderOrLotReference();
 	}
 
 	// BT-18 0..1 Invoiced object identifier
 	@Override
-	public void setInvoicedObjectIdentifier(Identifier id) {
-		if(id==null) return; // optional
-		setInvoicedObject(id.getContent(), id.getSchemeIdentifier());
-	}
-	@Override
-	public void setInvoicedObject(String name) {
-		setInvoicedObject(name, null);
-	}
-	@Override
 	public void setInvoicedObject(String name, String schemeID) {
-		if(name==null) return; // optional
-		ReferencedDocument rd = ReferencedDocument.create(name, DocumentNameCode.InvoicingDataSheet.getValueAsString(), schemeID);
-		addSupportigDocument(rd);
+		applicableHeaderTradeAgreement.setInvoicedObject(name, schemeID);
 	}
 	@Override
 	public Identifier getInvoicedObjectIdentifier() {
-		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		List<ReferencedDocumentType> list = headerTradeAgreement.getAdditionalReferencedDocument();
-		List<ReferencedDocument> res = new ArrayList<ReferencedDocument>(list.size());
-		list.forEach(rd -> {
-			ReferencedDocument refDoc = ReferencedDocument.create(rd);
-			if(refDoc.isInvoicingDataSheet()) res.add(refDoc);
-		});
-		if(res.isEmpty()) return null;
-		ReferencedDocument sd = res.get(0);
-		return new ID(sd.getDocumentReference().getName(), sd.getReferenceCode());
+		return applicableHeaderTradeAgreement.getInvoicedObjectIdentifier();
 	}
 	@Override
 	public String getInvoicedObject() {
@@ -517,7 +452,7 @@ UBL:
 		return id==null? null : id.getContent();
 	}
 	
-	// BT-19 + 0..1 Buyer accounting reference       --- keine Testdaten
+	// BT-19 0..1 Buyer accounting reference       --- keine Testdaten
 	// ApplicableHeaderTradeSettlement
 	//   - ReceivableSpecifiedTradeAccountingAccount
 	//      1 .. 1 ID Buchungsreferenz des Käufers BT-19
@@ -583,7 +518,7 @@ UBL:
 		this.setExchangedDocumentContext(exchangedDocumentContext);
 	}
 
-	// BG-2.BT-23 ++ 0..1 Business process type
+	// BG-2.BT-23 0..1 Business process type
 	@Override
 	public String getProcessType() {
 		List<DocumentContextParameterType> documentContextParameterList = super.getExchangedDocumentContext().getBusinessProcessSpecifiedDocumentContextParameter();
@@ -594,7 +529,7 @@ UBL:
 		return res.isEmpty() ? null : res.get(0);
 	}
 
-	// BG-2.BT-24 ++ 1..1 Specification identifier
+	// BG-2.BT-24 1..1 Specification identifier
 	@Override
 	public String getCustomization() {
 		List<DocumentContextParameterType> documentContextParameterList = super.getExchangedDocumentContext().getGuidelineSpecifiedDocumentContextParameter();
@@ -610,7 +545,7 @@ UBL:
 	 * die berichtigt oder gutgeschrieben werden soll.
 	 */
 	
-	// BG-3 + 0..n PRECEDING INVOICE REFERENCE / implements BG3_PrecedingInvoiceReference factory
+	// BG-3 0..n PRECEDING INVOICE REFERENCE / implements BG3_PrecedingInvoiceReference factory
 	@Override
 	public PrecedingInvoice createPrecedingInvoiceReference(String docRefId, Timestamp ts) {
 		return ReferencedDocument.create(docRefId, ts);
@@ -668,20 +603,12 @@ UBL:
 		party.setCompanyLegalForm(companyLegalForm);
 		setSeller(party);
 	}
-	
+	// BG-4 1..1 SELLER
 	public void setSeller(BusinessParty party) {
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setSellerTradeParty((TradePartyType)party);
-		
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+		applicableHeaderTradeAgreement.setSeller(party);
 	}
-
 	public BusinessParty getSeller() {
-		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		TradePartyType sellerParty = headerTradeAgreement.getSellerTradeParty();
-		return sellerParty==null ? null : TradeParty.create(sellerParty);
+		return applicableHeaderTradeAgreement.getSeller();
 	}
 
 	/* BUYER                                       BG-7                        1 (mandatory) 
@@ -692,18 +619,10 @@ UBL:
 		setBuyer(party);
 	}
 	public void setBuyer(BusinessParty party) {
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setBuyerTradeParty((TradePartyType) party);
-		
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+		applicableHeaderTradeAgreement.setBuyer(party);
 	}
-
 	public BusinessParty getBuyer() {
-		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		TradePartyType buyerParty = headerTradeAgreement.getBuyerTradeParty();
-		return buyerParty==null ? null : TradeParty.create(buyerParty);
+		return applicableHeaderTradeAgreement.getBuyer();
 	}
 
 	/* PAYEE                                       BG-10                       0..1
@@ -734,7 +653,7 @@ UBL:
 		party.setCompanyLegalForm(companyLegalForm);
 		setPayee(party);
 	}
-	// BG-10 + 0..1 PAYEE
+	// BG-10 0..1 PAYEE
 	public void setPayee(BusinessParty party) {
 		LOG.info("setPayee BusinessParty party "+party);
 		applicableHeaderTradeSettlement.setPayee(party);
@@ -748,27 +667,21 @@ UBL:
 	/* SELLER TAX REPRESENTATIVE PARTY             BG-11                       0..1
 	 * Eine Gruppe von Informationselementen, die Informationen über den Steuervertreter des Verkäufers liefern.
 	 */
-	// BT-62 ++ 1..1 Seller tax representative name
+	// BT-62 1..1 Seller tax representative name
 	
-	// BT-63 ++ 1..1 Seller tax representative VAT identifier
+	// BT-63 1..1 Seller tax representative VAT identifier
 	public void setTaxRepresentative(String name, PostalAddress address, String taxRegistrationName, String taxRegistrationSchemaID) {
 		BusinessParty party = createParty(name, address, null);
 		party.addTaxRegistrationId(taxRegistrationName, taxRegistrationSchemaID);
 		setTaxRepresentative(party);
 	}
+	// BG-11 0..1 SELLER TAX REPRESENTATIVE PARTY
 	public void setTaxRepresentative(BusinessParty party) {
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.setSellerTaxRepresentativeTradeParty((TradePartyType) party);
-		
-		SupplyChainTradeTransactionType supplyChainTradeTransaction = this.getSupplyChainTradeTransaction();
-		supplyChainTradeTransaction.setApplicableHeaderTradeAgreement(headerTradeAgreement);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);		
+		applicableHeaderTradeAgreement.setTaxRepresentative(party);
 	}
 
 	public BusinessParty getTaxRepresentative() {
-		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		TradePartyType party = headerTradeAgreement.getSellerTaxRepresentativeTradeParty();
-		return party==null ? null : TradeParty.create(party);
+		return applicableHeaderTradeAgreement.getTaxRepresentative();
 	}
 
 	/* DELIVERY INFORMATION                        BG-13                       0..1
@@ -854,7 +767,7 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	public void setPaymentInstructions(PaymentInstructions paymentInstructions) {
 		// so geht es nicht: applicableHeaderTradeSettlement = (ApplicableHeaderTradeSettlement)paymentInstructions;
 		// denn es gibt ein sequenzproblem: ApplicableHeaderTradeSettlement implementiert nicht nur PaymentInstructions
-		// sondern auch // BG-10 + 0..1 PAYEE : PayeeTradeParty und andere elemente,
+		// sondern auch BG-10 0..1 PAYEE : PayeeTradeParty und andere elemente,
 		// die man mit dem assign von paymentInstructions überschreiben würde
 		// ===> also: nur die paymentInstructions elemente kopieren:
 		applicableHeaderTradeSettlement.init(paymentInstructions.getPaymentMeansEnum()
@@ -1109,22 +1022,14 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 		rd.setAttachedDocument(content, mimeCode, filename);
 		return rd;
 	}
+	// BG-24 0..n ADDITIONAL SUPPORTING DOCUMENTS
 	@Override
 	public void addSupportigDocument(SupportingDocument supportigDocument) {
-		HeaderTradeAgreementType headerTradeAgreement = getApplicableHeaderTradeAgreement();
-		headerTradeAgreement.getAdditionalReferencedDocument().add((ReferencedDocument)supportigDocument);
+		applicableHeaderTradeAgreement.addSupportigDocument(supportigDocument);
 	}
 	@Override
 	public List<SupportingDocument> getAdditionalSupportingDocuments() {
-		HeaderTradeAgreementType headerTradeAgreement = super.getSupplyChainTradeTransaction().getApplicableHeaderTradeAgreement();
-		List<ReferencedDocumentType> list = headerTradeAgreement.getAdditionalReferencedDocument();
-		List<SupportingDocument> res = new ArrayList<SupportingDocument>(list.size());
-		list.forEach(rd -> {
-			ReferencedDocument referencedDocument = ReferencedDocument.create(rd);
-			if(referencedDocument.isRelatedDocument()) res.add(referencedDocument);
-		});
-		return res;
-
+		return applicableHeaderTradeAgreement.getAdditionalSupportingDocuments();
 	}
 
 	/* INVOICE LINE                                BG-25                       1..* (mandatory)
@@ -1139,52 +1044,11 @@ EN16931 sagt: BG-16 0..1 PAYMENT INSTRUCTIONS
 	 */
 	@Override
 	public void addLine(CoreInvoiceLine line) {
-		supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem().add((TradeLineItem)line);
-	}
-	
-	public void addLine(SupplyChainTradeLineItemType line) {
-		supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem().add(line);
-		super.setSupplyChainTradeTransaction(supplyChainTradeTransaction);
-	}
-
-	public void addLines(CrossIndustryInvoiceType doc) {
-		List<TradeLineItem> tradeLineItemList = getLines(doc);
-		tradeLineItemList.forEach(line -> {
-			CoreInvoiceLine invoiceLine = TradeLineItem.create(line); // TradeLineItem implements CoreInvoiceLine
-			addLine(invoiceLine);
-		});
-	}
-
-	public List<CoreInvoiceLine> getLines() {
-		List<SupplyChainTradeLineItemType> lines = supplyChainTradeTransaction.getIncludedSupplyChainTradeLineItem();
-		List<CoreInvoiceLine> resultLines = new ArrayList<CoreInvoiceLine>(lines.size());
-		lines.forEach(line -> {
-			resultLines.add(TradeLineItem.create(line));
-		});
-		return resultLines;
-	}
-	static List<TradeLineItem> getLines(CrossIndustryInvoiceType doc) {
-		List<SupplyChainTradeLineItemType> lines = doc.getSupplyChainTradeTransaction().getIncludedSupplyChainTradeLineItem();
-		List<TradeLineItem> resultLines = new ArrayList<TradeLineItem>(lines.size());
-		lines.forEach(line -> {
-			resultLines.add(TradeLineItem.create(line));
-		});
-		return resultLines;
-	}
-
-// -----------------------------------------------------------
-	
-	private HeaderTradeAgreementType getApplicableHeaderTradeAgreement() {
-		return getApplicableHeaderTradeAgreement(this.getSupplyChainTradeTransaction());
-	}
-	private HeaderTradeAgreementType getApplicableHeaderTradeAgreement(SupplyChainTradeTransactionType supplyChainTradeTransaction) {
-		HeaderTradeAgreementType headerTradeAgreement = supplyChainTradeTransaction.getApplicableHeaderTradeAgreement();
-		if(headerTradeAgreement==null) {
-			headerTradeAgreement = new HeaderTradeAgreementType();
-			LOG.config("new HeaderTradeAgreementType:"+headerTradeAgreement);
-		}
-		return headerTradeAgreement;
+		supplyChainTradeTransaction.addLine(line);
 	}	
+	public List<CoreInvoiceLine> getLines() {
+		return supplyChainTradeTransaction.getLines();
+	}
 
 	// ----------------- factories to delegate
 	@Override

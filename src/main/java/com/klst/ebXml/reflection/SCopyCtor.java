@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -279,13 +280,13 @@ public class SCopyCtor {
 			field.setAccessible(true);
 			if(field.get(obj)==null) {
 				fieldType = field.getType();
-				field.set(obj, fieldType.newInstance());
-//				LOG.info("field ist null fieldType="+fieldType.getSimpleName());
-//				if(fieldType==List.class) {
-//					field.set(obj, ArrayList.class.newInstance());
-//				} else {
-//					field.set(obj, fieldType.newInstance());
-//				}
+//				field.set(obj, fieldType.newInstance());
+				LOG.info(">>>>>field ist null fieldType="+fieldType.getSimpleName());
+				if(fieldType==List.class) {
+					field.set(obj, ArrayList.class.newInstance());
+				} else {
+					field.set(obj, fieldType.newInstance());
+				}
 				LOG.config(fieldType.getSimpleName()+" "+fieldName);
 			}
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | InstantiationException e) {
@@ -308,8 +309,9 @@ public class SCopyCtor {
     private Package packageUDT = typeUDT_ID.getPackage();
 //    private Class<?> typeUDT_Quantity = un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType.class;
     private Class<?> type_Quantity = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType.class;
-//    private Class<?> typeUDT_Amount = un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType.class;
+    private Class<?> typeUDT_Amount = un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType.class;
     private Class<?> type_Amount = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.AmountType.class;
+    private Package packageCCTSM = type_Amount.getPackage();
     
 	private void set(Field field, Object obj, String fieldName, Object value) {
 		if(value==null) return;
@@ -384,8 +386,8 @@ public class SCopyCtor {
 		String fieldName = field.getName();
 		String methodName = setget + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
 		try {
-			Object fo = field.get(obj);
 			if(setget==set) {
+				Object fo = field.get(obj);
 				Class<? extends Object> para = fo.getClass();
 				if(obj.getClass().getSimpleName().endsWith("Type")) {
 					return obj.getClass().getDeclaredMethod(methodName, para);
@@ -519,6 +521,62 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt):
 		if(value==null) return;
 		Field field = newFieldInstance(obj, fieldName); // == DocumentCodeType documentCode = new DocumentCodeType()
 		set(field, obj, fieldName, value);
+	}
+
+	/*  MACRO, die folgende Zeile ersetzt den //-code , TODO
+	 
+	SCopyCtor.getInstance().set(..., "lineTotalAmount", (Amount)amount);
+//	TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
+//	AmountType lineTotalAmt = new AmountType();
+//	((Amount)amount).copyTo(lineTotalAmt);
+//	tradeSettlementLineMonetarySummation.getLineTotalAmount().add(lineTotalAmt);
+//	specifiedLineTradeSettlement.setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
+//	super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);
+ 
+	 */
+	public void add(Object obj, String listName, Object value) {
+		if(value==null) return;
+		Field list = newFieldInstance(obj, listName); // liste anlegen, wenn notwendig
+		// den type von elem aus getXX ermitteln TODO
+		Method getter = getSetterGetter(get, obj, list);
+		Type retType = getter.getGenericReturnType();
+		LOG.info("Retern Type is "+retType);
+		LOG.info("value class "+value.getClass().getSuperclass().getCanonicalName());
+		// liefert : java.util.List<un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType>
+		// Oder doch aus Object value ermitteln:
+		if(packageCCTSM==value.getClass().getSuperclass().getPackage()) {
+			// typeUDT_Amount , fieldType.newInstance()
+		}
+		// list fo: AmountType lineTotalAmt = new AmountType();
+		Class<?> valueSuperType = value.getClass().getSuperclass();
+		try {
+			Object fo = typeUDT_Amount.newInstance();
+			Method setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
+			Method setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETCURRENCY, String.class);
+			setValue.invoke(fo, invokeGetXX(METHOD_GETVALUE, valueSuperType, value));
+			setUnitCode.invoke(fo, invokeGetXX(METHOD_GETCURRENCY, valueSuperType, value));
+			
+			Object liste = getter.invoke(obj);
+			((List)liste).add(fo);
+		} catch (InstantiationException | IllegalAccessException e) {
+			// newInstance() throw 
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// getDeclaredMethod( throw
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// getDeclaredMethod( throw
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// invoke( throw
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// invoke( throw
+			e.printStackTrace();
+		}
+		
+		// TODO felder belegen
+//		set(field, obj, listName, value);
 	}
 
 }
