@@ -10,10 +10,15 @@ import com.klst.edoc.untdid.DateTimeFormats;
 import com.klst.einvoice.api.BG13_DeliveryInformation;
 
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.HeaderTradeDeliveryType;
+import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.ReferencedDocumentType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.SupplyChainEventType;
 import un.unece.uncefact.data.standard.reusableaggregatebusinessinformationentity._100.TradePartyType;
 import un.unece.uncefact.data.standard.unqualifieddatatype._100.DateTimeType;
 
+/* BG13_DeliveryInformation extends
+ * BG15_DeliverToAddress ,
+ * BusinessPartyAddress , PostalAddress , PostalAddressFactory
+ */
 public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements BG13_DeliveryInformation {
 
 	@Override
@@ -55,6 +60,7 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements BG13
 		setParty(party);	
 	}
 
+	private static final String FIELD_issuerAssignedID = "issuerAssignedID";
 	private TradeParty party;
 	
 	private HeaderTradeDelivery(String businessName, Timestamp ts, PostalAddress address, String locationId, String schemeId) {
@@ -64,6 +70,24 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements BG13
 		if(schemeId!=null) party.getGlobalID().add(new ID(schemeId));
 		setParty(party);		
 		setActualDate(ts);
+	}
+
+	// BT-15 0..1 Receiving advice reference / Referenz auf die Wareneingangsmeldung
+	void setReceiptReference(String docRefId) {
+		SCopyCtor.getInstance().set(getReceivingAdviceReferencedDocument(), FIELD_issuerAssignedID, docRefId);
+	}
+	String getReceiptReference() {
+		ReferencedDocumentType referencedDocument = super.getReceivingAdviceReferencedDocument();
+		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
+	}
+
+	// BT-16 0..1 Despatch advice reference / Lieferavisreferenz
+	void setDespatchAdviceReference(String docRefId) {
+		SCopyCtor.getInstance().set(getDespatchAdviceReferencedDocument(), FIELD_issuerAssignedID, docRefId);
+	}
+	String getDespatchAdviceReference() {
+		ReferencedDocumentType referencedDocument = getDespatchAdviceReferencedDocument();
+		return referencedDocument==null ? null : referencedDocument.getIssuerAssignedID().getValue();	
 	}
 
 	// Party with businessName
@@ -76,11 +100,6 @@ public class HeaderTradeDelivery extends HeaderTradeDeliveryType implements BG13
 		return party;
 	}
 	
-	static TradeParty getParty(HeaderTradeDeliveryType delivery) {
-		TradePartyType party = delivery.getShipToTradeParty();
-		return party==null ? null : TradeParty.create(party);
-	}
-
 	@Override
 	public PostalAddress getAddress() {
 		if(party==null) return null;
