@@ -193,3 +193,24 @@ allowance.setTaxPercentage(new BigDecimal(20));
 invoice.addAllowanceCharge(allowance);
 
 ```
+
+## Rechnungsbezogene Anlagen
+
+Zu einer Rechnung kann es Anlagen ( SUPPORTING DOCUMENTS ) geben. Beispielsweise ein Stundenzettels, ein Montageprotokoll, Fotos, etc. Die Anlagen sind Belege für die in der Rechnung gestellten Ansprüche. Typischerweise sind solche Belege text- `pdf`- oder Bild-Dateien (`jpeg`, `png`). Diese Dateianlagen sind nicht Bestandteil der Rechnung.
+
+Auf zweierlei Weisen können die Belege der Rechung angefügt werden:
+
+1. als link zu einem externen Dokument (URL)
+1. als eingebettete Datei 
+
+	// BG-24 0..n external SUPPORTING DOCUMENT
+	String url = "https://beispiel.de/externalSupportingDocument.pdf";
+	SupportingDocument sd = invoice.createSupportigDocument("docRefId", "description", url);
+	invoice.addSupportigDocument(sd);
+
+Code BG-24 Bsp eingebettete Datei TODO
+
+Ähnliche XML-Elemente sind 
+- Losreferenzen oder Verweise auf eine Ausschreibung, die zum Vertrag geführt hat (BT-17). 
+- Oder Verweise, Kennungen für Objekte, auf das sich die Rechnung (BT-18) 
+- oder Rechnungsposition (BG-25.BT-128) bezieht.
