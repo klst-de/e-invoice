@@ -2,7 +2,7 @@
 
 Compare [UN/CEFACT xml-schemas](https://unece.org/trade/uncefact/xml-schemas) with [OASIS UBL-2.1](https://docs.oasis-open.org/ubl/UBL-2.1.html), see also [CEFeInvoicingWebinar](https://ec.europa.eu/cefdigital/wiki/download/attachments/44893070/CEFeInvoicingWebinar%20v1.00.pdf).
 
-- UBL was released in 2013 and consists of 62 main business documents defined as xml. Each document type has its unique Namespace, there is `UBL-CreditNote-2.1.xsd` or `UBL-Invoice-2.1.xsd` for example
+- UBL was released in 2013 and consists of 62 main business documents defined as xml. Each document type has its unique Namespace, there is `UBL-CreditNote-2.1.xsd` or `UBL-Invoice-2.1.xsd` for instance
 - You can find the release date in the xsd-module:
 
 ```xml
@@ -39,7 +39,7 @@ So this is the main difference between UBL-invoice and CII:
 - in CII both documents are defined in the same XML schema with different document types
 - in UBL there are two XML schemas, which are very similar
 
-The next difference is the target usage. In factur-x/ZUGFeRD CII documents can be delivered as xml or hybrid pdf invoice. UBL documents however cannot be delivered inside a pdf.
+The next difference in e-invoice context is the target usage. In factur-x/ZUGFeRD CII documents can be delivered as xml or hybrid pdf invoice. UBL documents however cannot be delivered inside a pdf.
 
 Cross Industry Invoice (CII) was the first UN/CEFACT schema derived from the process oriented Supply Chain Reference Data Model [SCRDM](https://www.unescap.org/sites/default/files/Session%202_SCRDM_UNCEFACT.pdf). In 2019 the Cross Industry Order (CIO) schema was published. Both messages has similar structure:
 
