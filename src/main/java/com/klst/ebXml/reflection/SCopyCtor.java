@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -254,7 +253,7 @@ public class SCopyCtor {
 	
 	/*  MACRO, die zwei Zeilen ersetzen den //-code , aus CrossIndustryInvoice ctor
 	 
-		SCopyCtor.getInstance().newFieldInstance(this, "exchangedDocument", documentNameCode.getValueAsString());
+		SCopyCtor.getInstance().newFieldInstance(this, "exchangedDocument", documentNameCode);
 		SCopyCtor.getInstance().set(getExchangedDocument(), "typeCode", documentNameCode.getValueAsString());
 //		exchangedDocument = new ExchangedDocumentType();
 //		DocumentCodeType documentCode = new DocumentCodeType();
@@ -267,6 +266,18 @@ public class SCopyCtor {
 		if(value==null) return null;
 		return newFieldInstance(obj, fieldName);
 	}
+	
+	/**
+	 * creates a new empty instance of object.field with name <code>fieldname</code> if field is null,
+	 * expl. in CII XmlRootElement (type CrossIndustryInvoiceType) there is field exchangedDocument,
+	 * <code>newFieldInstance(cii, "exchangedDocument")</code> guarantees that exchangedDocument is not null.
+	 * 
+	 * Note: works also for List fields
+	 * 
+	 * @param obj
+	 * @param fieldName
+	 * @return object.field
+	 */
 	private Field newFieldInstance(Object obj, String fieldName) {
 		Field field = null; // declared field in obj super
 		Class<?> fieldType = null;
@@ -280,9 +291,8 @@ public class SCopyCtor {
 			field.setAccessible(true);
 			if(field.get(obj)==null) {
 				fieldType = field.getType();
-//				field.set(obj, fieldType.newInstance());
-				LOG.info(">>>>>field ist null fieldType="+fieldType.getSimpleName());
 				if(fieldType==List.class) {
+					// field is a List
 					field.set(obj, ArrayList.class.newInstance());
 				} else {
 					field.set(obj, fieldType.newInstance());
@@ -334,7 +344,8 @@ public class SCopyCtor {
 				
 		methodName = METHOD_SETID;
 		try { // "setID" existiert ? ==> ausführen: .setID((ID)value)
-			// mit IDType ist der Mapper an unqualifieddatatype._103 bzw CLASS_IDType gebunden
+			// mit IDType ist der Mapper an unqualifieddatatype._103 bzw typeUDT_ID gebunden
+			// also nicht für UBL nutzbar
 			Method setID = fieldType.getDeclaredMethod(methodName, typeUDT_ID);	
 			setID.invoke(field.get(obj), typeUDT_ID.cast(value));
 			LOG.config(methodName + " with "+value);
@@ -382,7 +393,7 @@ public class SCopyCtor {
 
 	}
 
-	private Method getSetterGetter(String setget, Object obj, Field field) {
+	private Method getSetterGetter(String setget, Object obj, Field field) throws NoSuchMethodException {
 		String fieldName = field.getName();
 		String methodName = setget + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
 		try {
@@ -394,48 +405,38 @@ public class SCopyCtor {
 				}
 				return obj.getClass().getSuperclass().getDeclaredMethod(methodName, para);
 			} else {
-				return obj.getClass().getDeclaredMethod(methodName);
+				if(obj.getClass().getSimpleName().endsWith("Type")) {
+					return obj.getClass().getDeclaredMethod(methodName);					
+				}
+				return obj.getClass().getSuperclass().getDeclaredMethod(methodName);
 			}
-		} catch (IllegalArgumentException | IllegalAccessException e) {
+		} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-//			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.config(e.getMessage());
+			throw e;
 		}
 		return null;
 	}
 	
 	private boolean set(Object obj, Field field, Object value) {
-		Class<?> valueSuperType = value.getClass().getSuperclass();
-//		while(valueSuperType.getPackage()!=packageUDT) {
-//			LOG.info("seach for package of "+valueSuperType.getCanonicalName());
-//			valueSuperType = valueSuperType.getSuperclass();
-//		}
 		String fieldName = field.getName();
 		String methodName = set+get;
-//		String methodName = set + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
 
 		try {
 			Object fo = field.get(obj);
-			// exception, wenn es set methodName nicht gibt (in CII sind es oft Listen)
-//			Method setter = obj.getClass().getDeclaredMethod(methodName, fo.getClass());
-			Method setter = getSetterGetter(set, obj, field);
-			Method getter = null; 
-			if(setter!=null) {
+			Method setter;
+			Method getter = null;
+			try {
+				// exception, wenn es set methodName nicht gibt, in CII sind es oft Listen - für die gibt es nur getter
+				setter = getSetterGetter(set, obj, field);
 				methodName = setter.getName();
-//				LOG.info("setter gefunden????????????:"+methodName);
-			} else {
-				LOG.warning("setter für "+field.getName()+" nicht gefunden. para="+obj.getClass().getCanonicalName());
-				Method[] ms = obj.getClass().getSuperclass().getDeclaredMethods();
-				LOG.info("getter suchen:"+fo);
+			} catch (NoSuchMethodException e) {
+				LOG.warning(e.getMessage());
 				getter = getSetterGetter(get, obj, field);
-				// TODO getter==null
-				LOG.info("getter gefunden????????????:"+getter);
-				methodName = getter.getName();
+				LOG.info(fieldName+" is probably List!");
+				return false;
 			}
 			
 			/* setter methodName mit passender Signatur existiert:
@@ -463,42 +464,33 @@ un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType mit gleich
     protected String unitCodeListAgencyID;
     protected String unitCodeListAgencyName;
 
-ich kopiere nur value und unitCode (die anderen werden nicht genutzt):
+ich kopiere nur value und unitCode (die anderen werden nicht genutzt): mapQuantity, dto für mapAmount
 
 			 */
 
-//			LOG.info("value:"+value 
-//					+ "\n\t   Package:"+ valueSuperType.getPackage().getName()
-//					+ "\n\t     Class:"+ value.getClass().getCanonicalName()
-//					+ "\n\tSuperClass:"+ value.getClass().getSuperclass().getCanonicalName()
-//				);
-			// TODO bei Listen ist es nicht field object
-			// sondern es muss ein dummy Object vom Typ typeUDT_Amount erstellt werden
-			// und dass fo.add(dummy)
-			if(type_Amount==valueSuperType) {
-				Method setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
-				Method setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETCURRENCY, String.class);
-				setValue.invoke(fo, invokeGetXX(METHOD_GETVALUE, valueSuperType, value));
-				setUnitCode.invoke(fo, invokeGetXX(METHOD_GETCURRENCY, valueSuperType, value));
-			}
-			if(type_Quantity==valueSuperType) {
-				Method setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
-				Method setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETUNITCODE, String.class);
-				setValue.invoke(fo, invokeGetXX(METHOD_GETVALUE, valueSuperType, value));
-				setUnitCode.invoke(fo, invokeGetXX(METHOD_GETUNITCODE, valueSuperType, value));
+			try {
+				// exception, wenn METHOD_SETUNITCODE nicht da
+				mapQuantity(fo, value);
+				LOG.config(methodName + "() done for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);			
+			} catch (NoSuchMethodException e) {
+				// also kein setQuantity
 			}
 			
-//			setter.invoke(obj, fo);
+			try {
+				// exception, wenn METHOD_SETCURRENCY nicht da
+				mapAmount(fo, value);
+				LOG.config(methodName + "() done for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+			} catch (NoSuchMethodException e) {
+				// also auch kein setAmount
+				return false;
+			}
+			
 			if(setter!=null) {
 				setter.invoke(obj, fo);
 				LOG.info(methodName + " with "+value);
+				return true;
 			}
-			if(getter!=null) { // List
-				// invoke add
-				getter.invoke(obj, fo);
-				LOG.info(methodName + " add "+value);
-			}
-			return true;
+
 		} catch (NoSuchMethodException e) {
 			LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
 //			e.printStackTrace();
@@ -523,60 +515,83 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt):
 		set(field, obj, fieldName, value);
 	}
 
-	/*  MACRO, die folgende Zeile ersetzt den //-code , TODO
-	 
-	SCopyCtor.getInstance().set(..., "lineTotalAmount", (Amount)amount);
-//	TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
-//	AmountType lineTotalAmt = new AmountType();
-//	((Amount)amount).copyTo(lineTotalAmt);
-//	tradeSettlementLineMonetarySummation.getLineTotalAmount().add(lineTotalAmt);
-//	specifiedLineTradeSettlement.setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
-//	super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);
- 
+	/*  MACRO, die folgende Zeile ersetzt den //-code , aus TradeTax
+		
+		SCopyCtor.getInstance().add(this, "calculatedAmount", (Amount)taxAmount);
+//		AmountType calculatedAmount = new AmountType();
+//		((Amount)taxAmount).copyTo(calculatedAmount);
+//		super.getCalculatedAmount().add(calculatedAmount);
+
 	 */
-	public void add(Object obj, String listName, Object value) {
-		if(value==null) return;
+	public Object add(Object obj, String listName, Object value) {
+		if(value==null) return null;
 		Field list = newFieldInstance(obj, listName); // liste anlegen, wenn notwendig
-		// den type von elem aus getXX ermitteln TODO
-		Method getter = getSetterGetter(get, obj, list);
-		Type retType = getter.getGenericReturnType();
-		LOG.info("Retern Type is "+retType);
-		LOG.info("value class "+value.getClass().getSuperclass().getCanonicalName());
-		// liefert : java.util.List<un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType>
-		// Oder doch aus Object value ermitteln:
-		if(packageCCTSM==value.getClass().getSuperclass().getPackage()) {
-			// typeUDT_Amount , fieldType.newInstance()
-		}
-		// list fo: AmountType lineTotalAmt = new AmountType();
-		Class<?> valueSuperType = value.getClass().getSuperclass();
+
 		try {
+			Method getter = getSetterGetter(get, obj, list);
+
 			Object fo = typeUDT_Amount.newInstance();
+			mapAmount(fo, value);
+			
+			Object liste = getter.invoke(obj);
+			uncheckedAdd(liste, fo);
+			LOG.config(fo.toString() + " to "+listName);
+			return fo;
+			
+		} catch (InstantiationException | IllegalAccessException e) {
+			// newInstance() throws this
+			e.printStackTrace();
+		} catch (NoSuchMethodException | SecurityException e) {
+			// getSetterGetter, getDeclaredMethod throws this
+			e.printStackTrace();
+		} catch (IllegalArgumentException | InvocationTargetException e) {
+			// invoke throws this
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void uncheckedAdd(Object liste, Object fo) {
+		((List)liste).add(fo);		
+	}
+	
+	// ersetzt valueAmount.copyTo(AmountType) für CII
+	private void mapAmount(Object fo, Object value) 
+		throws NoSuchMethodException, SecurityException, IllegalAccessException, 
+			IllegalArgumentException, InvocationTargetException {
+		
+		Class<? extends Object> valueSuperType = value.getClass().getSuperclass();
+		while(valueSuperType.getPackage()!=packageCCTSM) {
+			// wird für Amount Subklassen benötigt, z.B. UnitPriceAmount
+			LOG.info("seach for proper package of "+valueSuperType.getCanonicalName());
+			valueSuperType = valueSuperType.getSuperclass();
+		}
+		if(type_Amount==valueSuperType) {
 			Method setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
 			Method setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETCURRENCY, String.class);
 			setValue.invoke(fo, invokeGetXX(METHOD_GETVALUE, valueSuperType, value));
 			setUnitCode.invoke(fo, invokeGetXX(METHOD_GETCURRENCY, valueSuperType, value));
-			
-			Object liste = getter.invoke(obj);
-			((List)liste).add(fo);
-		} catch (InstantiationException | IllegalAccessException e) {
-			// newInstance() throw 
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// getDeclaredMethod( throw
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// getDeclaredMethod( throw
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// invoke( throw
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// invoke( throw
-			e.printStackTrace();
 		}
+	}
+	
+	// ersetzt valueQuantity.copyTo(QuantityType)
+	private void mapQuantity(Object fo, Object value) 
+		throws NoSuchMethodException, SecurityException, IllegalAccessException, 
+			IllegalArgumentException, InvocationTargetException {
 		
-		// TODO felder belegen
-//		set(field, obj, listName, value);
+		Class<? extends Object> valueSuperType = value.getClass().getSuperclass();
+//		while(valueSuperType.getPackage()!=packageCCTSM) {
+//			// wird für Amount Subklassen benötigt, z.B. UnitPriceAmount
+//			LOG.info("seach for proper package of "+valueSuperType.getCanonicalName());
+//			valueSuperType = valueSuperType.getSuperclass();
+//		}
+		if(type_Quantity==valueSuperType) {
+			Method setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
+			Method setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETUNITCODE, String.class);
+			setValue.invoke(fo, invokeGetXX(METHOD_GETVALUE, valueSuperType, value));
+			setUnitCode.invoke(fo, invokeGetXX(METHOD_GETUNITCODE, valueSuperType, value));
+		}
 	}
 
 }

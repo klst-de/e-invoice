@@ -182,7 +182,7 @@ PS: CII hat den Status "Published" und zwar am 10 October 2016, Version 100.D16B
 		this(null);
 		setProcessControl(customization, processType);
 		
-		SCopyCtor.getInstance().newFieldInstance(this, "exchangedDocument", documentNameCode.getValueAsString());
+		SCopyCtor.getInstance().newFieldInstance(this, "exchangedDocument", documentNameCode);
 		SCopyCtor.getInstance().set(getExchangedDocument(), FIELD_typeCode, documentNameCode.getValueAsString());
 	}
 

@@ -186,17 +186,18 @@ public class TradeLineItem extends SupplyChainTradeLineItemType implements CoreI
 
 	// BG-25.BT-131 1..1 Invoice line net amount
 	private void setLineTotalAmount(IAmount amount) {
-		// TODO Baustelle
-		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeSettlement", (Amount)amount);
-		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", (Amount)amount);
-		SCopyCtor.getInstance().add(getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", (Amount)amount);
+		// TODO Baustelle OK:
+//		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeSettlement", (Amount)amount);
+//		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeSettlement(), "specifiedTradeSettlementLineMonetarySummation", (Amount)amount);
+//		SCopyCtor.getInstance().add(
+//				getSpecifiedLineTradeSettlement().getSpecifiedTradeSettlementLineMonetarySummation(), "lineTotalAmount", (Amount)amount);
 
-//		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
-//		AmountType lineTotalAmt = new AmountType();
-//		((Amount)amount).copyTo(lineTotalAmt);
-//		tradeSettlementLineMonetarySummation.getLineTotalAmount().add(lineTotalAmt);
-//		specifiedLineTradeSettlement.setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
-//		super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);
+		TradeSettlementLineMonetarySummationType tradeSettlementLineMonetarySummation = new TradeSettlementLineMonetarySummationType();
+		AmountType lineTotalAmt = new AmountType();
+		((Amount)amount).copyTo(lineTotalAmt);
+		tradeSettlementLineMonetarySummation.getLineTotalAmount().add(lineTotalAmt);
+		specifiedLineTradeSettlement.setSpecifiedTradeSettlementLineMonetarySummation(tradeSettlementLineMonetarySummation);
+		super.setSpecifiedLineTradeSettlement(specifiedLineTradeSettlement);
 	}
 
 	@Override
@@ -325,6 +326,12 @@ Bsp. CII 01.01a-INVOICE_uncefact.xml :
 	}	
 	
 	private TradePriceType setUnitPriceAmount(UnitPriceAmount unitPriceAmount) {
+		// TODO Baustelle NOK:
+//		SCopyCtor.getInstance().newFieldInstance(this, "specifiedLineTradeAgreement", unitPriceAmount);
+//		SCopyCtor.getInstance().newFieldInstance(getSpecifiedLineTradeAgreement(), "netPriceProductTradePrice", unitPriceAmount);
+//		Object o = SCopyCtor.getInstance().add(getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice(), "chargeAmount", unitPriceAmount);
+//		return getSpecifiedLineTradeAgreement().getNetPriceProductTradePrice();
+
 		AmountType chargeAmount = new AmountType();
 		unitPriceAmount.copyTo(chargeAmount);
 		TradePriceType tradePrice = new TradePriceType();

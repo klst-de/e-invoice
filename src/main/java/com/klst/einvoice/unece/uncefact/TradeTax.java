@@ -245,13 +245,16 @@ keine Beispiele für Tests!
 		return trc==null ? null : trc.getValue();		
 	}
 	
-	// BT-116 1..1 BasisAmount Steuerbasisbetrag
+	// BT-116 1..1 BasisAmount Steuerbasisbetrag/Bemessungsgrundlage
 	@Override
 	public void setTaxBaseAmount(IAmount amount) {
 		if(amount==null) return; // defensiv
 		AmountType basisAmount = new AmountType();
 		((Amount)amount).copyTo(basisAmount);
 		super.getBasisAmount().add(basisAmount);
+		
+//		TODO Baustelle OK:
+//		SCopyCtor.getInstance().add(this, "basisAmount", (Amount)amount);
 	}
 	@Override
 	public IAmount getTaxBaseAmount() {
@@ -263,7 +266,10 @@ keine Beispiele für Tests!
 	public void setCalculatedTaxAmount(IAmount taxAmount) {
 		AmountType calculatedAmount = new AmountType();
 		((Amount)taxAmount).copyTo(calculatedAmount);
-		super.getCalculatedAmount().add(calculatedAmount);		
+		super.getCalculatedAmount().add(calculatedAmount);
+		
+		// TODO Baustelle OK:
+//		SCopyCtor.getInstance().add(this, "calculatedAmount", (Amount)taxAmount);
 	}
 
 	@Override
