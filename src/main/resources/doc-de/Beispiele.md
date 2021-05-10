@@ -191,7 +191,6 @@ allowance.setTaxType(TaxTypeCode.VAT);
 allowance.setTaxCategoryCode(TaxCategoryCode.StandardRate);
 allowance.setTaxPercentage(new BigDecimal(20));
 invoice.addAllowanceCharge(allowance);
-
 ```
 
 ## Rechnungsbezogene Anlagen
@@ -203,10 +202,17 @@ Auf zweierlei Weisen können die Belege der Rechung angefügt werden:
 1. als link zu einem externen Dokument (URL)
 1. als eingebettete Datei 
 
+```java
 	// BG-24 0..n external SUPPORTING DOCUMENT
 	String url = "https://beispiel.de/externalSupportingDocument.pdf";
-	SupportingDocument sd = invoice.createSupportigDocument("docRefId", "description", url);
+	SupportingDocument sd = invoice.createSupportigDocument("docRefId-1", "description", url);
 	invoice.addSupportigDocument(sd);
+...
+	String PDF = "01_15_Anhang_01.pdf"; // eingebettete Datei
+	String mimeCode = "application/pdf";
+	byte[] content = getBytesFromTestFile(PDF);
+	invoice.addSupportigDocument("docRefId-2", "embedded file", content, mimeCode, PDF);
+```
 
 Code BG-24 Bsp eingebettete Datei TODO
 
