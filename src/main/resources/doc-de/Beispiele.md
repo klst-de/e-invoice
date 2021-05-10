@@ -193,9 +193,9 @@ allowance.setTaxPercentage(new BigDecimal(20));
 invoice.addAllowanceCharge(allowance);
 ```
 
-## Rechnungsbezogene Anlagen
+## Rechnungsbegründete Anlagen
 
-Zu einer Rechnung kann es Anlagen ( SUPPORTING DOCUMENTS ) geben. Beispielsweise ein Stundenzettels, ein Montageprotokoll, Fotos, etc. Die Anlagen sind Belege für die in der Rechnung gestellten Ansprüche. Typischerweise sind solche Belege text- `pdf`- oder Bild-Dateien (`jpeg`, `png`). Diese Dateianlagen sind nicht Bestandteil der Rechnung.
+Rechnungsbezogene Anlagen ( SUPPORTING DOCUMENTS ) sind beispielsweise  Stundenzettel, ein Montageprotokoll, Fotos, etc. Diese Anlagen sind Belege für die in der Rechnung gestellten Ansprüche. Typischerweise sind solche Belege text- `pdf`- oder Bild-Dateien (`jpeg`, `png`). Diese Dateianlagen sind nicht Bestandteil der Rechnung.
 
 Auf zweierlei Weisen können die Belege der Rechung angefügt werden:
 
