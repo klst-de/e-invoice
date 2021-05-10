@@ -207,14 +207,12 @@ Auf zweierlei Weisen können die Belege der Rechung angefügt werden:
 	String url = "https://beispiel.de/externalSupportingDocument.pdf";
 	SupportingDocument sd = invoice.createSupportigDocument("docRefId-1", "description", url);
 	invoice.addSupportigDocument(sd);
-...
-	String PDF = "01_15_Anhang_01.pdf"; // eingebettete Datei
+...	// BG-24 0..n embedded SUPPORTING DOCUMENT
+	String PDF = "01_15_Anhang_01.pdf";
 	String mimeCode = "application/pdf";
 	byte[] content = getBytesFromTestFile(PDF);
 	invoice.addSupportigDocument("docRefId-2", "embedded file", content, mimeCode, PDF);
 ```
-
-Code BG-24 Bsp eingebettete Datei TODO
 
 Ähnliche XML-Elemente sind 
 - Losreferenzen oder Verweise auf eine Ausschreibung, die zum Vertrag geführt hat (BT-17). 
