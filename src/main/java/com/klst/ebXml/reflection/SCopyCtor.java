@@ -262,7 +262,7 @@ public class SCopyCtor {
 //		super.setExchangedDocument(exchangedDocument);
  
 	 */
-	public Field newFieldInstance(Object obj, String fieldName, Object value) {
+	public Object newFieldInstance(Object obj, String fieldName, Object value) {
 		if(value==null) return null;
 		return newFieldInstance(obj, fieldName);
 	}
@@ -276,12 +276,11 @@ public class SCopyCtor {
 	 * 
 	 * @param obj
 	 * @param fieldName
-	 * @return object.field
+	 * @return object which name is fieldName
 	 */
-	private Field newFieldInstance(Object obj, String fieldName) {
-		Field field = null; // declared field in obj super
-		Class<?> fieldType = null;
+	private Object newFieldInstance(Object obj, String fieldName) {
 		try {
+			Field field;
 			// das .getSuperclass() ist notwendig, weil die Attribute in super <className>Type sind
 			if(obj.getClass().getSimpleName().endsWith("Type")) {
 				field = obj.getClass().getDeclaredField(fieldName);
@@ -290,7 +289,7 @@ public class SCopyCtor {
 			}
 			field.setAccessible(true);
 			if(field.get(obj)==null) {
-				fieldType = field.getType();
+				Class<?> fieldType = field.getType();
 				if(fieldType==List.class) {
 					// field is a List
 					field.set(obj, ArrayList.class.newInstance());
@@ -299,12 +298,12 @@ public class SCopyCtor {
 				}
 				LOG.config(fieldType.getSimpleName()+" "+fieldName);
 			}
+			return field.get(obj); // never null;
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | InstantiationException e) {
 			LOG.warning(obj.getClass().getSimpleName() +"."+fieldName + ": Exception:"+e);
 			e.printStackTrace();
 			return null;
 		}
-		return field;
 	}
 
     private static final String METHOD_SETVALUE = "setValue"; // setValue(String value)
@@ -317,20 +316,20 @@ public class SCopyCtor {
 
     private Class<?> typeUDT_ID = un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType.class;
     private Package packageUDT = typeUDT_ID.getPackage();
-//    private Class<?> typeUDT_Quantity = un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType.class;
+    private Class<?> typeUDT_Quantity = un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType.class;
     private Class<?> type_Quantity = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType.class;
     private Class<?> typeUDT_Amount = un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType.class;
     private Class<?> type_Amount = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.AmountType.class;
     private Package packageCCTSM = type_Amount.getPackage();
     
-	private void set(Field field, Object obj, String fieldName, Object value) {
+	private void set(Object fieldObj, Object obj, String fieldName, Object value) {
 		if(value==null) return;
-		Class<?> fieldType = field.getType();
+		Class<?> fieldType = fieldObj.getClass();
 		
 		String methodName = METHOD_SETVALUE;
 		try { // "setValue" existiert ? ==> ausführen
 			Method setValue = fieldType.getDeclaredMethod(methodName, value.getClass());	
-			setValue.invoke(field.get(obj), value.getClass().cast(value));
+			setValue.invoke(fieldObj, value.getClass().cast(value));
 			LOG.config(methodName + " with "+value);
 			return;
 		} catch (NoSuchMethodException e) {
@@ -347,7 +346,7 @@ public class SCopyCtor {
 			// mit IDType ist der Mapper an unqualifieddatatype._103 bzw typeUDT_ID gebunden
 			// also nicht für UBL nutzbar
 			Method setID = fieldType.getDeclaredMethod(methodName, typeUDT_ID);	
-			setID.invoke(field.get(obj), typeUDT_ID.cast(value));
+			setID.invoke(fieldObj, typeUDT_ID.cast(value));
 			LOG.config(methodName + " with "+value);
 			return;
 		} catch (NoSuchMethodException e) {
@@ -363,7 +362,7 @@ public class SCopyCtor {
 		if(value.getClass()==Boolean.class) {
 			methodName = METHOD_SETINDICATOR;
 			try {
-				Object fo = field.get(obj); // IndicatorType?
+				Object fo = fieldObj; // IndicatorType?
 				Method setter = fo.getClass().getDeclaredMethod(methodName, Boolean.class);
 				setter.invoke(fo, Boolean.class.cast(value));
 				return;
@@ -380,37 +379,44 @@ public class SCopyCtor {
 		if(type_Amount.isInstance(value) && value.getClass()!=type_Amount) {
 			// value is instance of a subclass of type_Amount, but not type_Amount itself
 			// mögliche Methoden: setLineTotalAmount / setChargeAmount
-			if (set(obj, field, value)) return;
+			if (set(fieldObj, obj, fieldName, value, typeUDT_Amount)) return;
 		}
 		
 		if(type_Quantity.isInstance(value) && value.getClass()!=type_Quantity) {
 			// value is instance of a subclass of QuantityType, but not QuantityType itself
 			// mögliche Methoden: setBilledQuantity / setRequestedQuantity / setAgreedQuantity / setBasisQuantity
-			if (set(obj, field, value)) return;
+			if (set(fieldObj, obj, fieldName, value, typeUDT_Quantity)) return;
 		}
 		
 		LOG.warning("NO METHOD found for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
 
 	}
 
-	private Method getSetterGetter(String setget, Object obj, Field field) throws NoSuchMethodException {
-		String fieldName = field.getName();
-		String methodName = setget + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
+	private Method getGetter(Object obj, String fieldName) throws NoSuchMethodException {
+		String methodName = get + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
 		try {
-			if(setget==set) {
-				Object fo = field.get(obj);
-				Class<? extends Object> para = fo.getClass();
-				if(obj.getClass().getSimpleName().endsWith("Type")) {
-					return obj.getClass().getDeclaredMethod(methodName, para);
-				}
-				return obj.getClass().getSuperclass().getDeclaredMethod(methodName, para);
-			} else {
-				if(obj.getClass().getSimpleName().endsWith("Type")) {
-					return obj.getClass().getDeclaredMethod(methodName);					
-				}
-				return obj.getClass().getSuperclass().getDeclaredMethod(methodName);
+			if(obj.getClass().getSimpleName().endsWith("Type")) {
+				return obj.getClass().getDeclaredMethod(methodName);					
 			}
-		} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
+			return obj.getClass().getSuperclass().getDeclaredMethod(methodName);
+		} catch (IllegalArgumentException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			LOG.config(e.getMessage());
+			throw e;
+		}
+		return null;
+	}
+	private Method getSetter(Object obj, String fieldName, Class<?> type) throws NoSuchMethodException {
+		String methodName = set + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
+		try {
+			Class<? extends Object> para = type;
+			if(obj.getClass().getSimpleName().endsWith("Type")) {
+				return obj.getClass().getDeclaredMethod(methodName, para);
+			}
+			return obj.getClass().getSuperclass().getDeclaredMethod(methodName, para);
+		} catch (IllegalArgumentException | SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchMethodException e) {
@@ -420,21 +426,22 @@ public class SCopyCtor {
 		return null;
 	}
 	
-	private boolean set(Object obj, Field field, Object value) {
-		String fieldName = field.getName();
+	/*
+	 * setter für Amount bzw. type_Quantity
+	 */
+	private boolean set(Object fo, Object obj, String fieldName, Object value, Class<?> type) {
 		String methodName = set+get;
 
 		try {
-			Object fo = field.get(obj);
 			Method setter;
 			Method getter = null;
 			try {
-				// exception, wenn es set methodName nicht gibt, in CII sind es oft Listen - für die gibt es nur getter
-				setter = getSetterGetter(set, obj, field);
+				// exception, wenn es setter nicht gibt, in CII sind es oft Listen - für die gibt es nur getter
+				setter = getSetter(obj, fieldName, type);
 				methodName = setter.getName();
 			} catch (NoSuchMethodException e) {
 				LOG.warning(e.getMessage());
-				getter = getSetterGetter(get, obj, field);
+				getter = getGetter(obj, fieldName);
 				LOG.info(fieldName+" is probably List!");
 				return false;
 			}
@@ -511,8 +518,8 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt): mapQuanti
 	 */
 	public void set(Object obj, String fieldName, Object value) {
 		if(value==null) return;
-		Field field = newFieldInstance(obj, fieldName); // == DocumentCodeType documentCode = new DocumentCodeType()
-		set(field, obj, fieldName, value);
+		Object fieldObj = newFieldInstance(obj, fieldName); // == DocumentCodeType documentCode = new DocumentCodeType()
+		set(fieldObj, obj, fieldName, value);
 	}
 
 	/*  MACRO, die folgende Zeile ersetzt den //-code , aus TradeTax
@@ -525,16 +532,16 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt): mapQuanti
 	 */
 	public Object add(Object obj, String listName, Object value) {
 		if(value==null) return null;
-		Field list = newFieldInstance(obj, listName); // liste anlegen, wenn notwendig
+		Object listObject = newFieldInstance(obj, listName); // leere liste anlegen, falls notwendig
 
 		try {
-			Method getter = getSetterGetter(get, obj, list);
-
+//			Method getter = getGetter(obj, listName);
+			// so ist add nur für Amount!!!
 			Object fo = typeUDT_Amount.newInstance();
 			mapAmount(fo, value);
 			
-			Object liste = getter.invoke(obj);
-			uncheckedAdd(liste, fo);
+//			Object liste = getter.invoke(obj);
+			uncheckedAdd(listObject, fo);
 			LOG.config(fo.toString() + " to "+listName);
 			return fo;
 			
@@ -557,7 +564,7 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt): mapQuanti
 	}
 	
 	// ersetzt valueAmount.copyTo(AmountType) für CII
-	private void mapAmount(Object fo, Object value) 
+	public void mapAmount(Object fo, Object value) 
 		throws NoSuchMethodException, SecurityException, IllegalAccessException, 
 			IllegalArgumentException, InvocationTargetException {
 		
