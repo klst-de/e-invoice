@@ -524,29 +524,36 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt): mapQuanti
 
 	/*  MACRO, die folgende Zeile ersetzt den //-code , aus TradeTax
 		
-		SCopyCtor.getInstance().add(this, "calculatedAmount", (Amount)taxAmount);
+		SCopyCtor.getInstance().add(getCalculatedAmount(), AmountType(), (Amount)taxAmount);
 //		AmountType calculatedAmount = new AmountType();
 //		((Amount)taxAmount).copyTo(calculatedAmount);
 //		super.getCalculatedAmount().add(calculatedAmount);
 
 	 */
-	public Object add(Object obj, String listName, Object value) {
+	public Object add(Object listObject, Object fo, Object value) {
 		if(value==null) return null;
-		Object listObject = newFieldInstance(obj, listName); // leere liste anlegen, falls notwendig
-
+		Class<?> fieldType = fo.getClass();
+		String methodName = METHOD_SETID;
 		try {
-//			Method getter = getGetter(obj, listName);
-			// so ist add nur für Amount!!!
-			Object fo = typeUDT_Amount.newInstance();
-			mapAmount(fo, value);
-			
-//			Object liste = getter.invoke(obj);
+			Method setID = fieldType.getDeclaredMethod(methodName, typeUDT_ID);
+			setID.invoke(fo, typeUDT_ID.cast(value));
 			uncheckedAdd(listObject, fo);
-			LOG.config(fo.toString() + " to "+listName);
 			return fo;
-			
-		} catch (InstantiationException | IllegalAccessException e) {
-			// newInstance() throws this
+		} catch (NoSuchMethodException e) {
+			LOG.config(methodName + "() not defined for " + fo.getClass().getSimpleName() + " and arg value:"+value);
+		} catch (IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+			LOG.warning(fo.getClass().getSimpleName() +"."+"id" + ": Exception:"+e);
+			e.printStackTrace();
+			return null;
+		}
+		
+		try {
+			mapAmount(fo, value);
+			uncheckedAdd(listObject, fo);
+			LOG.config(fo.toString() + " to List<"+fo.getClass().getSimpleName()+">");
+			return fo;
+		} catch (IllegalAccessException e) {
+			// mapAmount() throws this
 			e.printStackTrace();
 		} catch (NoSuchMethodException | SecurityException e) {
 			// getSetterGetter, getDeclaredMethod throws this
@@ -555,7 +562,7 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt): mapQuanti
 			// invoke throws this
 			e.printStackTrace();
 		}
-		return null;
+		return null;		
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
