@@ -209,7 +209,6 @@ public class SCopyCtor {
 	    }	
 	}
 	
-    private static final String METHOD_GETVALUE = "getValue";
     // == Getter.getValue(Object codeType, String clazz)
 	public Object invokeGetValue(Object codeType, String clazz) {
 		Class<?> type = null;
@@ -233,8 +232,41 @@ public class SCopyCtor {
 			LOG.info("Object "+codeType + " isInstance of "+codeType.getClass().getName() + " NOT "+clazz);
 		}
 
+		return null;	
+	}
+	
+//	private Method getGetter(Object obj, String fieldName) throws NoSuchMethodException {
+//		String methodName = get + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
+//		try {
+//			if(obj.getClass().getSimpleName().endsWith("Type")) {
+//				return obj.getClass().getDeclaredMethod(methodName);					
+//			}
+//			return obj.getClass().getSuperclass().getDeclaredMethod(methodName);
+//		} catch (IllegalArgumentException | SecurityException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (NoSuchMethodException e) {
+//			LOG.config(e.getMessage());
+//			throw e;
+//		}
+//		return null;
+//	}
+	private Method getSetter(Object obj, String fieldName, Class<?> type) throws NoSuchMethodException {
+		String methodName = set + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
+		try {
+			Class<? extends Object> para = type;
+			if(obj.getClass().getSimpleName().endsWith("Type")) {
+				return obj.getClass().getDeclaredMethod(methodName, para);
+			}
+			return obj.getClass().getSuperclass().getDeclaredMethod(methodName, para);
+		} catch (IllegalArgumentException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			LOG.config(e.getMessage());
+			throw e;
+		}
 		return null;
-		
 	}
 	
 	private Object invokeGetXX(String method, Class<?> type, Object object) {
@@ -307,6 +339,7 @@ public class SCopyCtor {
 	}
 
     private static final String METHOD_SETVALUE = "setValue"; // setValue(String value)
+    private static final String METHOD_GETVALUE = "getValue"; // getValue()
     private static final String METHOD_SETID = "setID"; // setID(IDType id)
     private static final String METHOD_SETINDICATOR = "setIndicator";
     private static final String METHOD_SETCURRENCY = "setCurrencyID"; // wg. Amount
@@ -315,10 +348,12 @@ public class SCopyCtor {
     private static final String METHOD_GETUNITCODE = "getUnitCode"; // wg. Quantity
 
     private Class<?> typeUDT_ID = un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType.class;
-    private Package packageUDT = typeUDT_ID.getPackage();
-    private Class<?> typeUDT_Quantity = un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType.class;
+//    private Package packageUDT = typeUDT_ID.getPackage();
+//    private Class<?> typeUDT_Quantity = un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType.class;
+    private Class<?> typeUBL_Quantity = oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.QuantityType.class;
     private Class<?> type_Quantity = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType.class;
-    private Class<?> typeUDT_Amount = un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType.class;
+//    private Class<?> typeUDT_Amount = un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType.class;
+    private Class<?> typeUBL_Amount = oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.AmountType.class;
     private Class<?> type_Amount = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.AmountType.class;
     private Package packageCCTSM = type_Amount.getPackage();
     
@@ -379,76 +414,71 @@ public class SCopyCtor {
 		if(type_Amount.isInstance(value) && value.getClass()!=type_Amount) {
 			// value is instance of a subclass of type_Amount, but not type_Amount itself
 			// mögliche Methoden: setLineTotalAmount / setChargeAmount
-			if (set(fieldObj, obj, fieldName, value, typeUDT_Amount)) return;
+			if (setAmount(fieldObj, obj, fieldName, value)) return;
 		}
 		
 		if(type_Quantity.isInstance(value) && value.getClass()!=type_Quantity) {
 			// value is instance of a subclass of QuantityType, but not QuantityType itself
 			// mögliche Methoden: setBilledQuantity / setRequestedQuantity / setAgreedQuantity / setBasisQuantity
-			if (set(fieldObj, obj, fieldName, value, typeUDT_Quantity)) return;
+			if (setQuantity(fieldObj, obj, fieldName, value)) return;
 		}
 		
 		LOG.warning("NO METHOD found for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
-
 	}
 
-	private Method getGetter(Object obj, String fieldName) throws NoSuchMethodException {
-		String methodName = get + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
+	/*
+	 * setter für Amount
+	 */
+	private boolean setAmount(Object fo, Object obj, String fieldName, Object value) {
 		try {
-			if(obj.getClass().getSimpleName().endsWith("Type")) {
-				return obj.getClass().getDeclaredMethod(methodName);					
-			}
-			return obj.getClass().getSuperclass().getDeclaredMethod(methodName);
-		} catch (IllegalArgumentException | SecurityException e) {
-			// TODO Auto-generated catch block
+			Method setter = getSetter(obj, fieldName, fo.getClass()); // NoSuchMethodException
+			
+			// exception, wenn METHOD_SETCURRENCY nicht da
+			mapAmount(fo, value);
+			
+			setter.invoke(obj, fo);
+			LOG.config(setter.getName() + "() done for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+			return true;
+		} catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			LOG.config(e.getMessage());
-			throw e;
 		}
-		return null;
+		return false;
 	}
-	private Method getSetter(Object obj, String fieldName, Class<?> type) throws NoSuchMethodException {
-		String methodName = set + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
-		try {
-			Class<? extends Object> para = type;
-			if(obj.getClass().getSimpleName().endsWith("Type")) {
-				return obj.getClass().getDeclaredMethod(methodName, para);
-			}
-			return obj.getClass().getSuperclass().getDeclaredMethod(methodName, para);
-		} catch (IllegalArgumentException | SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			LOG.config(e.getMessage());
-			throw e;
+
+	// ersetzt valueAmount.copyTo(AmountType)
+	public void mapAmount(Object fo, Object value) 
+		throws NoSuchMethodException, SecurityException, IllegalAccessException, 
+			IllegalArgumentException, InvocationTargetException {
+		
+		Class<? extends Object> valueSuperType = value.getClass().getSuperclass();
+		while(valueSuperType.getPackage()!=packageCCTSM) {
+			// wird für Amount Subklassen benötigt, z.B. UnitPriceAmount
+			LOG.info("seach for proper package of "+valueSuperType.getCanonicalName());
+			valueSuperType = valueSuperType.getSuperclass();
 		}
-		return null;
+
+		if(type_Amount==valueSuperType) {
+			Method setValue;
+			Method setUnitCode;
+			// UBL:
+			Class<? extends Object> foSuperType = fo.getClass().getSuperclass();
+			if(typeUBL_Amount==foSuperType) {
+				setValue = foSuperType.getSuperclass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
+				setUnitCode = foSuperType.getSuperclass().getDeclaredMethod(METHOD_SETCURRENCY, String.class);
+			} else {
+				setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
+				setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETCURRENCY, String.class);
+			}
+			setValue.invoke(fo, invokeGetXX(METHOD_GETVALUE, valueSuperType, value));
+			setUnitCode.invoke(fo, invokeGetXX(METHOD_GETCURRENCY, valueSuperType, value));
+		}
 	}
 	
-	/*
-	 * setter für Amount bzw. type_Quantity
-	 */
-	private boolean set(Object fo, Object obj, String fieldName, Object value, Class<?> type) {
-		String methodName = set+get;
+	/* setter für type_Quantity
 
-		try {
-			Method setter;
-			Method getter = null;
-			try {
-				// exception, wenn es setter nicht gibt, in CII sind es oft Listen - für die gibt es nur getter
-				setter = getSetter(obj, fieldName, type);
-				methodName = setter.getName();
-			} catch (NoSuchMethodException e) {
-				LOG.warning(e.getMessage());
-				getter = getGetter(obj, fieldName);
-				LOG.info(fieldName+" is probably List!");
-				return false;
-			}
-			
-			/* setter methodName mit passender Signatur existiert:
 Amount:
-Quantity: UBL nutzt die Klasse von CII, (UBL) DeliveryType, ... ist
+Quantity: UBL nutzt die Klasse von CII, (UBL) DeliveryType.quantity, ... ist
+InvoicedQuantityType, BaseQuantityType extends
 oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.QuantityType Subclass von
                                     |
                                     |extends
@@ -471,42 +501,47 @@ un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType mit gleich
     protected String unitCodeListAgencyID;
     protected String unitCodeListAgencyName;
 
-ich kopiere nur value und unitCode (die anderen werden nicht genutzt): mapQuantity, dto für mapAmount
+mapQuantity: kopiere nur value und unitCode (die anderen werden nicht genutzt)
 
-			 */
-
-			try {
-				// exception, wenn METHOD_SETUNITCODE nicht da
-				mapQuantity(fo, value);
-				LOG.config(methodName + "() done for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);			
-			} catch (NoSuchMethodException e) {
-				// also kein setQuantity
-			}
+	 */
+	private boolean setQuantity(Object fo, Object obj, String fieldName, Object value) {
+		try {
+			Method setter = getSetter(obj, fieldName, fo.getClass()); // NoSuchMethodException
 			
-			try {
-				// exception, wenn METHOD_SETCURRENCY nicht da
-				mapAmount(fo, value);
-				LOG.config(methodName + "() done for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
-			} catch (NoSuchMethodException e) {
-				// also auch kein setAmount
-				return false;
-			}
-			
-			if(setter!=null) {
-				setter.invoke(obj, fo);
-				LOG.info(methodName + " with "+value);
-				return true;
-			}
-
-		} catch (NoSuchMethodException e) {
-			LOG.warning(methodName + "() not defined for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
-//			e.printStackTrace();
-		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+			// exception, wenn METHOD_SETUNITCODE nicht da
+			mapQuantity(fo, value);
+			setter.invoke(obj, fo);
+			LOG.config(setter.getName() + "() done for " + obj.getClass().getSimpleName() +"."+fieldName + " and arg value:"+value);
+			return true;
+		} catch (NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
 	
+	// ersetzt valueQuantity.copyTo(QuantityType)
+	public void mapQuantity(Object fo, Object value) 
+		throws NoSuchMethodException, SecurityException, IllegalAccessException, 
+			IllegalArgumentException, InvocationTargetException {
+		
+		Class<? extends Object> valueSuperType = value.getClass().getSuperclass();
+		if(type_Quantity==valueSuperType) {
+			Method setValue;
+			Method setUnitCode;
+			// UBL:
+			Class<? extends Object> foSuperType = fo.getClass().getSuperclass();
+			if(typeUBL_Quantity==foSuperType) {
+				setValue = foSuperType.getSuperclass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
+				setUnitCode = foSuperType.getSuperclass().getDeclaredMethod(METHOD_SETUNITCODE, String.class);
+			} else {
+				setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
+				setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETUNITCODE, String.class);
+			}
+			setValue.invoke(fo, invokeGetXX(METHOD_GETVALUE, valueSuperType, value));
+			setUnitCode.invoke(fo, invokeGetXX(METHOD_GETUNITCODE, valueSuperType, value));
+		}
+	}
+		
 	/*  MACRO, die folgende Zeile ersetzt den //-code , aus ReferencedDocument.setDocumentCode
 	 
 		SCopyCtor.getInstance().set(this, "typeCode", code);
@@ -570,42 +605,4 @@ ich kopiere nur value und unitCode (die anderen werden nicht genutzt): mapQuanti
 		((List)liste).add(fo);		
 	}
 	
-	// ersetzt valueAmount.copyTo(AmountType) für CII
-	public void mapAmount(Object fo, Object value) 
-		throws NoSuchMethodException, SecurityException, IllegalAccessException, 
-			IllegalArgumentException, InvocationTargetException {
-		
-		Class<? extends Object> valueSuperType = value.getClass().getSuperclass();
-		while(valueSuperType.getPackage()!=packageCCTSM) {
-			// wird für Amount Subklassen benötigt, z.B. UnitPriceAmount
-			LOG.info("seach for proper package of "+valueSuperType.getCanonicalName());
-			valueSuperType = valueSuperType.getSuperclass();
-		}
-		if(type_Amount==valueSuperType) {
-			Method setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
-			Method setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETCURRENCY, String.class);
-			setValue.invoke(fo, invokeGetXX(METHOD_GETVALUE, valueSuperType, value));
-			setUnitCode.invoke(fo, invokeGetXX(METHOD_GETCURRENCY, valueSuperType, value));
-		}
-	}
-	
-	// ersetzt valueQuantity.copyTo(QuantityType)
-	private void mapQuantity(Object fo, Object value) 
-		throws NoSuchMethodException, SecurityException, IllegalAccessException, 
-			IllegalArgumentException, InvocationTargetException {
-		
-		Class<? extends Object> valueSuperType = value.getClass().getSuperclass();
-//		while(valueSuperType.getPackage()!=packageCCTSM) {
-//			// wird für Amount Subklassen benötigt, z.B. UnitPriceAmount
-//			LOG.info("seach for proper package of "+valueSuperType.getCanonicalName());
-//			valueSuperType = valueSuperType.getSuperclass();
-//		}
-		if(type_Quantity==valueSuperType) {
-			Method setValue = fo.getClass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
-			Method setUnitCode = fo.getClass().getDeclaredMethod(METHOD_SETUNITCODE, String.class);
-			setValue.invoke(fo, invokeGetXX(METHOD_GETVALUE, valueSuperType, value));
-			setUnitCode.invoke(fo, invokeGetXX(METHOD_GETUNITCODE, valueSuperType, value));
-		}
-	}
-
 }
