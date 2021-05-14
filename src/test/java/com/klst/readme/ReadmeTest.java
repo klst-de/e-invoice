@@ -90,16 +90,18 @@ public class ReadmeTest {
 		invoice = null;
     }
 
+	static final String PROCESS_TYPE = null; // "TEST processType";
+
 	@Test
 	public void ciiTest() {
-		invoice = CrossIndustryInvoice.getFactory().createInvoice(PROFILE_XRECHNUNG, CommercialInvoice);
+		invoice = CrossIndustryInvoice.getFactory().createInvoice(PROFILE_XRECHNUNG, PROCESS_TYPE, CommercialInvoice);
 		transformer = ciiTransformer;
 		commercialInvoiceTest();
 	}
 	
 	@Test
 	public void ublTest() {
-		invoice = GenericInvoice.getFactory().createInvoice(PROFILE_XRECHNUNG, CommercialInvoice);
+		invoice = GenericInvoice.getFactory().createInvoice(PROFILE_XRECHNUNG, PROCESS_TYPE, CommercialInvoice);
 		transformer = ublTransformer;
 		commercialInvoiceTest();
 	}
@@ -119,6 +121,8 @@ public class ReadmeTest {
 		line.setOrderLineID("6171175.1");                       // BT-132 Referenced purchase order line
 		line.setUnitPriceAllowance(new UnitPriceAmount(EUR, new BigDecimal(21.21)) // priceDiscount
 				                  ,new UnitPriceAmount(EUR, new BigDecimal(310))); // grossPrice
+		line.setUnitPriceAmountAndQuantity(new UnitPriceAmount(EUR, new BigDecimal(288.79))
+				, onePiece);
 		return line;
 	}
 	
@@ -264,7 +268,8 @@ public class ReadmeTest {
 		invoice.addSupportigDocument("docRefId", "description", "uri");
 		
 		assertEquals(CoreInvoice.PROFILE_XRECHNUNG, invoice.getCustomization());
-		assertThat(invoice.getProcessType()).isNull();
+//		assertThat(invoice.getProcessType()).isNull();
+		assertEquals(PROCESS_TYPE, invoice.getProcessType());
 		assertEquals(DocumentNameCode.CommercialInvoice, invoice.getTypeCode());
 		
 		Timestamp ts = invoice.getIssueDateAsTimestamp();
