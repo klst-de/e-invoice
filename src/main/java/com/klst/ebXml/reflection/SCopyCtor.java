@@ -35,8 +35,26 @@ public class SCopyCtor {
 	}
 	
 	private static final String TYPE_NAME_SEPARATOR = "::";
-
+    private static final String UNECE_QDT_PACKAGE = "un.unece.uncefact.data.standard.qualifieddatatype";
+    private static final String UNECE_UDT_PACKAGE = "un.unece.uncefact.data.standard.unqualifieddatatype";
+    private static final String UNECE_VERSION_100 = "._100";
+    private static final String UNECE_VERSION_128 = "._128";
+    private static final String UNECE_CCTSM_PACKAGE = "un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2";
+    private static final String CLASS_IDType = ".IDType";
+    private static final String CLASS_QuantityType = ".QuantityType";
+    private static final String CLASS_AmountType = ".AmountType";
+    private static final String CLASS_CodeType = ".CodeType";
+    private static final String CLASS_DocumentCodeType = ".DocumentCodeType";
+    
 	Map<String, String> getterFieldMap = new HashMap<String, String>();
+    Class<?> typeQDT_DocumentCode = null; // wg. enum DocumentNameCode
+    Class<?> type_Code = null; // wg. enum DocumentNameCode
+    private Class<?> typeUDT_ID = null;
+    private Class<?> typeUDT_Quantity = null;
+    private Class<?> type_Quantity = null;
+    private Class<?> typeUDT_Amount = null;
+    private Class<?> type_Amount = null;
+    private Package packageCCTSM = null;
 	
 	private SCopyCtor() {
 		// Ausnahmen: getter getYYY liefert nicht Fieldname YYY
@@ -47,6 +65,41 @@ public class SCopyCtor {
 		// org.opentrans.xmlschema._2
 		getterFieldMap.put("getEMAILAndPUBLICKEY", "emailAndPUBLICKEY");
 
+		// dynamisch Klassen laden
+		try {
+			String packageName = UNECE_UDT_PACKAGE+UNECE_VERSION_100;
+			typeUDT_ID = Class.forName(packageName+CLASS_IDType);
+			typeUDT_Quantity = Class.forName(packageName+CLASS_QuantityType);
+			typeUDT_Amount = Class.forName(packageName+CLASS_AmountType);
+			
+			typeQDT_DocumentCode = Class.forName(UNECE_QDT_PACKAGE+UNECE_VERSION_100+CLASS_DocumentCodeType);
+			type_Code = Class.forName(UNECE_CCTSM_PACKAGE+CLASS_CodeType);
+			
+			type_Quantity = Class.forName(UNECE_CCTSM_PACKAGE+CLASS_QuantityType);
+			type_Amount = Class.forName(UNECE_CCTSM_PACKAGE+CLASS_AmountType);
+			packageCCTSM = type_Amount.getPackage();
+			LOG.info("package "+packageName);
+		} catch (ClassNotFoundException e) {
+			LOG.config(e.getMessage());
+		}
+		
+		if(typeUDT_ID==null) try {
+			String packageName = UNECE_UDT_PACKAGE+UNECE_VERSION_128;
+			typeUDT_ID = Class.forName(packageName+CLASS_IDType);
+			typeUDT_Quantity = Class.forName(packageName+CLASS_QuantityType);
+			typeUDT_Amount = Class.forName(packageName+CLASS_AmountType);
+			
+			typeQDT_DocumentCode = Class.forName(UNECE_QDT_PACKAGE+UNECE_VERSION_128+CLASS_DocumentCodeType);
+			type_Code = Class.forName(packageName+CLASS_CodeType);
+			
+			type_Quantity = typeUDT_Quantity;
+			type_Amount = typeUDT_Amount;
+			packageCCTSM = type_Amount.getPackage();
+			LOG.info("package "+packageName);
+		} catch (ClassNotFoundException e) {
+			LOG.warning(e.getMessage());
+		}
+		
 	}
 	
 	Map<String, Field> fieldsByName = new HashMap<String, Field>();
@@ -347,16 +400,10 @@ public class SCopyCtor {
     private static final String METHOD_SETUNITCODE = "setUnitCode"; // wg. Quantity
     private static final String METHOD_GETUNITCODE = "getUnitCode"; // wg. Quantity
 
-    private Class<?> typeUDT_ID = un.unece.uncefact.data.standard.unqualifieddatatype._100.IDType.class;
-//    private Package packageUDT = typeUDT_ID.getPackage();
-//    private Class<?> typeUDT_Quantity = un.unece.uncefact.data.standard.unqualifieddatatype._100.QuantityType.class;
-    private Class<?> typeUBL_Quantity = oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.QuantityType.class;
-    private Class<?> type_Quantity = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.QuantityType.class;
-//    private Class<?> typeUDT_Amount = un.unece.uncefact.data.standard.unqualifieddatatype._100.AmountType.class;
-    private Class<?> typeUBL_Amount = oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2.AmountType.class;
-    private Class<?> type_Amount = un.unece.uncefact.data.specification.corecomponenttypeschemamodule._2.AmountType.class;
-    private Package packageCCTSM = type_Amount.getPackage();
-    
+    private static final String UBL_UDT_PACKAGE = "oasis.names.specification.ubl.schema.xsd.unqualifieddatatypes_2";
+    private static final String CLASS_UBLUDT_Quantity = UBL_UDT_PACKAGE+".QuantityType";
+    private static final String CLASS_UBLUDT_Amount = UBL_UDT_PACKAGE+".AmountType";
+
 	private void set(Object fieldObj, Object obj, String fieldName, Object value) {
 		if(value==null) return;
 		Class<?> fieldType = fieldObj.getClass();
@@ -453,7 +500,7 @@ public class SCopyCtor {
 		Class<? extends Object> valueSuperType = value.getClass().getSuperclass();
 		while(valueSuperType.getPackage()!=packageCCTSM) {
 			// wird für Amount Subklassen benötigt, z.B. UnitPriceAmount
-			LOG.info("seach for proper package of "+valueSuperType.getCanonicalName());
+			LOG.info("search for proper package to "+valueSuperType.getCanonicalName());
 			valueSuperType = valueSuperType.getSuperclass();
 		}
 
@@ -462,7 +509,7 @@ public class SCopyCtor {
 			Method setUnitCode;
 			// UBL:
 			Class<? extends Object> foSuperType = fo.getClass().getSuperclass();
-			if(typeUBL_Amount==foSuperType) {
+			if(CLASS_UBLUDT_Amount.equals(foSuperType.getCanonicalName())) {
 				setValue = foSuperType.getSuperclass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
 				setUnitCode = foSuperType.getSuperclass().getDeclaredMethod(METHOD_SETCURRENCY, String.class);
 			} else {
@@ -530,7 +577,7 @@ mapQuantity: kopiere nur value und unitCode (die anderen werden nicht genutzt)
 			Method setUnitCode;
 			// UBL:
 			Class<? extends Object> foSuperType = fo.getClass().getSuperclass();
-			if(typeUBL_Quantity==foSuperType) {
+			if(CLASS_UBLUDT_Quantity.equals(foSuperType.getCanonicalName())) {
 				setValue = foSuperType.getSuperclass().getDeclaredMethod(METHOD_SETVALUE, BigDecimal.class);
 				setUnitCode = foSuperType.getSuperclass().getDeclaredMethod(METHOD_SETUNITCODE, String.class);
 			} else {
