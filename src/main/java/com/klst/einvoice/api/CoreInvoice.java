@@ -268,9 +268,9 @@ Codeliste: UNTDID 2379 Untermenge Code Codename 102 . CCYYMMDD
 	 * The code shall distinguish between the following entries of UNTDID 2005 [6]:
 	 * <br> - Invoice document issue date
 	 * <br> - Delivery date, actual
-	 * <br> - Paid to dateThe Value added tax point
+	 * <br> - Paid to date
 	 * <p>
-	 * date code is used if the Value added tax point date is not known when the invoice is issued. 
+	 * The Value added tax point date code is used if the Value added tax point date is not known when the invoice is issued. 
 	 * The use of BT-8 and BT-7 is mutually exclusive.
 	 * <p>
 	 * Cardinality: 0..1 (optional)

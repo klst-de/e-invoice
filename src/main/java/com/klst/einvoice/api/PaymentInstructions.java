@@ -35,7 +35,7 @@ public interface PaymentInstructions {
 	 * <p>
 	 * The means, expressed as code, for how a payment is expected to be or has been settled.
 	 * <p>
-	 * Entries from the UNTDID 4461 code list [6] shall be used. Distinction should be made between SEPA and non-SEPA payments,
+	 * Entries from the UNTDID 4461 code list shall be used. Distinction should be made between SEPA and non-SEPA payments,
 	 * and between credit payments, direct debits, card payments and other instruments.
 	 * <p>
 	 * Cardinality: 	1..1
