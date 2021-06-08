@@ -113,7 +113,7 @@ public class ReadmeTest {
 		  , new Amount(EUR, new BigDecimal(288.79))				// line net amount
 		  , new UnitPriceAmount(EUR, new BigDecimal(288.79))	// price
 		  , "Zeitschrift [...]"									// itemName
-		  , TaxCategoryCode.StandardRate, new BigDecimal(7));	// VAT category code, rate 7%
+		  , TaxCategoryCode.STANDARD_RATE, new BigDecimal(7));	// VAT category code, rate 7%
 		
 		// optional ...
 		line.setNote("Die letzte Abonnementslieferung");        // BT-127 note
@@ -138,7 +138,7 @@ public class ReadmeTest {
 		  , new Amount(EUR, new BigDecimal(26.07))				// line net amount
 		  , new UnitPriceAmount(EUR, new BigDecimal(26.07))		// price
 		  , "Porto + Versandkosten"								// itemName
-		  , TaxCategoryCode.StandardRate, new BigDecimal(7));	// VAT category code, rate 7%
+		  , TaxCategoryCode.STANDARD_RATE, new BigDecimal(7));	// VAT category code, rate 7%
 		
 		line.setDescription(lineDescription);
 		// BG-27 0..n LINE ALLOWANCES:
@@ -164,7 +164,7 @@ public class ReadmeTest {
 		assertEquals(price01.toString(), line.getUnitPriceAmount().toString());
 		assertEquals("Porto + Versandkosten", line.getItemName());
 		assertEquals(lineDescription, line.getDescription());
-		assertEquals(TaxCategoryCode.StandardRate, line.getTaxCategory());
+		assertEquals(TaxCategoryCode.STANDARD_RATE, line.getTaxCategory());
 		assertEquals(rate7, line.getTaxRate());
 	}
 	
@@ -214,12 +214,12 @@ public class ReadmeTest {
 		VatBreakdown vb = invoice.createVATBreakDown(
 				new Amount(EUR, new BigDecimal(99.79)) // Amount taxableAmount
 			, 	new Amount(EUR, new BigDecimal(9.79))  // Amount taxAmount
-			, 	TaxCategoryCode.StandardRate // code
+			, 	TaxCategoryCode.STANDARD_RATE // code
 			, 	ermUSt // BigDecimal percent
 			);
 		LOG.info("VatBreakdown tax type : "+vb.getTaxType() + " , Standard:"+vb.getTaxCategoryCode() + vb.getTaxPercentage());
 		assertEquals(TaxTypeCode.VAT, vb.getTaxType());
-		assertEquals(TaxCategoryCode.StandardRate, vb.getTaxCategoryCode());
+		assertEquals(TaxCategoryCode.STANDARD_RATE, vb.getTaxCategoryCode());
 		assertEquals(ermUSt, vb.getTaxPercentage());
 		
 		String TobaccoTax = "AAD";
@@ -251,7 +251,7 @@ public class ReadmeTest {
 		allowance.setReasoncode("64");
 		allowance.setReasonText("SPECIAL AGREEMENT");
 		allowance.setTaxType(TaxTypeCode.VAT);
-		allowance.setTaxCategoryCode(TaxCategoryCode.StandardRate);
+		allowance.setTaxCategoryCode(TaxCategoryCode.STANDARD_RATE);
 		allowance.setTaxPercentage(new BigDecimal(20));
 		invoice.addAllowanceCharge(allowance);
 		
