@@ -24,10 +24,6 @@ import com.klst.edoc.untdid.PaymentMeansEnum;
  * BR-49 Zahlungsanweisungen :
  * Eine Zahlungsanweisung (BG-16) muss den Code der Zahlungsmittelart (BT-81) angeben.
  */
-// implemented in PaymentMeans extends PaymentMeansType (UBL)
-//                PaymentMeans extends TradeSettlementPaymentMeansType (CII)
-//  class ApplicableHeaderTradeSettlement extends HeaderTradeSettlementType 
-//                                     implements PaymentInstructions, CreditTransferFactory, DirectDebitFactory
 public interface PaymentInstructions {
 
 	/**
@@ -136,7 +132,7 @@ public interface PaymentInstructions {
 	 * Die Untergruppen sind alternativ
 	 * BG-17 0..n CREDIT TRANSFER ist anzugeben, wenn eine Zahlung per Überweisung erfolgen soll
 	 * BG-18 0..1 PAYMENT CARD INFORMATION ist anzugeben, wenn eine Zahlung per Zahlungskarte/Kreditkarte erfolgte
-	 * BG-19 0..1 DIRECT DEBIT ist anzugeben, n, wenn ein Mandat erteilt wurde und der Rechnungsbetrag per Lastschrift beglichen werden soll
+	 * BG-19 0..1 DIRECT DEBIT ist anzugeben, wenn ein Mandat erteilt wurde und der Rechnungsbetrag per Lastschrift beglichen werden soll
 	 * 
 	 * Eine der Untergruppen muss angegeben werden!
 	 */
