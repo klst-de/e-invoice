@@ -167,6 +167,7 @@ public class SCopyCtor {
 	 */
 	public void invokeCopy(Object obj, Object doc) {
 		LOG.fine("for "+doc);
+		if(doc==null) return;
 		getFieldsByName(doc.getClass());
 		getSettersByName(doc.getClass());
 		getGettersByName(doc.getClass());
@@ -502,6 +503,9 @@ public class SCopyCtor {
 			// wird für Amount Subklassen benötigt, z.B. UnitPriceAmount
 			LOG.info("search for proper package to "+valueSuperType.getCanonicalName());
 			valueSuperType = valueSuperType.getSuperclass();
+			if(valueSuperType==null) {
+				throw new IllegalArgumentException("Object '"+value+"' is not AmountType but "+value.getClass());
+			}
 		}
 
 		if(type_Amount==valueSuperType) {
@@ -622,7 +626,7 @@ mapQuantity: kopiere nur value und unitCode (die anderen werden nicht genutzt)
 			uncheckedAdd(listObject, fo);
 			return fo;
 		} catch (NoSuchMethodException e) {
-			LOG.config(methodName + "() not defined for " + fo.getClass().getSimpleName() + " and arg value:"+value);
+			LOG.config(methodName + "() not defined for type " + fo.getClass().getSimpleName() + " and arg value:"+value);
 		} catch (IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
 			LOG.warning(fo.getClass().getSimpleName() +"."+"id" + ": Exception:"+e);
 			e.printStackTrace();
@@ -642,8 +646,41 @@ mapQuantity: kopiere nur value und unitCode (die anderen werden nicht genutzt)
 			e.printStackTrace();
 		} catch (IllegalArgumentException | InvocationTargetException e) {
 			// invoke throws this
-			e.printStackTrace();
+//			e.printStackTrace();
+			LOG.config("Cannot apply mapAmount for type " + fo.getClass().getSimpleName() + " and arg value:"+value);
 		}
+		
+		// TODO Baustelle
+		methodName = METHOD_SETVALUE;
+		try { // "setValue" existiert ? ==> ausführen
+			Method setValue = fieldType.getDeclaredMethod(methodName, value.getClass());
+			setValue.invoke(fo, value.getClass().cast(value));
+			LOG.config(methodName + " with "+value);
+			uncheckedAdd(listObject, fo);
+			return fo;
+		} catch (NoSuchMethodException e) {
+			LOG.config(methodName + "() not defined in type " + fo.getClass().getSimpleName() + " and arg value:"+value);
+		} catch (IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+			LOG.warning(fo.getClass().getSimpleName() +"."+"id" + ": Exception:"+e);
+			e.printStackTrace();
+			return null;
+		}
+		try { // "setValue" existiert in Oberklassen von fo ? ==> ausführen
+			Method setValue = fieldType.getSuperclass().getDeclaredMethod(methodName, value.getClass());
+			LOG.config(methodName + "() defined in type " + fieldType.getSuperclass().getSimpleName() + " and arg value:"+value);
+			setValue.invoke(fo, value.getClass().cast(value));
+			LOG.config("done "+methodName + " with "+value);
+			uncheckedAdd(listObject, fo);
+			return fo;
+		} catch (NoSuchMethodException e) {
+			LOG.config(methodName + "() not defined for type " + fo.getClass().getSimpleName() + " and arg value:"+value);
+		} catch (IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+			LOG.warning(fo.getClass().getSimpleName() +"."+"id" + ": Exception:"+e);
+			e.printStackTrace();
+			return null;
+		}
+
+		LOG.warning("cannot add");
 		return null;		
 	}
 	
