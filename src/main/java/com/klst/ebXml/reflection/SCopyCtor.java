@@ -1,5 +1,6 @@
 package com.klst.ebXml.reflection;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -264,7 +265,15 @@ public class SCopyCtor {
 	}
 	
     // == Getter.getValue(Object codeType, String clazz)
-	public Object invokeGetValue(Object codeType, String clazz) {
+	public Object invokeGetValue(Object codeType, String[] clazz) {
+		for(int i=0; i<clazz.length; i++) {
+			Object o = invokeGetValue(codeType, clazz[i]);
+			if(o!=null) return o;
+		}
+		LOG.warning("Cannot "+METHOD_GETVALUE+" for "+codeType);
+		return null;
+	}
+	private Object invokeGetValue(Object codeType, String clazz) {
 		Class<?> type = null;
 		Object object = null;
 		try {
@@ -275,8 +284,8 @@ public class SCopyCtor {
 			LOG.fine(e.getMessage());
 			return null;
 		} catch (ClassNotFoundException e) {
-			LOG.warning(e.getMessage());
 			// kann in e-order passieren, siehe com.klst.edoc.untdid.DocumentNameCode#valueOf
+			LOG.config("Class not found "+e.getMessage());
 			return null;
 		}
 
@@ -289,22 +298,56 @@ public class SCopyCtor {
 		return null;	
 	}
 	
-//	private Method getGetter(Object obj, String fieldName) throws NoSuchMethodException {
-//		String methodName = get + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
-//		try {
-//			if(obj.getClass().getSimpleName().endsWith("Type")) {
-//				return obj.getClass().getDeclaredMethod(methodName);					
-//			}
-//			return obj.getClass().getSuperclass().getDeclaredMethod(methodName);
-//		} catch (IllegalArgumentException | SecurityException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (NoSuchMethodException e) {
-//			LOG.config(e.getMessage());
-//			throw e;
-//		}
-//		return null;
-//	}
+	public Object castTo(Class<? extends Object> type, Object object) {
+		try {
+			Object ctorO = type.getDeclaredConstructor(object.getClass());
+			/* Throws:
+			 * NoSuchMethodException - if a matching method is not found.
+			 * SecurityException - If a security manager s is present and any of the following conditions is met: 
+			 * • the caller's class loader is not the same as the class loader of this class and invocation 
+			 *   of s.checkPermission method with RuntimePermission("accessDeclaredMembers") 
+			 *   denies access to the declared constructor 
+			 * • the caller's class loader is not the same as or anancestor of the class loader for the current class 
+			 *   and invocation of s.checkPackageAccess() denies access to the package of this class 
+			 */
+			@SuppressWarnings("unchecked")
+			Constructor<Object> ctor = (Constructor<Object>) ctorO;
+			ctor.setAccessible(true); // Throws: SecurityException - if the request is denied.
+			return ctor.newInstance(object);
+			/* Throws:
+			 * IllegalAccessException - if this Constructor object is enforcing Java language access control 
+			 * 	and the underlyingconstructor is inaccessible.
+			 * IllegalArgumentException - if the number of actual and formal parameters differ; 
+			 *  if an unwrappingconversion for primitive arguments fails; 
+			 *  or if, after possible unwrapping, a parameter value cannot be converted to the corresponding 
+			 *  formal parameter type by a method invocation conversion; 
+			 *  if this constructor pertains to an enum type.
+			 * InstantiationException - if the class that declares the underlying constructor represents an abstract class.
+			 * InvocationTargetException - if the underlying constructor throws an exception.
+			 * ExceptionInInitializerError - if the initialization provokedby this method fails.
+			 */
+		} catch (NoSuchMethodException e) {
+			// ctor in type fehlt
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// siehe oben
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// darf nicht passieren bei korrekter Nutzung
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// darf nicht passieren, wenn setAccessible OK
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// darf nicht passieren, denn object type ist object.getClass()
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// kann passieren
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	private Method getSetter(Object obj, String fieldName, Class<?> type) throws NoSuchMethodException {
 		String methodName = set + fieldName.substring(0, 1).toUpperCase()+fieldName.substring(1);
 		try {
